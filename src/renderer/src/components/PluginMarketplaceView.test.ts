@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { SkillRootListItem } from '@shared/kun-gui-api'
+import type { SkillRootListItem } from '@shared/magicpocket-gui-api'
 import {
   buildMcpConfig,
   buildRemoteMcpConfig,
@@ -19,7 +19,7 @@ import {
 } from './PluginMarketplaceView'
 
 describe('PluginMarketplaceView MCP config helpers', () => {
-  it('does not recommend the filesystem MCP server because Kun has built-in file tools', () => {
+  it('does not recommend the filesystem MCP server because MagicPocket has built-in file tools', () => {
     expect(recommendedMarketplaceItemIds()).not.toContain('filesystem')
   })
 
@@ -33,7 +33,7 @@ describe('PluginMarketplaceView MCP config helpers', () => {
     ]))
   })
 
-  it('builds remote OAuth MCP server config using Kun-supported transport fields', () => {
+  it('builds remote OAuth MCP server config using MagicPocket-supported transport fields', () => {
     const config = buildRemoteMcpConfig({
       vercel: 'https://mcp.vercel.com',
       google_drive: 'https://drivemcp.googleapis.com/mcp/v1',
@@ -143,7 +143,7 @@ describe('PluginMarketplaceView MCP config helpers', () => {
     expect(audit.permissions).toEqual(expect.arrayContaining(['command', 'file', 'network']))
   })
 
-  it('accepts custom JSON as either a single server or a Kun config fragment', () => {
+  it('accepts custom JSON as either a single server or a MagicPocket config fragment', () => {
     expect(customMcpConfigFragment(
       'docs',
       '{"transport":"stdio","command":"npx","args":["-y","docs-mcp"]}',
@@ -172,7 +172,7 @@ describe('PluginMarketplaceView MCP config helpers', () => {
     })
   })
 
-  it('detects MCP servers from full Kun capability config', () => {
+  it('detects MCP servers from full MagicPocket capability config', () => {
     const content = JSON.stringify({
       capabilities: {
         mcp: {
@@ -313,7 +313,7 @@ describe('PluginMarketplaceView MCP config helpers', () => {
     expect(enabledParsed.servers.docs.command).toBe('docs-mcp')
   })
 
-  it('toggles nested Kun capability MCP servers', () => {
+  it('toggles nested MagicPocket capability MCP servers', () => {
     const text = setMcpServerEnabled(JSON.stringify({
       capabilities: {
         mcp: {

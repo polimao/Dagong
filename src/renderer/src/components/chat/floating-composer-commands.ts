@@ -43,7 +43,8 @@ export const NEW_COMMAND_ALIASES = [
   'new-chat',
   'new-thread',
   '新会话',
-  '新建会话'
+  '新建会话',
+  '新建任务'
 ]
 
 export const REVIEW_COMMAND_ALIASES = [

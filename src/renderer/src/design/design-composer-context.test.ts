@@ -20,7 +20,7 @@ const createdAt = '2026-06-20T00:00:00.000Z'
 
 function artifact(id: string, kind: DesignArtifact['kind'] = 'html'): DesignArtifact {
   const relativePath =
-    kind === 'canvas' ? `.kun-design/${id}/canvas.json` : `.kun-design/${id}/v1.html`
+    kind === 'canvas' ? `.magicpocket-design/${id}/canvas.json` : `.magicpocket-design/${id}/v1.html`
   return {
     id,
     kind,
@@ -318,8 +318,8 @@ describe('designSelectedContextLocations', () => {
       {
         title: 'screen-a',
         kind: 'html',
-        path: '.kun-design/screen-a/v1.html',
-        directory: '.kun-design/screen-a'
+        path: '.magicpocket-design/screen-a/v1.html',
+        directory: '.magicpocket-design/screen-a'
       }
     ])
   })
@@ -339,8 +339,8 @@ describe('designSelectedContextLocations', () => {
       {
         title: 'board',
         kind: 'canvas',
-        path: '.kun-design/board/canvas.json',
-        directory: '.kun-design/board'
+        path: '.magicpocket-design/board/canvas.json',
+        directory: '.magicpocket-design/board'
       }
     ])
   })

@@ -6,7 +6,7 @@ import { ImageAnnotationEditor } from './ImageAnnotationEditor'
 function renderEditor(): string {
   return renderToStaticMarkup(
     createElement(ImageAnnotationEditor, {
-      imageUrl: '.kun-design/image.png',
+      imageUrl: '.magicpocket-design/image.png',
       workspaceRoot: '/workspace',
       title: 'image.png',
       onCancel: () => undefined,

@@ -40,8 +40,8 @@ const labels: Record<string, string> = {
   settingsFooter: 'Settings',
   easterEggSection: 'Mode workshop',
   uiModeWorkshopTitle: 'Mascot modes',
-  uiModeWorkshopDesc: 'Pick the workspace mascot pack. iKun is a pre-installed plugin example.',
-  uiModeDefaultTitle: 'Default Kun',
+  uiModeWorkshopDesc: 'Pick the workspace mascot pack. iMagicPocket is a pre-installed plugin example.',
+  uiModeDefaultTitle: 'Default MagicPocket',
   uiModeDefaultSubtitle: 'The little blue bird',
   uiPaletteRetromaOn: 'Retroma palette on — click to use default palette',
   uiPaletteRetromaOff: 'Switch to Retroma parchment palette',
@@ -79,13 +79,13 @@ describe('EasterEggSettingsSection (mode workshop)', () => {
 
     expect(html).toContain('Mode workshop')
     expect(html).toContain('Mascot modes')
-    expect(html).toContain('Default Kun')
+    expect(html).toContain('Default MagicPocket')
     expect(html).toContain('Install plugin folder…')
     expect(html).toContain('docs/UI_PLUGINS.md')
-    // 默认模式应处于使用中状态;iKun 不再硬编码,而是预装插件,SSR 下列表为空
+    // 默认模式应处于使用中状态;iMagicPocket 不再硬编码,而是预装插件,SSR 下列表为空
     expect(html).toContain('Active')
-    expect(html).not.toContain('iKun mode')
-    // 默认 Kun 卡片右上角带 Retroma 配色切换按钮(SSR 下 uiMode=default,按钮为关闭态)
+    expect(html).not.toContain('iMagicPocket mode')
+    // 默认 MagicPocket 卡片右上角带 Retroma 配色切换按钮(SSR 下 uiMode=default,按钮为关闭态)
     expect(html).toContain('Switch to Retroma parchment palette')
     expect(html).toContain('aria-pressed="false"')
   })

@@ -5,8 +5,8 @@
 # invented. Anything not in this block is editorial, not authoritative.
 
 schema_version: 1
-project: Kun
-single_runtime: kun
+project: MagicPocket
+single_runtime: magicpocket
 themes: [light, dark, system]
 
 # ---------- 1. Palette (raw hex from --ds-* tokens) ----------
@@ -224,8 +224,8 @@ window:
   app_region: drag           # html/body/-webkit-app-region
   no_drag_class: ds-no-drag  # add to anything clickable in the title bar
   macos_top_inset_px: 42     # safe area for traffic-light controls
-  app_icon: src/asset/img/kun.png
-  secondary_logos: [kun_mac.png, kun_tray.png]
+  app_icon: src/asset/img/magicpocket.png
+  secondary_logos: [magicpocket_mac.png, magicpocket_tray.png]
 
 # ---------- 9. Iconography ----------
 icons:
@@ -286,8 +286,8 @@ i18n:
 
 # ---------- 13. Brand & voice ----------
 brand:
-  product_name: "Kun"
-  tagline: "把 Kun 的本地智能体能力带进桌面窗口"
+  product_name: "MagicPocket"
+  tagline: "把 MagicPocket 的本地智能体能力带进桌面窗口"
   hero_kw: [Code, Design, Write, Connect phone]
   pillars:
     - "本地优先 (Local-first): settings, sessions, logs all on disk; model calls use your own DeepSeek API key."
@@ -311,19 +311,19 @@ a11y:
 
 # ---------- 15. Don't (anti-patterns enforced by the codebase) ----------
 dont:
-  - "Use a second live agent runtime — Kun is the only one."
+  - "Use a second live agent runtime — MagicPocket is the only one."
   - "Add AgentSwitcher / ConnectionStatusBar / RuntimeDiagnosticsDialog."
   - "Add CodeWhale/Reasonix adapters, process managers, RPC bridges, updaters, importers."
   - "Add a design/drawing starter card in the core workbench."
   - "Add /usage or /runtime slash command that opens a runtime control panel."
-  - "Save settings under agents.codewhale or agents.reasonix; only agents.kun."
+  - "Save settings under agents.codewhale or agents.reasonix; only agents.magicpocket."
   - "Use emoji in production copy or as functional UI affordance."
   - "Apply a tint or hue that isn't in the palette above."
   - "Use a font outside the three declared families."
   - "Use a border radius smaller than 4px on a clickable surface."
 ---
 
-# Kun — DESIGN.md
+# MagicPocket — DESIGN.md
 
 > 单一权威设计文档。所有屏幕、所有组件、所有视觉决策,都从这里出。
 
@@ -353,8 +353,8 @@ the frontmatter wins, and the markdown needs an update.
 
 ## 1. Project at a glance
 
-Kun (formerly DeepSeek GUI) is a local desktop workbench built
-around its namesake **Kun** runtime. The desktop shell is Electron; the runtime is a TypeScript
+MagicPocket (formerly DeepSeek GUI) is a local desktop workbench built
+around its namesake **MagicPocket** runtime. The desktop shell is Electron; the runtime is a TypeScript
 package that speaks HTTP/SSE; the renderer is React 19 + Zustand 5;
 the visual system is TailwindCSS 3 with a hand-built token layer on
 top.
@@ -372,7 +372,7 @@ human staying in the loop on every mutating call.
 | **Write** | A long-form writing space: Markdown files, FIM completion, selection-scoped inline agent. |
 | **Connect phone** | Background automation: Feishu / Lark channels, webhook / relay, scheduled tasks. Internal route and storage names still use `claw` for compatibility. |
 
-All product surfaces share the same Kun HTTP/SSE boundary, the same
+All product surfaces share the same MagicPocket HTTP/SSE boundary, the same
 settings (API key, base URL, model), and the same visual system.
 
 ---
@@ -383,7 +383,7 @@ These six rules are not aspirations — they are how the product is
 already built. New screens must follow them, not re-interpret them.
 
 1. **One runtime, one boundary.** Code, Design, Write, and Connect phone all call
-   `kun serve` over `127.0.0.1:port`. The renderer never
+   `magicpocket serve` over `127.0.0.1:port`. The renderer never
    embeds an agent loop and never speaks a second protocol. This
    keeps upgrades and debugging boring.
 2. **Local-first, observable, controllable.** Settings, sessions,
@@ -397,7 +397,7 @@ already built. New screens must follow them, not re-interpret them.
    important, it goes in Settings, not in the main canvas.
 4. **The renderer maps HTTP, it does not implement agent logic.**
    Approvals, steering, compaction, fork, resume, usage — all
-   come from Kun endpoints, never re-implemented in React.
+   come from MagicPocket endpoints, never re-implemented in React.
 5. **Stable visual identity, not visual novelty.** A new screen
    should look like a sibling of an existing one, not a fresh
    experiment. New components earn their place by replacing
@@ -589,7 +589,7 @@ containing many cells. Do not animate the composer.
 
 ### 3.9 Layout grammar
 
-Every screen in Kun follows the same macro-grammar:
+Every screen in MagicPocket follows the same macro-grammar:
 
 - **Topbar**: a translucent strip with the back button, session
   title, mode switcher, and right-side action cluster. The topbar
@@ -620,8 +620,8 @@ first.
   Write, and Connect phone"), second person for the user. No emoji. No
   marketing language. Error messages are full sentences ending in
   punctuation; never a raw stack trace.
-- The product name is "Kun" (formerly "DeepSeek GUI"). The bundled
-  runtime shares the name; say "Kun runtime" when the distinction matters.
+- The product name is "MagicPocket" (formerly "DeepSeek GUI"). The bundled
+  runtime shares the name; say "MagicPocket runtime" when the distinction matters.
   The main workbenches are "Code" and "Write"; the phone/IM surface is
   "Connect phone" in English and "连接手机" in zh copy. Internal code may
   still say `claw`, but production copy should not expose it as the product name.
@@ -667,19 +667,19 @@ If any box is unchecked, fix it before merging.
 │ Renderer (React 19 + Zustand 5)                             │
 │  AppShell  →  Workbench  →  (Code | Design | Write | Connect phone) UI│
 │       │                                                      │
-│       │ window.kunGui.runtimeRequest / startSse             │
+│       │ window.magicpocketGui.runtimeRequest / startSse             │
 │       ▼                                                      │
 │ Preload (contextBridge, contextIsolated)                    │
-│  kunGui.* IPC surface                                        │
+│  magicpocketGui.* IPC surface                                        │
 │       │                                                      │
 │       ▼                                                      │
 │ Main process (Node)                                          │
-│  RuntimeHost  →  kunRuntimeAdapter                    │
+│  RuntimeHost  →  magicpocketRuntimeAdapter                    │
 │  Settings / Connect phone runtime / Terminal / Updater / Logger│
 │       │                                                      │
 │       │ spawn child process + HTTP/SSE                       │
 │       ▼                                                      │
-│ Kun (TypeScript package)                              │
+│ MagicPocket (TypeScript package)                              │
 │  serve --host 127.0.0.1 --port 18899                          │
 │  /health · /v1/* · SSE /v1/threads/{id}/events              │
 │  cache-first AgentLoop · ports & adapters · append-only log  │
@@ -693,7 +693,7 @@ If any box is unchecked, fix it before merging.
 Three lessons baked into this shape:
 
 1. The renderer **does not know** which runtime it talks to
-   beyond "kun". Switching providers is not a product
+   beyond "magicpocket". Switching providers is not a product
    surface; it's a main-process concern.
 2. The main process **does not implement agent logic**. It
    spawns the child, forwards HTTP, and forwards SSE. It also
@@ -701,22 +701,22 @@ Three lessons baked into this shape:
    workspace
    files, external editors, and Write export/completion) that the
    renderer can ask for.
-3. Kun **is** the agent. Loop, tool host, stores, model
+3. MagicPocket **is** the agent. Loop, tool host, stores, model
    client, server — all in one process, behind one HTTP/SSE
    boundary.
 
 ---
 
-## 5. Core runtime: Kun
+## 5. Core runtime: MagicPocket
 
-The Kun package (`kun/`) is the single active agent
+The MagicPocket package (`magicpocket/`) is the single active agent
 runtime. It is a TypeScript ESM package that ships its own HTTP
 server and is built before the Electron app.
 
 ### 5.1 Module layout
 
 ```text
-kun/src/
+magicpocket/src/
   cli/             # Command-line entrypoints (serve)
   contracts/       # Zod schemas and inferred types for HTTP/SSE
   domain/          # Thread, Turn, Item, Event, Approval, Usage entities
@@ -731,17 +731,17 @@ kun/src/
   telemetry/       # Usage counter, cache telemetry
   server/          # HTTP server, router, auth, SSE, response helpers,
                    # runtime-factory, route handlers
-  prompt/          # System prompt for the Kun identity
+  prompt/          # System prompt for the MagicPocket identity
   shared/          # Shared types with the GUI
 ```
 
 ### 5.2 Hexagonal shape
 
-Kun is structured as **ports & adapters**:
+MagicPocket is structured as **ports & adapters**:
 
 - `contracts/` — the boundary. Zod schemas describe every HTTP/SSE
   DTO. This is what the GUI imports indirectly through its mapper
-  (`src/renderer/src/agent/kun-contract.ts`).
+  (`src/renderer/src/agent/magicpocket-contract.ts`).
 - `domain/` — entities. Thread, Turn, Item, Event, Approval, Usage.
   No I/O.
 - `ports/` — interfaces. The agent loop only knows about
@@ -790,7 +790,7 @@ telemetry. The principles:
   pinned constraints from the immutable prefix. Soft threshold
   16k tokens, hard threshold 24k tokens.
 - **Tool pair healing.** Before sending history to the model,
-  Kun drops orphan `tool_result`s and tool calls with
+  MagicPocket drops orphan `tool_result`s and tool calls with
   missing results, to avoid 400/retry storms.
 
 Cache hit rate is reported as `hit / (hit + miss)` using
@@ -892,12 +892,12 @@ next replay skips them).
 
 ### 6.1 Process roles
 
-- **Main** (`src/main/`) — Node process. Owns the Kun
+- **Main** (`src/main/`) — Node process. Owns the MagicPocket
   child process, settings store, updater, Connect phone runtime,
   file/git/editor helpers, Write services, IPC handlers, logger,
   GUI updater, macOS/Windows code-signing glue.
 - **Preload** (`src/preload/`) — `contextBridge` surface.
-  Exposes a typed `window.kunGui` API to the renderer. No Node
+  Exposes a typed `window.magicpocketGui` API to the renderer. No Node
   access leaks into the renderer.
 - **Renderer** (`src/renderer/`) — Chromium process. React 19
   SPA. Runs Code / Design / Write / Connect phone UIs.
@@ -916,16 +916,16 @@ src/
     claw-schedule-mcp-*             # schedule MCP config + standalone server
     gui-updater.ts                  # electron-updater integration
     logger.ts                       # structured logger
-    resolve-kun-binary.ts     # CLI / dev-script / packaged binary resolver
+    resolve-magicpocket-binary.ts     # CLI / dev-script / packaged binary resolver
   preload/
-    index.ts                        # contextBridge surface (window.kunGui)
+    index.ts                        # contextBridge surface (window.magicpocketGui)
     index.d.ts                      # API type definitions
   shared/                           # types + constants shared by main and renderer
   renderer/
     src/
       App.tsx                       # Suspense shell
       AppShell.tsx                  # routes Workbench / Settings / InitialSetup
-      agent/                        # AgentProvider interface + Kun impl
+      agent/                        # AgentProvider interface + MagicPocket impl
       components/                   # Workbench, Settings, ChangeInspector, …
       design/                       # Design-mode canvas, artifacts, prompts, graph, persistence
       hooks/
@@ -936,13 +936,13 @@ src/
       write/                        # Write-mode workspace, inline edit, RAG
 ```
 
-### 6.3 The kunGui API surface
+### 6.3 The magicpocketGui API surface
 
-`window.kunGui` is the only thing the renderer is allowed to call
+`window.magicpocketGui` is the only thing the renderer is allowed to call
 on the system. It includes:
 
 - `runtimeRequest(path, method, body)` — generic JSON request to
-  Kun.
+  MagicPocket.
 - `startSse(threadId, sinceSeq, streamId)` / `stopSse` /
   `onSseEvent` — SSE subscription for a thread.
 - `getSettings` / `setSettings` — typed settings I/O.
@@ -966,24 +966,24 @@ on the system. It includes:
   `checkGuiUpdate`, `downloadGuiUpdate`, `installGuiUpdate`,
   `onGuiUpdateState`, `logError`, `getLogPath`, `openLogDir`).
 
-Every method on this surface is typed in `src/shared/kun-gui-api.ts`
+Every method on this surface is typed in `src/shared/magicpocket-gui-api.ts`
 and validated at the IPC boundary by Zod schemas in
 `src/main/ipc/app-ipc-schemas.ts`.
 
 ### 6.4 The runtime adapter
 
-The main process owns the Kun child process through a
+The main process owns the MagicPocket child process through a
 `LocalHttpRuntimeAdapter`:
 
-- `kunRuntimeAdapter.resolveExecutable(settings)` —
+- `magicpocketRuntimeAdapter.resolveExecutable(settings)` —
   finds the right binary or falls back to the dev script.
-- `kunRuntimeAdapter.ensureRunning(settings)` — starts
+- `magicpocketRuntimeAdapter.ensureRunning(settings)` — starts
   the child if it isn't already.
-- `kunRuntimeAdapter.stopAndWait()` — graceful shutdown
+- `magicpocketRuntimeAdapter.stopAndWait()` — graceful shutdown
   for app exit.
-- `kunRuntimeAdapter.getBaseUrl(settings)` — base URL
+- `magicpocketRuntimeAdapter.getBaseUrl(settings)` — base URL
   for the current settings.
-- `kunRuntimeAdapter.reclaimPort(port)` — recover a
+- `magicpocketRuntimeAdapter.reclaimPort(port)` — recover a
   stuck port.
 
 `runtimeRequestViaHost` is the single chokepoint: it ensures the
@@ -1046,19 +1046,19 @@ Persistence is layered:
   fork registry).
 - `electron-store` (main) — settings, Connect phone config (internal Claw key), write
   workspace config.
-- `~/.deepseekgui/kun` (Kun) — threads,
+- `~/.deepseekgui/magicpocket` (MagicPocket) — threads,
   events, sessions, usage.
 
 ### 7.3 The AgentProvider interface
 
 The renderer talks to the runtime through one interface,
 `AgentProvider` (`src/renderer/src/agent/types.ts`). Today the
-only implementation is `KunRuntimeProvider`
-(`src/renderer/src/agent/kun-runtime.ts`), which is a thin
+only implementation is `MagicPocketRuntimeProvider`
+(`src/renderer/src/agent/magicpocket-runtime.ts`), which is a thin
 HTTP/SSE client. Its DTOs live in
-`src/renderer/src/agent/kun-contract.ts` and the
+`src/renderer/src/agent/magicpocket-contract.ts` and the
 DTO-to-ChatBlock mapping lives in
-`src/renderer/src/agent/kun-mapper.ts`.
+`src/renderer/src/agent/magicpocket-mapper.ts`.
 
 `getProvider()` (in `registry.ts`) returns a single cached
 instance. `resetProviderCacheForTests()` exists for unit tests
@@ -1099,17 +1099,17 @@ the runtime contract, only which renderer and local workflow state the store pul
 - **Code** — default mode, full agent flow, workspace roots,
   todo panel, changes inspector, plan panel, file preview, and dev browser.
 - **Design** — design-thread registry isolates design sessions from Code, Write,
-  and Connect phone sessions. Artifacts persist under `.kun-design/`, the canvas
+  and Connect phone sessions. Artifacts persist under `.magicpocket-design/`, the canvas
   previews interactive HTML prototypes and graph outputs, and approved designs can
   publish `DESIGN_SYSTEM.md` before opening a fresh Code thread.
 - **Write** — write-thread registry isolates Write sessions
-  from Code / Design / Connect phone sessions. Uses the same Kun but a
+  from Code / Design / Connect phone sessions. Uses the same MagicPocket but a
   separate `WRITE_ASSISTANT_THREAD_TITLE` namespace. Inline
   completion and selected-text agent go through dedicated
   main-process services.
 - **Connect phone** — internal `claw` channel registry. Each IM channel has its
   own thread id, model, and workspace root. Runs through
-  `ClawRuntime` (main process), which calls Kun over
+  `ClawRuntime` (main process), which calls MagicPocket over
   HTTP just like the renderer does.
 
 ---
@@ -1121,12 +1121,12 @@ the runtime contract, only which renderer and local workflow state the store pul
 | Settings | OS app-data dir | JSON | `JsonSettingsStore` (main) |
 | Session list / workbench layout | `localStorage` | JSON | Renderer |
 | Design thread registry | `localStorage` | JSON | Renderer |
-| Design artifacts | workspace `.kun-design/` | HTML / PNG / JSON / Markdown | Renderer + Kun |
+| Design artifacts | workspace `.magicpocket-design/` | HTML / PNG / JSON / Markdown | Renderer + MagicPocket |
 | Write thread registry | `localStorage` | JSON | Renderer |
 | Connect phone channels | OS app-data dir | JSON | `JsonSettingsStore` |
-| Threads / turns / events | `~/.deepseekgui/kun` | JSON + JSONL | Kun |
-| Usage counters | Kun data dir | JSON | Kun |
-| Skill / MCP files | Kun data dir + workspace | Markdown / JSON | Kun + renderer |
+| Threads / turns / events | `~/.deepseekgui/magicpocket` | JSON + JSONL | MagicPocket |
+| Usage counters | MagicPocket data dir | JSON | MagicPocket |
+| Skill / MCP files | MagicPocket data dir + workspace | Markdown / JSON | MagicPocket + renderer |
 | GUI logs | OS app-data dir / `log/` | NDJSON | `logger.ts` |
 | Inline completion debug | OS app-data dir | NDJSON | `write-inline-completion-service.ts` |
 
@@ -1146,7 +1146,7 @@ the README and respected by the install script.
 
 ### 9.1 Tool execution & approval
 
-- `LocalToolHost` (`kun/src/adapters/tool/local-tool-host.ts`)
+- `LocalToolHost` (`magicpocket/src/adapters/tool/local-tool-host.ts`)
   holds the registered tools and their policies. Policies:
   `auto`, `on-request`, `suggest`, `never`, `untrusted`.
 - A tool with `shouldAdvertise(ctx)` is gated at the listing
@@ -1197,13 +1197,13 @@ compaction block inline with a "show replaced" detail.
 
 ### 9.5 Connect phone automation
 
-- `ClawRuntime` (main process) creates and reuses Kun
+- `ClawRuntime` (main process) creates and reuses MagicPocket
   threads for each IM channel and each scheduled task.
 - Feishu / Lark integration uses `@larksuiteoapi/node-sdk`.
   Install is device-flow QR code; the renderer polls
   `claw:im-install:poll` until authorized.
 - Webhook / relay is a small HTTP server in `ClawRuntime` that
-  POSTs inbound webhooks into a Kun thread.
+  POSTs inbound webhooks into a MagicPocket thread.
 - Scheduled tasks are detected from natural-language Connect phone
   prompts (`claw-scheduled-task-detector.ts`) and stored under
   `claw.scheduledTasks` in settings.
@@ -1243,14 +1243,14 @@ postmortem timing.
   workspace inspector and the file/tool adapters.
 - **Renderer isolation** — `contextIsolation: true`, no
   `nodeIntegration`, no `webviewTag` exposure. The renderer
-  only sees the `window.kunGui` API surface.
+  only sees the `window.magicpocketGui` API surface.
 - **External links** — `openExternal` is the only way to leave
   the app; URLs are validated against an allow-list.
 - **Markdown rendering** — `rehype-harden` strips unsafe
   nodes. Code blocks go through `shiki` with a fixed theme.
 - **Settings file** — written atomically, debounced, never
   read on the renderer side. Legacy `codewhale` / `reasonix`
-  keys are migrated to `kun` once and discarded.
+  keys are migrated to `magicpocket` once and discarded.
 
 ---
 
@@ -1259,18 +1259,18 @@ postmortem timing.
 These are enforced by `docs/AGENTS.md` and reflect real product
 decisions. New work must respect them.
 
-- **One live agent runtime: Kun.** No second live
+- **One live agent runtime: MagicPocket.** No second live
   provider, no provider switcher, no runtime diagnostics
   panel, no legacy CodeWhale / Reasonix process path.
 - **No UI surface for runtime internals.** No AgentSwitcher,
   no ConnectionStatusBar, no RuntimeDiagnosticsDialog, no
   RuntimeInsightsPanel, no `/usage` or `/runtime` slash
   command.
-- **Saved settings only contain `agents.kun`.** Old keys
+- **Saved settings only contain `agents.magicpocket`.** Old keys
   may only appear in migration.
 - **Renderer does not implement agent logic.** Approvals,
   steering, compaction, fork, resume, usage — all come from
-  Kun endpoints, never re-implemented in React.
+  MagicPocket endpoints, never re-implemented in React.
 - **No new drawing / design starter card** in the core
   workbench.
 - **No emoji in production copy or as functional UI
@@ -1287,19 +1287,19 @@ When you need to add a new capability, follow this path. It's
 intentionally boring.
 
 1. **Add the protocol field.** New Zod schema in
-   `kun/src/contracts/`. Run `npm --prefix kun run
+   `magicpocket/src/contracts/`. Run `npm --prefix magicpocket run
    build`.
-2. **Add the agent behavior.** In `kun/src/loop/`,
-   `kun/src/services/`, or a new port + adapter pair
-   under `kun/src/ports/` and `kun/src/adapters/`.
+2. **Add the agent behavior.** In `magicpocket/src/loop/`,
+   `magicpocket/src/services/`, or a new port + adapter pair
+   under `magicpocket/src/ports/` and `magicpocket/src/adapters/`.
 3. **Add the HTTP route.** New file under
-   `kun/src/server/routes/`, registered in
+   `magicpocket/src/server/routes/`, registered in
    `routes/index.ts`.
 4. **Map the endpoint / event in the GUI.** Add to
-   `src/renderer/src/agent/kun-contract.ts` and the
-   mapper `kun-mapper.ts`; expose the call in
-   `kun-runtime.ts`.
-5. **Add settings only under `agents.kun`.** Anything
+   `src/renderer/src/agent/magicpocket-contract.ts` and the
+   mapper `magicpocket-mapper.ts`; expose the call in
+   `magicpocket-runtime.ts`.
+5. **Add settings only under `agents.magicpocket`.** Anything
    else gets migrated to it.
 6. **Add i18n strings to both `zh` and `en` locale files.**
 7. **If the surface needs a new visual element, add it to
@@ -1326,9 +1326,9 @@ Manual smoke (full list in `docs/AGENTS.md`):
 - Code: create thread, stream reply, approve / deny, interrupt.
 - Write: open workspace, request inline completion, run
   selected-text agent.
-- Connect phone: save settings, run a manual task through a Kun
+- Connect phone: save settings, run a manual task through a MagicPocket
   thread.
-- Settings → Agents: shows only Kun.
+- Settings → Agents: shows only MagicPocket.
 - Cache telemetry on a hot thread should stay ≥ 90% hit.
 
 If any check fails, the change is not ready.
@@ -1340,14 +1340,14 @@ If any check fails, the change is not ready.
 | Concern | File |
 | --- | --- |
 | App lifecycle | `src/main/index.ts` |
-| Runtime adapter | `src/main/runtime/kun-adapter.ts` |
+| Runtime adapter | `src/main/runtime/magicpocket-adapter.ts` |
 | HTTP forwarding | `src/main/runtime/runtime-host.ts` |
-| Child process | `src/main/kun-process.ts` |
+| Child process | `src/main/magicpocket-process.ts` |
 | Settings | `src/main/settings-store.ts`, `src/shared/app-settings.ts` |
 | IPC | `src/main/ipc/register-app-ipc-handlers.ts`, `src/main/ipc/app-ipc-schemas.ts` |
-| kunGui API | `src/preload/index.ts`, `src/shared/kun-gui-api.ts` |
-| Agent provider | `src/renderer/src/agent/kun-runtime.ts` |
-| DTO mapping | `src/renderer/src/agent/kun-mapper.ts` |
+| magicpocketGui API | `src/preload/index.ts`, `src/shared/magicpocket-gui-api.ts` |
+| Agent provider | `src/renderer/src/agent/magicpocket-runtime.ts` |
+| DTO mapping | `src/renderer/src/agent/magicpocket-mapper.ts` |
 | App shell | `src/renderer/src/AppShell.tsx` |
 | Workbench | `src/renderer/src/components/Workbench.tsx` |
 | Chat store | `src/renderer/src/store/chat-store.ts` |
@@ -1355,26 +1355,26 @@ If any check fails, the change is not ready.
 | Write services | `src/main/services/write-*-service.ts` |
 | Workspace/editor services | `src/main/services/workspace-*.ts`, `src/main/services/workspace-editors.ts` |
 | Tokens / styles | `src/renderer/src/styles/*.css`, `src/renderer/src/index.css` |
-| Agent loop | `kun/src/loop/agent-loop.ts` |
-| Immutable prefix | `kun/src/cache/immutable-prefix.ts` |
-| HTTP routes | `kun/src/server/routes/` |
-| Tool host | `kun/src/adapters/tool/local-tool-host.ts` |
-| Model client | `kun/src/adapters/model/compat-model-client.ts` |
-| Cache doc | `docs/kun-cache-optimization.md` |
-| Architecture doc | `docs/kun-architecture.md` |
-| Contribution doc | `docs/kun-contributing.md` |
+| Agent loop | `magicpocket/src/loop/agent-loop.ts` |
+| Immutable prefix | `magicpocket/src/cache/immutable-prefix.ts` |
+| HTTP routes | `magicpocket/src/server/routes/` |
+| Tool host | `magicpocket/src/adapters/tool/local-tool-host.ts` |
+| Model client | `magicpocket/src/adapters/model/compat-model-client.ts` |
+| Cache doc | `docs/magicpocket-cache-optimization.md` |
+| Architecture doc | `docs/magicpocket-architecture.md` |
+| Contribution doc | `docs/magicpocket-contributing.md` |
 
 ---
 
 ## 15. References
 
-- `docs/kun-architecture.md` — single-runtime plan and
+- `docs/magicpocket-architecture.md` — single-runtime plan and
   GUI拆改范围.
-- `docs/kun-cache-optimization.md` — cache hit rate
+- `docs/magicpocket-cache-optimization.md` — cache hit rate
   measurement, stable prefix rules, tool pair healing.
-- `docs/kun-contributing.md` — port & adapter / FCIS
+- `docs/magicpocket-contributing.md` — port & adapter / FCIS
   patterns, four PR archetypes.
-- `kun/README.md` — CLI flags, env vars, data dir layout,
+- `magicpocket/README.md` — CLI flags, env vars, data dir layout,
   HTTP API.
 - `docs/AGENTS.md` — agent runtime notes (constraints enforced
   on contributors).

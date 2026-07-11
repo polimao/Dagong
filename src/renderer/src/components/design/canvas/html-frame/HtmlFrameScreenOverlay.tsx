@@ -216,8 +216,8 @@ function ScreenOverlayInner({
       return
     }
     if (
-      typeof window.kunGui?.readWorkspaceFile !== 'function' ||
-      typeof window.kunGui?.writeWorkspaceFile !== 'function'
+      typeof window.magicpocketGui?.readWorkspaceFile !== 'function' ||
+      typeof window.magicpocketGui?.writeWorkspaceFile !== 'function'
     ) {
       setElementTextStatus({ kind: 'error', message: 'Workspace file editing is unavailable.' })
       return
@@ -225,7 +225,7 @@ function ScreenOverlayInner({
 
     setElementTextStatus({ kind: 'saving' })
     void (async () => {
-      const read = await window.kunGui.readWorkspaceFile({
+      const read = await window.magicpocketGui.readWorkspaceFile({
         path: artifact.relativePath,
         workspaceRoot
       })
@@ -237,7 +237,7 @@ function ScreenOverlayInner({
 
       if (replaced.content !== read.content) {
         setArtifactPreviewStatus(artifact.id, 'pending')
-        const write = await window.kunGui.writeWorkspaceFile({
+        const write = await window.magicpocketGui.writeWorkspaceFile({
           path: artifact.relativePath,
           workspaceRoot,
           content: replaced.content

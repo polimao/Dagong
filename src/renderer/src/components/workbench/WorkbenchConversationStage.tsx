@@ -57,6 +57,8 @@ export type WorkbenchConversationStageProps = {
     planPanelEnabled: boolean
     terminalOpen: boolean
     onToggleTerminal: () => void
+    collapsed: boolean
+    onToggleCollapsed: () => void
     onToggleFileTree: () => void
   }
 }
@@ -98,14 +100,14 @@ export function WorkbenchConversationStage({
             rightOffset={
               (rightPanelDockedVisible ? rightSidebarWidth + 24 : 24) +
               fileTreeSidePanelOffset +
-              RAIL_WIDTH
+              (sideRail.collapsed ? 0 : RAIL_WIDTH)
             }
           />
         ) : null}
 
         {rightPanel}
         <WorkbenchFileTreeSidePanel {...fileTree} />
-        {!activeSddDraft ? (
+        {!activeSddDraft && !sideRail.collapsed ? (
           <WorkbenchSideRail
             rightPanelMode={sideRail.rightPanelMode}
             onToggleRightPanelMode={sideRail.onToggleRightPanelMode}

@@ -43,7 +43,7 @@ jobs:
           dev_version="$(date +'%Y%m%d.%H%M')"
           app_version="0.0.0-dev-${dev_version//./-}"
           tag="dev-${dev_version}"
-          release_name="Kun Dev ${dev_version}"
+          release_name="MagicPocket Dev ${dev_version}"
           head_sha="$(git rev-parse HEAD)"
 
           {
@@ -96,9 +96,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: |
-            dist/Kun-*-mac-*.dmg
-            dist/Kun-*-mac-*.zip
-            dist/Kun-*-mac-*.blockmap
+            dist/MagicPocket-*-mac-*.dmg
+            dist/MagicPocket-*-mac-*.zip
+            dist/MagicPocket-*-mac-*.blockmap
             dist/latest-mac.yml
 
   build-windows:
@@ -140,8 +140,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: |
-            dist/Kun-*-win-x64.exe
-            dist/Kun-*-win-x64.exe.blockmap
+            dist/MagicPocket-*-win-x64.exe
+            dist/MagicPocket-*-win-x64.exe.blockmap
             dist/latest.yml
 
   build-linux:
@@ -188,8 +188,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: |
-            dist/Kun-*-linux-x86_64.AppImage
-            dist/Kun-*-linux-x86_64.AppImage.blockmap
+            dist/MagicPocket-*-linux-x86_64.AppImage
+            dist/MagicPocket-*-linux-x86_64.AppImage.blockmap
             dist/latest-linux.yml
 
   publish:
@@ -224,12 +224,12 @@ jobs:
         run: |
           set -euo pipefail
           required=(
-            "Kun-${DEV_VERSION}-mac-arm64.dmg"
-            "Kun-${DEV_VERSION}-mac-x64.dmg"
-            "Kun-${DEV_VERSION}-mac-arm64.zip"
-            "Kun-${DEV_VERSION}-mac-x64.zip"
-            "Kun-${DEV_VERSION}-win-x64.exe"
-            "Kun-${DEV_VERSION}-linux-x86_64.AppImage"
+            "MagicPocket-${DEV_VERSION}-mac-arm64.dmg"
+            "MagicPocket-${DEV_VERSION}-mac-x64.dmg"
+            "MagicPocket-${DEV_VERSION}-mac-arm64.zip"
+            "MagicPocket-${DEV_VERSION}-mac-x64.zip"
+            "MagicPocket-${DEV_VERSION}-win-x64.exe"
+            "MagicPocket-${DEV_VERSION}-linux-x86_64.AppImage"
           )
 
           for file in "${required[@]}"; do
@@ -298,7 +298,7 @@ jobs:
           set -euo pipefail
           mapfile -d '' assets < <(
             find release-artifacts -type f \
-              \( -name 'Kun-*' -o -name 'latest*.yml' \) \
+              \( -name 'MagicPocket-*' -o -name 'latest*.yml' \) \
               -print0
           )
 

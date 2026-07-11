@@ -75,9 +75,9 @@ function createHarness(): {
   return { actions, get }
 }
 
-function installDsGui(overrides: Partial<Window['kunGui']>): void {
+function installDsGui(overrides: Partial<Window['magicpocketGui']>): void {
   vi.stubGlobal('window', {
-    kunGui: overrides
+    magicpocketGui: overrides
   })
 }
 

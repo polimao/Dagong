@@ -17,7 +17,7 @@ The loop:
 1. Describe a design in the right pane (with a design-context form: brand color,
    tone, design-system preset, structured tokens).
 2. The design agent writes **one self-contained HTML document** to a reserved path
-   under `.kun-design/`.
+   under `.magicpocket-design/`.
 3. The center **canvas** live-renders it (a `<webview>`, refreshed as the agent
    writes).
 4. Iterate in place — each turn snapshots a new version.
@@ -33,7 +33,7 @@ Product positioning:
 | **Write** | Draft, edit, polish, and export long-form Markdown documents. | Markdown workspaces, inline completions/edits, `HTML / PDF / DOC / DOCX` exports. |
 
 Design mode is therefore not a legacy painting shortcut. It is the design leg
-of Kun's requirement -> design -> plan -> code -> verify loop, sharing the same
+of MagicPocket's requirement -> design -> plan -> code -> verify loop, sharing the same
 runtime, provider configuration, approvals, and thread mechanics as Code and
 Write.
 
@@ -94,7 +94,7 @@ src/renderer/src/components/design/
 A `DesignArtifact` = `{ id, kind, title, relativePath, createdAt, updatedAt,
 versions[], implementedAt?, implementedThreadId?, implementedDesignSystemHash? }`.
 
-- **On disk**: each artifact is a directory `.kun-design/<id>/`:
+- **On disk**: each artifact is a directory `.magicpocket-design/<id>/`:
   - HTML artifacts: `v1.html`, `v2.html`, … (the latest is the current document).
   - Graph artifacts: `graph.json` (+ `<nodeId>.html` / `<nodeId>.png` node outputs).
   - `meta.json` — a sidecar mirroring the artifact's metadata.
@@ -103,7 +103,7 @@ versions[], implementedAt?, implementedThreadId?, implementedDesignSystemHash? }
 - **Durability**: the artifact list used to be in-memory only and was lost on reload.
   Now every mutation (`upsert` / `addVersion` / `markImplemented` / `rename`) writes
   `meta.json`, and on load `rehydrateArtifacts()` rebuilds the list from
-  `window.kunGui.listWorkspaceDirectory('.kun-design')` — reading each `meta.json`,
+  `window.magicpocketGui.listWorkspaceDirectory('.magicpocket-design')` — reading each `meta.json`,
   falling back to reconstructing from the on-disk files when a sidecar is missing.
   `removeArtifact` deletes the whole dir (`deleteWorkspaceEntry`) and a
   session-scoped `removedArtifactIds` guard stops a not-yet-flushed delete from
@@ -133,7 +133,7 @@ versions[], implementedAt?, implementedThreadId?, implementedDesignSystemHash? }
 This is what makes design mode "organic", not isolated:
 
 1. **Implement in code** (`implementDesignInCode`) — publishes the shared design system
-   to `.kun-design/DESIGN_SYSTEM.md`, builds an implement prompt, opens a **fresh code
+   to `.magicpocket-design/DESIGN_SYSTEM.md`, builds an implement prompt, opens a **fresh code
    thread**, dispatches the turn, and records provenance (`markImplemented`).
 2. **Shared design system** — `DESIGN_SYSTEM.md` is the single source of truth both the
    design agent and the code agent read; the design context is injected into both.
@@ -160,8 +160,8 @@ A `graph` artifact is a small design pipeline on a React Flow canvas
 
 - **Node kinds**:
   - `prompt` — carries text / context.
-  - `design` — generates an HTML artifact at `.kun-design/<graphId>/<nodeId>.html`.
-  - `image` — generates an image at `.kun-design/<graphId>/<nodeId>.png` (multimodal).
+  - `design` — generates an HTML artifact at `.magicpocket-design/<graphId>/<nodeId>.html`.
+  - `image` — generates an image at `.magicpocket-design/<graphId>/<nodeId>.png` (multimodal).
 - **Execution engine** (`runDesignNode` + `runGraph`): **Run** topologically orders the
   nodes (Kahn; cycles are rejected), then runs each `design`/`image` node **in order** —
   collecting upstream nodes' text along incoming edges, dispatching one agent turn, and
@@ -202,7 +202,7 @@ dialog that defaults to the artifact title. Buttons live on the canvas toolbar.
 
 ## 9. Built-in "design system & craft" skill
 
-`src/main/skill-bundled.ts` seeds a built-in skill into `~/.kun/skills/design-system/`
+`src/main/skill-bundled.ts` seeds a built-in skill into `~/.magicpocket/skills/design-system/`
 on first launch (idempotent marker, mirrors `ensureBundledUiPlugins`). Its `SKILL.md`
 carries design-system-first thinking and the anti-AI-slop craft baseline, so the agent
 auto-gets design guidance (triggers on design prompts, or via `load_skill`). Honors
@@ -250,7 +250,7 @@ agent reasoning, images/text/code as canvas context, Agent Manager parallel
 directions, DESIGN.md import/export, instant prototype playback, voice critiques,
 and MCP/developer-tool export.
 
-Kun should align by strengthening the same workflow spine while keeping the
+MagicPocket should align by strengthening the same workflow spine while keeping the
 in-IDE design-to-code advantage:
 
 1. **Canvas maturity first**: selection, lock/visibility, nudge, snap, grouping,
@@ -329,8 +329,8 @@ in-IDE design-to-code advantage:
    side-by-side compare overlay with one live HTML preview column per direction
    and synchronized switching for shared or partially covered screen names.
    Remaining work: pixel/style diff overlays plus richer archive filtering.
-4. **DESIGN.md compatibility**: keep `.kun-design/DESIGN_SYSTEM.md` as the local
-   source of truth. Kun now exports a project-level `.kun-design/DESIGN.md`
+4. **DESIGN.md compatibility**: keep `.magicpocket-design/DESIGN_SYSTEM.md` as the local
+   source of truth. MagicPocket now exports a project-level `.magicpocket-design/DESIGN.md`
    that summarizes the brief, design context, doc-level tokens/components,
    screens, and prototype flow for Stitch-style/code-agent handoff. The design
    context popover can import that file back into guidelines, brand/preset, and
@@ -384,8 +384,8 @@ most startup-critical file) and cannot be verified without a packaged run. The p
    / `design_read_artifact`.
 3. Add `design-artifacts-mcp-node-entry.ts`; handle the launch flag in `main/index.ts`
    (generalize `runningClawScheduleMcpServer`'s 6 gate sites).
-4. Inject the server into the Kun config in `kun-process.ts` (mirror
-   `buildGuiScheduleKunMcpServer`), and package the entry via `package.json`.
+4. Inject the server into the MagicPocket config in `magicpocket-process.ts` (mirror
+   `buildGuiScheduleMagicPocketMcpServer`), and package the entry via `package.json`.
 
 ---
 

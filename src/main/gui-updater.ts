@@ -18,16 +18,16 @@ import { DEFAULT_GUI_UPDATE_CHANNEL, normalizeGuiUpdateChannel } from '../shared
 
 // R2 prefix 保持旧值:线上还在运行的 DeepSeek GUI 老版本轮询的
 // 就是 `deepseek-gui/channels/<channel>/latest/`,prefix 一改老客户端
-// 就再也收不到 Kun 的升级包。域名优先使用 kun-agent,旧域名仅作兜底。
-const PRIMARY_R2_PUBLIC_BASE_URL = 'https://www.kun-agent.com/api/r2'
-const SECONDARY_R2_PUBLIC_BASE_URL = 'https://kun-agent.com/api/r2'
+// 就再也收不到 MagicPocket 的升级包。域名优先使用 magicpocket-agent,旧域名仅作兜底。
+const PRIMARY_R2_PUBLIC_BASE_URL = 'https://www.magicpocket-agent.com/api/r2'
+const SECONDARY_R2_PUBLIC_BASE_URL = 'https://magicpocket-agent.com/api/r2'
 const LEGACY_R2_PUBLIC_BASE_URL = 'https://deepseek-gui.com/api/r2'
 const DEFAULT_R2_RELEASE_PREFIX = 'deepseek-gui'
 const UPDATE_FEED_PROBE_TIMEOUT_MS = 5_000
 const { autoUpdater } = electronUpdater
 
-function envWithLegacyFallback(kunName: string, legacyName: string): string {
-  return process.env[kunName]?.trim() || process.env[legacyName]?.trim() || ''
+function envWithLegacyFallback(magicpocketName: string, legacyName: string): string {
+  return process.env[magicpocketName]?.trim() || process.env[legacyName]?.trim() || ''
 }
 
 let initialized = false
@@ -50,8 +50,8 @@ let backgroundCheckPromise: Promise<void> | null = null
 
 const GUI_UPDATE_SCHEDULE_FILE = 'gui-update-schedule.json'
 const GUI_VERSION_STATE_FILE = 'gui-version-state.json'
-const DEFAULT_CHANGELOG_DIRECTORY_URL = 'https://github.com/KunAgent/Kun/tree/master/release'
-const DEFAULT_CHANGELOG_FILE_BASE_URL = 'https://github.com/KunAgent/Kun/blob/master/release'
+const DEFAULT_CHANGELOG_DIRECTORY_URL = 'https://github.com/MagicPocketAgent/MagicPocket/tree/master/release'
+const DEFAULT_CHANGELOG_FILE_BASE_URL = 'https://github.com/MagicPocketAgent/MagicPocket/blob/master/release'
 
 type GuiVersionState = {
   lastSeenVersion?: string
@@ -120,7 +120,7 @@ async function isUpdateFeedAccessible(feedUrl: string): Promise<boolean> {
       method: 'HEAD',
       headers: {
         Accept: 'application/x-yaml,text/yaml,text/plain,*/*',
-        'User-Agent': `kun/${app.getVersion()}`
+        'User-Agent': `magicpocket/${app.getVersion()}`
       },
       signal: controller.signal
     })
@@ -450,7 +450,7 @@ async function runScheduledGuiUpdateCheck(): Promise<void> {
       await writeLastScheduledCheckAt(nowMs)
       await checkGuiUpdate()
     } catch (error) {
-      console.warn('[kun-gui updater] scheduled GUI update check failed:', error)
+      console.warn('[magicpocket-gui updater] scheduled GUI update check failed:', error)
     } finally {
       backgroundCheckPromise = null
       void scheduleNextBackgroundCheck()
@@ -502,7 +502,7 @@ async function checkManualUpdate(
     const res = await fetch(url, {
       headers: {
         Accept: 'application/x-yaml,text/yaml,text/plain,*/*',
-        'User-Agent': `kun/${currentVersion}`
+        'User-Agent': `magicpocket/${currentVersion}`
       }
     })
     if (!res.ok) {
@@ -574,9 +574,9 @@ export function initializeGuiUpdater(
   }
 
   autoUpdater.logger = {
-    info: (message?: unknown) => console.info('[kun-gui updater]', message),
-    warn: (message?: unknown) => console.warn('[kun-gui updater]', message),
-    error: (message?: unknown) => console.error('[kun-gui updater]', message)
+    info: (message?: unknown) => console.info('[magicpocket-gui updater]', message),
+    warn: (message?: unknown) => console.warn('[magicpocket-gui updater]', message),
+    error: (message?: unknown) => console.error('[magicpocket-gui updater]', message)
   }
 
   autoUpdater.on('checking-for-update', () => {
@@ -607,7 +607,7 @@ export function initializeGuiUpdater(
     lastInfo = info
     pendingVersionStateWrite = recordPendingUpdate(event)
       .catch((error) => {
-        console.warn('[kun-gui updater] failed to save release notes:', error)
+        console.warn('[magicpocket-gui updater] failed to save release notes:', error)
       })
       .finally(() => {
         pendingVersionStateWrite = null
@@ -622,7 +622,7 @@ export function initializeGuiUpdater(
 
   nativeAutoUpdater?.on?.('before-quit-for-update', () => {
     void runBeforeInstallUpdate().catch((error) => {
-      console.warn('[kun-gui updater] failed to stop runtimes before update quit:', error)
+      console.warn('[magicpocket-gui updater] failed to stop runtimes before update quit:', error)
     })
   })
 
@@ -646,13 +646,13 @@ export async function showPostUpdateReleaseNotes(): Promise<void> {
   const isZh = locale === 'zh'
   const options: MessageBoxOptions = {
     type: 'info',
-    title: isZh ? 'Kun 已更新' : 'Kun updated',
-    message: isZh ? `已更新到 Kun ${currentVersion}` : `Kun has been updated to ${currentVersion}`,
+    title: isZh ? 'MagicPocket 已更新' : 'MagicPocket updated',
+    message: isZh ? `已更新到 MagicPocket ${currentVersion}` : `MagicPocket has been updated to ${currentVersion}`,
     detail:
       pendingUpdate?.releaseNotes ??
       (isZh
-        ? '此版本的完整更新内容可在 Kun 更新日志中查看。'
-        : 'See the Kun changelog for the complete release notes.'),
+        ? '此版本的完整更新内容可在 MagicPocket 更新日志中查看。'
+        : 'See the MagicPocket changelog for the complete release notes.'),
     buttons: isZh ? ['查看更新日志', '稍后'] : ['View changelog', 'Later'],
     defaultId: 0,
     cancelId: 1,

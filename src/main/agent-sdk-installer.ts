@@ -16,7 +16,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fetchWithOptionalProxy } from './proxy-fetch'
 
-// Keep in sync with kun/package.json's @anthropic-ai/claude-agent-sdk version.
+// Keep in sync with magicpocket/package.json's @anthropic-ai/claude-agent-sdk version.
 export const AGENT_SDK_VERSION = '0.3.193'
 const REGISTRY = 'https://registry.npmjs.org'
 
@@ -46,16 +46,16 @@ export function agentSdkBinaryPath(userDataDir: string): string {
 
 /**
  * Resolve the Claude Code binary: the on-demand download first, then a bundled
- * copy in kun's node_modules (present in dev / if ever bundled). Returns the
+ * copy in magicpocket's node_modules (present in dev / if ever bundled). Returns the
  * first that exists, or undefined → needs downloading.
  */
-export function resolveClaudeBinary(userDataDir: string, kunDirs: readonly string[]): string | undefined {
+export function resolveClaudeBinary(userDataDir: string, magicpocketDirs: readonly string[]): string | undefined {
   const downloaded = agentSdkBinaryPath(userDataDir)
   if (existsSync(downloaded)) return downloaded
   const pkg = platformBinaryPackage()
   if (pkg) {
     const bin = claudeBinaryName()
-    for (const dir of kunDirs) {
+    for (const dir of magicpocketDirs) {
       const candidate = join(dir, 'node_modules', pkg, bin)
       if (existsSync(candidate)) return candidate
     }
@@ -65,9 +65,9 @@ export function resolveClaudeBinary(userDataDir: string, kunDirs: readonly strin
 
 export function agentSdkStatus(
   userDataDir: string,
-  kunDirs: readonly string[]
+  magicpocketDirs: readonly string[]
 ): { installed: boolean; path?: string } {
-  const path = resolveClaudeBinary(userDataDir, kunDirs)
+  const path = resolveClaudeBinary(userDataDir, magicpocketDirs)
   return path ? { installed: true, path } : { installed: false }
 }
 
@@ -100,7 +100,7 @@ export async function installClaudeBinary(options: {
   const proxyUrl = options.proxyUrl ?? ''
   const destDir = join(options.userDataDir, 'agent-sdk')
   const binPath = join(destDir, claudeBinaryName())
-  const tgz = join(tmpdir(), `kun-agent-sdk-${process.pid}.tgz`)
+  const tgz = join(tmpdir(), `magicpocket-agent-sdk-${process.pid}.tgz`)
   try {
     // 1. registry metadata → exact tarball url
     const metaRes = await fetchWithOptionalProxy(`${REGISTRY}/${pkg}/${version}`, {}, proxyUrl)

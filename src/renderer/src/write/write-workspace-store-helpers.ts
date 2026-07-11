@@ -31,10 +31,10 @@ import {
 } from '../lib/browser-storage'
 import type { WritePreviewMode, WriteWorkspaceState } from './write-workspace-store-types'
 
-export const WRITE_PREVIEW_MODE_KEY = 'kun.write.preview-mode'
-export const WRITE_ASSISTANT_OPEN_KEY = 'kun.write.assistant-open'
-export const WRITE_ASSISTANT_MODEL_KEY = 'kun.write.assistant-model'
-export const WRITE_ASSISTANT_PROVIDER_KEY = 'kun.write.assistant-provider'
+export const WRITE_PREVIEW_MODE_KEY = 'magicpocket.write.preview-mode'
+export const WRITE_ASSISTANT_OPEN_KEY = 'magicpocket.write.assistant-open'
+export const WRITE_ASSISTANT_MODEL_KEY = 'magicpocket.write.assistant-model'
+export const WRITE_ASSISTANT_PROVIDER_KEY = 'magicpocket.write.assistant-provider'
 const DEFAULT_WRITE_ASSISTANT_MODEL = DEFAULT_KUN_MODEL
 
 export function readStoredPreviewMode(): WritePreviewMode {
@@ -218,7 +218,7 @@ export function writeRelativeToWorkspace(workspaceRoot: string, filePath: string
 }
 
 export function activeFileStorageKey(workspaceRoot: string): string {
-  return `kun.write.active-file:${normalizePath(workspaceRoot)}`
+  return `magicpocket.write.active-file:${normalizePath(workspaceRoot)}`
 }
 
 export function rememberActiveFile(workspaceRoot: string, nextPath: string | null): void {

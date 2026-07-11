@@ -35,7 +35,7 @@ export default function AppShell(): React.ReactElement {
   const route = useChatStore((s) => s.route)
   const boot = useChatStore((s) => s.boot)
   const initialSetupOpen = useChatStore((s) => s.initialSetupOpen)
-  const platform = typeof window !== 'undefined' ? window.kunGui?.platform ?? 'unknown' : 'unknown'
+  const platform = typeof window !== 'undefined' ? window.magicpocketGui?.platform ?? 'unknown' : 'unknown'
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
 
   useEffect(() => {

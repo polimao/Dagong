@@ -22,11 +22,11 @@ import {
 import { readBrowserStorageItem, writeBrowserStorageItem } from '../lib/browser-storage'
 import { normalizeWorkspaceRoot } from '../lib/workspace-path'
 import { getProvider } from '../agent/registry'
-import type { SkillListItem, SkillRootListItem } from '@shared/kun-gui-api'
+import type { SkillListItem, SkillRootListItem } from '@shared/magicpocket-gui-api'
 import type {
   CoreRuntimeInfoJson,
   CoreRuntimeToolDiagnosticsJson
-} from '../agent/kun-contract'
+} from '../agent/magicpocket-contract'
 import { useChatStore } from '../store/chat-store'
 import { NoticeView, TabButton, type MarketplaceNotice } from './PluginMarketplaceParts'
 import {
@@ -100,7 +100,7 @@ type SkillRootOption = {
   skillCount: number
 }
 
-const INSTALLED_STORAGE_KEY = 'kun.installedPlugins'
+const INSTALLED_STORAGE_KEY = 'magicpocket.installedPlugins'
 const GUI_SCHEDULE_MCP_SERVER_ID = 'gui_schedule'
 
 function loadInstalledPlugins(): string[] {
@@ -514,7 +514,7 @@ export function setMcpServerEnabled(content: string, id: string, enabled: boolea
       [id]: {
         ...rawServer,
         enabled,
-        ...(enabled ? { disabled: undefined } : {})
+        disabled: undefined
       }
     }
   }
@@ -544,7 +544,7 @@ export function setMcpServerEnabled(content: string, id: string, enabled: boolea
 function buildSkillContent(id: string, title: string, description: string, instructions: string): string {
   return [
     '---',
-    `name: ${id}`,
+    `name: ${title}`,
     `description: ${description}`,
     '---',
     '',
@@ -872,6 +872,86 @@ const RECOMMENDED_ITEMS: MarketplaceItem[] = [
     supplyChain: { source: 'skill', permissions: ['file'] },
     skillInstructions:
       'Use this skill when preparing release notes. Group user-facing changes by outcome, call out migrations or risks, and keep wording concise and scannable.'
+  },
+  {
+    id: 'financial-statement-analysis',
+    kind: 'skill',
+    titleKey: 'pluginSkillFinStmtTitle',
+    descriptionKey: 'pluginSkillFinStmtDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when analyzing financial statements. Extract key metrics from balance sheet, income statement, and cash flow statement. Calculate profitability, liquidity, solvency, and efficiency ratios. Compare period-over-period trends, flag anomalies and accounting red flags, and provide a structured assessment with supporting numbers.'
+  },
+  {
+    id: 'stock-research',
+    kind: 'skill',
+    titleKey: 'pluginSkillStockTitle',
+    descriptionKey: 'pluginSkillStockDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when researching stocks or equities. Cover company overview, business model, competitive positioning, financial highlights, valuation (DCF, multiples, comparables), risks, and catalysts. Present bull and bear cases, cite data sources with timestamps, and conclude with a clear investment thesis and confidence level.'
+  },
+  {
+    id: 'investment-due-diligence',
+    kind: 'skill',
+    titleKey: 'pluginSkillDDTitle',
+    descriptionKey: 'pluginSkillDDDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when conducting investment due diligence. Build a structured DD checklist covering financial, legal, operational, commercial, and technology dimensions. For each item, assess status (pass/concern/fail), provide evidence, and assign severity. Output a risk heat map, a list of deal-breakers, and recommended conditions or representations.'
+  },
+  {
+    id: 'valuation-modeling',
+    kind: 'skill',
+    titleKey: 'pluginSkillValuationTitle',
+    descriptionKey: 'pluginSkillValuationDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when building valuation models. Implement DCF (WACC, terminal value, scenario analysis), trading comparables, precedent transactions, and where relevant, asset-based valuation. Present key assumptions in a clear table, run sensitivity on the top 3 drivers, and show valuation ranges (conservative/base/optimistic). Always cross-check multiple methods.'
+  },
+  {
+    id: 'macro-analysis',
+    kind: 'skill',
+    titleKey: 'pluginSkillMacroTitle',
+    descriptionKey: 'pluginSkillMacroDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when analyzing macroeconomic conditions. Cover GDP growth, inflation (CPI/PPI), employment, interest rates, monetary and fiscal policy, trade balance, and FX. Connect macro indicators to sector and asset-class implications. Distinguish leading vs lagging indicators, cite data sources and release dates, and note consensus vs surprise.'
+  },
+  {
+    id: 'industry-research',
+    kind: 'skill',
+    titleKey: 'pluginSkillIndustryTitle',
+    descriptionKey: 'pluginSkillIndustryDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when producing industry research reports. Cover market size (TAM/SAM/SOM), growth drivers, competitive landscape (market share, concentration), value chain, barriers to entry, regulatory environment, and key trends. Structure as a brief with clear data tables, cite sources, and end with investment or strategic implications.'
+  },
+  {
+    id: 'risk-assessment',
+    kind: 'skill',
+    titleKey: 'pluginSkillRiskTitle',
+    descriptionKey: 'pluginSkillRiskDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when assessing financial or operational risks. Identify risk categories (market, credit, liquidity, operational, compliance, concentration), quantify exposure where possible (VaR, expected loss, stress scenarios), and rate likelihood and impact. Output a risk matrix, key risk indicators (KRIs), and prioritized mitigation actions with owners and timelines.'
+  },
+  {
+    id: 'esg-analysis',
+    kind: 'skill',
+    titleKey: 'pluginSkillESGTitle',
+    descriptionKey: 'pluginSkillESGDesc',
+    group: 'recommended',
+    supplyChain: { source: 'skill', permissions: ['file'] },
+    skillInstructions:
+      'Use this skill when conducting ESG analysis. Assess environmental (carbon, energy, waste), social (labor, community, data privacy), and governance (board, ethics, ownership) dimensions. Reference GRI/SASB/TCFD frameworks, compare against industry peers, identify material ESG risks and opportunities, and evaluate ESG ratings and disclosures quality.'
   }
 ]
 
@@ -882,7 +962,7 @@ export function recommendedMarketplaceItemIds(): string[] {
 export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSidebar }: Props): ReactElement {
   const { t } = useTranslation('common')
   const workspaceRoot = normalizeWorkspaceRoot(useChatStore((s) => s.workspaceRoot))
-  const [activeKind, setActiveKind] = useState<PluginKind>('mcp')
+  const [activeKind, setActiveKind] = useState<PluginKind>('skill')
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<PluginFilter>('all')
   const [installed, setInstalled] = useState<string[]>(() => loadInstalledPlugins())
@@ -914,7 +994,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   const [skillListLoading, setSkillListLoading] = useState(false)
   const [skillListError, setSkillListError] = useState('')
   const [skillRoots, setSkillRoots] = useState<SkillRootListItem[]>([])
-  const [disabledSkillIds, setDisabledSkillIds] = useState<string[]>([])
+  const disabledSkillIds = useChatStore((s) => s.disabledSkillIds)
   const [skillToggleBusyId, setSkillToggleBusyId] = useState<string | null>(null)
   const [oauthPreviewItem, setOauthPreviewItem] = useState<MarketplaceItem | null>(null)
 
@@ -924,7 +1004,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   )
 
   const selectedSkillRoot =
-    skillRootOptions.find((option) => option.id === skillRootId) ??
+    skillRootOptions.find((option) => option.id === skillRootId && option.enabled) ??
     skillRootOptions.find((option) => option.enabled) ??
     skillRootOptions[0]
 
@@ -941,8 +1021,8 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   }, [skillRootId, skillRootOptions])
 
   const readMcpConfig = useCallback(async (): Promise<string> => {
-    if (typeof window.kunGui?.getKunConfigFile !== 'function') return mcpConfigText
-    const file = await window.kunGui.getKunConfigFile()
+    if (typeof window.magicpocketGui?.getMagicPocketConfigFile !== 'function') return mcpConfigText
+    const file = await window.magicpocketGui.getMagicPocketConfigFile()
     setMcpConfigText(file.content)
     setMcpLoaded(true)
     return file.content
@@ -956,7 +1036,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   }, [activeKind, mcpLoaded, readMcpConfig])
 
   const refreshMcpRuntimeOverlay = useCallback(async (): Promise<void> => {
-    if (typeof window.kunGui?.runtimeRequest !== 'function') {
+    if (typeof window.magicpocketGui?.runtimeRequest !== 'function') {
       setRuntimeInfo(null)
       setToolDiagnostics(null)
       setRuntimeOverlayError(t('pluginMcpRuntimeUnavailable'))
@@ -995,7 +1075,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   }, [activeKind, refreshMcpRuntimeOverlay])
 
   const refreshSkillList = useCallback(async (): Promise<void> => {
-    if (typeof window.kunGui?.listSkills !== 'function') {
+    if (typeof window.magicpocketGui?.listSkills !== 'function') {
       setDiscoveredSkills([])
       setSkillListError(t('pluginSkillScanUnavailable'))
       return
@@ -1003,7 +1083,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
     setSkillListLoading(true)
     setSkillListError('')
     try {
-      const result = await window.kunGui.listSkills(workspaceRoot || undefined)
+      const result = await window.magicpocketGui.listSkills(workspaceRoot || undefined)
       if (!result.ok) {
         setDiscoveredSkills([])
         setSkillListError(result.message)
@@ -1022,12 +1102,12 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   }, [t, workspaceRoot])
 
   const refreshSkillRoots = useCallback(async (): Promise<void> => {
-    if (typeof window.kunGui?.listSkillRoots !== 'function') {
+    if (typeof window.magicpocketGui?.listSkillRoots !== 'function') {
       setSkillRoots([])
       return
     }
     try {
-      const result = await window.kunGui.listSkillRoots(workspaceRoot || undefined)
+      const result = await window.magicpocketGui.listSkillRoots(workspaceRoot || undefined)
       setSkillRoots(result.ok ? result.roots : [])
     } catch {
       setSkillRoots([])
@@ -1045,10 +1125,10 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
     let cancelled = false
     void rendererRuntimeClient.getSettings({ forceRefresh: true })
       .then((settings) => {
-        if (!cancelled) setDisabledSkillIds(normalizeDisabledSkillIds(settings.disabledSkillIds))
+        if (!cancelled) useChatStore.setState({ disabledSkillIds: normalizeDisabledSkillIds(settings.disabledSkillIds) })
       })
       .catch(() => {
-        if (!cancelled) setDisabledSkillIds([])
+        // 失败时保留 chat-store 现有的 disabledSkillIds
       })
     return () => {
       cancelled = true
@@ -1060,6 +1140,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
     setCustomOpen(false)
     setGithubImportOpen(false)
     setGithubImportSummary(null)
+    setOauthPreviewItem(null)
   }, [activeKind])
 
   const markInstalled = (key: string): void => {
@@ -1105,12 +1186,16 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
     if ('group' in item && item.group === 'personal') return true
     const catalogItem = RECOMMENDED_ITEMS.find((candidate) => candidate.kind === item.kind && candidate.id === item.id)
     if (catalogItem?.systemManaged) return true
-    if (item.kind === 'skill' && discoveredSkillIds.has(item.id)) return true
-    if (item.kind === 'mcp' && discoveredMcpIds.has(item.id)) return true
-    if (item.kind === 'mcp' && item.serverIds?.length) return mcpConfigHasServers(mcpConfigText, item.serverIds)
+    if (item.kind === 'mcp') {
+      // mcp 以配置文件/运行时诊断为权威源，不依赖 localStorage 兜底，
+      // 避免 server 被删除后仍因历史记录显示为"已安装"
+      if (discoveredMcpIds.has(item.id)) return true
+      if (item.serverIds?.length) return mcpConfigHasServers(mcpConfigText, item.serverIds)
+      return mcpConfigHasServer(mcpConfigText, item.id)
+    }
+    if (discoveredSkillIds.has(item.id)) return true
     const key = storageKey(item.kind, item.id)
-    if (installed.includes(key)) return true
-    return item.kind === 'mcp' && mcpConfigHasServer(mcpConfigText, item.id)
+    return installed.includes(key)
   }, [discoveredMcpIds, discoveredSkillIds, installed, mcpConfigText])
 
   const visibleItems = useMemo(() => {
@@ -1133,7 +1218,6 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
       })
   }, [activeKind, filter, isInstalled, marketplaceItems, query, t])
 
-  const builtInItems = visibleItems.filter((item) => item.systemManaged)
   const recommendedItems = visibleItems.filter((item) => !item.systemManaged && !isInstalled(item))
   const personalItems = visibleItems.filter((item) =>
     item.group === 'personal' ||
@@ -1156,7 +1240,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
       setNotice({ tone: 'info', message: t('pluginAlreadyAdded') })
       return
     }
-    const result = await window.kunGui.setKunConfigFile(merged.text)
+    const result = await window.magicpocketGui.setMagicPocketConfigFile(merged.text)
     setMcpConfigText(merged.text)
     setMcpLoaded(true)
     markInstalled(storageKey('mcp', id))
@@ -1184,7 +1268,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
         return
       }
 
-      if (!selectedSkillRoot?.path) {
+      if (!selectedSkillRoot?.path || !selectedSkillRoot.enabled) {
         setNotice({ tone: 'error', message: t('pluginSkillRootMissing') })
         return
       }
@@ -1197,7 +1281,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
         description,
         item.skillInstructions ?? description
       )
-      const result = await window.kunGui.saveSkillFile(selectedSkillRoot.path, item.id, content)
+      const result = await window.magicpocketGui.saveSkillFile(selectedSkillRoot.path, item.id, content)
       if (!result.ok) {
         setNotice({ tone: 'error', message: result.message })
         return
@@ -1249,13 +1333,13 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
         if (!audit.ok) throw new Error(audit.errors.join('\n'))
         await appendMcpConfig(id, fragment)
       } else {
-        if (!selectedSkillRoot?.path) {
+        if (!selectedSkillRoot?.path || !selectedSkillRoot.enabled) {
           setNotice({ tone: 'error', message: t('pluginSkillRootMissing') })
           return
         }
         const body = customSkillBody.trim() || t('pluginCustomSkillFallbackBody')
         const content = buildSkillContent(id, customName.trim() || id, description, body)
-        const result = await window.kunGui.saveSkillFile(selectedSkillRoot.path, id, content)
+        const result = await window.magicpocketGui.saveSkillFile(selectedSkillRoot.path, id, content)
         if (!result.ok) {
           setNotice({ tone: 'error', message: result.message })
           return
@@ -1289,7 +1373,6 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
         : [...new Set([...disabledSkillIds, normalizedId])]
       const settings = await rendererRuntimeClient.setSettings({ disabledSkillIds: next })
       const normalized = normalizeDisabledSkillIds(settings.disabledSkillIds)
-      setDisabledSkillIds(normalized)
       useChatStore.setState({ disabledSkillIds: normalized })
       setNotice({
         tone: 'success',
@@ -1308,7 +1391,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
     try {
       const content = mcpLoaded ? mcpConfigText : await readMcpConfig()
       const nextText = setMcpServerEnabled(content, id, enabled)
-      await window.kunGui.setKunConfigFile(nextText)
+      await window.magicpocketGui.setMagicPocketConfigFile(nextText)
       setMcpConfigText(nextText)
       setMcpLoaded(true)
       setNotice({
@@ -1326,7 +1409,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
   const openManageTarget = async (): Promise<void> => {
     try {
       if (activeKind === 'mcp') {
-        const result = await window.kunGui.openKunConfigDir()
+        const result = await window.magicpocketGui.openMagicPocketConfigDir()
         if (!result.ok) setNotice({ tone: 'error', message: result.message ?? t('pluginActionFailed') })
         return
       }
@@ -1334,7 +1417,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
         setNotice({ tone: 'error', message: t('pluginSkillRootMissing') })
         return
       }
-      const result = await window.kunGui.openSkillRoot(selectedSkillRoot.path)
+      const result = await window.magicpocketGui.openSkillRoot(selectedSkillRoot.path)
       if (!result.ok) setNotice({ tone: 'error', message: result.message ?? t('pluginActionFailed') })
     } catch (e) {
       setNotice({ tone: 'error', message: e instanceof Error ? e.message : String(e) })
@@ -1355,7 +1438,7 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
     setNotice(null)
     setGithubImportSummary(null)
     try {
-      const result = await window.kunGui.importSkillsFromGitHub(selectedSkillRoot.path, trimmedUrl)
+      const result = await window.magicpocketGui.importSkillsFromGitHub(selectedSkillRoot.path, trimmedUrl)
       if (!result.ok) {
         throw new Error(result.message)
       }
@@ -1398,11 +1481,11 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
         <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex rounded-xl bg-ds-subtle p-1">
+            <TabButton active={activeKind === 'skill'} onClick={() => setActiveKind('skill')}>
+              {t('pluginTabSkill')}
+            </TabButton>
             <TabButton active={activeKind === 'mcp'} onClick={() => setActiveKind('mcp')}>
               {t('pluginTabMcp')}
-            </TabButton>
-            <TabButton active={activeKind === 'skill'} tone="skill" onClick={() => setActiveKind('skill')}>
-              {t('pluginTabSkill')}
             </TabButton>
           </div>
           <div className="flex items-center gap-2">
@@ -1567,24 +1650,6 @@ export function PluginMarketplaceView({ leftSidebarCollapsed, onToggleLeftSideba
             item={oauthPreviewItem}
             onClose={() => setOauthPreviewItem(null)}
             onConfirm={() => void confirmOauthInstall(oauthPreviewItem)}
-            t={t}
-          />
-        ) : null}
-
-        {activeKind === 'mcp' ? (
-          <PluginSection
-            title={t('pluginBuiltIn')}
-            emptyText={t('pluginNoResults')}
-            items={builtInItems}
-            busyId={busyId}
-            isInstalled={isInstalled}
-            onAdd={addItem}
-            disabledSkillIds={disabledSkillIds}
-            skillToggleBusyId={skillToggleBusyId}
-            onToggleSkillEnabled={toggleSkillEnabled}
-            mcpConfigText={mcpConfigText}
-            mcpToggleBusyId={mcpToggleBusyId}
-            onToggleMcpEnabled={toggleMcpEnabled}
             t={t}
           />
         ) : null}
@@ -1807,7 +1872,7 @@ function marketplaceSourceTone(tone: MarketplaceItem['statusTone']): string {
 
 function runtimeOverlayErrorMessage(error: unknown, fallback: string): string {
   const message = error instanceof Error ? error.message : String(error)
-  return /runtimeRequest|kunGui|Cannot read properties/i.test(message) ? fallback : message
+  return /runtimeRequest|magicpocketGui|Cannot read properties/i.test(message) ? fallback : message
 }
 
 function OAuthConnectorPreviewDialog({
@@ -1824,11 +1889,11 @@ function OAuthConnectorPreviewDialog({
   const oauth = item.oauth
   const title = itemTitle(item, t)
   const openDocs = (): void => {
-    if (!oauth || typeof window.kunGui?.openExternal !== 'function') return
+    if (!oauth || typeof window.magicpocketGui?.openExternal !== 'function') return
     // Only open allowlisted https docs origins; ignore anything else so a
     // malformed or unexpected docsUrl can never reach the OS link handler.
     if (!isAllowedDocsUrl(oauth.docsUrl)) return
-    void window.kunGui.openExternal(oauth.docsUrl).catch(() => undefined)
+    void window.magicpocketGui.openExternal(oauth.docsUrl).catch(() => undefined)
   }
 
   if (!oauth) return <></>

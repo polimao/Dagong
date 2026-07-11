@@ -19,22 +19,22 @@ import {
   JsonSettingsStore,
   devServerHintUrl
 } from './settings-store'
-import kunLogoPng from '../asset/img/kun.png?url'
-import kunMacLogoPng from '../asset/img/kun_mac.png?url'
-import kunTrayPng from '../asset/img/kun_tray.png?url'
+import magicpocketLogoPng from '../asset/img/imagicpocket.png?url'
+import magicpocketMacLogoPng from '../asset/img/magicpocket_mac.png?url'
+import magicpocketTrayPng from '../asset/img/magicpocket_tray.png?url'
 import { createAppIcon, pickTrayIcon, prepareTrayIcon } from './app-icon'
 import { buildTrayMenuTemplate, parseTrayThreads, type TrayThreadSummary } from './tray-session-menu'
 import { configureLinuxWaylandImeSwitches } from './app-command-line'
 import { configureAppIdentity } from './app-identity'
 import { shouldStartHidden, syncLoginItemSettings } from './desktop-behavior'
 import { resolveLogDirectory, resolvePreloadPath } from './main-paths'
-import { runLegacyKunDataMigration } from './legacy-data-migration'
+import { runLegacyMagicPocketDataMigration } from './legacy-data-migration'
 import {
-  applyKunRuntimePatch,
-  kunSettingsEnvelope,
+  applyMagicPocketRuntimePatch,
+  magicpocketSettingsEnvelope,
   getActiveAgentApiKey,
-  getKunRuntimeSettings,
-  mergeKunRuntimeSettings,
+  getMagicPocketRuntimeSettings,
+  mergeMagicPocketRuntimeSettings,
   mergeClawSettings,
   mergeWorkflowSettings,
   mergeAppBehaviorSettings,
@@ -49,7 +49,7 @@ import {
   normalizeCheckpointCleanupSettings,
   normalizeKeyboardShortcuts,
   resolveModelProviderProxyUrl,
-  resolveKunRuntimeSettings,
+  resolveMagicPocketRuntimeSettings,
   resolveTerminalColorMode,
   type AppBehaviorConfigV1,
   type AppSettingsPatch,
@@ -58,27 +58,27 @@ import {
 } from '../shared/app-settings'
 import { parseRuntimeErrorBody, runtimeErrorToError, type RuntimeErrorCode } from '../shared/runtime-error'
 import type { GuiUpdateState } from '../shared/gui-update'
-import type { TrayActionPayload } from '../shared/kun-gui-api'
+import type { TrayActionPayload } from '../shared/magicpocket-gui-api'
 import { isAllowedDevPreviewUrl } from '../shared/dev-preview-url'
 import { isAuthorizedPrototypeFileUrl } from './services/prototype-embed-registry'
 import { fetchUpstreamModelIds } from './upstream-models'
 import {
-  kunRuntimeAdapter,
+  magicpocketRuntimeAdapter,
   getRuntimeBaseUrlForSettings,
   runtimeAuthHeaders,
   runtimeRequestViaHost
-} from './runtime/kun-adapter'
+} from './runtime/magicpocket-adapter'
 import { waitForRuntimeTurnsIdle } from './runtime/managed-runtime-idle'
 import {
-  resolveKunDataDir,
-  setKunUnexpectedExitHandler,
-  syncGuiManagedKunConfig,
-  waitForKunStartupSettled,
-  type KunUnexpectedExitInfo
-} from './kun-process'
+  resolveMagicPocketDataDir,
+  setMagicPocketUnexpectedExitHandler,
+  syncGuiManagedMagicPocketConfig,
+  waitForMagicPocketStartupSettled,
+  type MagicPocketUnexpectedExitInfo
+} from './magicpocket-process'
 import { resolveCodexOAuthApiKey } from './codex-auth'
 import { expandHomePath } from './settings-store'
-import { RestartBudget, type KunRuntimeStatus } from './kun-runtime-supervisor'
+import { RestartBudget, type MagicPocketRuntimeStatus } from './magicpocket-runtime-supervisor'
 import { configureLogger, logError, logWarn, pruneOnStartup } from './logger'
 import { cleanupUnusedGitCheckpointsIfDue } from './services/git-checkpoint-service'
 import { createClawRuntime, type ClawRuntime } from './claw-runtime'
@@ -86,7 +86,7 @@ import { createScheduleRuntime, type ScheduleRuntime } from './schedule-runtime'
 import { createWorkflowRuntime, type WorkflowRuntime } from './workflow-runtime'
 import { runClawScheduleMcpServerFromArgv } from './claw-schedule-mcp-server'
 import {
-  resolveKunMcpJsonPath,
+  resolveMagicPocketMcpJsonPath,
   syncClawScheduleMcpConfig,
   type ClawScheduleMcpLaunchConfig
 } from './claw-schedule-mcp-config'
@@ -114,10 +114,10 @@ import {
 } from './weixin-bridge-runtime'
 import { webhookUrl } from './claw-runtime-helpers'
 import { createTelegramRuntime, type TelegramRuntime, verifyTelegramBotToken } from './telegram-runtime'
-import { isKunHealthResponseBody } from './kun-health'
+import { isMagicPocketHealthResponseBody } from './magicpocket-health'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-// 品牌升级为 Kun 后仍保留旧 AppUserModelId:它必须和 electron-builder
+// 品牌升级为 MagicPocket 后仍保留旧 AppUserModelId:它必须和 electron-builder
 // 的 appId 一致才能让 Windows 通知 / 任务栏分组在升级前后连续,而
 // appId 因为 NSIS 升级 GUID 与 macOS 更新签名校验的原因永远不改。
 const APP_USER_MODEL_ID = 'com.xingyuzhong.deepseekgui'
@@ -199,10 +199,10 @@ configureAppIdentity()
 // 紧跟在身份设置之后、requestSingleInstanceLock() 之前做旧数据迁移:
 // 单实例锁文件就放在 userData 里,必须先把目录定下来。rename 失败
 // (典型场景:老版本还在运行)时退回旧目录,功能不受影响,下次再迁。
-const legacyMigration = runLegacyKunDataMigration({
+const legacyMigration = runLegacyMagicPocketDataMigration({
   userDataPath: app.getPath('userData'),
   homeDir: homedir(),
-  log: (message, detail) => console.warn(`[kun-gui] ${message}`, detail ?? '')
+  log: (message, detail) => console.warn(`[magicpocket-gui] ${message}`, detail ?? '')
 })
 if (legacyMigration.userData.usedLegacyFallback) {
   app.setPath('userData', legacyMigration.userData.userDataPath)
@@ -256,8 +256,8 @@ function stopCheckpointCleanupTimer(): void {
 
 async function runCheckpointCleanupIfDue(settings: AppSettingsV1): Promise<void> {
   if (!settings.checkpointCleanup.enabled) return
-  const runtime = resolveKunRuntimeSettings(settings)
-  const dataDir = resolveKunDataDir(runtime)
+  const runtime = resolveMagicPocketRuntimeSettings(settings)
+  const dataDir = resolveMagicPocketDataDir(runtime)
   const intervalDays = settings.checkpointCleanup.intervalDays
   const checkpointsRoot = settings.checkpointCleanup.directory?.trim()
     ? expandHomePath(settings.checkpointCleanup.directory.trim())
@@ -271,7 +271,7 @@ async function runCheckpointCleanupIfDue(settings: AppSettingsV1): Promise<void>
     if (!cleanup.due) return
     const { result } = cleanup
     console.info(
-      `[kun-gui] git checkpoint cleanup scanned=${result.scanned} deleted=${result.deleted} kept=${result.kept} failed=${result.failed}`
+      `[magicpocket-gui] git checkpoint cleanup scanned=${result.scanned} deleted=${result.deleted} kept=${result.kept} failed=${result.failed}`
     )
     if (result.failed > 0) {
       logWarn('git-checkpoint-cleanup', 'failed to delete some unused checkpoints', {
@@ -312,7 +312,7 @@ async function stopManagedRuntimes(): Promise<void> {
       clawRuntime?.stop()
       telegramRuntime?.stop()
       stopWeixinBridgeRuntime()
-      await kunRuntimeAdapter.stopAndWait()
+      await magicpocketRuntimeAdapter.stopAndWait()
     })().finally(() => {
       managedRuntimesStopPromise = null
     })
@@ -391,9 +391,9 @@ function installDevPreviewWebviewGuards(): void {
 }
 
 
-const appIconSource = process.platform === 'win32' ? kunMacLogoPng : kunLogoPng
+const appIconSource = process.platform === 'win32' ? magicpocketMacLogoPng : magicpocketLogoPng
 const appIcon = createAppIcon(appIconSource)
-const trayIcon = createAppIcon(kunTrayPng)
+const trayIcon = createAppIcon(magicpocketTrayPng)
 traceStartup('app icon loaded', { source: appIconSource.startsWith('data:') ? 'data-url' : 'path' })
 const gotSingleInstanceLock = runningClawScheduleMcpServer || app.requestSingleInstanceLock()
 traceStartup('single instance lock checked', {
@@ -414,7 +414,7 @@ function windowCloseLabels(locale: AppSettingsV1['locale']): {
     return {
       title: '关闭窗口',
       message: '关闭窗口时要怎么处理？',
-      detail: '选择最小化到托盘时，Kun 会继续在后台运行；选择退出应用会结束后台服务。',
+      detail: '选择最小化到托盘时，MagicPocket 会继续在后台运行；选择退出应用会结束后台服务。',
       minimizeToTray: '最小化到托盘',
       quit: '退出应用',
       cancel: '取消',
@@ -423,8 +423,8 @@ function windowCloseLabels(locale: AppSettingsV1['locale']): {
   }
   return {
     title: 'Close window',
-    message: 'What should Kun do when this window closes?',
-    detail: 'Minimize to tray keeps Kun running in the background. Quit app stops the background service.',
+    message: 'What should MagicPocket do when this window closes?',
+    detail: 'Minimize to tray keeps MagicPocket running in the background. Quit app stops the background service.',
     minimizeToTray: 'Minimize to tray',
     quit: 'Quit app',
     cancel: 'Cancel',
@@ -556,7 +556,7 @@ function syncTray(settings: AppSettingsV1): void {
     tray.on('right-click', showTrayMenu)
   }
 
-  tray.setToolTip('Kun')
+  tray.setToolTip('MagicPocket')
   trayMenu = createTrayMenu(settings, [])
   tray.setContextMenu(null)
 }
@@ -601,7 +601,7 @@ async function promptWindowCloseAction(window: BrowserWindow): Promise<void> {
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    console.warn('[kun-gui] failed to handle close-window prompt:', error)
+    console.warn('[magicpocket-gui] failed to handle close-window prompt:', error)
     logWarn('desktop-behavior', 'Failed to handle close-window prompt.', { message })
   } finally {
     closeWindowPromptOpen = false
@@ -642,7 +642,7 @@ async function showTurnCompleteNotification(
     return { ok: true, shown: false, reason: 'unsupported' }
   }
 
-  const title = normalizeNotificationText(payload.title, 'Kun', 80)
+  const title = normalizeNotificationText(payload.title, 'MagicPocket', 80)
   const body = normalizeNotificationText(payload.body, 'Conversation complete.', 180)
 
   try {
@@ -705,14 +705,14 @@ async function probeThreadApi(settings: AppSettingsV1): Promise<
   }
 }
 
-async function waitForKunHealth(settings: AppSettingsV1, timeoutMs: number): Promise<boolean> {
+async function waitForMagicPocketHealth(settings: AppSettingsV1, timeoutMs: number): Promise<boolean> {
   const base = getRuntimeBaseUrlForSettings(settings)
   const deadline = Date.now() + timeoutMs
   let lastError = ''
 
   while (Date.now() <= deadline) {
     const remaining = Math.max(1, deadline - Date.now())
-    const result = await probeKunHealthOnce(settings, base, remaining)
+    const result = await probeMagicPocketHealthOnce(settings, base, remaining)
     if (result.healthy) return true
     if (result.error !== lastError) {
       lastError = result.error
@@ -725,25 +725,25 @@ async function waitForKunHealth(settings: AppSettingsV1, timeoutMs: number): Pro
   return false
 }
 
-type KunHealthProbeResult = { healthy: boolean; error: string }
-const kunHealthProbeInFlight = new Map<string, Promise<KunHealthProbeResult>>()
+type MagicPocketHealthProbeResult = { healthy: boolean; error: string }
+const magicpocketHealthProbeInFlight = new Map<string, Promise<MagicPocketHealthProbeResult>>()
 
-function probeKunHealthOnce(
+function probeMagicPocketHealthOnce(
   settings: AppSettingsV1,
   base: string,
   remainingMs: number
-): Promise<KunHealthProbeResult> {
-  const existing = kunHealthProbeInFlight.get(base)
+): Promise<MagicPocketHealthProbeResult> {
+  const existing = magicpocketHealthProbeInFlight.get(base)
   if (existing) return existing
 
-  let task: Promise<KunHealthProbeResult>
+  let task: Promise<MagicPocketHealthProbeResult>
   task = (async () => {
     try {
       const res = await fetch(`${base}/health`, {
         headers: runtimeAuthHeaders(settings),
         signal: AbortSignal.timeout(Math.max(250, Math.min(1_000, remainingMs)))
       })
-      const healthy = res.ok && isKunHealthResponseBody(await res.text())
+      const healthy = res.ok && isMagicPocketHealthResponseBody(await res.text())
       return { healthy, error: healthy ? '' : `unexpected status ${res.status}` }
     } catch (error) {
       return {
@@ -752,9 +752,9 @@ function probeKunHealthOnce(
       }
     }
   })().finally(() => {
-    if (kunHealthProbeInFlight.get(base) === task) kunHealthProbeInFlight.delete(base)
+    if (magicpocketHealthProbeInFlight.get(base) === task) magicpocketHealthProbeInFlight.delete(base)
   })
-  kunHealthProbeInFlight.set(base, task)
+  magicpocketHealthProbeInFlight.set(base, task)
   return task
 }
 
@@ -790,14 +790,14 @@ const RUNTIME_WATCHDOG_FAILURE_THRESHOLD = 3
  */
 const RUNTIME_HUNG_CONFIRM_MS = 10_000
 const runtimeRestartBudget = new RestartBudget({ windowMs: 60_000, maxRestarts: 3 })
-let lastRuntimeStatus: KunRuntimeStatus | null = null
+let lastRuntimeStatus: MagicPocketRuntimeStatus | null = null
 let supervisedRestartInFlight = false
 let runtimeWatchdogTimer: NodeJS.Timeout | null = null
 let runtimeWatchdogFailures = 0
 let runtimeWatchdogTickInFlight = false
 
-function publishRuntimeStatus(status: Omit<KunRuntimeStatus, 'at'>): void {
-  const full: KunRuntimeStatus = { ...status, at: new Date().toISOString() }
+function publishRuntimeStatus(status: Omit<MagicPocketRuntimeStatus, 'at'>): void {
+  const full: MagicPocketRuntimeStatus = { ...status, at: new Date().toISOString() }
   lastRuntimeStatus = full
   logWarn('runtime-status', `${full.state} (${full.source})${full.message ? `: ${full.message}` : ''}`)
   for (const win of BrowserWindow.getAllWindows()) {
@@ -815,33 +815,33 @@ function noteRuntimeHealthy(source: string): void {
   }
 }
 
-function handleUnexpectedKunExit(info: KunUnexpectedExitInfo): void {
-  void superviseKunCrash(info).catch((error: unknown) => {
-    logError('kun-supervisor', 'supervised restart crashed', {
+function handleUnexpectedMagicPocketExit(info: MagicPocketUnexpectedExitInfo): void {
+  void superviseMagicPocketCrash(info).catch((error: unknown) => {
+    logError('magicpocket-supervisor', 'supervised restart crashed', {
       message: error instanceof Error ? error.message : String(error)
     })
   })
 }
 
-async function superviseKunCrash(info: KunUnexpectedExitInfo): Promise<void> {
+async function superviseMagicPocketCrash(info: MagicPocketUnexpectedExitInfo): Promise<void> {
   if (managedRuntimesStoppedForQuit || isQuitting) return
   const exitLabel = info.signal ? `signal ${info.signal}` : `code ${info.code ?? 'unknown'}`
   publishRuntimeStatus({
     state: 'crashed',
     source: 'supervisor',
-    message: `Kun exited unexpectedly (${exitLabel}).`,
+    message: `MagicPocket exited unexpectedly (${exitLabel}).`,
     stderrTail: info.stderrTail
   })
   if (supervisedRestartInFlight) return
   supervisedRestartInFlight = true
   try {
     const settings = await store.load()
-    const runtime = getKunRuntimeSettings(settings)
+    const runtime = getMagicPocketRuntimeSettings(settings)
     if (!resolveConfiguredApiKey(settings) || !runtime.autoStart) {
       publishRuntimeStatus({
         state: 'stopped',
         source: 'supervisor',
-        message: 'Kun exited and automatic restart is unavailable (missing API key or auto-start disabled).'
+        message: 'MagicPocket exited and automatic restart is unavailable (missing API key or auto-start disabled).'
       })
       return
     }
@@ -854,8 +854,8 @@ async function superviseKunCrash(info: KunUnexpectedExitInfo): Promise<void> {
           state: 'failed',
           source: 'supervisor',
           message: lastError
-            ? `Kun keeps crashing; automatic restarts are paused. Last error: ${lastError}`
-            : 'Kun keeps crashing; automatic restarts are paused. Check the runtime logs, then retry.',
+            ? `MagicPocket keeps crashing; automatic restarts are paused. Last error: ${lastError}`
+            : 'MagicPocket keeps crashing; automatic restarts are paused. Check the runtime logs, then retry.',
           stderrTail: info.stderrTail
         })
         return
@@ -865,7 +865,7 @@ async function superviseKunCrash(info: KunUnexpectedExitInfo): Promise<void> {
         source: 'supervisor',
         attempt: verdict.attempt,
         maxAttempts: 3,
-        message: `Restarting Kun automatically (attempt ${verdict.attempt}/3).`
+        message: `Restarting MagicPocket automatically (attempt ${verdict.attempt}/3).`
       })
       await new Promise((resolve) => setTimeout(resolve, verdict.delayMs))
       try {
@@ -874,7 +874,7 @@ async function superviseKunCrash(info: KunUnexpectedExitInfo): Promise<void> {
         return
       } catch (error) {
         lastError = error instanceof Error ? error.message : String(error)
-        logWarn('kun-supervisor', `automatic restart attempt ${verdict.attempt} failed: ${lastError}`)
+        logWarn('magicpocket-supervisor', `automatic restart attempt ${verdict.attempt} failed: ${lastError}`)
       }
     }
   } finally {
@@ -886,7 +886,7 @@ function startRuntimeWatchdog(): void {
   if (runtimeWatchdogTimer) return
   const timer = setInterval(() => {
     void runtimeWatchdogTick().catch((error: unknown) => {
-      logWarn('kun-watchdog', 'watchdog tick failed', {
+      logWarn('magicpocket-watchdog', 'watchdog tick failed', {
         message: error instanceof Error ? error.message : String(error)
       })
     })
@@ -903,7 +903,7 @@ function stopRuntimeWatchdog(): void {
 }
 
 /**
- * Post-startup liveness check for the GUI-managed kun child: the boot
+ * Post-startup liveness check for the GUI-managed magicpocket child: the boot
  * probe only covers launch, so a runtime that hangs later (blocked
  * event loop, sqlite lock) would otherwise stay dead until the user
  * restarts the app.
@@ -919,18 +919,18 @@ async function runtimeWatchdogTick(): Promise<void> {
   ) {
     return
   }
-  if (!kunRuntimeAdapter.isChildRunning()) return
+  if (!magicpocketRuntimeAdapter.isChildRunning()) return
   runtimeWatchdogTickInFlight = true
   try {
     const settings = await store.load()
-    const healthy = await waitForKunHealth(settings, 5_000)
+    const healthy = await waitForMagicPocketHealth(settings, 5_000)
     if (healthy) {
       runtimeWatchdogFailures = 0
       return
     }
     runtimeWatchdogFailures += 1
     logWarn(
-      'kun-watchdog',
+      'magicpocket-watchdog',
       `health probe failed (${runtimeWatchdogFailures}/${RUNTIME_WATCHDOG_FAILURE_THRESHOLD})`
     )
     if (runtimeWatchdogFailures < RUNTIME_WATCHDOG_FAILURE_THRESHOLD) return
@@ -938,7 +938,7 @@ async function runtimeWatchdogTick(): Promise<void> {
     publishRuntimeStatus({
       state: 'restarting',
       source: 'watchdog',
-      message: 'Kun stopped responding to health checks; restarting it.'
+      message: 'MagicPocket stopped responding to health checks; restarting it.'
     })
     try {
       await restartRuntime(settings)
@@ -947,7 +947,7 @@ async function runtimeWatchdogTick(): Promise<void> {
       publishRuntimeStatus({
         state: 'failed',
         source: 'watchdog',
-        message: `Kun is unresponsive and the automatic restart failed: ${
+        message: `MagicPocket is unresponsive and the automatic restart failed: ${
           error instanceof Error ? error.message : String(error)
         }`
       })
@@ -982,7 +982,7 @@ function queueRuntimeSettingsApply(prev: AppSettingsV1, next: AppSettingsV1): vo
       }
     })
     .catch((error: unknown) => {
-      logWarn('settings-apply', 'Failed to apply Kun runtime settings in background', {
+      logWarn('settings-apply', 'Failed to apply MagicPocket runtime settings in background', {
         message: error instanceof Error ? error.message : String(error)
       })
     })
@@ -1009,7 +1009,7 @@ function queueRuntimeMcpConfigApply(settings: AppSettingsV1): void {
       }
     })
     .catch((error: unknown) => {
-      logWarn('mcp-config', 'Failed to apply Kun MCP config change in background', {
+      logWarn('mcp-config', 'Failed to apply MagicPocket MCP config change in background', {
         message: error instanceof Error ? error.message : String(error)
       })
     })
@@ -1029,13 +1029,13 @@ async function waitForQueuedRuntimeSettingsApply(): Promise<void> {
 
 /**
  * Build a stable fingerprint of the settings that affect the
- * Kun runtime so that `ensureRuntime` can debounce on real
+ * MagicPocket runtime so that `ensureRuntime` can debounce on real
  * state instead of on a single in-flight promise. Without this,
  * a fresh call that arrives while a failing ensure is still pending
  * would re-throw the old error.
  */
 function runtimeFingerprint(settings: AppSettingsV1): string {
-  return stableSettingsStringify(resolveKunRuntimeSettings(settings))
+  return stableSettingsStringify(resolveMagicPocketRuntimeSettings(settings))
 }
 
 async function ensureRuntime(settings: AppSettingsV1): Promise<AppSettingsV1> {
@@ -1080,22 +1080,22 @@ async function ensureRuntime(settings: AppSettingsV1): Promise<AppSettingsV1> {
 
 async function ensureRuntimeOnce(settings: AppSettingsV1): Promise<AppSettingsV1> {
   await waitForQueuedRuntimeSettingsApply()
-  return ensureKunRuntime(settings)
+  return ensureMagicPocketRuntime(settings)
 }
 
-async function resolveManagedKunLaunchSettings(
+async function resolveManagedMagicPocketLaunchSettings(
   settings: AppSettingsV1,
   source: string
 ): Promise<AppSettingsV1> {
-  const tokenResult = await ensureManagedKunRuntimeToken(settings, source)
+  const tokenResult = await ensureManagedMagicPocketRuntimeToken(settings, source)
   const launchSettings = tokenResult.settings
-  const runtime = getKunRuntimeSettings(launchSettings)
-  const resolved = await kunRuntimeAdapter.resolveAvailablePort(runtime.port)
+  const runtime = getMagicPocketRuntimeSettings(launchSettings)
+  const resolved = await magicpocketRuntimeAdapter.resolveAvailablePort(runtime.port)
   if (!resolved.changed) return launchSettings
 
-  const next = await store.patch({ agents: { kun: { port: resolved.port } } })
+  const next = await store.patch({ agents: { magicpocket: { port: resolved.port } } })
   lastAppliedSettings = next
-  logWarn(source, `Kun port ${runtime.port} is unavailable; using ${resolved.port} for the managed runtime`, {
+  logWarn(source, `MagicPocket port ${runtime.port} is unavailable; using ${resolved.port} for the managed runtime`, {
     previousPort: runtime.port,
     port: resolved.port,
     message: resolved.message
@@ -1103,39 +1103,39 @@ async function resolveManagedKunLaunchSettings(
   return next
 }
 
-function generateKunRuntimeToken(): string {
+function generateMagicPocketRuntimeToken(): string {
   return randomBytes(32).toString('base64url')
 }
 
-async function ensureManagedKunRuntimeToken(
+async function ensureManagedMagicPocketRuntimeToken(
   settings: AppSettingsV1,
   source: string
 ): Promise<{ settings: AppSettingsV1; generated: boolean }> {
-  const runtime = getKunRuntimeSettings(settings)
+  const runtime = getMagicPocketRuntimeSettings(settings)
   if (runtime.runtimeToken.trim()) {
     return { settings, generated: false }
   }
 
   const next = await store.patch({
-    agents: { kun: { runtimeToken: generateKunRuntimeToken() } }
+    agents: { magicpocket: { runtimeToken: generateMagicPocketRuntimeToken() } }
   })
   lastAppliedSettings = next
-  logWarn(source, 'Generated a runtime token for the managed Kun runtime because none was configured.')
+  logWarn(source, 'Generated a runtime token for the managed MagicPocket runtime because none was configured.')
   return { settings: next, generated: true }
 }
 
-async function ensureKunRuntime(settings: AppSettingsV1): Promise<AppSettingsV1> {
-  const tokenResult = await ensureManagedKunRuntimeToken(settings, 'runtime-start')
+async function ensureMagicPocketRuntime(settings: AppSettingsV1): Promise<AppSettingsV1> {
+  const tokenResult = await ensureManagedMagicPocketRuntimeToken(settings, 'runtime-start')
   const currentSettings = tokenResult.settings
-  if (tokenResult.generated && kunRuntimeAdapter.isChildRunning()) {
-    logWarn('runtime-start', 'Restarting managed Kun to apply the generated runtime token.')
-    await kunRuntimeAdapter.stopAndWait()
+  if (tokenResult.generated && magicpocketRuntimeAdapter.isChildRunning()) {
+    logWarn('runtime-start', 'Restarting managed MagicPocket to apply the generated runtime token.')
+    await magicpocketRuntimeAdapter.stopAndWait()
   }
 
-  const runtime = getKunRuntimeSettings(currentSettings)
+  const runtime = getMagicPocketRuntimeSettings(currentSettings)
   const hasApiKey = Boolean(resolveConfiguredApiKey(currentSettings))
 
-  const healthy = await waitForKunHealth(currentSettings, 2_000)
+  const healthy = await waitForMagicPocketHealth(currentSettings, 2_000)
   if (healthy) {
     const threadApi = await probeThreadApi(currentSettings)
     if (threadApi.ok) {
@@ -1148,32 +1148,32 @@ async function ensureKunRuntime(settings: AppSettingsV1): Promise<AppSettingsV1>
   if (!hasApiKey) {
     throw runtimeJsonError(
       'missing_api_key',
-      'DeepSeek API Key is required before the GUI can start Kun.'
+      'DeepSeek API Key is required before the GUI can start MagicPocket.'
     )
   }
   if (!runtime.autoStart) {
     throw runtimeJsonError(
       'runtime_offline',
-      'Kun is offline. Enable automatic startup in Settings, or start `kun serve` manually.'
+      'MagicPocket is offline. Enable automatic startup in Settings, or start `magicpocket serve` manually.'
     )
   }
 
   // A managed child that is alive but failed the probe is hung (blocked event
   // loop) or merely busy — not absent. The launch path below cannot recover it
   // on its own: resolveAvailablePort skips our own child when reclaiming the
-  // port (isCurrentKunChildPid) and startKunChild early-returns while
+  // port (isCurrentMagicPocketChildPid) and startMagicPocketChild early-returns while
   // isChildRunning() stays true, so it would pick a fresh port, never spawn,
   // and fail every request until the ~90s watchdog finally force-restarts
-  // (KunAgent/Kun#621). Stop the hung child here so the relaunch spawns a fresh
+  // (MagicPocketAgent/MagicPocket#621). Stop the hung child here so the relaunch spawns a fresh
   // process on the SAME port instead.
-  if (kunRuntimeAdapter.isChildRunning()) {
+  if (magicpocketRuntimeAdapter.isChildRunning()) {
     // Never tear down a child still inside its (deliberately generous) startup
     // window — interrupting a slow-but-healthy boot is the #544 restart storm.
-    await waitForKunStartupSettled()
-    if (kunRuntimeAdapter.isChildRunning()) {
+    await waitForMagicPocketStartupSettled()
+    if (magicpocketRuntimeAdapter.isChildRunning()) {
       // Give a merely-busy runtime a real chance to answer before judging it
       // hung, so one long synchronous step does not cost the user their turn.
-      const recovered = await waitForKunHealth(currentSettings, RUNTIME_HUNG_CONFIRM_MS)
+      const recovered = await waitForMagicPocketHealth(currentSettings, RUNTIME_HUNG_CONFIRM_MS)
       if (recovered) {
         const threadApi = await probeThreadApi(currentSettings)
         if (threadApi.ok) {
@@ -1184,25 +1184,25 @@ async function ensureKunRuntime(settings: AppSettingsV1): Promise<AppSettingsV1>
       }
       logWarn(
         'runtime-start',
-        `managed Kun child stopped responding on port ${runtime.port}; restarting it in place`
+        `managed MagicPocket child stopped responding on port ${runtime.port}; restarting it in place`
       )
-      await kunRuntimeAdapter.stopAndWait()
+      await magicpocketRuntimeAdapter.stopAndWait()
     }
   }
 
-  const launchSettings = await resolveManagedKunLaunchSettings(currentSettings, 'runtime-start')
-  const adapter = kunRuntimeAdapter
+  const launchSettings = await resolveManagedMagicPocketLaunchSettings(currentSettings, 'runtime-start')
+  const adapter = magicpocketRuntimeAdapter
   try {
     await adapter.ensureRunning(launchSettings)
   } catch (e) {
-    console.error('[kun-gui] failed to start kun:', e)
+    console.error('[magicpocket-gui] failed to start magicpocket:', e)
     throw e
   }
-  const started = await waitForKunHealth(launchSettings, 20_000)
+  const started = await waitForMagicPocketHealth(launchSettings, 20_000)
   if (!started) {
     throw runtimeJsonError(
       'runtime_unhealthy',
-      'Kun did not become healthy after launch.'
+      'MagicPocket did not become healthy after launch.'
     )
   }
 
@@ -1233,38 +1233,38 @@ async function restartRuntimeOnce(settings: AppSettingsV1): Promise<void> {
   // Don't tear down a child that is still completing its startup; wait for it
   // to settle so a restart trigger that races a boot doesn't reset the clock
   // (#544). Resolves immediately when nothing is launching.
-  await waitForKunStartupSettled()
-  const runtime = getKunRuntimeSettings(settings)
+  await waitForMagicPocketStartupSettled()
+  const runtime = getMagicPocketRuntimeSettings(settings)
 
   if (!resolveConfiguredApiKey(settings)) {
     throw runtimeJsonError(
       'missing_api_key',
-      'DeepSeek API Key is required before the GUI can start Kun.'
+      'DeepSeek API Key is required before the GUI can start MagicPocket.'
     )
   }
   if (!runtime.autoStart) {
     throw runtimeJsonError(
       'runtime_offline',
-      'Kun is offline. Enable automatic startup in Settings, or start `kun serve` manually.'
+      'MagicPocket is offline. Enable automatic startup in Settings, or start `magicpocket serve` manually.'
     )
   }
 
-  const adapter = kunRuntimeAdapter
+  const adapter = magicpocketRuntimeAdapter
   await adapter.stopAndWait()
-  const launchSettings = await resolveManagedKunLaunchSettings(settings, 'runtime-restart')
+  const launchSettings = await resolveManagedMagicPocketLaunchSettings(settings, 'runtime-restart')
 
   try {
     await adapter.ensureRunning(launchSettings)
   } catch (e) {
-    console.error('[kun-gui] failed to restart kun:', e)
+    console.error('[magicpocket-gui] failed to restart magicpocket:', e)
     throw e
   }
 
-  const healthy = await waitForKunHealth(launchSettings, 20_000)
+  const healthy = await waitForMagicPocketHealth(launchSettings, 20_000)
   if (!healthy) {
     throw runtimeJsonError(
       'runtime_unhealthy',
-      'Kun did not become healthy after restart.'
+      'MagicPocket did not become healthy after restart.'
     )
   }
 
@@ -1295,7 +1295,7 @@ function createWindow(options: { suppressInitialShow?: boolean } = {}): void {
       sandbox: true,
       webviewTag: true,
       // Pass the home dir to the sandboxed preload (it can't require node:os).
-      additionalArguments: [`--kun-home-dir=${homedir()}`]
+      additionalArguments: [`--magicpocket-home-dir=${homedir()}`]
     }
   })
   if (usesDesktopTitleBar) {
@@ -1304,7 +1304,7 @@ function createWindow(options: { suppressInitialShow?: boolean } = {}): void {
   }
   mainWindow.webContents.on('preload-error', (_event, preloadPath, error) => {
     const message = error instanceof Error ? error.message : String(error)
-    console.error(`[kun-gui] failed to load preload ${preloadPath}:`, error)
+    console.error(`[magicpocket-gui] failed to load preload ${preloadPath}:`, error)
     logError('preload', 'Failed to load preload script', { preloadPath, message })
   })
   mainWindow.webContents.on('context-menu', (event, params) => {
@@ -1350,13 +1350,13 @@ function createWindow(options: { suppressInitialShow?: boolean } = {}): void {
 }
 
 /**
- * Reject runtime-affecting values that would persist a config kun can
+ * Reject runtime-affecting values that would persist a config magicpocket can
  * never boot with. Runs before the settings patch is written to disk.
  */
 function validateRuntimeSettingsForApply(next: AppSettingsV1): string | null {
-  const runtime = resolveKunRuntimeSettings(next)
+  const runtime = resolveMagicPocketRuntimeSettings(next)
   if (!Number.isInteger(runtime.port) || runtime.port < MIN_KUN_LOCAL_PORT || runtime.port > 65_535) {
-    return `Kun port must be an integer between ${MIN_KUN_LOCAL_PORT} and 65535 (got ${String(runtime.port)})`
+    return `MagicPocket port must be an integer between ${MIN_KUN_LOCAL_PORT} and 65535 (got ${String(runtime.port)})`
   }
   const baseUrl = (runtime.baseUrl ?? '').trim()
   if (baseUrl) {
@@ -1376,19 +1376,19 @@ function preserveRuntimeTokenForFullSettingsSnapshot(
   prev: AppSettingsV1,
   partial: AppSettingsPatch
 ): AppSettingsPatch {
-  const incomingKun = partial.agents?.kun
-  if (!incomingKun || !isFullSettingsSnapshotPatch(partial)) return partial
-  if (typeof incomingKun.runtimeToken !== 'string' || incomingKun.runtimeToken.trim()) return partial
+  const incomingMagicPocket = partial.agents?.magicpocket
+  if (!incomingMagicPocket || !isFullSettingsSnapshotPatch(partial)) return partial
+  if (typeof incomingMagicPocket.runtimeToken !== 'string' || incomingMagicPocket.runtimeToken.trim()) return partial
 
-  const currentToken = getKunRuntimeSettings(prev).runtimeToken.trim()
+  const currentToken = getMagicPocketRuntimeSettings(prev).runtimeToken.trim()
   if (!currentToken) return partial
 
   return {
     ...partial,
     agents: {
       ...partial.agents,
-      kun: {
-        ...incomingKun,
+      magicpocket: {
+        ...incomingMagicPocket,
         runtimeToken: currentToken
       }
     }
@@ -1398,7 +1398,7 @@ function preserveRuntimeTokenForFullSettingsSnapshot(
 function isFullSettingsSnapshotPatch(partial: AppSettingsPatch): boolean {
   return partial.version !== undefined &&
     partial.provider !== undefined &&
-    partial.agents?.kun !== undefined &&
+    partial.agents?.magicpocket !== undefined &&
     partial.log !== undefined &&
     partial.checkpointCleanup !== undefined &&
     partial.notifications !== undefined &&
@@ -1418,13 +1418,13 @@ async function applyManagedRuntimeSettingsHot(
   settings: AppSettingsV1,
   source: string
 ): Promise<ManagedRuntimeHotApplyResult> {
-  await waitForKunStartupSettled()
-  const adapter = kunRuntimeAdapter
+  await waitForMagicPocketStartupSettled()
+  const adapter = magicpocketRuntimeAdapter
   if (!adapter.isChildRunning()) return 'skipped'
 
-  const runtime = resolveKunRuntimeSettings(settings)
-  const dataDir = resolveKunDataDir(runtime)
-  const config = await syncGuiManagedKunConfig(dataDir, runtime, {
+  const runtime = resolveMagicPocketRuntimeSettings(settings)
+  const dataDir = resolveMagicPocketDataDir(runtime)
+  const config = await syncGuiManagedMagicPocketConfig(dataDir, runtime, {
     scheduleMcp: {
       settings,
       launch: getClawScheduleMcpLaunchConfig()
@@ -1463,7 +1463,7 @@ async function applyManagedRuntimeSettingsHot(
     )
     const text = await response.text()
     if (response.status === 404 || response.status === 405) {
-      logWarn(source, 'Kun runtime does not support hot config apply; falling back to restart.')
+      logWarn(source, 'MagicPocket runtime does not support hot config apply; falling back to restart.')
       return 'restart_required'
     }
     let parsed: unknown = null
@@ -1483,13 +1483,13 @@ async function applyManagedRuntimeSettingsHot(
       ? String((parsed as { message?: unknown }).message ?? text)
       : text
     if (code === 'restart_required') {
-      logWarn(source, `Kun hot config apply requested restart: ${message}`)
+      logWarn(source, `MagicPocket hot config apply requested restart: ${message}`)
       return 'restart_required'
     }
-    throw new Error(message || `Kun hot config apply failed with HTTP ${response.status}`)
+    throw new Error(message || `MagicPocket hot config apply failed with HTTP ${response.status}`)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    logWarn(source, `Kun hot config apply failed; falling back to restart: ${message}`)
+    logWarn(source, `MagicPocket hot config apply failed; falling back to restart: ${message}`)
     return 'restart_required'
   }
 }
@@ -1502,14 +1502,14 @@ async function restartManagedRuntimeForSettingsChange(
   if (!force && !runtimeProcessConfigChanged(prev, next)) return
 
   // Let any in-flight boot launch finish (or fail) before we read liveness
-  // and stop the child. Killing a kun that is still inside its startup window
+  // and stop the child. Killing a magicpocket that is still inside its startup window
   // throws away the boot's progress and restarts the clock — the #544 restart
   // storm. Once it settles, the child is either healthy (graceful restart
   // below) or already gone (`wasRunning` is false and we return).
-  await waitForKunStartupSettled()
+  await waitForMagicPocketStartupSettled()
 
-  const runtime = resolveKunRuntimeSettings(next)
-  const adapter = kunRuntimeAdapter
+  const runtime = resolveMagicPocketRuntimeSettings(next)
+  const adapter = magicpocketRuntimeAdapter
   const wasRunning = adapter.isChildRunning()
 
   if (!wasRunning) return
@@ -1526,7 +1526,7 @@ async function restartManagedRuntimeForSettingsChange(
   if (!nextHasApiKey && Boolean(resolveConfiguredApiKey(prev))) {
     logWarn(
       'settings-apply',
-      'Skipping Kun restart: the new settings resolve to no API key but the running runtime had one — leaving the healthy runtime in place.'
+      'Skipping MagicPocket restart: the new settings resolve to no API key but the running runtime had one — leaving the healthy runtime in place.'
     )
     return
   }
@@ -1537,24 +1537,24 @@ async function restartManagedRuntimeForSettingsChange(
     publishRuntimeStatus({
       state: 'stopped',
       source: 'settings-apply',
-      message: 'Kun was stopped: the new settings have no API key or auto-start is disabled.'
+      message: 'MagicPocket was stopped: the new settings have no API key or auto-start is disabled.'
     })
     return
   }
 
   publishRuntimeStatus({ state: 'restarting', source: 'settings-apply' })
   try {
-    const launchSettings = await resolveManagedKunLaunchSettings(next, 'settings-apply')
+    const launchSettings = await resolveManagedMagicPocketLaunchSettings(next, 'settings-apply')
     await adapter.ensureRunning(launchSettings)
-    const healthy = await waitForKunHealth(launchSettings, 20_000)
+    const healthy = await waitForMagicPocketHealth(launchSettings, 20_000)
     if (!healthy) {
-      throw new Error('Kun did not become healthy after the settings change')
+      throw new Error('MagicPocket did not become healthy after the settings change')
     }
     noteRuntimeHealthy('settings-apply')
     publishRuntimeStatus({ state: 'running', source: 'settings-apply' })
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
-    logWarn('settings-apply', `Kun restart failed after settings change: ${message}`)
+    logWarn('settings-apply', `MagicPocket restart failed after settings change: ${message}`)
     await rollbackRuntimeSettingsAfterFailedApply(prev, message)
   }
 }
@@ -1562,18 +1562,18 @@ async function restartManagedRuntimeForSettingsChange(
 /**
  * A settings change took the runtime down and the new config cannot
  * boot. Restore the previous runtime/provider settings on disk (so the
- * next app launch is not bricked either) and bring kun back up on the
+ * next app launch is not bricked either) and bring magicpocket back up on the
  * last-known-good configuration.
  */
 async function rollbackRuntimeSettingsAfterFailedApply(
   prev: AppSettingsV1,
   failureMessage: string
 ): Promise<void> {
-  const adapter = kunRuntimeAdapter
+  const adapter = magicpocketRuntimeAdapter
   let base: AppSettingsV1 = prev
   try {
     base = await store.patch({
-      agents: { kun: getKunRuntimeSettings(prev) },
+      agents: { magicpocket: getMagicPocketRuntimeSettings(prev) },
       provider: prev.provider
     })
     lastAppliedSettings = base
@@ -1582,7 +1582,7 @@ async function rollbackRuntimeSettingsAfterFailedApply(
       message: error instanceof Error ? error.message : String(error)
     })
   }
-  if (!resolveConfiguredApiKey(base) || !getKunRuntimeSettings(base).autoStart) {
+  if (!resolveConfiguredApiKey(base) || !getMagicPocketRuntimeSettings(base).autoStart) {
     publishRuntimeStatus({
       state: 'stopped',
       source: 'settings-apply',
@@ -1592,9 +1592,9 @@ async function rollbackRuntimeSettingsAfterFailedApply(
     return
   }
   try {
-    const launchSettings = await resolveManagedKunLaunchSettings(base, 'settings-apply-rollback')
+    const launchSettings = await resolveManagedMagicPocketLaunchSettings(base, 'settings-apply-rollback')
     await adapter.ensureRunning(launchSettings)
-    const healthy = await waitForKunHealth(launchSettings, 20_000)
+    const healthy = await waitForMagicPocketHealth(launchSettings, 20_000)
     if (!healthy) {
       throw new Error('previous configuration did not become healthy')
     }
@@ -1603,7 +1603,7 @@ async function rollbackRuntimeSettingsAfterFailedApply(
       state: 'running',
       source: 'settings-apply',
       rolledBack: true,
-      message: `The new settings failed to apply (${failureMessage}); Kun is running on the previous settings again.`
+      message: `The new settings failed to apply (${failureMessage}); MagicPocket is running on the previous settings again.`
     })
   } catch (error) {
     publishRuntimeStatus({
@@ -1620,10 +1620,10 @@ async function rollbackRuntimeSettingsAfterFailedApply(
 async function restartManagedRuntimeForMcpConfigChange(settings: AppSettingsV1): Promise<void> {
   // See restartManagedRuntimeForSettingsChange: never interrupt an in-flight
   // boot launch (#544 restart storm).
-  await waitForKunStartupSettled()
+  await waitForMagicPocketStartupSettled()
 
-  const runtime = resolveKunRuntimeSettings(settings)
-  const adapter = kunRuntimeAdapter
+  const runtime = resolveMagicPocketRuntimeSettings(settings)
+  const adapter = magicpocketRuntimeAdapter
   const wasRunning = adapter.isChildRunning()
 
   if (!wasRunning) return
@@ -1633,21 +1633,21 @@ async function restartManagedRuntimeForMcpConfigChange(settings: AppSettingsV1):
 
   publishRuntimeStatus({ state: 'restarting', source: 'mcp-config' })
   try {
-    const launchSettings = await resolveManagedKunLaunchSettings(settings, 'mcp-config')
+    const launchSettings = await resolveManagedMagicPocketLaunchSettings(settings, 'mcp-config')
     await adapter.ensureRunning(launchSettings)
-    const healthy = await waitForKunHealth(launchSettings, 20_000)
+    const healthy = await waitForMagicPocketHealth(launchSettings, 20_000)
     if (!healthy) {
-      throw new Error('Kun did not become healthy after the MCP config change')
+      throw new Error('MagicPocket did not become healthy after the MCP config change')
     }
     noteRuntimeHealthy('mcp-config')
     publishRuntimeStatus({ state: 'running', source: 'mcp-config' })
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
-    logWarn('mcp-config', `Kun restart failed after MCP config change: ${message}`)
+    logWarn('mcp-config', `MagicPocket restart failed after MCP config change: ${message}`)
     publishRuntimeStatus({
       state: 'failed',
       source: 'mcp-config',
-      message: `Kun failed to restart after the MCP config change: ${message}. Check the MCP config file, then retry.`
+      message: `MagicPocket failed to restart after the MCP config change: ${message}. Check the MCP config file, then retry.`
     })
   }
 }
@@ -1656,16 +1656,16 @@ async function waitForManagedRuntimeReadyBeforeStop(
   settings: AppSettingsV1,
   source: string
 ): Promise<void> {
-  const healthy = await waitForKunHealth(settings, 20_000)
+  const healthy = await waitForMagicPocketHealth(settings, 20_000)
   if (!healthy) {
-    logWarn(source, 'Kun did not become healthy before a managed restart; stopping it anyway')
+    logWarn(source, 'MagicPocket did not become healthy before a managed restart; stopping it anyway')
     return
   }
   const idle = await waitForRuntimeTurnsIdle({ settings })
   if (idle === 'timeout') {
-    logWarn(source, 'Kun still has running turns after waiting; stopping it anyway')
+    logWarn(source, 'MagicPocket still has running turns after waiting; stopping it anyway')
   } else if (idle === 'unavailable') {
-    logWarn(source, 'Could not verify Kun turn idleness before a managed restart; stopping it anyway')
+    logWarn(source, 'Could not verify MagicPocket turn idleness before a managed restart; stopping it anyway')
   }
 }
 
@@ -1702,7 +1702,7 @@ app.whenReady().then(async () => {
   traceStartup('install webview guards:done')
 
   if (process.platform === 'darwin') {
-    const macDockIcon = createAppIcon(kunMacLogoPng)
+    const macDockIcon = createAppIcon(magicpocketMacLogoPng)
     app.dock.setIcon(macDockIcon.isEmpty() ? appIcon : macDockIcon)
   }
 
@@ -1710,7 +1710,7 @@ app.whenReady().then(async () => {
   traceStartup('settings load:start')
   const initial = await store.load()
   traceStartup('settings load:done')
-  setKunUnexpectedExitHandler(handleUnexpectedKunExit)
+  setMagicPocketUnexpectedExitHandler(handleUnexpectedMagicPocketExit)
   appBehavior = initial.appBehavior
   syncLoginItemSettings(initial)
   syncTray(initial)
@@ -1772,7 +1772,7 @@ app.whenReady().then(async () => {
     const effectivePartial = preserveRuntimeTokenForFullSettingsSnapshot(prev, partial)
     const { agents: agentsPatch, provider: providerPatch, ...restPatch } = effectivePartial
     const next = normalizeAppSettings({
-      ...applyKunRuntimePatch(prev, agentsPatch?.kun),
+      ...applyMagicPocketRuntimePatch(prev, agentsPatch?.magicpocket),
       ...restPatch,
       provider: mergeModelProviderSettings(prev.provider, providerPatch),
       log: { ...prev.log, ...(effectivePartial.log ?? {}) },
@@ -1858,8 +1858,8 @@ app.whenReady().then(async () => {
     pollFeishuInstall,
     startWeixinInstallQrcode,
     pollWeixinInstall,
-    resolveKunConfigPath: resolveKunMcpJsonPath,
-    onKunMcpConfigWritten: async () => {
+    resolveMagicPocketConfigPath: resolveMagicPocketMcpJsonPath,
+    onMagicPocketMcpConfigWritten: async () => {
       const settings = await store.load()
       queueRuntimeMcpConfigApply(settings)
     },
@@ -1872,7 +1872,7 @@ app.whenReady().then(async () => {
   })
 
   void loadGuiUpdaterModule().catch((error) => {
-    console.warn('[kun-gui updater] failed to initialize on startup:', error)
+    console.warn('[magicpocket-gui updater] failed to initialize on startup:', error)
   })
 
   registerRuntimeSseIpc({ ipcMain, store, ensureRuntime, logError })
@@ -1890,17 +1890,17 @@ app.whenReady().then(async () => {
   void loadGuiUpdaterModule()
     .then((module) => module.showPostUpdateReleaseNotes())
     .catch((error) => {
-      console.warn('[kun-gui updater] failed to show post-update release notes:', error)
+      console.warn('[magicpocket-gui updater] failed to show post-update release notes:', error)
     })
 
   void pruneOnStartup().catch((err) => {
-    console.warn('[kun-gui] prune logs:', err)
+    console.warn('[magicpocket-gui] prune logs:', err)
   })
 
   if (resolveConfiguredApiKey(initial)) {
     setTimeout(() => {
-      void kunRuntimeAdapter.resolveExecutable(initial).catch((err) => {
-        console.warn('[kun-gui] prewarm Kun binary:', err)
+      void magicpocketRuntimeAdapter.resolveExecutable(initial).catch((err) => {
+        console.warn('[magicpocket-gui] prewarm MagicPocket binary:', err)
       })
     }, 1500)
   }
@@ -1915,15 +1915,15 @@ app.whenReady().then(async () => {
   })
 }).catch((error) => {
   const message = error instanceof Error ? error.message : String(error)
-  console.error('[kun-gui] startup failed:', error)
-  dialog.showErrorBox('Kun failed to start', message)
+  console.error('[magicpocket-gui] startup failed:', error)
+  dialog.showErrorBox('MagicPocket failed to start', message)
   app.quit()
 })
 }
 
 app.on('window-all-closed', () => {
   void stopManagedRuntimes().catch((error) => {
-    console.warn('[kun-gui] failed to stop Kun runtime:', error)
+    console.warn('[magicpocket-gui] failed to stop MagicPocket runtime:', error)
   })
   if (process.platform !== 'darwin') {
     app.quit()
@@ -1938,7 +1938,7 @@ app.on('before-quit', (event) => {
   event.preventDefault()
   void stopManagedRuntimesForQuit()
     .catch((error) => {
-      console.warn('[kun-gui] failed to stop Kun runtime:', error)
+      console.warn('[magicpocket-gui] failed to stop MagicPocket runtime:', error)
       managedRuntimesStoppedForQuit = true
     })
     .finally(() => {

@@ -9,11 +9,11 @@ function normalizedHomeDir(homeDir: string | undefined): string {
 }
 
 function currentPlatform(): string {
-  return typeof window !== 'undefined' ? window.kunGui?.platform ?? '' : ''
+  return typeof window !== 'undefined' ? window.magicpocketGui?.platform ?? '' : ''
 }
 
 function currentHomeDir(): string {
-  return typeof window !== 'undefined' ? window.kunGui?.homeDir ?? '' : ''
+  return typeof window !== 'undefined' ? window.magicpocketGui?.homeDir ?? '' : ''
 }
 
 export function compactHomePathForSettingsDisplay(
@@ -95,20 +95,20 @@ export function expandSettingsHomePathsForUse(
 ): AppSettingsV1 {
   const expand = (value: string): string => expandHomePathForSettingsUse(value, homeDir, platform)
   const expandList = (values: readonly string[]): string[] => expandHomePathListForSettingsUse(values, homeDir, platform)
-  const kun = settings.agents.kun
+  const magicpocket = settings.agents.magicpocket
   return {
     ...settings,
     workspaceRoot: expand(settings.workspaceRoot),
     conversationWorkspaceRoot: expand(settings.conversationWorkspaceRoot),
     agents: {
       ...settings.agents,
-      kun: {
-        ...kun,
-        binaryPath: expand(kun.binaryPath),
-        dataDir: expand(kun.dataDir),
+      magicpocket: {
+        ...magicpocket,
+        binaryPath: expand(magicpocket.binaryPath),
+        dataDir: expand(magicpocket.dataDir),
         storage: {
-          ...kun.storage,
-          sqlitePath: expand(kun.storage.sqlitePath)
+          ...magicpocket.storage,
+          sqlitePath: expand(magicpocket.storage.sqlitePath)
         }
       }
     },

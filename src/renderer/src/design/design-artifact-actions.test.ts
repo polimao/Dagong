@@ -12,7 +12,7 @@ import { useDesignWorkspaceStore } from './design-workspace-store'
 function artifact(id: string, kind: DesignArtifact['kind'], patch: Partial<DesignArtifact> = {}): DesignArtifact {
   const createdAt = '2026-06-20T00:00:00.000Z'
   const relativePath =
-    kind === 'canvas' ? `.kun-design/${id}/canvas.json` : `.kun-design/${id}/v1.html`
+    kind === 'canvas' ? `.magicpocket-design/${id}/canvas.json` : `.magicpocket-design/${id}/v1.html`
   return {
     id,
     kind,

@@ -6,7 +6,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -29,10 +29,10 @@ function buildSettings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      kun: defaultKunRuntimeSettings()
+      magicpocket: defaultMagicPocketRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: true, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -100,7 +100,7 @@ function buildChannel(overrides: Partial<ClawImChannelV1> = {}): ClawImChannelV1
     threadId: 'thr_old',
     workspaceRoot: '/tmp/workspace',
     agentProfile: {
-      name: 'kun',
+      name: 'magicpocket',
       description: '',
       identity: '',
       personality: '',
@@ -173,7 +173,7 @@ describe('ClawRuntime', () => {
       threadId: '',
       workspaceRoot: '',
       agentProfile: {
-        name: 'kun',
+        name: 'magicpocket',
         description: '',
         identity: '',
         personality: '',
@@ -230,7 +230,7 @@ describe('ClawRuntime', () => {
       threadId: '',
       workspaceRoot: '',
       agentProfile: {
-        name: 'kun',
+        name: 'magicpocket',
         description: '',
         identity: '',
         personality: '',
@@ -364,8 +364,8 @@ describe('ClawRuntime', () => {
 
   it('accepts assistant_text items when waiting for a Claw turn result', async () => {
     const settings = buildSettings()
-    settings.agents.kun.approvalPolicy = 'on-request'
-    settings.agents.kun.sandboxMode = 'workspace-write'
+    settings.agents.magicpocket.approvalPolicy = 'on-request'
+    settings.agents.magicpocket.sandboxMode = 'workspace-write'
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {
         return { ok: true, status: 200, body: JSON.stringify({ id: 'thr_1' }) }
@@ -444,8 +444,8 @@ describe('ClawRuntime', () => {
 
   it('passes non-default agent approval/sandbox settings through to IM turns without downgrading', async () => {
     const settings = buildSettings()
-    settings.agents.kun.approvalPolicy = 'untrusted'
-    settings.agents.kun.sandboxMode = 'read-only'
+    settings.agents.magicpocket.approvalPolicy = 'untrusted'
+    settings.agents.magicpocket.sandboxMode = 'read-only'
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {
         return { ok: true, status: 200, body: JSON.stringify({ id: 'thr_1' }) }
@@ -519,8 +519,8 @@ describe('ClawRuntime', () => {
 
   it('passes the never approval policy through to IM turns without escalating to auto', async () => {
     const settings = buildSettings()
-    settings.agents.kun.approvalPolicy = 'never'
-    settings.agents.kun.sandboxMode = 'read-only'
+    settings.agents.magicpocket.approvalPolicy = 'never'
+    settings.agents.magicpocket.sandboxMode = 'read-only'
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {
         return { ok: true, status: 200, body: JSON.stringify({ id: 'thr_1' }) }
@@ -594,8 +594,8 @@ describe('ClawRuntime', () => {
 
   it('does not attach IM-only permission fields when source is not im', async () => {
     const settings = buildSettings()
-    settings.agents.kun.approvalPolicy = 'untrusted'
-    settings.agents.kun.sandboxMode = 'read-only'
+    settings.agents.magicpocket.approvalPolicy = 'untrusted'
+    settings.agents.magicpocket.sandboxMode = 'read-only'
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {
         return { ok: true, status: 200, body: JSON.stringify({ id: 'thr_1' }) }
@@ -666,7 +666,7 @@ describe('ClawRuntime', () => {
     expect(turnBody).not.toHaveProperty('disableUserInput')
   })
 
-  it('reads assistant text from the Kun thread detail shape used by the real runtime', async () => {
+  it('reads assistant text from the MagicPocket thread detail shape used by the real runtime', async () => {
     const settings = buildSettings()
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {
@@ -1145,8 +1145,8 @@ describe('ClawRuntime', () => {
     })]
     const { store } = mutableSettingsStore(settings)
     const runtimeRequest = vi.fn(async (requestSettings: AppSettingsV1, path, init) => {
-      expect(requestSettings.agents.kun.providerId).toBe('minimax')
-      expect(requestSettings.agents.kun.model).toBe('MiniMax-M3')
+      expect(requestSettings.agents.magicpocket.providerId).toBe('minimax')
+      expect(requestSettings.agents.magicpocket.model).toBe('MiniMax-M3')
       if (path === '/v1/threads/thr_minimax/turns' && init?.method === 'POST') {
         const body = JSON.parse(init?.body ?? '{}') as { model?: string }
         expect(body.model).toBe('MiniMax-M3')
@@ -1214,12 +1214,12 @@ describe('ClawRuntime', () => {
     )
   })
 
-  it('resolves the default IM auto model to the current Kun model before starting a turn', async () => {
+  it('resolves the default IM auto model to the current MagicPocket model before starting a turn', async () => {
     const settings = buildSettings()
     settings.claw.im.enabled = true
     settings.claw.im.responseTimeoutMs = 2_000
-    settings.agents.kun.providerId = 'xiaomi'
-    settings.agents.kun.model = 'mimo-v2.5'
+    settings.agents.magicpocket.providerId = 'xiaomi'
+    settings.agents.magicpocket.model = 'mimo-v2.5'
     settings.provider.providers = [
       ...settings.provider.providers,
       buildModelProvider({
@@ -1232,8 +1232,8 @@ describe('ClawRuntime', () => {
       })
     ]
     const runtimeRequest = vi.fn(async (requestSettings: AppSettingsV1, path, init) => {
-      expect(requestSettings.agents.kun.providerId).toBe('xiaomi')
-      expect(requestSettings.agents.kun.model).toBe('mimo-v2.5')
+      expect(requestSettings.agents.magicpocket.providerId).toBe('xiaomi')
+      expect(requestSettings.agents.magicpocket.model).toBe('mimo-v2.5')
       if (path === '/v1/threads/thr_xiaomi/turns' && init?.method === 'POST') {
         const body = JSON.parse(init?.body ?? '{}') as { model?: string }
         expect(body.model).toBe('mimo-v2.5')
@@ -1296,7 +1296,7 @@ describe('ClawRuntime', () => {
     expect(result).toMatchObject({ ok: true, text: 'hello from mimo' })
   })
 
-  it('handles webhook /help as an IM command before starting a Kun turn', async () => {
+  it('handles webhook /help as an IM command before starting a MagicPocket turn', async () => {
     const settings = buildSettings()
     settings.claw.im.enabled = true
     settings.claw.channels = [buildChannel({ provider: 'weixin' as const, id: 'channel_weixin' })]
@@ -1449,8 +1449,8 @@ describe('ClawRuntime', () => {
     const settings = buildSettings()
     settings.claw.im.enabled = true
     settings.claw.im.responseTimeoutMs = 2_500
-    settings.agents.kun.approvalPolicy = 'untrusted'
-    settings.agents.kun.sandboxMode = 'read-only'
+    settings.agents.magicpocket.approvalPolicy = 'untrusted'
+    settings.agents.magicpocket.sandboxMode = 'read-only'
     settings.claw.channels = [buildChannel({
       provider: 'weixin' as const,
       id: 'channel_weixin',
@@ -1760,7 +1760,7 @@ describe('ClawRuntime', () => {
     expect(send).toHaveBeenCalledTimes(2)
     const welcomeCall = send.mock.calls[0] as unknown as [string, { markdown?: string }, Record<string, unknown>]
     expect(welcomeCall[0]).toBe('oc_chat_a')
-    expect(welcomeCall[1].markdown).toContain('Kun')
+    expect(welcomeCall[1].markdown).toContain('MagicPocket')
     expect(welcomeCall[1].markdown).toContain('`/new`')
     expect(welcomeCall[1].markdown).toContain('`/model`')
     expect(welcomeCall[2]).toEqual({})
@@ -1961,7 +1961,7 @@ describe('ClawRuntime', () => {
     }).handleWebhook(req, res)
 
     const reply = String(JSON.parse(responseBody).reply)
-    expect(reply).toContain('Kun')
+    expect(reply).toContain('MagicPocket')
     expect(reply).toContain('`/new`')
     expect(reply.endsWith('hello from GUI')).toBe(true)
     expect(current().claw.channels[0].welcomeSentAt).toBeTruthy()
@@ -2665,7 +2665,7 @@ describe('ClawRuntime', () => {
         threadId: '',
         workspaceRoot,
         agentProfile: {
-          name: 'kun',
+          name: 'magicpocket',
           description: '',
           identity: '',
           personality: '',
@@ -2798,7 +2798,7 @@ describe('ClawRuntime', () => {
       const settings = buildSettings()
       settings.claw.im.enabled = true
       settings.claw.im.responseTimeoutMs = 2_000
-      settings.agents.kun.imageGeneration = {
+      settings.agents.magicpocket.imageGeneration = {
         enabled: true,
         providerId: '',
         protocol: 'openai-images',
@@ -2931,7 +2931,7 @@ describe('ClawRuntime', () => {
       const settings = buildSettings()
       settings.claw.im.enabled = true
       settings.claw.im.responseTimeoutMs = 2_000
-      settings.agents.kun.imageGeneration = {
+      settings.agents.magicpocket.imageGeneration = {
         enabled: true,
         providerId: '',
         protocol: 'openai-images',
@@ -3064,7 +3064,7 @@ describe('ClawRuntime', () => {
       const settings = buildSettings()
       settings.claw.im.enabled = true
       settings.claw.im.responseTimeoutMs = 2_000
-      settings.agents.kun.musicGeneration = {
+      settings.agents.magicpocket.musicGeneration = {
         enabled: true,
         providerId: '',
         protocol: 'minimax-music',
@@ -3195,7 +3195,7 @@ describe('ClawRuntime', () => {
       const settings = buildSettings()
       settings.claw.im.enabled = true
       settings.claw.im.responseTimeoutMs = 2_000
-      settings.agents.kun.imageGeneration = {
+      settings.agents.magicpocket.imageGeneration = {
         enabled: true,
         providerId: '',
         protocol: 'openai-images',
@@ -3328,7 +3328,7 @@ describe('ClawRuntime', () => {
       const settings = buildSettings()
       settings.claw.im.enabled = true
       settings.claw.im.responseTimeoutMs = 2_000
-      settings.agents.kun.textToSpeech = {
+      settings.agents.magicpocket.textToSpeech = {
         enabled: true,
         providerId: '',
         protocol: 'minimax-t2a',
@@ -3460,7 +3460,7 @@ describe('ClawRuntime', () => {
       const settings = buildSettings()
       settings.claw.im.enabled = true
       settings.claw.im.responseTimeoutMs = 2_000
-      settings.agents.kun.videoGeneration = {
+      settings.agents.magicpocket.videoGeneration = {
         enabled: true,
         providerId: '',
         protocol: 'minimax-video',

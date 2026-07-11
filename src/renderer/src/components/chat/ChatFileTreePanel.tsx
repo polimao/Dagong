@@ -116,7 +116,7 @@ export function ChatFileTreePanel({
   }, [root])
 
   const loadDirectory = useCallback((path: string): void => {
-    if (!root || typeof window.kunGui?.listWorkspaceDirectory !== 'function') return
+    if (!root || typeof window.magicpocketGui?.listWorkspaceDirectory !== 'function') return
     setDirectories((current) => ({
       ...current,
       [path || ROOT_PATH]: {
@@ -125,7 +125,7 @@ export function ChatFileTreePanel({
         error: null
       }
     }))
-    void window.kunGui
+    void window.magicpocketGui
       .listWorkspaceDirectory({
         workspaceRoot: root,
         path: path || root
@@ -206,8 +206,8 @@ export function ChatFileTreePanel({
   }
 
   const revealEntry = async (entry: WorkspaceEntry): Promise<void> => {
-    if (typeof window.kunGui?.openEditorPath !== 'function') return
-    await window.kunGui.openEditorPath({
+    if (typeof window.magicpocketGui?.openEditorPath !== 'function') return
+    await window.magicpocketGui.openEditorPath({
       path: entry.path,
       workspaceRoot: root,
       editorId: 'file-manager'
@@ -373,7 +373,7 @@ export function ChatFileTreePanel({
           >
             <FolderSearch className="h-3.5 w-3.5 text-ds-muted" strokeWidth={1.9} />
             <span className="min-w-0 truncate">
-              {window.kunGui?.platform === 'darwin'
+              {window.magicpocketGui?.platform === 'darwin'
                 ? t('fileTreeRevealInFinder')
                 : t('fileTreeRevealInFileManager')}
             </span>

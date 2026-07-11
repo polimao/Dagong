@@ -15,8 +15,8 @@ function artifact(kind: DesignArtifact['kind'] = 'html'): DesignArtifact {
     id: `${kind}_1`,
     kind,
     title: kind === 'html' ? 'Home' : 'Board',
-    relativePath: `.kun-design/doc/${kind}_1/${kind === 'html' ? 'v1.html' : 'canvas.json'}`,
-    designMdPath: kind === 'html' ? '.kun-design/doc/html_1/DESIGN.md' : undefined,
+    relativePath: `.magicpocket-design/doc/${kind}_1/${kind === 'html' ? 'v1.html' : 'canvas.json'}`,
+    designMdPath: kind === 'html' ? '.magicpocket-design/doc/html_1/DESIGN.md' : undefined,
     createdAt: now,
     updatedAt: now,
     versions: []
@@ -34,7 +34,7 @@ describe('design code roundtrip', () => {
   it('prepares a design-to-code implementation turn and publishes the design system', async () => {
     const writeWorkspaceFile = vi.fn(async () => ({
       ok: true as const,
-      path: '.kun-design/DESIGN_SYSTEM.md',
+      path: '.magicpocket-design/DESIGN_SYSTEM.md',
       savedAt: now
     }))
 
@@ -48,14 +48,14 @@ describe('design code roundtrip', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.kun-design/DESIGN_SYSTEM.md',
+      path: '.magicpocket-design/DESIGN_SYSTEM.md',
       workspaceRoot: '/workspace'
     }))
     expect(result.designSystemHash).toBeTruthy()
-    expect(result.prompt).toContain('Design source (a standalone HTML mockup): .kun-design/doc/html_1/v1.html')
-    expect(result.prompt).toContain('Project design system: .kun-design/DESIGN_SYSTEM.md')
+    expect(result.prompt).toContain('Design source (a standalone HTML mockup): .magicpocket-design/doc/html_1/v1.html')
+    expect(result.prompt).toContain('Project design system: .magicpocket-design/DESIGN_SYSTEM.md')
     expect(result.prompt).toContain('Target stack: React + Tailwind')
-    expect(result.prompt).toContain('Read the design notes `.kun-design/doc/html_1/DESIGN.md`')
+    expect(result.prompt).toContain('Read the design notes `.magicpocket-design/doc/html_1/DESIGN.md`')
   })
 
   it('keeps design-system publish failures non-fatal', async () => {
@@ -69,7 +69,7 @@ describe('design code roundtrip', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.designSystemHash).toBeUndefined()
-    expect(result.prompt).not.toContain('Project design system: .kun-design/DESIGN_SYSTEM.md')
+    expect(result.prompt).not.toContain('Project design system: .magicpocket-design/DESIGN_SYSTEM.md')
   })
 
   it('rejects non-html artifacts for implementation', async () => {
@@ -103,7 +103,7 @@ describe('design code roundtrip', () => {
       api: {
         writeWorkspaceFile: vi.fn(async () => ({
           ok: true as const,
-          path: '.kun-design/DESIGN_SYSTEM.md',
+          path: '.magicpocket-design/DESIGN_SYSTEM.md',
           savedAt: now
         }))
       }
@@ -155,16 +155,16 @@ describe('design code roundtrip', () => {
       id: 'artifact_1',
       kind: 'html',
       title: 'From Home.tsx',
-      relativePath: '.kun-design/doc_1/artifact_1/v1.html'
+      relativePath: '.magicpocket-design/doc_1/artifact_1/v1.html'
     })
     expect(prepared.artifact.versions[0]).toMatchObject({
       id: 'artifact_1-v1',
-      relativePath: '.kun-design/doc_1/artifact_1/v1.html',
+      relativePath: '.magicpocket-design/doc_1/artifact_1/v1.html',
       createdAt: now,
       summary: 'From Home.tsx'
     })
     expect(prepared.prompt).toContain('Source UI code: src/components/Home.tsx')
-    expect(prepared.prompt).toContain('Reserved artifact file: .kun-design/doc_1/artifact_1/v1.html')
+    expect(prepared.prompt).toContain('Reserved artifact file: .magicpocket-design/doc_1/artifact_1/v1.html')
   })
 
   it('dispatches code-to-design by reserving an artifact and sending with assistant model overrides', async () => {
@@ -197,7 +197,7 @@ describe('design code roundtrip', () => {
     expect(state.ensureActiveDocument).toHaveBeenCalled()
     expect(upsertArtifact).toHaveBeenCalledWith(expect.objectContaining({
       id: 'artifact_1',
-      relativePath: '.kun-design/doc_1/artifact_1/v1.html'
+      relativePath: '.magicpocket-design/doc_1/artifact_1/v1.html'
     }))
     expect(sendMessage).toHaveBeenCalledWith(expect.stringContaining('Source UI code: src/components/Home.tsx'), 'agent', {
       displayText: 'Redesign Home.tsx',

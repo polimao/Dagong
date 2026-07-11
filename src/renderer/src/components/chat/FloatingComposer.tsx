@@ -42,7 +42,7 @@ import {
   X
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { ModelProviderModelGroup } from '@shared/kun-gui-api'
+import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
 import type { AttachmentReference, ChatBlock, ReviewTarget } from '../../agent/types'
 import { useChatStore } from '../../store/chat-store'
 import { normalizeWorkspaceRoot } from '../../lib/workspace-path'
@@ -552,6 +552,8 @@ export function FloatingComposer({
   const activeClawChannelId = useChatStore((s) => s.activeClawChannelId)
   const blocks = useChatStore((s) => s.blocks)
   const resolveUserInput = useChatStore((s) => s.resolveUserInput)
+  const collaborationContext = useChatStore((s) => s.collaborationContext)
+  const setCollaborationContext = useChatStore((s) => s.setCollaborationContext)
   const compact = variant === 'compact'
   // The pending ask-user request for the active thread, surfaced as a panel
   // docked above this composer. Only the main chat composer hosts it: `blocks`
@@ -795,15 +797,15 @@ export function FloatingComposer({
             : t('clawComposerHintNeedsInbound')
           : useWorktreePool
             ? t('composerWorktreeModeHint')
-            : t('composerSlashHint')
+            : undefined
 
   useEffect(() => {
-    if (!useWorktreePool || !effectiveWorkspaceRoot || typeof window.kunGui?.getGitBranches !== 'function') {
+    if (!useWorktreePool || !effectiveWorkspaceRoot || typeof window.magicpocketGui?.getGitBranches !== 'function') {
       setWorktreeBranches([])
       return
     }
     let cancelled = false
-    void window.kunGui.getGitBranches(effectiveWorkspaceRoot).then((result) => {
+    void window.magicpocketGui.getGitBranches(effectiveWorkspaceRoot).then((result) => {
       if (cancelled || !result.ok) return
       const names = result.branches.map((branch) => branch.name)
       setWorktreeBranches(names)
@@ -1619,7 +1621,7 @@ export function FloatingComposer({
       const paths: string[] = []
       for (const file of pathFiles) {
         try {
-          const path = window.kunGui.getPathForFile(file)
+          const path = window.magicpocketGui.getPathForFile(file)
           if (path) paths.push(path)
         } catch {
           // ignore files we cannot resolve a filesystem path for
@@ -2155,12 +2157,35 @@ export function FloatingComposer({
               })}
             </div>
           ) : null}
+          {collaborationContext && collaborationContext.threadId === activeThreadId ? (
+            <div className="flex flex-wrap items-center gap-2 px-1">
+              <span
+                className="ds-no-drag inline-flex h-7 max-w-full items-center gap-1.5 rounded-lg border border-violet-500/25 bg-violet-500/10 px-2 text-[12px] font-medium text-ds-muted"
+                title={`${collaborationContext.type === 'team' ? '专家团' : '专家'}：${collaborationContext.name}`}
+              >
+                <span className="shrink-0 text-[13px]">{collaborationContext.emoji}</span>
+                <span className="max-w-40 truncate text-ds-ink">{collaborationContext.name}</span>
+                <span className="shrink-0 rounded bg-violet-500/15 px-1 text-[10px] text-violet-600 dark:text-violet-300">
+                  {collaborationContext.type === 'team' ? '团' : '专家'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCollaborationContext(null)}
+                  className="rounded-full p-0.5 text-ds-faint transition hover:bg-ds-hover hover:text-ds-ink"
+                  aria-label="移除协作上下文"
+                  title="移除"
+                >
+                  <X className="h-3 w-3" strokeWidth={2} />
+                </button>
+              </span>
+            </div>
+          ) : null}
           <textarea
             ref={draft.textareaRef}
             rows={1}
             className={`ds-no-drag block w-full min-w-0 resize-none break-words bg-transparent px-1 py-2.5 text-[15px] leading-[1.45] text-ds-ink placeholder:text-ds-faint focus:outline-none [overflow-wrap:anywhere] ${
               canEditComposer ? '' : 'opacity-80'
-            } ${compact ? 'text-[14px] py-2' : 'min-h-[40px]'}`}
+            } ${compact ? 'text-[14px] py-2' : 'min-h-[56px]'}`}
             placeholder={placeholder}
             value={input}
             disabled={!canEditComposer}
@@ -2467,7 +2492,8 @@ export function FloatingComposer({
                 type="button"
                 disabled={primaryActionDisabled}
                 onClick={handlePrimaryAction}
-                className="ds-no-drag flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-white shadow-[0_10px_22px_rgba(20,47,95,0.22)] transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-ds-card disabled:text-ds-faint disabled:shadow-none dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 dark:disabled:bg-ds-card dark:disabled:text-ds-faint"
+                style={{ backgroundColor: input.trim().length > 0 ? '#000000' : '#333333' }}
+                className="ds-no-drag flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed"
                 aria-label={primaryActionLabel}
                 title={primaryActionLabel}
               >
@@ -2507,7 +2533,7 @@ export function FloatingComposer({
                 </select>
               </label>
             ) : null}
-            {showThreadUsageFooter ? (
+            {showThreadUsageFooter && threadUsage ? (
               <div
                 className="ds-composer-usage ds-no-drag inline-flex min-h-7 max-w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 overflow-visible rounded-lg border border-ds-border-muted bg-ds-card px-2.5 py-0.5 text-[12.5px] font-medium leading-5 text-ds-muted shadow-sm"
                 title={

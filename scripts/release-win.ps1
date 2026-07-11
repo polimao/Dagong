@@ -165,7 +165,7 @@ Remove-Item -Recurse -Force -ErrorAction SilentlyContinue `
   (Join-Path $Root 'dist\mac-arm64'), `
   (Join-Path $Root 'dist\linux-unpacked')
 Remove-Item -Force -ErrorAction SilentlyContinue `
-  (Join-Path $Root 'dist\Kun-*'), `
+  (Join-Path $Root 'dist\MagicPocket-*'), `
   (Join-Path $Root 'dist\DeepSeek-GUI-*'), `
   (Join-Path $Root 'dist\DeepSeek GUI-*'), `
   (Join-Path $Root 'dist\latest*.yml'), `

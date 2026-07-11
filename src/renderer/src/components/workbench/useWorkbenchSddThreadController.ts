@@ -308,7 +308,7 @@ export function useWorkbenchSddThreadController({
     const suggestedWorkspace = resolveSddRequirementWorkspace(codeThreads, activeThreadId, workspaceRoot)
     let targetWorkspace = ''
     try {
-      const picked = await window.kunGui.pickWorkspaceDirectory(suggestedWorkspace || undefined)
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(suggestedWorkspace || undefined)
       if (picked.canceled || !picked.path) return
       targetWorkspace = normalizeWorkspaceRoot(picked.path)
     } catch (error) {
@@ -338,7 +338,7 @@ export function useWorkbenchSddThreadController({
       `## ${t('sddTemplateAcceptance')}`,
       ''
     ].join('\n')
-    const result = await window.kunGui.createWorkspaceFile({
+    const result = await window.magicpocketGui.createWorkspaceFile({
       workspaceRoot: targetWorkspace,
       path: draft.relativePath,
       content: initialContent
@@ -368,7 +368,7 @@ export function useWorkbenchSddThreadController({
     }
     const restored = await restoreSddDraft({
       draft,
-      readWorkspaceFile: window.kunGui.readWorkspaceFile
+      readWorkspaceFile: window.magicpocketGui.readWorkspaceFile
     })
     if (restored.kind !== 'restored') {
       setError(restored.kind === 'unreadable' ? restored.message : t('sddDraftHistoryOpenFailed'))
@@ -392,8 +392,8 @@ export function useWorkbenchSddThreadController({
     }
 
     if (thread && !isEmptySddAssistantThreadCandidate(thread)) return null
-    const listWorkspaceDirectory = window.kunGui?.listWorkspaceDirectory
-    const readWorkspaceFile = window.kunGui?.readWorkspaceFile
+    const listWorkspaceDirectory = window.magicpocketGui?.listWorkspaceDirectory
+    const readWorkspaceFile = window.magicpocketGui?.readWorkspaceFile
     if (typeof listWorkspaceDirectory !== 'function' || typeof readWorkspaceFile !== 'function') {
       return null
     }

@@ -115,7 +115,7 @@ export function canPrepareImplementDesignTurn(
 }
 
 function currentWriteApi(api?: DesignCodeRoundtripWriteApi): DesignCodeRoundtripWriteApi | undefined {
-  return api ?? (typeof window !== 'undefined' ? window.kunGui : undefined)
+  return api ?? (typeof window !== 'undefined' ? window.magicpocketGui : undefined)
 }
 
 async function publishDesignSystemForImplementation(options: {
@@ -126,7 +126,7 @@ async function publishDesignSystemForImplementation(options: {
   if (!options.designState.publishDesignSystem) return {}
   const api = currentWriteApi(options.api)
   if (typeof api?.writeWorkspaceFile !== 'function') return {}
-  const relativePath = '.kun-design/DESIGN_SYSTEM.md'
+  const relativePath = '.magicpocket-design/DESIGN_SYSTEM.md'
   const content = formatDesignSystemMarkdown(options.designState.designContext)
   try {
     const result = await api.writeWorkspaceFile({
@@ -207,7 +207,7 @@ export function prepareDesignFromCodeTurn(
   const source = options.sourceRelativePath.trim()
   const artifactId = (options.createArtifactId ?? createDesignArtifactId)()
   const createdAt = (options.now ?? (() => new Date().toISOString()))()
-  const relativePath = `.kun-design/${options.documentId}/${artifactId}/v1.html`
+  const relativePath = `.magicpocket-design/${options.documentId}/${artifactId}/v1.html`
   const artifact: DesignArtifact & { kind: 'html' } = {
     id: artifactId,
     kind: 'html',

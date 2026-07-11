@@ -9,8 +9,8 @@ import {
   resolveClawScheduleMcpCommand,
   resolveClawScheduleMcpNodeEntryPath,
   resolveDeepseekConfigPath,
-  resolveKunConfigPath,
-  resolveKunMcpJsonPath,
+  resolveMagicPocketConfigPath,
+  resolveMagicPocketMcpJsonPath,
   syncClawScheduleMcpConfig,
   type ClawScheduleMcpLaunchConfig
 } from './claw-schedule-mcp-config'
@@ -18,7 +18,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -38,10 +38,10 @@ function createSettings(patch: Partial<AppSettingsV1['schedule']['internal']> = 
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      kun: defaultKunRuntimeSettings()
+      magicpocket: defaultMagicPocketRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: {
       enabled: true,
       retentionDays: 2
@@ -82,19 +82,19 @@ function createSettings(patch: Partial<AppSettingsV1['schedule']['internal']> = 
 }
 
 const launch: ClawScheduleMcpLaunchConfig = {
-  appPath: '/Applications/Kun.app',
-  execPath: '/Applications/Kun.app/Contents/MacOS/Kun',
+  appPath: '/Applications/MagicPocket.app',
+  execPath: '/Applications/MagicPocket.app/Contents/MacOS/MagicPocket',
   isPackaged: false
 }
 
 describe('claw schedule MCP config', () => {
-  it('uses Kun config files by default', () => {
-    expect(resolveKunConfigPath()).toBe(join(homedir(), '.kun', 'config.toml'))
-    expect(resolveKunMcpJsonPath()).toBe(join(homedir(), '.kun', 'mcp.json'))
-    expect(resolveDeepseekConfigPath()).toBe(resolveKunConfigPath())
+  it('uses MagicPocket config files by default', () => {
+    expect(resolveMagicPocketConfigPath()).toBe(join(homedir(), '.magicpocket', 'config.toml'))
+    expect(resolveMagicPocketMcpJsonPath()).toBe(join(homedir(), '.magicpocket', 'mcp.json'))
+    expect(resolveDeepseekConfigPath()).toBe(resolveMagicPocketConfigPath())
   })
 
-  it('writes the gui_schedule server to the Kun MCP JSON config shape', () => {
+  it('writes the gui_schedule server to the MagicPocket MCP JSON config shape', () => {
     const settings = createSettings({ port: 19787, secret: 'top-secret' })
     const synced = buildSyncedClawScheduleMcpJson(
       {
@@ -140,7 +140,7 @@ describe('claw schedule MCP config', () => {
 
   it('uses the macOS Electron helper for real app bundle paths', () => {
     expect(resolveClawScheduleMcpCommand(launch, 'darwin')).toBe(
-      '/Applications/Kun.app/Contents/Frameworks/Kun Helper.app/Contents/MacOS/Kun Helper'
+      '/Applications/MagicPocket.app/Contents/Frameworks/MagicPocket Helper.app/Contents/MacOS/MagicPocket Helper'
     )
     expect(resolveClawScheduleMcpCommand({
       appPath: '/tmp/deepseek-gui-test-app',
@@ -193,10 +193,10 @@ describe('claw schedule MCP config', () => {
 
   it('syncs mcp.json and cleans the old config.toml entry on disk', async () => {
     const root = await mkdtemp(join(tmpdir(), 'ds-gui-mcp-'))
-    const kunDir = join(root, '.kun')
-    const configTomlPath = join(kunDir, 'config.toml')
-    const mcpJsonPath = join(kunDir, 'mcp.json')
-    await mkdir(kunDir, { recursive: true })
+    const magicpocketDir = join(root, '.magicpocket')
+    const configTomlPath = join(magicpocketDir, 'config.toml')
+    const mcpJsonPath = join(magicpocketDir, 'mcp.json')
+    await mkdir(magicpocketDir, { recursive: true })
     await writeFile(
       configTomlPath,
       [

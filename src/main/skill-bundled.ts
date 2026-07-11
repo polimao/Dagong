@@ -2,9 +2,9 @@ import { mkdir, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 /**
- * Built-in "design system & craft" skill. Seeded once into ~/.kun/skills/ on
+ * Built-in "design system & craft" skill. Seeded once into ~/.magicpocket/skills/ on
  * first launch (idempotent seed marker, mirrors ensureBundledUiPlugins). The
- * Kun runtime discovers it from the skills root and the agent can load it
+ * MagicPocket runtime discovers it from the skills root and the agent can load it
  * (auto-activated on design prompts, or via load_skill). Deleting it is honored
  * — it is not force-recreated. Appears after the next runtime restart.
  */
@@ -38,7 +38,7 @@ description: Brand-grade visual craft for design work — design-system-first th
 Hold this bar on any visual work — HTML mockups, prototypes, real UI.
 
 ## 1. Design system is the source of truth
-- If \`.kun-design/DESIGN_SYSTEM.md\` exists in the workspace, read it first and honor it: brand color, tone, type, radius, density, the named preset. It is the contract shared between the design canvas and the code.
+- If \`.magicpocket-design/DESIGN_SYSTEM.md\` exists in the workspace, read it first and honor it: brand color, tone, type, radius, density, the named preset. It is the contract shared between the design canvas and the code.
 - Derive every visual decision from tokens (color, spacing scale, radius, type scale), not ad-hoc values. Keep them consistent across the whole artifact.
 
 ## 2. Avoid generic AI tells
@@ -66,9 +66,9 @@ These read as "AI made this" — do not ship them:
 
 let seedPromise: Promise<void> | null = null
 
-export function ensureBundledSkills(kunHomeDir: string): Promise<void> {
+export function ensureBundledSkills(magicpocketHomeDir: string): Promise<void> {
   seedPromise ??= (async () => {
-    const skillsRoot = join(kunHomeDir, 'skills')
+    const skillsRoot = join(magicpocketHomeDir, 'skills')
     const markerPath = join(skillsRoot, BUNDLED_SEED_MARKER)
     try {
       await stat(markerPath)

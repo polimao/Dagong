@@ -178,13 +178,13 @@ export function useDesignHtmlPreview({
 
     const path = relativePath?.trim()
     if (!enabled || !workspaceRoot || !path) return
-    if (typeof window.kunGui?.authorizeWritePrototype !== 'function') {
+    if (typeof window.magicpocketGui?.authorizeWritePrototype !== 'function') {
       reportError('Prototype preview is unavailable.')
       return
     }
 
     const tryAuthorize = (): void => {
-      void window.kunGui
+      void window.magicpocketGui
         .authorizeWritePrototype({ path, workspaceRoot })
         .then((res) => {
           if (cancelled) return

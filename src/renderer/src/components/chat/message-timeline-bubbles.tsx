@@ -638,8 +638,8 @@ function useMediaPreviewUrls(media: TimelineMediaReference[]): Record<string, st
               previewUrl: `data:${content.attachment.mimeType};base64,${content.dataBase64}`
             }
           }
-          if (request.mode === 'workspace-image' && request.path && typeof window.kunGui?.readWorkspaceImage === 'function') {
-            const result = await window.kunGui.readWorkspaceImage({
+          if (request.mode === 'workspace-image' && request.path && typeof window.magicpocketGui?.readWorkspaceImage === 'function') {
+            const result = await window.magicpocketGui.readWorkspaceImage({
               path: request.path,
               ...(workspaceRoot ? { workspaceRoot } : {})
             })
@@ -715,7 +715,7 @@ function MediaPreviewTile({
           ? t('generatedFileSaveFailed')
           : t('generatedFileDownload')
   const handleSaveAs = async (): Promise<void> => {
-    if (saveState === 'saving' || typeof window.kunGui?.saveWorkspaceFileAs !== 'function') return
+    if (saveState === 'saving' || typeof window.magicpocketGui?.saveWorkspaceFileAs !== 'function') return
     const data = dataUrlPayload(previewUrl)
     if (!filePath && !data) {
       setSaveState('error')
@@ -723,7 +723,7 @@ function MediaPreviewTile({
     }
     setSaveState('saving')
     try {
-      const result = await window.kunGui.saveWorkspaceFileAs({
+      const result = await window.magicpocketGui.saveWorkspaceFileAs({
         suggestedName: title,
         ...(filePath ? { sourcePath: filePath } : {}),
         ...(workspaceRoot ? { workspaceRoot } : {}),
@@ -740,7 +740,7 @@ function MediaPreviewTile({
       }
     } catch (error) {
       setSaveState('error')
-      void window.kunGui?.logError?.('file-save-as', 'Failed to save generated file', {
+      void window.magicpocketGui?.logError?.('file-save-as', 'Failed to save generated file', {
         message: error instanceof Error ? error.message : String(error),
         filePath,
         title
@@ -1133,7 +1133,7 @@ function AssistantExportButton({
   const [error, setError] = useState('')
 
   const handleExport = async (format: WriteExportFormat): Promise<void> => {
-    if (typeof window.kunGui?.exportWriteDocument !== 'function') {
+    if (typeof window.magicpocketGui?.exportWriteDocument !== 'function') {
       setError(t('writeExportUnavailable'))
       return
     }
@@ -1143,8 +1143,8 @@ function AssistantExportButton({
     try {
       const parsedDate = createdAt ? new Date(createdAt) : new Date()
       const date = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate
-      const title = `Kun-answer-${date.toISOString().replace(/[:.]/g, '-')}`
-      const result = await window.kunGui.exportWriteDocument({
+      const title = `MagicPocket-answer-${date.toISOString().replace(/[:.]/g, '-')}`
+      const result = await window.magicpocketGui.exportWriteDocument({
         title,
         workspaceRoot: workspaceRoot || undefined,
         format,

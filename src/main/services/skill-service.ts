@@ -62,7 +62,7 @@ type SkillRootCandidate = {
 }
 
 /**
- * Enabled, on-disk skill roots passed to the Kun runtime. Builds the common
+ * Enabled, on-disk skill roots passed to the MagicPocket runtime. Builds the common
  * directory conventions (.agents/.claude/.codex/skills + global equivalents)
  * plus configured extra dirs, drops any the user toggled off, and appends
  * enabled Codex plugin caches. Precedence (earlier wins on duplicate skill
@@ -77,7 +77,7 @@ export async function guiSkillRootsForRuntime(
   const candidates = buildSkillRootCandidates(settings, workspaceRootOverride).filter((candidate) => {
     if (isCandidateDisabled(candidate, disabled)) return false
     // Configured extra dirs are passed through even when absent (the user set
-    // them deliberately and Kun tolerates missing roots); common conventions
+    // them deliberately and MagicPocket tolerates missing roots); common conventions
     // are only included once they actually exist on disk.
     return candidate.source === 'extra' || existsSync(candidate.path)
   })
@@ -154,7 +154,7 @@ export async function listGuiSkillRoots(
  * Comparable paths of every GUI-managed candidate (common dirs + extra dirs),
  * regardless of enabled state. Lets the runtime config builder tell apart
  * roots it manages (and may need to drop when toggled off) from roots a user
- * added by hand to the Kun config file.
+ * added by hand to the MagicPocket config file.
  */
 export function guiSkillManagedComparablePaths(
   settings: AppSettingsV1 | undefined,

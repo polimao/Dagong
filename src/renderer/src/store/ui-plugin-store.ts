@@ -17,8 +17,8 @@ import {
 } from '../lib/ui-mode'
 
 /**
- * 形象工坊运行时:单一 uiMode('default' | 'ikun' | 插件 id),
- * 负责 DOM 属性(data-ikun-mode / data-ui-plugin)、token 样式注入与插件图集加载。
+ * 形象工坊运行时:单一 uiMode('default' | 'imagicpocket' | 插件 id),
+ * 负责 DOM 属性(data-imagicpocket-mode / data-ui-plugin)、token 样式注入与插件图集加载。
  */
 
 export type UiPluginRuntime = {
@@ -42,15 +42,15 @@ type UiPluginState = {
 
 const TOKEN_STYLE_ELEMENT_ID = 'ds-ui-plugin-tokens'
 
-function uiPluginApi(): Window['kunGui'] | null {
+function uiPluginApi(): Window['magicpocketGui'] | null {
   if (typeof window === 'undefined') return null
-  return window.kunGui ?? null
+  return window.magicpocketGui ?? null
 }
 
 function applyUiModeDom(mode: string, runtime: UiPluginRuntime | null): void {
   if (typeof document === 'undefined') return
   const root = document.documentElement
-  root.setAttribute('data-ikun-mode', mode === UI_MODE_IKUN ? 'on' : 'off')
+  root.setAttribute('data-imagicpocket-mode', mode === UI_MODE_IKUN ? 'on' : 'off')
   // Retroma 是纯配色模式:仅点亮 data-retroma-mode(浅色守卫在 CSS 侧),
   // 不走插件运行时,不注入插件 token。
   root.setAttribute('data-retroma-mode', mode === UI_MODE_RETROMA ? 'on' : 'off')
@@ -92,7 +92,7 @@ export const useUiPluginStore = create<UiPluginState>((set, get) => ({
       void get().refreshUiPlugins()
       return
     }
-    // 插件模式(含预装的 ikun):先把 ikun 属性立即点亮避免闪烁,再异步加载图集;失败则回退默认
+    // 插件模式(含预装的 imagicpocket):先把 imagicpocket 属性立即点亮避免闪烁,再异步加载图集;失败则回退默认
     applyUiModeDom(mode === UI_MODE_IKUN ? UI_MODE_IKUN : UI_MODE_DEFAULT, null)
     await get().activateUiMode(mode)
     void get().refreshUiPlugins()
@@ -126,11 +126,11 @@ export const useUiPluginStore = create<UiPluginState>((set, get) => ({
       return
     }
 
-    // 'ikun' 不再特殊:它是预装插件,与第三方插件走同一条加载链路;
-    // applyUiModeDom 会在 id 为 ikun 时同时点亮 data-ikun-mode 手工机制
+    // 'imagicpocket' 不再特殊:它是预装插件,与第三方插件走同一条加载链路;
+    // applyUiModeDom 会在 id 为 imagicpocket 时同时点亮 data-imagicpocket-mode 手工机制
     const api = uiPluginApi()
     if (typeof api?.loadUiPlugin !== 'function') {
-      // 桌面接口不可用(如纯渲染测试):ikun 仍可退化为仅属性模式
+      // 桌面接口不可用(如纯渲染测试):imagicpocket 仍可退化为仅属性模式
       if (normalized === UI_MODE_IKUN) {
         writeUiModePreference(normalized)
         set({ uiMode: normalized, activeRuntime: null, lastError: null })
@@ -222,7 +222,7 @@ export function useUiPluginWorkLabel(labelKey: UiPluginLabelKey, language: strin
   })
 }
 
-/** 是否应启用主会话出没彩蛋(ikun 内置 或 插件声明 features.cameos) */
+/** 是否应启用主会话出没彩蛋(imagicpocket 内置 或 插件声明 features.cameos) */
 export function useUiModeCameosEnabled(): boolean {
   return useUiPluginStore(
     (state) =>

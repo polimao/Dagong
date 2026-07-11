@@ -17,13 +17,13 @@ import {
   CUSTOM_VIDEO_GENERATION_PROVIDER_ID,
   type AppSettingsV1,
   type ImageGenerationProtocol,
-  type KunImageGenerationSettingsV1,
-  type KunMusicGenerationSettingsV1,
-  type KunRuntimeSettingsV1,
-  type KunRuntimeSettingsPatchV1,
-  type KunSpeechToTextSettingsV1,
-  type KunTextToSpeechSettingsV1,
-  type KunVideoGenerationSettingsV1,
+  type MagicPocketImageGenerationSettingsV1,
+  type MagicPocketMusicGenerationSettingsV1,
+  type MagicPocketRuntimeSettingsV1,
+  type MagicPocketRuntimeSettingsPatchV1,
+  type MagicPocketSpeechToTextSettingsV1,
+  type MagicPocketTextToSpeechSettingsV1,
+  type MagicPocketVideoGenerationSettingsV1,
   type MusicGenerationProtocol,
   type ModelProviderImageCapabilityPatchV1,
   type ModelProviderImageCapabilityV1,
@@ -49,8 +49,8 @@ import {
   type TextToSpeechProtocol,
   type VideoGenerationProtocol
 } from './app-settings-types'
-import { normalizeModelEndpointFormat, type ModelEndpointFormat } from '../../kun/src/contracts/model-endpoint-format.js'
-import { getKunRuntimeSettings } from './app-settings-kun'
+import { normalizeModelEndpointFormat, type ModelEndpointFormat } from '../../magicpocket/src/contracts/model-endpoint-format.js'
+import { getMagicPocketRuntimeSettings } from './app-settings-magicpocket'
 import { normalizeDeepseekBaseUrl } from './app-settings-normalizers'
 import { DEFAULT_COMPOSER_MODEL_IDS } from './default-composer-models'
 import {
@@ -384,7 +384,7 @@ type TokenPlanCapabilityWithOptionalBaseUrl = {
   models: readonly string[]
 }
 
-type KunMediaSettingCore = Partial<{
+type MagicPocketMediaSettingCore = Partial<{
   enabled: boolean
   providerId: string
   baseUrl: string
@@ -395,14 +395,14 @@ type KunMediaSettingCore = Partial<{
 const MINIMAX_PROVIDER_ID = 'minimax'
 const MINIMAX_TOKEN_PLAN_PROVIDER_ID = `${MINIMAX_PROVIDER_ID}${TOKEN_PLAN_PROVIDER_ID_SUFFIX}`
 
-export function defaultMiniMaxMediaGenerationKunPatch(input: {
+export function defaultMiniMaxMediaGenerationMagicPocketPatch(input: {
   providers: readonly ModelProviderProfileV1[]
-  currentKun?: Partial<KunRuntimeSettingsV1>
-  kunPatch?: KunRuntimeSettingsPatchV1
-}): KunRuntimeSettingsPatchV1 | undefined {
-  const patch: KunRuntimeSettingsPatchV1 = {}
-  if (!input.kunPatch?.textToSpeech && isBlankKunMediaSetting(input.currentKun?.textToSpeech)) {
-    const match = configuredMiniMaxMediaCapability(input.providers, 'textToSpeech', input.currentKun?.providerId)
+  currentMagicPocket?: Partial<MagicPocketRuntimeSettingsV1>
+  magicpocketPatch?: MagicPocketRuntimeSettingsPatchV1
+}): MagicPocketRuntimeSettingsPatchV1 | undefined {
+  const patch: MagicPocketRuntimeSettingsPatchV1 = {}
+  if (!input.magicpocketPatch?.textToSpeech && isBlankMagicPocketMediaSetting(input.currentMagicPocket?.textToSpeech)) {
+    const match = configuredMiniMaxMediaCapability(input.providers, 'textToSpeech', input.currentMagicPocket?.providerId)
     if (match) {
       patch.textToSpeech = {
         enabled: true,
@@ -414,8 +414,8 @@ export function defaultMiniMaxMediaGenerationKunPatch(input: {
       }
     }
   }
-  if (!input.kunPatch?.musicGeneration && isBlankKunMediaSetting(input.currentKun?.musicGeneration)) {
-    const match = configuredMiniMaxMediaCapability(input.providers, 'music', input.currentKun?.providerId)
+  if (!input.magicpocketPatch?.musicGeneration && isBlankMagicPocketMediaSetting(input.currentMagicPocket?.musicGeneration)) {
+    const match = configuredMiniMaxMediaCapability(input.providers, 'music', input.currentMagicPocket?.providerId)
     if (match) {
       patch.musicGeneration = {
         enabled: true,
@@ -427,8 +427,8 @@ export function defaultMiniMaxMediaGenerationKunPatch(input: {
       }
     }
   }
-  if (!input.kunPatch?.videoGeneration && isBlankKunMediaSetting(input.currentKun?.videoGeneration)) {
-    const match = configuredMiniMaxMediaCapability(input.providers, 'video', input.currentKun?.providerId)
+  if (!input.magicpocketPatch?.videoGeneration && isBlankMagicPocketMediaSetting(input.currentMagicPocket?.videoGeneration)) {
+    const match = configuredMiniMaxMediaCapability(input.providers, 'video', input.currentMagicPocket?.providerId)
     if (match) {
       patch.videoGeneration = {
         enabled: true,
@@ -443,7 +443,7 @@ export function defaultMiniMaxMediaGenerationKunPatch(input: {
   return Object.keys(patch).length > 0 ? patch : undefined
 }
 
-function isBlankKunMediaSetting(setting: KunMediaSettingCore | undefined): boolean {
+function isBlankMagicPocketMediaSetting(setting: MagicPocketMediaSettingCore | undefined): boolean {
   return setting?.enabled !== true &&
     !setting?.providerId?.trim() &&
     !setting?.baseUrl?.trim() &&
@@ -520,8 +520,8 @@ function firstCapabilityModel(models: readonly string[]): string {
   return models.map((model) => model.trim()).find(Boolean) ?? ''
 }
 
-export function resolveKunSpeechToTextSettings(settings: AppSettingsV1): KunSpeechToTextSettingsV1 {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketSpeechToTextSettings(settings: AppSettingsV1): MagicPocketSpeechToTextSettingsV1 {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   const speechToText = runtime.speechToText
   const providerId = normalizeModelProviderId(speechToText.providerId)
   if (!providerId || providerId === CUSTOM_SPEECH_TO_TEXT_PROVIDER_ID) {
@@ -687,8 +687,8 @@ function resolveProviderSpeechModel(configuredModel: string, providerModels: rea
   return TEXT_TO_SPEECH_MODEL_PATTERN.test(model) ? providerModels[0] ?? model : model
 }
 
-export function resolveKunTextToSpeechSettings(settings: AppSettingsV1): KunTextToSpeechSettingsV1 {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketTextToSpeechSettings(settings: AppSettingsV1): MagicPocketTextToSpeechSettingsV1 {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   const textToSpeech = runtime.textToSpeech
   const providerId = normalizeModelProviderId(textToSpeech.providerId)
   if (!providerId || providerId === CUSTOM_TEXT_TO_SPEECH_PROVIDER_ID) {
@@ -717,8 +717,8 @@ export function resolveKunTextToSpeechSettings(settings: AppSettingsV1): KunText
   }
 }
 
-export function resolveKunMusicGenerationSettings(settings: AppSettingsV1): KunMusicGenerationSettingsV1 {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketMusicGenerationSettings(settings: AppSettingsV1): MagicPocketMusicGenerationSettingsV1 {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   const musicGeneration = runtime.musicGeneration
   const providerId = normalizeModelProviderId(musicGeneration.providerId)
   if (!providerId || providerId === CUSTOM_MUSIC_GENERATION_PROVIDER_ID) {
@@ -747,8 +747,8 @@ export function resolveKunMusicGenerationSettings(settings: AppSettingsV1): KunM
   }
 }
 
-export function resolveKunVideoGenerationSettings(settings: AppSettingsV1): KunVideoGenerationSettingsV1 {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketVideoGenerationSettings(settings: AppSettingsV1): MagicPocketVideoGenerationSettingsV1 {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   const videoGeneration = runtime.videoGeneration
   const providerId = normalizeModelProviderId(videoGeneration.providerId)
   if (!providerId || providerId === CUSTOM_VIDEO_GENERATION_PROVIDER_ID) {
@@ -777,8 +777,8 @@ export function resolveKunVideoGenerationSettings(settings: AppSettingsV1): KunV
   }
 }
 
-export function resolveKunMemoryEnabled(settings: AppSettingsV1): boolean {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketMemoryEnabled(settings: AppSettingsV1): boolean {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   return runtime.memoryEnabled ?? false
 }
 
@@ -823,8 +823,8 @@ function canonicalBaseUrl(value: string): string {
   return value.trim().replace(/\/+$/, '')
 }
 
-export function resolveKunImageGenerationSettings(settings: AppSettingsV1): KunImageGenerationSettingsV1 {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketImageGenerationSettings(settings: AppSettingsV1): MagicPocketImageGenerationSettingsV1 {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   const imageGeneration = runtime.imageGeneration
   const providerId = normalizeModelProviderId(imageGeneration.providerId)
   if (!providerId || providerId === CUSTOM_IMAGE_GENERATION_PROVIDER_ID) {
@@ -853,8 +853,8 @@ export function resolveKunImageGenerationSettings(settings: AppSettingsV1): KunI
   }
 }
 
-export function resolveKunRuntimeSettings(settings: AppSettingsV1): KunRuntimeSettingsV1 {
-  const runtime = getKunRuntimeSettings(settings)
+export function resolveMagicPocketRuntimeSettings(settings: AppSettingsV1): MagicPocketRuntimeSettingsV1 {
+  const runtime = getMagicPocketRuntimeSettings(settings)
   const provider = getModelProviderProfile(settings, runtime.providerId)
   const providerId = normalizeModelProviderId(runtime.providerId)
   const runtimeApiKey = runtime.apiKey?.trim() ?? ''
@@ -868,7 +868,7 @@ export function resolveKunRuntimeSettings(settings: AppSettingsV1): KunRuntimeSe
     // to the agent's own runtime.apiKey if the profile happens to be keyless.
     // A providerId pointing at a keyless profile must NOT resolve to an empty
     // key (issue #329) — that briefly reads as "no API key" and the
-    // settings-apply gate then stops a perfectly healthy Kun runtime.
+    // settings-apply gate then stops a perfectly healthy MagicPocket runtime.
     apiKey: useProviderCredentials
       ? provider.apiKey.trim() || runtimeApiKey
       : runtimeApiKey || provider.apiKey.trim(),
@@ -877,13 +877,13 @@ export function resolveKunRuntimeSettings(settings: AppSettingsV1): KunRuntimeSe
         ? normalizeDeepseekBaseUrl(runtimeBaseUrl)
         : normalizeDeepseekBaseUrl(providerBaseUrl),
     endpointFormat: provider.endpointFormat,
-    imageGeneration: resolveKunImageGenerationSettings(settings),
-    speechToText: resolveKunSpeechToTextSettings(settings),
-    textToSpeech: resolveKunTextToSpeechSettings(settings),
-    musicGeneration: resolveKunMusicGenerationSettings(settings),
-    videoGeneration: resolveKunVideoGenerationSettings(settings),
+    imageGeneration: resolveMagicPocketImageGenerationSettings(settings),
+    speechToText: resolveMagicPocketSpeechToTextSettings(settings),
+    textToSpeech: resolveMagicPocketTextToSpeechSettings(settings),
+    musicGeneration: resolveMagicPocketMusicGenerationSettings(settings),
+    videoGeneration: resolveMagicPocketVideoGenerationSettings(settings),
     modelProfiles: modelProviderModelProfilesForSettings(settings),
-    memoryEnabled: resolveKunMemoryEnabled(settings)
+    memoryEnabled: resolveMagicPocketMemoryEnabled(settings)
   }
 }
 

@@ -87,11 +87,11 @@ export function useSettingsGuiUpdate({
   }, [])
 
   const checkGuiUpdate = useCallback(async (): Promise<void> => {
-    if (typeof window.kunGui?.checkGuiUpdate !== 'function') return
+    if (typeof window.magicpocketGui?.checkGuiUpdate !== 'function') return
     setCheckingGuiUpdate(true)
     setGuiUpdateError(null)
     try {
-      const info = await window.kunGui.checkGuiUpdate(channel)
+      const info = await window.magicpocketGui.checkGuiUpdate(channel)
       setGuiUpdateInfo(info)
       if (!info.ok) {
         setGuiUpdateError(info.code === 'not_configured' ? null : guiUpdateFailureMessage(info, t))
@@ -104,12 +104,12 @@ export function useSettingsGuiUpdate({
   }, [channel, t])
 
   const downloadGuiUpdate = async (): Promise<void> => {
-    if (typeof window.kunGui?.downloadGuiUpdate !== 'function') return
+    if (typeof window.magicpocketGui?.downloadGuiUpdate !== 'function') return
     setDownloadingGuiUpdate(true)
     setGuiUpdateProgress(null)
     setGuiUpdateError(null)
     try {
-      const result = await window.kunGui.downloadGuiUpdate(form?.guiUpdate?.channel)
+      const result = await window.magicpocketGui.downloadGuiUpdate(form?.guiUpdate?.channel)
       if (!result.ok) {
         setGuiUpdateError(result.message)
         return
@@ -123,11 +123,11 @@ export function useSettingsGuiUpdate({
   }
 
   const installGuiUpdate = async (): Promise<void> => {
-    if (typeof window.kunGui?.installGuiUpdate !== 'function') return
+    if (typeof window.magicpocketGui?.installGuiUpdate !== 'function') return
     setInstallingGuiUpdate(true)
     setGuiUpdateError(null)
     try {
-      const result = await window.kunGui.installGuiUpdate()
+      const result = await window.magicpocketGui.installGuiUpdate()
       if (!result.ok) {
         setGuiUpdateError(result.message)
         setInstallingGuiUpdate(false)
@@ -139,10 +139,10 @@ export function useSettingsGuiUpdate({
   }
 
   useEffect(() => {
-    if (typeof window.kunGui?.onGuiUpdateState !== 'function') return
-    const unsubscribe = window.kunGui.onGuiUpdateState(applyGuiUpdateState)
-    if (typeof window.kunGui?.getGuiUpdateState === 'function') {
-      void window.kunGui.getGuiUpdateState().then(applyGuiUpdateState).catch(() => undefined)
+    if (typeof window.magicpocketGui?.onGuiUpdateState !== 'function') return
+    const unsubscribe = window.magicpocketGui.onGuiUpdateState(applyGuiUpdateState)
+    if (typeof window.magicpocketGui?.getGuiUpdateState === 'function') {
+      void window.magicpocketGui.getGuiUpdateState().then(applyGuiUpdateState).catch(() => undefined)
     }
     return unsubscribe
   }, [applyGuiUpdateState])

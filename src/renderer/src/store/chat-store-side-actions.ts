@@ -543,7 +543,7 @@ export function createSideActions(ctx: SideContext): Pick<
       // as a generic runtimeRequest body — we use a direct request here
       // because the rename surface is title-only.
       try {
-        const response = await window.kunGui.runtimeRequest(
+        const response = await window.magicpocketGui.runtimeRequest(
           `/v1/threads/${encodeURIComponent(sideId)}`,
           'PATCH',
           JSON.stringify({ relation: 'primary' })

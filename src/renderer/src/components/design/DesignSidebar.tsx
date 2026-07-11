@@ -19,7 +19,6 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { SettingsRouteSection } from '../../store/chat-store'
-import { WorkspaceModeTabs } from '../chat/WorkspaceModeTabs'
 import { useDesignWorkspaceStore } from '../../design/design-workspace-store'
 import type { DesignArtifact, DesignDocument } from '../../design/design-types'
 import { collectAgentDrawingArtifactIds, groupDesignArtifacts } from '../../design/design-artifact-actions'
@@ -35,14 +34,16 @@ import {
   SidebarSectionHeader,
   SidebarTreeRow
 } from '../sidebar/SidebarPrimitives'
+import { SidebarMoreMenu } from '../sidebar/SidebarMoreMenu'
 import { CanvasLayersPanel } from './canvas/CanvasLayersPanel'
 
 type Props = {
-  onCodeOpen: () => void
-  onWriteOpen: () => void
-  onDesignOpen: () => void
   onOpenSettings: (section?: SettingsRouteSection) => void
   onToggleTheme: () => void
+  connectPhoneSidebarOpen: boolean
+  onToggleConnectPhone: () => void
+  onOpenWrite: () => void
+  onOpenDesign: () => void
 }
 
 export function getDesignSidebarVisibleArtifacts(artifacts: readonly DesignArtifact[]): DesignArtifact[] {
@@ -63,11 +64,12 @@ export function getDesignSidebarDocumentLabel(doc: Pick<DesignDocument, 'id'>): 
  * active one.
  */
 export function DesignSidebar({
-  onCodeOpen,
-  onWriteOpen,
-  onDesignOpen,
   onOpenSettings,
-  onToggleTheme
+  onToggleTheme,
+  connectPhoneSidebarOpen,
+  onToggleConnectPhone,
+  onOpenWrite,
+  onOpenDesign
 }: Props): ReactElement {
   const { t } = useTranslation('common')
   const [isDarkMode, setIsDarkMode] = useState(
@@ -522,17 +524,18 @@ export function DesignSidebar({
         }
       >
         <div className="ds-no-drag flex flex-col px-1">
-          <WorkspaceModeTabs
-            activeView="design"
-            onCodeOpen={onCodeOpen}
-            onWriteOpen={onWriteOpen}
-            onDesignOpen={onDesignOpen}
-          />
           <SidebarCommandRow
             icon={<FilePlus2 className="h-4 w-4" strokeWidth={1.9} />}
             label={t('designNewDocument')}
             onClick={handleNewDocument}
             variant="accent"
+          />
+          <SidebarMoreMenu
+            connectPhoneSidebarOpen={connectPhoneSidebarOpen}
+            currentView="design"
+            onToggleConnectPhone={onToggleConnectPhone}
+            onOpenWrite={onOpenWrite}
+            onOpenDesign={onOpenDesign}
           />
         </div>
 

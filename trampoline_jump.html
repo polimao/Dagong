@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>蹦床跳高</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    position: fixed;
+    background: #0a0a2e;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  canvas {
+    display: block;
+    width: 100%; height: 100%;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+// ============================================================
+// 蹦床跳高游戏 — Trampoline Jump Game
+// 在蹦床压到最低点时点击屏幕，就能跳得更高！
+// ============================================================
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let W, H, dpr;
+let trampolineRestY, trampolineBaseY, groundY;
+let centerX, frameLeftX, frameRightX, bedLeftX, bedRightX;
+
+// ── 物理参数 ──────────────────────────────────────────
+const GRAVITY   = 980;   // 重力 px/s²
+const SPRING_K  = 75;    // 蹦床弹性系数
+const DAMPING   = 2.8;   // 阻尼
+const MAX_BOOST = 380;   // 最大助力速度
+const SCALE     = 48;    // 像素/米
+
+// ── 游戏状态 ──────────────────────────────────────────
+let playerY, playerVy;
+let onTrampoline;
+let maxCompression;           // 本轮最大压缩量
+let jumpPeakHeight;           // 当前跳跃达到的最高点
+let sessionRecord;            // 本次会话记录
+let allTimeRecord;            // 历史记录 (localStorage)
+let combo;
+let jumpsCount;
+let hintAlpha;
+let shakeAmount;
+
+// 蹦床视觉振荡（离床后）
+let bedVisualCompression;
+let bedVisualV;
+
+// 粒子
+let particles = [];
+
+// 评分弹出
+let rating = null;
+
+// 角色轨迹
+let trail = [];
+
+// ── 辅助函数 ──────────────────────────────────────────
+
+function pxToMeters(px) {
+  return px / SCALE;
+}
+
+function metersToPx(m) {
+  return m * SCALE;
+}
+
+// ── 初始化和重置 ──────────────────────────────────────
+
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2); // 限制像素比，保证性能
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = Math.floor(W * dpr);
+  canvas.height = Math.floor(H * dpr);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+
+  trampolineRestY = H * 0.58;
+  trampolineBaseY = trampolineRestY;
+  groundY        = trampolineRestY + 130;
+  centerX        = W * 0.5;
+  frameLeftX     = W * 0.18;
+  frameRightX    = W * 0.82;
+  bedLeftX       = W * 0.22;
+  bedRightX      = W * 0.78;
+}
+
+function resetGame() {
+  playerY        = trampolineRestY - 55;
+  playerVy       = 0;
+  onTrampoline   = false;
+  maxCompression = 0;
+  jumpPeakHeight = 0;
+  combo          = 0;
+  jumpsCount     = 0;
+  hintAlpha      = 1;
+  shakeAmount    = 0;
+  bedVisualCompression = 0;
+  bedVisualV     = 0;
+  particles      = [];
+  rating         = null;
+  trail          = [];
+  sessionRecord  = 0;
+}
+
+function init() {
+  resize();
+  allTimeRecord = parseFloat(localStorage.getItem('trampoline_record') || '0');
+  resetGame();
+  requestAnimationFrame(gameLoop);
+}
+
+// ── 粒子系统 ──────────────────────────────────────────
+
+function spawnParticles(x, y, count, type) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 60 + Math.random() * 250;
+    let hue;
+    switch (type) {
+      case 'gold':   hue = 42 + Math.random() * 20; break;
+      case 'green':  hue = 140 + Math.random() * 20; break;
+      case 'blue':   hue = 200 + Math.random() * 30; break;
+      case 'spark':  hue = 30 + Math.random() * 30; break;
+      default:       hue = 0; break;
+    }
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 80,
+      life: 0.4 + Math.random() * 0.8,
+      maxLife: 0.4 + Math.random() * 0.8,
+      color: `hsl(${hue}, 90%, ${50 + Math.random() * 30}%)`,
+      size: 2 + Math.random() * 4,
+    });
+  }
+}
+
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x  += p.vx * dt;
+    p.y  += p.vy * dt;
+    p.vy += GRAVITY * 0.3 * dt;
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+// ── 评分文字 ──────────────────────────────────────────
+
+function showRating(text, color) {
+  rating = {
+    text, color,
+    x: centerX,
+    y: playerY - 20,
+    alpha: 1,
+    scale: 1.6,
+  };
+}
+
+function updateRating(dt) {
+  if (!rating) return;
+  rating.y     -= 90 * dt;
+  rating.alpha -= 1.4 * dt;
+  rating.scale  = Math.max(0.8, rating.scale - 1.2 * dt);
+  if (rating.alpha <= 0) rating = null;
+}
+
+// ── 核心物理 ──────────────────────────────────────────
+
+function update(dt) {
+  dt = Math.min(dt, 0.04); // 防止大帧跳跃
+
+  const effectiveDt = dt;
+
+  if (onTrampoline) {
+    // ── 在蹦床上 ──
+    const compression = playerY - trampolineRestY;
+    if (compression > maxCompression) maxCompression = compression;
+
+    // 弹簧力（向上为负）+ 阻尼 + 重力
+    const accel = -SPRING_K * compression - DAMPING * playerVy + GRAVITY;
+    playerVy += accel * effectiveDt;
+    playerY  += playerVy * effectiveDt;
+
+    // 安全钳：最大压缩
+    const maxC = 130;
+    if (playerY - trampolineRestY > maxC) {
+      playerY  = trampolineRestY + maxC;
+      if (playerVy > 0) playerVy *= -0.35;
+    }
+
+    // 离床判定：回到平衡位置以上且速度向上足够大
+    if (playerY <= trampolineRestY && playerVy < -30) {
+      onTrampoline          = false;
+      bedVisualCompression  = maxCompression * 0.55; // 用本轮最大压缩驱动离床后蹦床余振
+      bedVisualV            = playerVy;
+      maxCompression        = 0;
+      jumpPeakHeight        = 0;
+    }
+  } else {
+    // ── 空中 ──
+    playerVy += GRAVITY * effectiveDt;
+    playerY  += playerVy * effectiveDt;
+
+    // 记录最高点
+    const h = trampolineRestY - playerY;
+    if (h > jumpPeakHeight) jumpPeakHeight = h;
+    if (h > sessionRecord)  sessionRecord  = h;
+    if (h > allTimeRecord) {
+      allTimeRecord = h;
+      localStorage.setItem('trampoline_record', allTimeRecord.toFixed(1));
+      showRating('🏆 新纪录!', '#FF6D00');
+      spawnParticles(centerX, playerY, 35, 'gold');
+      shakeAmount = Math.max(shakeAmount, 6);
+    }
+
+    // 轨迹
+    if (playerVy < -50) { // 上升时记录
+      trail.push({ x: centerX, y: playerY, life: 0.35 });
+    }
+
+    // 接触蹦床判定
+    if (playerY >= trampolineRestY) {
+      onTrampoline          = true;
+      maxCompression        = 0;
+      bedVisualCompression  = 0;
+      bedVisualV            = 0;
+
+      // 落地粒子
+      const impactSpeed = Math.abs(playerVy);
+      if (impactSpeed > 200) {
+        const count = Math.floor(impactSpeed / 40);
+        spawnParticles(centerX, trampolineRestY, Math.min(count, 18), 'spark');
+        shakeAmount = Math.max(shakeAmount, impactSpeed / 180);
+      }
+    }
+  }
+
+  // ── 蹦床视觉振荡（离床后） ──
+  if (!onTrampoline && bedVisualCompression > 0.3) {
+    const accel = -SPRING_K * bedVisualCompression - DAMPING * 1.6 * bedVisualV;
+    bedVisualV += accel * effectiveDt;
+    bedVisualCompression += bedVisualV * effectiveDt;
+    if (bedVisualCompression < 0) {
+      bedVisualCompression = Math.abs(bedVisualCompression) * 0.25;
+      bedVisualV *= -0.25;
+    }
+    if (bedVisualCompression < 0.2) {
+      bedVisualCompression = 0;
+      bedVisualV = 0;
+    }
+  }
+
+  // ── 更新轨迹 ──
+  for (let i = trail.length - 1; i >= 0; i--) {
+    trail[i].life -= effectiveDt;
+    if (trail[i].life <= 0) trail.splice(i, 1);
+  }
+
+  // ── 更新粒子 / 评分 / 震动 ──
+  updateParticles(effectiveDt);
+  updateRating(effectiveDt);
+  if (shakeAmount > 0.05) shakeAmount *= 0.88;
+  else shakeAmount = 0;
+}
+
+// ── 输入处理 ──────────────────────────────────────────
+
+function handleTap() {
+  if (!onTrampoline) return;
+
+  const compression = playerY - trampolineRestY;
+  let timingFactor;
+
+  if (maxCompression < 3) {
+    // 刚开始压缩，还没足够参考
+    timingFactor = 0.35;
+  } else if (playerVy > 8) {
+    // 还在下沉：渐进评分
+    const ratio = Math.min(compression / maxCompression, 1);
+    timingFactor = 0.25 + 0.75 * ratio;
+  } else if (playerVy > -8) {
+    // 接近底部（速度接近零）—— 最佳时机！
+    timingFactor = 0.92;
+  } else {
+    // 已经开始回弹，太晚了
+    timingFactor = 0.12;
+  }
+
+  // 施加向下冲量（压蹦床）
+  const boost = timingFactor * MAX_BOOST;
+  playerVy += boost;
+
+  // ── 评分与反馈 ──
+  jumpsCount++;
+  hintAlpha = Math.max(0, hintAlpha - 0.25);
+
+  if (timingFactor >= 0.9) {
+    showRating('完美! ✨', '#FFD700');
+    combo++;
+    spawnParticles(centerX, playerY, 22, 'gold');
+    shakeAmount = Math.max(shakeAmount, 5);
+  } else if (timingFactor >= 0.7) {
+    showRating('漂亮!', '#00E676');
+    combo++;
+    spawnParticles(centerX, playerY, 12, 'green');
+    shakeAmount = Math.max(shakeAmount, 3);
+  } else if (timingFactor >= 0.4) {
+    showRating('不错', '#448AFF');
+    combo = 0;
+    spawnParticles(centerX, playerY, 6, 'blue');
+  } else if (timingFactor >= 0.15) {
+    showRating('太早了', '#FF9800');
+    combo = 0;
+  } else {
+    showRating('太晚了', '#FF5252');
+    combo = 0;
+  }
+}
+
+// ── 渲染 ──────────────────────────────────────────────
+
+function drawSky() {
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0,    '#0d1b3e');
+  grad.addColorStop(0.25, '#1a3a6b');
+  grad.addColorStop(0.5,  '#3b7dd8');
+  grad.addColorStop(0.75, '#7ec8f8');
+  grad.addColorStop(1,    '#c5e8fc');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 高处星星（仅在能看到的时候画几颗）
+  if (trampolineRestY > 180) {
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    const seed = 42;
+    for (let i = 0; i < 25; i++) {
+      const sx = ((i * 137 + seed) % W);
+      const sy = ((i * 89 + seed * 3) % trampolineRestY) * 0.5;
+      const sr = 0.6 + (i % 3) * 0.6;
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+function drawClouds() {
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  drawOneCloud(W * 0.12, H * 0.13, 35);
+  drawOneCloud(W * 0.78, H * 0.10, 44);
+  drawOneCloud(W * 0.50, H * 0.22, 28);
+  drawOneCloud(W * 0.35, H * 0.08, 24);
+
+  function drawOneCloud(cx, cy, r) {
+    ctx.beginPath();
+    ctx.arc(cx,          cy,          r,       0, Math.PI * 2);
+    ctx.arc(cx + r*0.75, cy - r*0.25, r * 0.7, 0, Math.PI * 2);
+    ctx.arc(cx - r*0.65, cy - r*0.15, r * 0.6, 0, Math.PI * 2);
+    ctx.arc(cx + r*0.3,  cy - r*0.45, r * 0.55,0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawGround() {
+  // 草地
+  const grassGrad = ctx.createLinearGradient(0, groundY, 0, H);
+  grassGrad.addColorStop(0,    '#5CB860');
+  grassGrad.addColorStop(0.15, '#3D8B40');
+  grassGrad.addColorStop(1,    '#1B5E20');
+  ctx.fillStyle = grassGrad;
+  ctx.fillRect(0, groundY, W, H - groundY);
+
+  // 地面线
+  ctx.strokeStyle = '#81C784';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, groundY);
+  ctx.lineTo(W, groundY);
+  ctx.stroke();
+
+  // 草丛
+  ctx.strokeStyle = '#A5D6A7';
+  ctx.lineWidth = 1.6;
+  for (let x = 3; x < W; x += 14) {
+    const h = 5 + Math.sin(x * 0.4) * 7 + Math.cos(x * 0.13) * 4;
+    ctx.beginPath();
+    ctx.moveTo(x, groundY);
+    ctx.quadraticCurveTo(x + 3, groundY - h, x + 6, groundY);
+    ctx.stroke();
+  }
+}
+
+function drawRuler() {
+  const rx = 14;
+  const topMark = trampolineRestY - 420;
+  if (topMark < -10) return;
+
+  // 竖线
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(rx, trampolineRestY);
+  ctx.lineTo(rx, Math.max(0, topMark));
+  ctx.stroke();
+
+  for (let m = 0; m <= 10; m++) {
+    const y = trampolineRestY - m * SCALE;
+    if (y < -10) break;
+    const isMajor = m % 2 === 0;
+    ctx.strokeStyle = `rgba(255,255,255,${isMajor ? 0.65 : 0.35})`;
+    ctx.lineWidth = isMajor ? 1.8 : 1;
+    ctx.beginPath();
+    ctx.moveTo(rx, y);
+    ctx.lineTo(rx + (isMajor ? 18 : 10), y);
+    ctx.stroke();
+
+    if (isMajor && m > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = `${m >= 8 ? 'bold ' : ''}10px -apple-system,"PingFang SC",sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText(m + 'm', rx + 21, y + 4);
+    }
+  }
+
+  // 零刻度
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.font = 'bold 10px -apple-system,"PingFang SC",sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('0', rx + 21, trampolineRestY + 4);
+}
+
+function drawRecordMarker() {
+  if (allTimeRecord < 5) return;
+  const ry = trampolineRestY - allTimeRecord;
+  if (ry < 0) return;
+
+  ctx.strokeStyle = 'rgba(255, 152, 0, 0.6)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(35, ry);
+  ctx.lineTo(W - 20, ry);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#FF9800';
+  ctx.font = 'bold 11px -apple-system,"PingFang SC",sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('纪录 ' + pxToMeters(allTimeRecord).toFixed(1) + 'm', W - 24, ry - 7);
+
+  // 小旗标
+  ctx.fillStyle = '#FF9800';
+  ctx.beginPath();
+  ctx.moveTo(W - 20, ry);
+  ctx.lineTo(W - 28, ry - 9);
+  ctx.lineTo(W - 20, ry - 6);
+  ctx.fill();
+}
+
+function drawTrampoline() {
+  const barY = trampolineRestY - 28;
+
+  // 有效压缩量（在空中用视觉振荡）
+  const effectiveComp = onTrampoline
+    ? Math.max(0, playerY - trampolineRestY)
+    : bedVisualCompression;
+
+  // ── 支架 ──
+  const poleW = 8;
+
+  // 左柱
+  ctx.fillStyle = '#455A64';
+  drawRoundRect(frameLeftX - poleW/2, barY, poleW, groundY - barY, 4);
+  // 右柱
+  drawRoundRect(frameRightX - poleW/2, barY, poleW, groundY - barY, 4);
+
+  // 横梁
+  ctx.fillStyle = '#546E7A';
+  drawRoundRect(frameLeftX - 2, barY - 6, frameRightX - frameLeftX + 4, 14, 5);
+
+  // 高光
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fillRect(frameLeftX, barY - 4, frameRightX - frameLeftX, 4);
+
+  // ── 弹簧 ──
+  ctx.strokeStyle = '#B0BEC5';
+  ctx.lineWidth = 1.6;
+  ctx.lineCap = 'round';
+
+  const bedTopY = trampolineRestY + effectiveComp;
+  // 左弹簧 × 3
+  for (let i = 0; i < 3; i++) {
+    const sx = bedLeftX - 14 + i * 10;
+    drawZigzag(sx, barY + 7, bedTopY);
+  }
+  // 右弹簧 × 3
+  for (let i = 0; i < 3; i++) {
+    const sx = bedRightX + 4 + i * 10;
+    drawZigzag(sx, barY + 7, bedTopY);
+  }
+
+  // ── 蹦床面 ──
+  // 控制点使曲线最低点 =  bedTopY
+  const ctrlY = trampolineRestY + effectiveComp * 2;
+
+  // 床面色（越压越红）
+  const ratio = Math.min(effectiveComp / 60, 1);
+  const r = Math.floor(220 + ratio * 35);
+  const g = Math.floor(120 - ratio * 70);
+  const b = Math.floor(60  - ratio * 40);
+
+  // 床面阴影
+  ctx.fillStyle = `rgba(${r - 30},${Math.max(0,g - 30)},${Math.max(0,b - 30)},0.4)`;
+  ctx.beginPath();
+  ctx.moveTo(bedLeftX, bedTopY + 2);
+  ctx.quadraticCurveTo(centerX, ctrlY + 2, bedRightX, bedTopY + 2);
+  ctx.lineTo(bedRightX, bedTopY + 7);
+  ctx.quadraticCurveTo(centerX, ctrlY + 7, bedLeftX, bedTopY + 7);
+  ctx.closePath();
+  ctx.fill();
+
+  // 床面主体
+  ctx.fillStyle = `rgb(${r},${g},${b})`;
+  ctx.beginPath();
+  ctx.moveTo(bedLeftX, bedTopY);
+  ctx.quadraticCurveTo(centerX, ctrlY, bedRightX, bedTopY);
+  ctx.lineTo(bedRightX, bedTopY + 5);
+  ctx.quadraticCurveTo(centerX, ctrlY + 5, bedLeftX, bedTopY + 5);
+  ctx.closePath();
+  ctx.fill();
+
+  // 床面高光
+  ctx.strokeStyle = `rgba(255,255,255,0.25)`;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(bedLeftX + 10, bedTopY + 1);
+  ctx.quadraticCurveTo(centerX, ctrlY + 1, bedRightX - 10, bedTopY + 1);
+  ctx.stroke();
+
+  // ── 底部安全网示意 ──
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 0.8;
+  ctx.setLineDash([3, 8]);
+  ctx.beginPath();
+  ctx.moveTo(frameLeftX + 15, groundY);
+  ctx.lineTo(bedLeftX - 5, trampolineRestY + 20);
+  ctx.moveTo(frameRightX - 15, groundY);
+  ctx.lineTo(bedRightX + 5, trampolineRestY + 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawRoundRect(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawZigzag(x, topY, bottomY) {
+  const h = bottomY - topY;
+  if (h < 3) return;
+  ctx.beginPath();
+  ctx.moveTo(x, topY);
+  const steps = 8;
+  const stepH = h / steps;
+  for (let i = 1; i <= steps; i++) {
+    const y = topY + i * stepH;
+    ctx.lineTo(x + (i % 2 === 0 ? 5 : -5), y);
+  }
+  ctx.stroke();
+}
+
+// ── 角色 ──
+
+function drawCharacter() {
+  const charR = Math.min(22, W * 0.05);
+  const bedTopY = onTrampoline
+    ? playerY
+    : trampolineRestY + bedVisualCompression;
+
+  const charX = centerX;
+  const charFeetY = onTrampoline ? playerY : playerY;
+  // 空中时 playerY 就是角色脚的位置；床上时脚在 bedTopY
+  const feetY = onTrampoline ? bedTopY : playerY;
+
+  const compression = onTrampoline ? Math.max(0, playerY - trampolineRestY) : 0;
+  const squish = Math.max(0.55, 1 - compression / 110);
+
+  // ── 轨迹 ──
+  for (const t of trail) {
+    const alpha = t.life / 0.35;
+    ctx.fillStyle = `rgba(255,183,77,${alpha * 0.5})`;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y - charR * 0.6, charR * alpha * 0.7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.save();
+  ctx.translate(charX, feetY);
+
+  // 纵向压扁变换
+  ctx.scale(1 + (1 - squish) * 0.15, squish);
+
+  // ── 阴影 ──
+  if (onTrampoline) {
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(0, charR * 0.25, charR * 0.8, charR * 0.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ── 身体 ──
+  const bodyGrad = ctx.createRadialGradient(-charR*0.3, -charR*0.8, charR*0.1, 0, 0, charR);
+  bodyGrad.addColorStop(0, '#FFCC80');
+  bodyGrad.addColorStop(0.6, '#FF9800');
+  bodyGrad.addColorStop(1, '#E65100');
+  ctx.fillStyle = bodyGrad;
+  ctx.beginPath();
+  ctx.arc(0, -charR, charR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 身体描边
+  ctx.strokeStyle = '#BF360C';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // ── 护目镜/眼白 ──
+  const eyeY = -charR - charR * 0.15;
+  const eyeSpacing = charR * 0.38;
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
+  ctx.arc(-eyeSpacing, eyeY, charR * 0.32, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc( eyeSpacing, eyeY, charR * 0.32, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── 瞳孔 ──
+  const pupilOffY = onTrampoline ? charR * 0.06 : -charR * 0.08;
+  ctx.fillStyle = '#1a1a1a';
+  ctx.beginPath();
+  ctx.arc(-eyeSpacing, eyeY + pupilOffY, charR * 0.16, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc( eyeSpacing, eyeY + pupilOffY, charR * 0.16, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 高光
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
+  ctx.arc(-eyeSpacing - charR*0.07, eyeY - charR*0.08, charR * 0.07, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc( eyeSpacing - charR*0.07, eyeY - charR*0.08, charR * 0.07, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── 嘴巴 ──
+  const mouthY = -charR + charR * 0.38;
+  if (onTrampoline && compression > 10) {
+    // 压扁时的小嘴
+    ctx.strokeStyle = '#BF360C';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(0, mouthY + charR*0.12, charR * 0.15, 0, Math.PI);
+    ctx.stroke();
+  } else if (!onTrampoline && playerVy < -200) {
+    // 高速上升时开心的嘴巴
+    ctx.fillStyle = '#BF360C';
+    ctx.beginPath();
+    ctx.arc(0, mouthY, charR * 0.18, 0, Math.PI);
+    ctx.fill();
+  } else {
+    // 普通微笑
+    ctx.strokeStyle = '#BF360C';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(0, mouthY, charR * 0.2, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
+  }
+
+  // ── 腮红 ──
+  ctx.fillStyle = 'rgba(255,138,128,0.5)';
+  ctx.beginPath();
+  ctx.ellipse(-charR * 0.55, -charR + charR * 0.12, charR * 0.13, charR * 0.08, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse( charR * 0.55, -charR + charR * 0.12, charR * 0.13, charR * 0.08, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── 小手臂 ──
+  ctx.strokeStyle = '#FF9800';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  if (!onTrampoline && playerVy < -100) {
+    // 上升：手臂向上
+    ctx.beginPath();
+    ctx.moveTo(-charR * 0.6, -charR * 0.45);
+    ctx.lineTo(-charR * 1.1, -charR * 1.4);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo( charR * 0.6, -charR * 0.45);
+    ctx.lineTo( charR * 1.1, -charR * 1.4);
+    ctx.stroke();
+  } else {
+    // 正常/压缩：手臂微张
+    ctx.beginPath();
+    ctx.moveTo(-charR * 0.65, -charR * 0.4);
+    ctx.lineTo(-charR * 0.95, -charR * 0.95);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo( charR * 0.65, -charR * 0.4);
+    ctx.lineTo( charR * 0.95, -charR * 0.95);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ── UI ──
+
+function drawUI() {
+  // ── 半透明顶栏 ──
+  const barH = 52;
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(0, 0, W, barH);
+
+  // 标题
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${Math.min(18, W * 0.045)}px -apple-system,"PingFang SC",sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.fillText('🤸 蹦床跳高', 16, barH / 2 + 6);
+
+  // 当前高度
+  const curH = onTrampoline ? 0 : Math.max(0, jumpPeakHeight);
+  const curMeters = pxToMeters(curH);
+  ctx.fillStyle = '#FFD740';
+  ctx.font = `bold ${Math.min(16, W * 0.04)}px -apple-system,"PingFang SC",sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(curMeters.toFixed(1) + ' m', W / 2, barH / 2 + 6);
+
+  // 最高纪录
+  const recordMeters = pxToMeters(allTimeRecord);
+  ctx.fillStyle = '#FF9800';
+  ctx.font = `${Math.min(13, W * 0.032)}px -apple-system,"PingFang SC",sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('🏆 ' + recordMeters.toFixed(1) + ' m', W - 16, barH / 2 + 6);
+
+  // ── 连击 ──
+  if (combo >= 3) {
+    ctx.fillStyle = '#FFD740';
+    ctx.font = `bold ${Math.min(15, W * 0.038)}px -apple-system,"PingFang SC",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('🔥 连击 ×' + combo, W / 2, barH + 24);
+  }
+
+  // ── 提示文字 ──
+  if (hintAlpha > 0.02 && jumpsCount < 5) {
+    ctx.fillStyle = `rgba(255,255,255,${hintAlpha * 0.85})`;
+    ctx.font = `${Math.min(15, W * 0.038)}px -apple-system,"PingFang SC",sans-serif`;
+    ctx.textAlign = 'center';
+    const hintY = trampolineRestY - 80;
+    ctx.fillText('👆 蹦床压到最低时点击屏幕！', W / 2, hintY);
+
+    // 小箭头动画
+    const arrowBob = Math.sin(performance.now() / 400) * 6;
+    ctx.fillText('⬇', W / 2, hintY + 22 + arrowBob);
+  }
+
+  // ── 评分弹出 ──
+  if (rating && rating.alpha > 0.01) {
+    ctx.save();
+    ctx.globalAlpha = rating.alpha;
+    ctx.translate(rating.x, rating.y);
+    ctx.scale(rating.scale, rating.scale);
+
+    // 阴影
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.font = 'bold 26px -apple-system,"PingFang SC",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(rating.text, 2, 2);
+
+    // 主体
+    ctx.fillStyle = rating.color;
+    ctx.fillText(rating.text, 0, 0);
+
+    // 白色描边
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth = 2;
+    ctx.strokeText(rating.text, 0, 0);
+
+    ctx.restore();
+  }
+
+  // ── 粒子 ──
+  for (const p of particles) {
+    const alpha = Math.max(0, p.life / p.maxLife);
+    ctx.fillStyle = p.color.replace(')', `, ${alpha})`).replace('hsl', 'hsla');
+    if (p.color.startsWith('hsl(')) {
+      // 重新构造带 alpha 的颜色
+      const m = p.color.match(/hsl\(([^)]+)\)/);
+      if (m) {
+        ctx.fillStyle = `hsla(${m[1]}, ${alpha})`;
+      }
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// ── 主渲染 ──
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+
+  // ── 屏幕震动 ──
+  ctx.save();
+  if (shakeAmount > 0.1) {
+    const sx = (Math.random() - 0.5) * shakeAmount * 2;
+    const sy = (Math.random() - 0.5) * shakeAmount * 2;
+    ctx.translate(sx, sy);
+  }
+
+  drawSky();
+  drawClouds();
+  drawRuler();
+  drawRecordMarker();
+  drawGround();
+  drawTrampoline();
+  drawCharacter();
+
+  ctx.restore();
+
+  // UI 不受震动影响
+  drawUI();
+}
+
+// ── 游戏循环 ──
+
+let lastTime = 0;
+function gameLoop(timestamp) {
+  if (lastTime === 0) lastTime = timestamp;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  update(dt);
+  render();
+
+  requestAnimationFrame(gameLoop);
+}
+
+// ── 事件监听 ──
+
+canvas.addEventListener('click', (e) => {
+  e.preventDefault();
+  handleTap();
+});
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  handleTap();
+}, { passive: false });
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+    e.preventDefault();
+    handleTap();
+  }
+});
+
+window.addEventListener('resize', () => {
+  // 保存当前状态比例再 resize
+  const oldRestY = trampolineRestY;
+  resize();
+  const ratio = trampolineRestY / oldRestY;
+  playerY = trampolineRestY + (playerY - oldRestY) * ratio;
+});
+
+// 防止双击缩放
+document.addEventListener('dblclick', (e) => e.preventDefault());
+
+// ── 启动 ──
+init();
+</script>
+</body>
+</html>

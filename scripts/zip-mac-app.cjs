@@ -27,9 +27,9 @@ if (!version) {
 
 const distDir = resolve(process.env.KUN_DIST_DIR || process.env.DEEPSEEK_GUI_DIST_DIR || join(root, 'dist'))
 const appOutDir = join(distDir, arch === 'arm64' ? 'mac-arm64' : 'mac')
-const appName = 'Kun.app'
+const appName = 'MagicPocket.app'
 const appPath = join(appOutDir, appName)
-const zipPath = join(distDir, `Kun-${version}-mac-${arch}.zip`)
+const zipPath = join(distDir, `MagicPocket-${version}-mac-${arch}.zip`)
 
 if (!existsSync(appPath)) {
   console.error(`[zip-mac-app] App bundle not found: ${appPath}`)

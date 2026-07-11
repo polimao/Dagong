@@ -10,10 +10,10 @@ import {
   ShieldQuestion
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { ApprovalPolicy, KunToolPermissionMode, SandboxMode } from '@shared/app-settings'
+import type { ApprovalPolicy, MagicPocketToolPermissionMode, SandboxMode } from '@shared/app-settings'
 import {
-  kunToolPermissionModeFromSettings,
-  kunToolPermissionModeSettings
+  magicpocketToolPermissionModeFromSettings,
+  magicpocketToolPermissionModeSettings
 } from '@shared/app-settings'
 
 export type ComposerExecutionSettings = {
@@ -29,7 +29,7 @@ type Props = {
 }
 
 type ApprovalOption = {
-  value: KunToolPermissionMode
+  value: MagicPocketToolPermissionMode
   labelKey: string
   descriptionKey: string
   Icon: typeof Hand
@@ -87,15 +87,15 @@ const APPROVAL_OPTIONS: ApprovalOption[] = [
   }
 ]
 
-function permissionOption(mode: KunToolPermissionMode): ApprovalOption {
+function permissionOption(mode: MagicPocketToolPermissionMode): ApprovalOption {
   return APPROVAL_OPTIONS.find((option) => option.value === mode) ?? APPROVAL_OPTIONS[1]
 }
 
-function permissionLabelKey(mode: KunToolPermissionMode): string {
+function permissionLabelKey(mode: MagicPocketToolPermissionMode): string {
   return permissionOption(mode).labelKey
 }
 
-function permissionDescriptionKey(mode: KunToolPermissionMode): string {
+function permissionDescriptionKey(mode: MagicPocketToolPermissionMode): string {
   return permissionOption(mode).descriptionKey
 }
 
@@ -111,7 +111,7 @@ export function FloatingComposerExecutionPicker({
   const rootRef = useRef<HTMLDivElement | null>(null)
   const approvalButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
-  const permissionMode = kunToolPermissionModeFromSettings(value)
+  const permissionMode = magicpocketToolPermissionModeFromSettings(value)
   const currentPermissionOption = permissionOption(permissionMode)
   const bypass = permissionMode === 'bypass'
   const PermissionIcon = currentPermissionOption.Icon
@@ -182,7 +182,7 @@ export function FloatingComposerExecutionPicker({
             description={t(option.descriptionKey)}
             Icon={option.Icon}
             iconClass={option.iconClass}
-            onClick={() => update(kunToolPermissionModeSettings(option.value))}
+            onClick={() => update(magicpocketToolPermissionModeSettings(option.value))}
           />
         ))}
       </div>
@@ -200,10 +200,10 @@ export function FloatingComposerExecutionPicker({
           type="button"
           disabled={disabled || applying}
           onClick={() => toggleMenu('approval')}
-          className={`inline-flex min-h-7 items-center gap-1.5 rounded-lg border px-2.5 py-0.5 text-[12.5px] font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-55 ${
+          className={`inline-flex min-h-7 items-center gap-1.5 rounded-lg pl-2.5 pr-0 py-0.5 text-[12.5px] font-semibold shadow-none transition disabled:cursor-not-allowed disabled:opacity-55 ${
             bypass
-              ? 'border-orange-300/70 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-800/70 dark:bg-orange-950/30 dark:text-orange-200'
-              : 'border-ds-border-muted bg-ds-card/72 text-ds-muted hover:bg-ds-hover hover:text-ds-ink'
+              ? 'text-orange-600 hover:bg-ds-hover dark:text-orange-300'
+              : 'text-ds-muted hover:bg-ds-hover hover:text-ds-ink'
           }`}
           title={`${t(permissionLabelKey(permissionMode))}. ${t(permissionDescriptionKey(permissionMode))}`}
           aria-expanded={openMenu === 'approval'}

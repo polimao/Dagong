@@ -8,7 +8,7 @@ import type {
   CoreRuntimeInfoJson,
   CoreRuntimeSkillJson,
   CoreRuntimeToolDiagnosticsJson
-} from './kun-contract'
+} from './magicpocket-contract'
 import type { ApprovalPolicy, SandboxMode } from '@shared/app-settings'
 
 export type ToolItemKind = 'tool_call' | 'command_execution' | 'file_change'
@@ -410,7 +410,7 @@ export type ThreadErrorOptions = {
   terminal?: boolean
 }
 
-/** Cumulative usage/cost for a Kun thread. */
+/** Cumulative usage/cost for a MagicPocket thread. */
 export type ThreadUsageSnapshot = {
   inputTokens: number
   outputTokens: number
@@ -448,7 +448,7 @@ export type ThreadEventSink = {
 }
 
 export interface AgentProvider {
-  readonly id: 'kun'
+  readonly id: 'magicpocket'
   readonly displayName: string
   getCapabilities(): {
     interrupt: boolean
@@ -507,7 +507,7 @@ export interface AgentProvider {
   getToolDiagnostics?(): Promise<CoreRuntimeToolDiagnosticsJson>
   getMcpOAuthDiagnostics?(): Promise<CoreMcpOAuthDiagnosticJson[]>
   clearMcpOAuthCredentials?(serverId?: string): Promise<string[]>
-  authorizeMcpOAuthCredentials?(serverId: string): Promise<import('./kun-contract').CoreMcpOAuthAuthorizeResponseJson>
+  authorizeMcpOAuthCredentials?(serverId: string): Promise<import('./magicpocket-contract').CoreMcpOAuthAuthorizeResponseJson>
   listSkills?(): Promise<CoreRuntimeSkillJson[]>
   uploadAttachment?(input: {
     name: string

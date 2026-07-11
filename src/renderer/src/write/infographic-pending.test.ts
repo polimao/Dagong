@@ -42,29 +42,29 @@ describe('pending infographic tokens', () => {
   it('rejects non-pending sources', () => {
     expect(parsePendingInfographicId('img/photo.png')).toBeNull()
     expect(parsePendingInfographicId('https://example.com/a.png')).toBeNull()
-    expect(parsePendingInfographicId('kun-pending-infographic://')).toBeNull()
+    expect(parsePendingInfographicId('magicpocket-pending-infographic://')).toBeNull()
     expect(parsePendingInfographicId(undefined)).toBeNull()
   })
 
   it('parses pending image markdown and ignores regular images', () => {
-    const parsed = parsePendingInfographicImage('![信息图](kun-pending-infographic://abc-123)')
+    const parsed = parsePendingInfographicImage('![信息图](magicpocket-pending-infographic://abc-123)')
     expect(parsed).toEqual({
       alt: '信息图',
       id: 'abc-123',
-      src: 'kun-pending-infographic://abc-123'
+      src: 'magicpocket-pending-infographic://abc-123'
     })
     expect(parsePendingInfographicImage('![信息图](img/a.png)')).toBeNull()
     expect(parsePendingInfographicImage('not markdown')).toBeNull()
   })
 
   it('strips square brackets from the alt text', () => {
-    expect(buildPendingInfographicMarkdown('a[b]c', 'kun-pending-infographic://x'))
-      .toBe('![abc](kun-pending-infographic://x)')
+    expect(buildPendingInfographicMarkdown('a[b]c', 'magicpocket-pending-infographic://x'))
+      .toBe('![abc](magicpocket-pending-infographic://x)')
   })
 })
 
 describe('replacePendingInfographicInText', () => {
-  const token = '![信息图](kun-pending-infographic://abc)'
+  const token = '![信息图](magicpocket-pending-infographic://abc)'
 
   it('swaps the placeholder for the generated image markdown', () => {
     const content = `段落一。\n\n${token}\n\n段落二。`

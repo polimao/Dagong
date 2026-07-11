@@ -3,13 +3,13 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useTranslation } from 'react-i18next'
 import {
   DEFAULT_WRITE_INLINE_COMPLETION_BASE_URL,
-  kunSettingsPatch,
+  magicpocketSettingsPatch,
   DEFAULT_WRITE_WORKSPACE_ROOT,
   type AppSettingsPatch,
   getActiveAgentApiKey,
-  getKunRuntimeSettings,
+  getMagicPocketRuntimeSettings,
   getModelProviderSettings,
-  isKunRuntimeInsecure,
+  isMagicPocketRuntimeInsecure,
   resolveWriteInlineCompletionApiKey,
   resolveWriteInlineCompletionBaseUrl,
   resolveWriteInlineCompletionModel,
@@ -22,7 +22,7 @@ import type {
   CoreMemoryRecordJson,
   CoreRuntimeInfoJson,
   CoreRuntimeToolDiagnosticsJson
-} from '../agent/kun-contract'
+} from '../agent/magicpocket-contract'
 import type { WriteInlineCompletionDebugEntry } from '@shared/write-inline-completion'
 import {
   applyChatContentMaxWidth,
@@ -33,7 +33,7 @@ import {
   applyWriteTypography
 } from '../lib/apply-theme'
 import { formatWorkspacePickerError } from '../lib/format-workspace-picker-error'
-import type { SkillRootListItem } from '@shared/kun-gui-api'
+import type { SkillRootListItem } from '@shared/magicpocket-gui-api'
 import { defaultConversationWorkspaceRoot, normalizeWorkspaceRoot } from '../lib/workspace-path'
 import {
   compactHomePathForSettingsDisplay,
@@ -54,7 +54,7 @@ import {
   mergeSettings,
   splitSettingsList
 } from './settings-utils'
-import { loadKunDiagnostics } from '../lib/load-kun-diagnostics'
+import { loadMagicPocketDiagnostics } from '../lib/load-magicpocket-diagnostics'
 import { SETTINGS_CHANGED_EVENT, emitRendererSettingsChanged } from '../lib/keyboard-shortcut-settings'
 import { confirmDialog } from '../lib/confirm-dialog'
 import { GeneralSettingsSection } from './settings-section-general'
@@ -172,7 +172,7 @@ export function SettingsView(): ReactElement {
   const [skillRoots, setSkillRoots] = useState<SkillRootListItem[]>([])
   const [skillRootsLoading, setSkillRootsLoading] = useState(false)
   const [skillNotice, setSkillNotice] = useState<InlineNotice | null>(null)
-  const [mcpConfigPath, setMcpConfigPath] = useState('~/.kun/mcp.json')
+  const [mcpConfigPath, setMcpConfigPath] = useState('~/.magicpocket/mcp.json')
   const [mcpConfigText, setMcpConfigText] = useState('')
   const [mcpConfigExists, setMcpConfigExists] = useState(false)
   const [mcpLoading, setMcpLoading] = useState(false)
@@ -209,14 +209,14 @@ export function SettingsView(): ReactElement {
   const formUiFontScale = form?.uiFontScale
   const formChatContentMaxWidthPx = form?.chatContentMaxWidthPx
   const writeTypography = form?.write?.typography
-  const formKun = form ? getKunRuntimeSettings(form) : null
-  const formPort = formKun?.port
+  const formMagicPocket = form ? getMagicPocketRuntimeSettings(form) : null
+  const formPort = formMagicPocket?.port
   const formGuiUpdateChannel = form?.guiUpdate?.channel
   const formCursorSpotlight = form?.cursorSpotlight
   const formCursorSpotlightColor = form?.cursorSpotlightColor
   const markAgentsSectionReady = useCallback(() => setAgentsSectionReady(true), [])
-  const settingsPlatform = typeof window !== 'undefined' ? window.kunGui?.platform ?? '' : ''
-  const settingsHomeDir = typeof window !== 'undefined' ? window.kunGui?.homeDir ?? '' : ''
+  const settingsPlatform = typeof window !== 'undefined' ? window.magicpocketGui?.platform ?? '' : ''
+  const settingsHomeDir = typeof window !== 'undefined' ? window.magicpocketGui?.homeDir ?? '' : ''
   const compactHomePath = useCallback((value: string): string =>
     compactHomePathForSettingsDisplay(value, settingsHomeDir, settingsPlatform), [settingsHomeDir, settingsPlatform])
   const expandHomePath = useCallback((value: string): string =>
@@ -246,7 +246,7 @@ export function SettingsView(): ReactElement {
 
   useEffect(() => {
     let cancelled = false
-    if (typeof window.kunGui === 'undefined') {
+    if (typeof window.magicpocketGui === 'undefined') {
       setLoadError('PRELOAD_BRIDGE')
       return
     }
@@ -307,16 +307,16 @@ export function SettingsView(): ReactElement {
   }, [])
 
   useEffect(() => {
-    if (typeof window.kunGui?.getLogPath !== 'function') return
-    void window.kunGui.getLogPath().then((p) => setLogPath(p)).catch(() => undefined)
+    if (typeof window.magicpocketGui?.getLogPath !== 'function') return
+    void window.magicpocketGui.getLogPath().then((p) => setLogPath(p)).catch(() => undefined)
   }, [category])
 
   const loadWriteDebugEntries = useCallback(async (): Promise<void> => {
     setWriteDebugLoading(true)
     setWriteDebugError(null)
     try {
-      const completionEntries = typeof window.kunGui?.listWriteInlineCompletionDebugEntries === 'function'
-        ? await window.kunGui.listWriteInlineCompletionDebugEntries()
+      const completionEntries = typeof window.magicpocketGui?.listWriteInlineCompletionDebugEntries === 'function'
+        ? await window.magicpocketGui.listWriteInlineCompletionDebugEntries()
         : []
       setWriteCompletionDebugEntries(completionEntries)
       setWriteCompletionDebugSelectedId((current) =>
@@ -457,12 +457,12 @@ export function SettingsView(): ReactElement {
   }, [form, formPort, t])
 
   const refreshSkillRoots = useCallback(async (): Promise<void> => {
-    if (typeof window.kunGui?.listSkillRoots !== 'function') return
+    if (typeof window.magicpocketGui?.listSkillRoots !== 'function') return
     setSkillRootsLoading(true)
     try {
       // Settings is global: list every configured skill root from persisted
       // settings, not the sidebar's currently selected project workspace.
-      const result = await window.kunGui.listSkillRoots()
+      const result = await window.magicpocketGui.listSkillRoots()
       if (result.ok) setSkillRoots(result.roots)
     } catch {
       /* listing skill roots is best-effort; keep the last known list */
@@ -477,11 +477,11 @@ export function SettingsView(): ReactElement {
   }, [category, refreshSkillRoots])
 
   const loadMcpConfig = async (): Promise<void> => {
-    if (typeof window.kunGui?.getKunConfigFile !== 'function') return
+    if (typeof window.magicpocketGui?.getMagicPocketConfigFile !== 'function') return
     setMcpLoading(true)
     setMcpNotice(null)
     try {
-      const config = await window.kunGui.getKunConfigFile()
+      const config = await window.magicpocketGui.getMagicPocketConfigFile()
       setMcpConfigPath(config.path)
       setMcpConfigText(config.content)
       setMcpConfigExists(config.exists)
@@ -506,9 +506,9 @@ export function SettingsView(): ReactElement {
       setSkillNotice({ tone: 'error', message: t('skillsRootUnavailable') })
       return
     }
-    if (typeof window.kunGui?.openSkillRoot !== 'function') return
+    if (typeof window.magicpocketGui?.openSkillRoot !== 'function') return
     setSkillNotice(null)
-    const result = await window.kunGui.openSkillRoot(path)
+    const result = await window.magicpocketGui.openSkillRoot(path)
     if (!result.ok) {
       setSkillNotice({ tone: 'error', message: result.message ?? t('applyFailed') })
     }
@@ -531,11 +531,11 @@ export function SettingsView(): ReactElement {
   }
 
   const saveMcpConfig = async (): Promise<void> => {
-    if (typeof window.kunGui?.setKunConfigFile !== 'function') return
+    if (typeof window.magicpocketGui?.setMagicPocketConfigFile !== 'function') return
     setMcpBusy(true)
     setMcpNotice(null)
     try {
-      const result = await window.kunGui.setKunConfigFile(mcpConfigText)
+      const result = await window.magicpocketGui.setMagicPocketConfigFile(mcpConfigText)
       setMcpConfigPath(result.path)
       setMcpConfigExists(true)
       setMcpNotice({
@@ -553,19 +553,19 @@ export function SettingsView(): ReactElement {
   }
 
   const openMcpConfigDir = async (): Promise<void> => {
-    if (typeof window.kunGui?.openKunConfigDir !== 'function') return
-    const result = await window.kunGui.openKunConfigDir()
+    if (typeof window.magicpocketGui?.openMagicPocketConfigDir !== 'function') return
+    const result = await window.magicpocketGui.openMagicPocketConfigDir()
     if (!result.ok) {
       setMcpNotice({ tone: 'error', message: result.message ?? t('applyFailed') })
     }
   }
 
-  const refreshKunDiagnostics = useCallback(async (): Promise<void> => {
+  const refreshMagicPocketDiagnostics = useCallback(async (): Promise<void> => {
     const provider = getProvider()
     setRuntimeDiagnosticsBusy(true)
     setRuntimeDiagnosticsNotice(null)
     try {
-      const loaded = await loadKunDiagnostics(provider, { listAllMemories: true })
+      const loaded = await loadMagicPocketDiagnostics(provider, { listAllMemories: true })
       if (loaded.runtimeInfo !== undefined) setRuntimeInfo(loaded.runtimeInfo)
       if (loaded.toolDiagnostics !== undefined) setToolDiagnostics(loaded.toolDiagnostics)
       if (loaded.memoryRecords !== undefined) setMemoryRecords(loaded.memoryRecords)
@@ -587,8 +587,8 @@ export function SettingsView(): ReactElement {
 
   useEffect(() => {
     if (category !== 'agents' && category !== 'memory') return
-    void refreshKunDiagnostics()
-  }, [category, refreshKunDiagnostics])
+    void refreshMagicPocketDiagnostics()
+  }, [category, refreshMagicPocketDiagnostics])
 
   const refreshMemoryDiagnostics = async (): Promise<void> => {
     const provider = getProvider()
@@ -765,7 +765,7 @@ export function SettingsView(): ReactElement {
       const message = e instanceof Error ? e.message : String(e)
       setSaveError(message)
       setSaveStatus('error')
-      void window.kunGui?.logError?.('settings', 'Failed to apply settings', { message }).catch(() => undefined)
+      void window.magicpocketGui?.logError?.('settings', 'Failed to apply settings', { message }).catch(() => undefined)
     }
   }
 
@@ -839,7 +839,7 @@ export function SettingsView(): ReactElement {
       })
       .catch((e) => {
         const message = e instanceof Error ? e.message : String(e)
-        void window.kunGui?.logError?.('settings', 'Failed to flush settings on unmount', { message }).catch(
+        void window.magicpocketGui?.logError?.('settings', 'Failed to flush settings on unmount', { message }).catch(
           () => undefined
         )
       })
@@ -901,7 +901,7 @@ export function SettingsView(): ReactElement {
     )
   }
 
-  const kun = getKunRuntimeSettings(form)
+  const magicpocket = getMagicPocketRuntimeSettings(form)
   const provider = getModelProviderSettings(form)
   const activeApiKey = getActiveAgentApiKey(form)
 
@@ -929,17 +929,17 @@ export function SettingsView(): ReactElement {
     update({ provider: patch })
   }
 
-  const updateKun = (patch: Partial<AppSettingsV1['agents']['kun']>): void => {
-    update({ agents: kunSettingsPatch(patch) })
+  const updateMagicPocket = (patch: Partial<AppSettingsV1['agents']['magicpocket']>): void => {
+    update({ agents: magicpocketSettingsPatch(patch) })
   }
 
   const pickWorkspace = async (): Promise<void> => {
     try {
       setWorkspacePickerError(null)
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(expandHomePath(form.workspaceRoot) || undefined)
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(expandHomePath(form.workspaceRoot) || undefined)
       if (!picked.canceled && picked.path) {
         update({ workspaceRoot: picked.path })
       }
@@ -956,10 +956,10 @@ export function SettingsView(): ReactElement {
   const pickConversationWorkspace = async (): Promise<void> => {
     try {
       setConversationWorkspacePickerError(null)
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(
         expandHomePath(form.conversationWorkspaceRoot || defaultConversationWorkspaceRoot())
       )
       if (!picked.canceled && picked.path) {
@@ -978,10 +978,10 @@ export function SettingsView(): ReactElement {
   const pickWriteWorkspace = async (): Promise<void> => {
     try {
       setWriteWorkspacePickerError(null)
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(
         expandHomePath(form.write.defaultWorkspaceRoot || DEFAULT_WRITE_WORKSPACE_ROOT)
       )
       if (!picked.canceled && picked.path) {
@@ -1018,10 +1018,10 @@ export function SettingsView(): ReactElement {
   const pickClawWorkspace = async (): Promise<void> => {
     try {
       setClawWorkspacePickerError(null)
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(
         expandHomePath(form.claw.im.workspaceRoot || form.workspaceRoot) || undefined
       )
       if (!picked.canceled && picked.path) {
@@ -1041,8 +1041,8 @@ export function SettingsView(): ReactElement {
     setWriteDebugLoading(true)
     setWriteDebugError(null)
     try {
-      if (typeof window.kunGui?.clearWriteInlineCompletionDebugEntries === 'function') {
-        await window.kunGui.clearWriteInlineCompletionDebugEntries()
+      if (typeof window.magicpocketGui?.clearWriteInlineCompletionDebugEntries === 'function') {
+        await window.magicpocketGui.clearWriteInlineCompletionDebugEntries()
       }
       setWriteCompletionDebugEntries([])
       setWriteCompletionDebugSelectedId(null)
@@ -1061,10 +1061,10 @@ export function SettingsView(): ReactElement {
     tCommon,
     form,
     provider,
-    kun,
+    magicpocket,
     activeApiKey,
     update,
-    updateKun,
+    updateMagicPocket,
     updateSharedCredential,
     sharedApiKey,
     sharedBaseUrl,
@@ -1136,7 +1136,7 @@ export function SettingsView(): ReactElement {
     memoryDiagnostics,
     runtimeDiagnosticsBusy,
     runtimeDiagnosticsNotice,
-    refreshKunDiagnostics,
+    refreshMagicPocketDiagnostics,
     createMemoryRecord,
     updateMemoryRecord,
     disableMemoryRecord,

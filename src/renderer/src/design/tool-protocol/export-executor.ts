@@ -31,9 +31,9 @@ export function executeDesignExportInvocation(invocation: DesignToolInvocation):
   }
 
   const state = readDesignToolState()
-  const title = maybeString(record?.title) ?? state.document?.title ?? 'Kun design project'
+  const title = maybeString(record?.title) ?? state.document?.title ?? 'MagicPocket design project'
   const updatedAt = new Date().toISOString()
-  const designSystemMdPath = '.kun-design/DESIGN_SYSTEM.md'
+  const designSystemMdPath = '.magicpocket-design/DESIGN_SYSTEM.md'
   const projectBriefPath = maybeString(record?.projectBriefPath)
   const markdown = buildStitchDesignMarkdown({
     title,

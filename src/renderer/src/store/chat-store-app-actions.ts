@@ -56,6 +56,8 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
   | 'openClaw'
   | 'openSchedule'
   | 'openWorkflow'
+  | 'openExperts'
+  | 'setCollaborationContext'
   | 'openDesign'
   | 'openInitialSetup'
   | 'closeInitialSetup'
@@ -125,8 +127,8 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
       }
       set({ composerModel: modelId, composerProviderId: nextProviderId })
       const trimmed = modelId.trim()
-      if (!activeThreadId && trimmed && trimmed.toLowerCase() !== 'auto' && typeof window.kunGui !== 'undefined') {
-        void window.kunGui.saveSettingsSilent({ agents: { kun: { model: trimmed } } })
+      if (!activeThreadId && trimmed && trimmed.toLowerCase() !== 'auto' && typeof window.magicpocketGui !== 'undefined') {
+        void window.magicpocketGui.saveSettingsSilent({ agents: { magicpocket: { model: trimmed } } })
       }
     },
 
@@ -136,9 +138,9 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
 
     loadComposerModels: async () => {
       if (getComposerModelLoadPromise()) return getComposerModelLoadPromise()!
-      if (typeof window.kunGui === 'undefined') return
+      if (typeof window.magicpocketGui === 'undefined') return
       const task = (async () => {
-        const res = await window.kunGui.fetchUpstreamModels()
+        const res = await window.magicpocketGui.fetchUpstreamModels()
         const pick = mergeComposerPickList(res.ok, res.ok ? res.modelIds : [])
         const groups = res.ok ? res.modelGroups ?? [] : []
         const runtimeDefault = res.ok ? res.defaultModelId?.trim() ?? '' : ''
@@ -223,6 +225,10 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
     openWorkflow: () => {
       set({ route: 'workflow' })
     },
+    openExperts: () => {
+      set({ route: 'experts' })
+    },
+    setCollaborationContext: (ctx) => set({ collaborationContext: ctx }),
     openDesign: () => {
       set({ route: 'design' })
     },
@@ -240,7 +246,7 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
     },
 
     reloadUiSettings: async () => {
-      if (typeof window.kunGui === 'undefined') return
+      if (typeof window.magicpocketGui === 'undefined') return
       const settings = await rendererRuntimeClient.getSettings({ forceRefresh: true })
       const workspaceRoot = normalizeWorkspaceRoot(settings.workspaceRoot)
       applyTheme(settings.theme)

@@ -33,8 +33,8 @@ export type DesignToolProtocolTool = {
 
 export type DesignToolProtocolManifest = {
   version: 1
-  kind: 'kun.design.tool-protocol'
-  source: 'kun-design-mode'
+  kind: 'magicpocket.design.tool-protocol'
+  source: 'magicpocket-design-mode'
   tools: DesignToolProtocolTool[]
 }
 
@@ -130,8 +130,8 @@ export const DESIGN_TOOL_PROTOCOL_TOOLS: DesignToolProtocolTool[] = [
 export function buildDesignToolProtocolManifest(): DesignToolProtocolManifest {
   return {
     version: 1,
-    kind: 'kun.design.tool-protocol',
-    source: 'kun-design-mode',
+    kind: 'magicpocket.design.tool-protocol',
+    source: 'magicpocket-design-mode',
     tools: DESIGN_TOOL_PROTOCOL_TOOLS
   }
 }

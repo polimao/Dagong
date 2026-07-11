@@ -33,14 +33,14 @@ describe('normalizeUiPluginManifest', () => {
   })
 
   it('rejects reserved and malformed ids', () => {
-    for (const id of ['default', 'kun', 'ON', 'a', 'Has Space', '../x']) {
+    for (const id of ['default', 'magicpocket', 'ON', 'a', 'Has Space', '../x']) {
       const result = normalizeUiPluginManifest({ ...validManifest, id })
       expect(result.ok).toBe(false)
     }
   })
 
-  it('allows the bundled ikun id (iKun ships as a pre-installed plugin)', () => {
-    expect(normalizeUiPluginManifest({ ...validManifest, id: 'ikun' }).ok).toBe(true)
+  it('allows the bundled imagicpocket id (iMagicPocket ships as a pre-installed plugin)', () => {
+    expect(normalizeUiPluginManifest({ ...validManifest, id: 'imagicpocket' }).ok).toBe(true)
   })
 
   it('rejects traversal, absolute paths, and non-image extensions in figures', () => {

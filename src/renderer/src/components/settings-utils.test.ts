@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import type { AppSettingsV1, KunRuntimeSettingsV1 } from '@shared/app-settings'
+import type { AppSettingsV1, MagicPocketRuntimeSettingsV1 } from '@shared/app-settings'
 import { coerceRendererSettings, diffSettingsPatch, mergeSettings } from './settings-utils'
 
-function settings(kunPatch: Partial<KunRuntimeSettingsV1> = {}): AppSettingsV1 {
+function settings(magicpocketPatch: Partial<MagicPocketRuntimeSettingsV1> = {}): AppSettingsV1 {
   return coerceRendererSettings({
     agents: {
-      kun: kunPatch
+      magicpocket: magicpocketPatch
     }
   } as unknown as AppSettingsV1)
 }
@@ -29,8 +29,8 @@ describe('diffSettingsPatch', () => {
     const next: AppSettingsV1 = {
       ...base,
       agents: {
-        kun: {
-          ...base.agents.kun,
+        magicpocket: {
+          ...base.agents.magicpocket,
           runtimeToken: ''
         }
       }
@@ -38,7 +38,7 @@ describe('diffSettingsPatch', () => {
 
     expect(diffSettingsPatch(base, next)).toEqual({
       agents: {
-        kun: {
+        magicpocket: {
           runtimeToken: ''
         }
       }

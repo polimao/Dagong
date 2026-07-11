@@ -50,11 +50,11 @@ describe('design.export package output', () => {
         id: 'artifact_home',
         kind: 'html',
         title: 'Home',
-        relativePath: '.kun-design/doc/artifact_home/v1.html',
-        designMdPath: '.kun-design/doc/artifact_home/DESIGN.md',
+        relativePath: '.magicpocket-design/doc/artifact_home/v1.html',
+        designMdPath: '.magicpocket-design/doc/artifact_home/DESIGN.md',
         createdAt,
         updatedAt: createdAt,
-        versions: [{ id: 'artifact_home-v1', relativePath: '.kun-design/doc/artifact_home/v1.html', createdAt, summary: 'Home screen' }],
+        versions: [{ id: 'artifact_home-v1', relativePath: '.magicpocket-design/doc/artifact_home/v1.html', createdAt, summary: 'Home screen' }],
         direction: { id: 'dir_calm', name: 'Calm operator', status: 'active' },
         prototypeLinks: [{ targetTitle: 'Settings', targetArtifactId: 'artifact_settings', href: './settings.html', label: 'Configure routing' }]
       },
@@ -62,11 +62,11 @@ describe('design.export package output', () => {
         id: 'artifact_settings',
         kind: 'html',
         title: 'Settings',
-        relativePath: '.kun-design/doc/artifact_settings/v1.html',
-        designMdPath: '.kun-design/doc/artifact_settings/DESIGN.md',
+        relativePath: '.magicpocket-design/doc/artifact_settings/v1.html',
+        designMdPath: '.magicpocket-design/doc/artifact_settings/DESIGN.md',
         createdAt,
         updatedAt: createdAt,
-        versions: [{ id: 'artifact_settings-v1', relativePath: '.kun-design/doc/artifact_settings/v1.html', createdAt, summary: 'Settings screen' }],
+        versions: [{ id: 'artifact_settings-v1', relativePath: '.magicpocket-design/doc/artifact_settings/v1.html', createdAt, summary: 'Settings screen' }],
         direction: { id: 'dir_calm', name: 'Calm operator', status: 'active' }
       }
     ]
@@ -110,10 +110,10 @@ describe('design.export package output', () => {
     expect(output.markdown).toContain('# DESIGN.md: Routing redesign')
     expect(output.markdown).toContain('Configure routing -> Settings')
     expect(output.resources).toEqual(expect.arrayContaining([
-      expect.objectContaining({ kind: 'project-design-md', path: '.kun-design/DESIGN.md' }),
-      expect.objectContaining({ kind: 'html', path: '.kun-design/doc/artifact_home/v1.html', artifactId: 'artifact_home', frameId: homeFrame.id }),
-      expect.objectContaining({ kind: 'screen-design-md', path: '.kun-design/doc/artifact_home/DESIGN.md', artifactId: 'artifact_home' }),
-      expect.objectContaining({ kind: 'graph-json', path: '.kun-design/design-graph.json' })
+      expect.objectContaining({ kind: 'project-design-md', path: '.magicpocket-design/DESIGN.md' }),
+      expect.objectContaining({ kind: 'html', path: '.magicpocket-design/doc/artifact_home/v1.html', artifactId: 'artifact_home', frameId: homeFrame.id }),
+      expect.objectContaining({ kind: 'screen-design-md', path: '.magicpocket-design/doc/artifact_home/DESIGN.md', artifactId: 'artifact_home' }),
+      expect.objectContaining({ kind: 'graph-json', path: '.magicpocket-design/design-graph.json' })
     ]))
     expect(output.directions).toEqual([
       expect.objectContaining({ id: 'dir_calm', name: 'Calm operator', screenCount: 2 })

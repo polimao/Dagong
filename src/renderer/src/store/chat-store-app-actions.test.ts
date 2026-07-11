@@ -11,11 +11,11 @@ import {
 } from './chat-store-helpers'
 import { createAppActions } from './chat-store-app-actions'
 
-const COMPOSER_MODEL_STORAGE_KEY = 'kun.composerModel'
-const COMPOSER_PROVIDER_STORAGE_KEY = 'kun.composerProviderId'
-const THREAD_COMPOSER_SELECTION_STORAGE_KEY = 'kun.threadComposerSelection.v1'
-const THREAD_COMPOSER_MODE_STORAGE_KEY = 'kun.threadComposerMode.v1'
-const COMPOSER_MODE_STORAGE_KEY = 'kun.composerMode'
+const COMPOSER_MODEL_STORAGE_KEY = 'magicpocket.composerModel'
+const COMPOSER_PROVIDER_STORAGE_KEY = 'magicpocket.composerProviderId'
+const THREAD_COMPOSER_SELECTION_STORAGE_KEY = 'magicpocket.threadComposerSelection.v1'
+const THREAD_COMPOSER_MODE_STORAGE_KEY = 'magicpocket.threadComposerMode.v1'
+const COMPOSER_MODE_STORAGE_KEY = 'magicpocket.composerMode'
 
 function createMemoryStorage(): Storage {
   const items = new Map<string, string>()
@@ -60,7 +60,7 @@ function buildHarness(fetchModelsResult: FetchModelsResult): {
   const get: ChatStoreGet = () => state
 
   vi.stubGlobal('window', {
-    kunGui: {
+    magicpocketGui: {
       fetchUpstreamModels: vi.fn(async () => fetchModelsResult),
       saveSettingsSilent: vi.fn(async () => state)
     }
@@ -147,8 +147,8 @@ describe('chat-store app actions composer model loading', () => {
     expect(state.composerModel).toBe('MiniMax-M2')
     expect(state.composerProviderId).toBe('minimax')
     expect(localStorage.getItem(COMPOSER_PROVIDER_STORAGE_KEY)).toBe('minimax')
-    expect(window.kunGui.saveSettingsSilent).toHaveBeenCalledWith({
-      agents: { kun: { model: 'MiniMax-M2' } }
+    expect(window.magicpocketGui.saveSettingsSilent).toHaveBeenCalledWith({
+      agents: { magicpocket: { model: 'MiniMax-M2' } }
     })
   })
 
@@ -170,7 +170,7 @@ describe('chat-store app actions composer model loading', () => {
     })
   })
 
-  it('keeps active-thread model changes out of the global Kun default', () => {
+  it('keeps active-thread model changes out of the global MagicPocket default', () => {
     const { actions, state } = buildHarness({
       ok: true,
       modelIds: ['MiniMax-M2'],
@@ -206,7 +206,7 @@ describe('chat-store app actions composer model loading', () => {
     expect(JSON.parse(localStorage.getItem(THREAD_COMPOSER_SELECTION_STORAGE_KEY) ?? '{}')).toEqual({
       'thread-a': { model: 'MiniMax-M2', providerId: 'minimax' }
     })
-    expect(window.kunGui.saveSettingsSilent).not.toHaveBeenCalled()
+    expect(window.magicpocketGui.saveSettingsSilent).not.toHaveBeenCalled()
   })
 
   it('restores a model selection from the active thread instead of the global picker', async () => {
@@ -334,7 +334,7 @@ describe('chat-store app actions composer model loading', () => {
     expect(state.composerModel).toBe('vision-model')
     expect(state.composerProviderId).toBe('test-provider')
     expect(localStorage.getItem(THREAD_COMPOSER_SELECTION_STORAGE_KEY)).toBeNull()
-    expect(window.kunGui.saveSettingsSilent).not.toHaveBeenCalled()
+    expect(window.magicpocketGui.saveSettingsSilent).not.toHaveBeenCalled()
   })
 
   it('allows switching a text-only chat from vision to text-only (issue #579)', () => {
@@ -456,8 +456,8 @@ describe('chat-store app actions composer model loading', () => {
     expect(state.composerModel).toBe('text-model')
     expect(state.composerProviderId).toBe('test-provider')
     expect(localStorage.getItem(COMPOSER_MODEL_STORAGE_KEY)).toBe('text-model')
-    expect(window.kunGui.saveSettingsSilent).toHaveBeenCalledWith({
-      agents: { kun: { model: 'text-model' } }
+    expect(window.magicpocketGui.saveSettingsSilent).toHaveBeenCalledWith({
+      agents: { magicpocket: { model: 'text-model' } }
     })
   })
 

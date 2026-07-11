@@ -11,6 +11,9 @@ const ScheduleTasksView = lazy(() =>
 const WorkflowView = lazy(() =>
   import('../workflow/WorkflowView').then((module) => ({ default: module.WorkflowView }))
 )
+const ExpertTeamView = lazy(() =>
+  import('../ExpertTeamView').then((module) => ({ default: module.ExpertTeamView }))
+)
 const WorkflowRunPanel = lazy(() =>
   import('../workflow/WorkflowRunPanel').then((module) => ({ default: module.WorkflowRunPanel }))
 )
@@ -61,7 +64,7 @@ export function WorkbenchStageRouter({
   return (
     <main
       className={`ds-drag ds-stage-surface relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${
-        route === 'plugins' ? 'px-0' : ''
+        route === 'plugins' || route === 'experts' ? 'px-0' : ''
       }`}
     >
       {route === 'plugins' ? (
@@ -85,6 +88,13 @@ export function WorkbenchStageRouter({
             leftSidebarCollapsed={leftSidebarCollapsed}
             onToggleLeftSidebar={onToggleLeftSidebar}
             onOpenThread={onOpenThread}
+          />
+        </Suspense>
+      ) : route === 'experts' ? (
+        <Suspense fallback={<div className="h-full bg-ds-main" />}>
+          <ExpertTeamView
+            leftSidebarCollapsed={leftSidebarCollapsed}
+            onToggleLeftSidebar={onToggleLeftSidebar}
           />
         </Suspense>
       ) : route === 'design' ? (

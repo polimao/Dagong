@@ -70,7 +70,7 @@ export {
 type Props = {
   workspaceRoot: string
   artifactId: string
-  /** Workspace subdirectory the canvas doc persists under. Defaults to `.kun-design`. */
+  /** Workspace subdirectory the canvas doc persists under. Defaults to `.magicpocket-design`. */
   baseDir?: string
   /** Optional design-system directory. Defaults to baseDir; Code canvases use a per-thread dir. */
   designSystemBaseDir?: string

@@ -2,15 +2,15 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 import { vi } from 'vitest'
-import type { KunRuntimeStatusPayload } from '@shared/kun-gui-api'
+import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
 import { RuntimeStatusBanner } from './RuntimeStatusBanner'
 
 const storeState = vi.hoisted(() => ({
-  runtimeStatus: null as KunRuntimeStatusPayload | null
+  runtimeStatus: null as MagicPocketRuntimeStatusPayload | null
 }))
 
 vi.mock('../store/chat-store', () => ({
-  useChatStore: (selector: (state: { runtimeStatus: KunRuntimeStatusPayload | null }) => unknown) =>
+  useChatStore: (selector: (state: { runtimeStatus: MagicPocketRuntimeStatusPayload | null }) => unknown) =>
     selector(storeState)
 }))
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
-  applyKunRuntimePatch,
-  kunSettingsEnvelope,
-  kunSettingsPatch,
+  applyMagicPocketRuntimePatch,
+  magicpocketSettingsEnvelope,
+  magicpocketSettingsPatch,
   DEFAULT_KUN_DATA_DIR,
   DEFAULT_KUN_MODEL,
   DEFAULT_LOG_RETENTION_DAYS,
@@ -17,9 +17,9 @@ import {
   buildClawRuntimePrompt,
   defaultClawSettings,
   defaultModelProviderSettings,
-  mergeKunRuntimeSettings,
+  mergeMagicPocketRuntimeSettings,
   mergeScheduleSettings,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
   defaultTerminalSettings,
@@ -33,7 +33,7 @@ import {
   mergeWriteSettings,
   normalizeWriteSettings,
   normalizeWriteAgentPresets,
-  isKunRuntimeInsecure,
+  isMagicPocketRuntimeInsecure,
   migrateLegacyAppSettings,
   normalizeAppSettings,
   normalizeChatContentMaxWidth,
@@ -41,10 +41,10 @@ import {
   applyGitBranchPrefix,
   parseClawUserPromptForDisplay,
   inferModelEndpointFormatFromUrl,
-  kunToolPermissionModeFromSettings,
-  kunToolPermissionModeSettings,
+  magicpocketToolPermissionModeFromSettings,
+  magicpocketToolPermissionModeSettings,
   normalizeScheduleSettings,
-  resolveKunRuntimeSettings,
+  resolveMagicPocketRuntimeSettings,
   resolveWriteInlineCompletionApiKey,
   resolveWriteInlineCompletionBaseUrl,
   resolveWriteInlineCompletionModel,
@@ -62,10 +62,10 @@ function settings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      kun: defaultKunRuntimeSettings()
+      magicpocket: defaultMagicPocketRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -145,64 +145,64 @@ function clawChannel(provider: ClawImProvider, label: string, name = label): Cla
   }
 }
 
-describe('kun defaults', () => {
+describe('magicpocket defaults', () => {
   it('keeps a single shared default data directory source', () => {
-    expect(defaultKunRuntimeSettings().dataDir).toBe(DEFAULT_KUN_DATA_DIR)
+    expect(defaultMagicPocketRuntimeSettings().dataDir).toBe(DEFAULT_KUN_DATA_DIR)
   })
 
   it('defaults the assistant model to v4 pro', () => {
-    expect(defaultKunRuntimeSettings().model).toBe(DEFAULT_KUN_MODEL)
+    expect(defaultMagicPocketRuntimeSettings().model).toBe(DEFAULT_KUN_MODEL)
   })
 
   it('defaults approval policy to auto', () => {
-    expect(defaultKunRuntimeSettings().approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
-    expect(defaultKunRuntimeSettings().approvalPolicy).toBe('auto')
+    expect(defaultMagicPocketRuntimeSettings().approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
+    expect(defaultMagicPocketRuntimeSettings().approvalPolicy).toBe('auto')
   })
 
   it('defaults sandbox mode to full access', () => {
-    expect(defaultKunRuntimeSettings().sandboxMode).toBe(DEFAULT_SANDBOX_MODE)
-    expect(defaultKunRuntimeSettings().sandboxMode).toBe('danger-full-access')
+    expect(defaultMagicPocketRuntimeSettings().sandboxMode).toBe(DEFAULT_SANDBOX_MODE)
+    expect(defaultMagicPocketRuntimeSettings().sandboxMode).toBe('danger-full-access')
   })
 
   it('maps unified tool permission modes to approval and sandbox settings', () => {
-    expect(kunToolPermissionModeSettings('always-ask')).toEqual({
+    expect(magicpocketToolPermissionModeSettings('always-ask')).toEqual({
       approvalPolicy: 'always',
       sandboxMode: 'danger-full-access'
     })
-    expect(kunToolPermissionModeSettings('read-only')).toEqual({
+    expect(magicpocketToolPermissionModeSettings('read-only')).toEqual({
       approvalPolicy: 'on-request',
       sandboxMode: 'danger-full-access'
     })
-    expect(kunToolPermissionModeSettings('sensitive-ask')).toEqual({
+    expect(magicpocketToolPermissionModeSettings('sensitive-ask')).toEqual({
       approvalPolicy: 'untrusted',
       sandboxMode: 'danger-full-access'
     })
-    expect(kunToolPermissionModeSettings('workspace-write')).toEqual({
+    expect(magicpocketToolPermissionModeSettings('workspace-write')).toEqual({
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     })
-    expect(kunToolPermissionModeSettings('bypass')).toEqual({
+    expect(magicpocketToolPermissionModeSettings('bypass')).toEqual({
       approvalPolicy: 'auto',
       sandboxMode: 'danger-full-access'
     })
-    expect(kunToolPermissionModeFromSettings(defaultKunRuntimeSettings())).toBe('bypass')
-    expect(kunToolPermissionModeFromSettings({
+    expect(magicpocketToolPermissionModeFromSettings(defaultMagicPocketRuntimeSettings())).toBe('bypass')
+    expect(magicpocketToolPermissionModeFromSettings({
       approvalPolicy: 'always',
       sandboxMode: 'danger-full-access'
     })).toBe('always-ask')
-    expect(kunToolPermissionModeFromSettings({
+    expect(magicpocketToolPermissionModeFromSettings({
       approvalPolicy: 'untrusted',
       sandboxMode: 'danger-full-access'
     })).toBe('sensitive-ask')
-    expect(kunToolPermissionModeFromSettings({
+    expect(magicpocketToolPermissionModeFromSettings({
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     })).toBe('workspace-write')
   })
 
   it('defaults token economy mode to off', () => {
-    expect(defaultKunRuntimeSettings().tokenEconomyMode).toBe(false)
-    expect(defaultKunRuntimeSettings().tokenEconomy).toMatchObject({
+    expect(defaultMagicPocketRuntimeSettings().tokenEconomyMode).toBe(false)
+    expect(defaultMagicPocketRuntimeSettings().tokenEconomy).toMatchObject({
       enabled: false,
       compressToolDescriptions: true,
       compressToolResults: true,
@@ -219,16 +219,16 @@ describe('kun defaults', () => {
   })
 
   it('defaults tool output limits to 500kb and 20000 lines', () => {
-    expect(defaultKunRuntimeSettings().toolOutputLimits).toEqual({
+    expect(defaultMagicPocketRuntimeSettings().toolOutputLimits).toEqual({
       maxLines: DEFAULT_TOOL_OUTPUT_MAX_LINES,
       maxBytes: DEFAULT_TOOL_OUTPUT_MAX_BYTES
     })
-    expect(defaultKunRuntimeSettings().toolOutputLimits.maxLines).toBe(20_000)
-    expect(defaultKunRuntimeSettings().toolOutputLimits.maxBytes).toBe(500 * 1024)
+    expect(defaultMagicPocketRuntimeSettings().toolOutputLimits.maxLines).toBe(20_000)
+    expect(defaultMagicPocketRuntimeSettings().toolOutputLimits.maxBytes).toBe(500 * 1024)
   })
 
   it('defaults MCP search discovery to off', () => {
-    expect(defaultKunRuntimeSettings().mcpSearch).toMatchObject({
+    expect(defaultMagicPocketRuntimeSettings().mcpSearch).toMatchObject({
       enabled: false,
       mode: 'auto',
       autoThresholdToolCount: 24,
@@ -238,7 +238,7 @@ describe('kun defaults', () => {
   })
 
   it('defaults image generation to off with empty provider fields', () => {
-    expect(defaultKunRuntimeSettings().imageGeneration).toEqual({
+    expect(defaultMagicPocketRuntimeSettings().imageGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'openai-images',
@@ -252,7 +252,7 @@ describe('kun defaults', () => {
   })
 
   it('defaults media generation to off with empty provider fields', () => {
-    expect(defaultKunRuntimeSettings().textToSpeech).toEqual({
+    expect(defaultMagicPocketRuntimeSettings().textToSpeech).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'openai-speech',
@@ -263,7 +263,7 @@ describe('kun defaults', () => {
       format: 'mp3',
       timeoutMs: 120000
     })
-    expect(defaultKunRuntimeSettings().musicGeneration).toEqual({
+    expect(defaultMagicPocketRuntimeSettings().musicGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'minimax-music',
@@ -273,7 +273,7 @@ describe('kun defaults', () => {
       format: 'mp3',
       timeoutMs: 300000
     })
-    expect(defaultKunRuntimeSettings().videoGeneration).toEqual({
+    expect(defaultMagicPocketRuntimeSettings().videoGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'minimax-video',
@@ -287,8 +287,8 @@ describe('kun defaults', () => {
     })
   })
 
-  it('defaults advanced Kun runtime tuning to conservative values', () => {
-    expect(defaultKunRuntimeSettings()).toMatchObject({
+  it('defaults advanced MagicPocket runtime tuning to conservative values', () => {
+    expect(defaultMagicPocketRuntimeSettings()).toMatchObject({
       storage: {
         backend: 'hybrid',
         sqlitePath: ''
@@ -519,11 +519,11 @@ describe('claw settings', () => {
   })
 })
 
-describe('isKunRuntimeInsecure', () => {
+describe('isMagicPocketRuntimeInsecure', () => {
   it('keeps auth enabled even when the runtime token is empty', () => {
     expect(
-      isKunRuntimeInsecure({
-        ...defaultKunRuntimeSettings(),
+      isMagicPocketRuntimeInsecure({
+        ...defaultMagicPocketRuntimeSettings(),
         insecure: false,
         runtimeToken: ''
       })
@@ -532,8 +532,8 @@ describe('isKunRuntimeInsecure', () => {
 
   it('keeps auth enabled when a token exists and insecure is false', () => {
     expect(
-      isKunRuntimeInsecure({
-        ...defaultKunRuntimeSettings(),
+      isMagicPocketRuntimeInsecure({
+        ...defaultMagicPocketRuntimeSettings(),
         insecure: false,
         runtimeToken: 'tok-1'
       })
@@ -542,8 +542,8 @@ describe('isKunRuntimeInsecure', () => {
 
   it('honors explicit insecure mode', () => {
     expect(
-      isKunRuntimeInsecure({
-        ...defaultKunRuntimeSettings(),
+      isMagicPocketRuntimeInsecure({
+        ...defaultMagicPocketRuntimeSettings(),
         insecure: true,
         runtimeToken: 'tok-1'
       })
@@ -551,10 +551,10 @@ describe('isKunRuntimeInsecure', () => {
   })
 })
 
-describe('mergeKunRuntimeSettings', () => {
-  it('merges a direct kun patch without the envelope wrapper', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+describe('mergeMagicPocketRuntimeSettings', () => {
+  it('merges a direct magicpocket patch without the envelope wrapper', () => {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       model: 'deepseek-reasoner',
       port: 19000,
       tokenEconomyMode: true
@@ -567,8 +567,8 @@ describe('mergeKunRuntimeSettings', () => {
   })
 
   it('deep-merges token economy settings and keeps the legacy switch synced', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       tokenEconomy: {
         enabled: true,
         compressToolResults: false,
@@ -587,14 +587,14 @@ describe('mergeKunRuntimeSettings', () => {
       current.tokenEconomy.historyHygiene.maxToolResultBytes
     )
 
-    const legacySwitch = mergeKunRuntimeSettings(next, { tokenEconomyMode: false })
+    const legacySwitch = mergeMagicPocketRuntimeSettings(next, { tokenEconomyMode: false })
     expect(legacySwitch.tokenEconomyMode).toBe(false)
     expect(legacySwitch.tokenEconomy.enabled).toBe(false)
   })
 
   it('deep-merges tool output limits and normalizes out-of-range values', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       toolOutputLimits: {
         maxBytes: 2 * 1024 * 1024
       }
@@ -603,7 +603,7 @@ describe('mergeKunRuntimeSettings', () => {
     expect(next.toolOutputLimits.maxLines).toBe(current.toolOutputLimits.maxLines)
     expect(next.toolOutputLimits.maxBytes).toBe(2 * 1024 * 1024)
 
-    const clamped = mergeKunRuntimeSettings(next, {
+    const clamped = mergeMagicPocketRuntimeSettings(next, {
       toolOutputLimits: {
         maxLines: 9_999_999,
         maxBytes: 999 * 1024 * 1024
@@ -614,8 +614,8 @@ describe('mergeKunRuntimeSettings', () => {
   })
 
   it('deep-merges MCP search settings', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       mcpSearch: {
         enabled: true,
         mode: 'search',
@@ -630,42 +630,42 @@ describe('mergeKunRuntimeSettings', () => {
   })
 
   it('preserves workspace-write when normalizing unified tool permission settings', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     })
 
     expect(next.approvalPolicy).toBe('on-request')
     expect(next.sandboxMode).toBe('workspace-write')
-    expect(kunToolPermissionModeFromSettings(next)).toBe('workspace-write')
+    expect(magicpocketToolPermissionModeFromSettings(next)).toBe('workspace-write')
   })
 
   it('preserves non-UI approval/sandbox combinations instead of canonicalizing them', () => {
     // The unified 5-mode selector cannot represent every approvalPolicy/sandboxMode
-    // combination. mergeKunRuntimeSettings must NOT snap these to a canonical mode,
+    // combination. mergeMagicPocketRuntimeSettings must NOT snap these to a canonical mode,
     // otherwise it would silently weaken a user's saved security posture.
-    const current = defaultKunRuntimeSettings()
+    const current = defaultMagicPocketRuntimeSettings()
 
-    const neverReadOnly = mergeKunRuntimeSettings(current, {
+    const neverReadOnly = mergeMagicPocketRuntimeSettings(current, {
       approvalPolicy: 'never',
       sandboxMode: 'read-only'
     })
     expect(neverReadOnly.approvalPolicy).toBe('never')
     expect(neverReadOnly.sandboxMode).toBe('read-only')
 
-    const suggest = mergeKunRuntimeSettings(current, { approvalPolicy: 'suggest' })
+    const suggest = mergeMagicPocketRuntimeSettings(current, { approvalPolicy: 'suggest' })
     expect(suggest.approvalPolicy).toBe('suggest')
 
-    const externalSandbox = mergeKunRuntimeSettings(current, { sandboxMode: 'external-sandbox' })
+    const externalSandbox = mergeMagicPocketRuntimeSettings(current, { sandboxMode: 'external-sandbox' })
     expect(externalSandbox.sandboxMode).toBe('external-sandbox')
   })
 
-  it('deep-merges advanced Kun settings', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+  it('deep-merges advanced MagicPocket settings', () => {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       storage: {
-        sqlitePath: ' /tmp/kun.sqlite3 '
+        sqlitePath: ' /tmp/magicpocket.sqlite3 '
       },
       contextCompaction: {
         defaultSoftThreshold: 64000
@@ -678,7 +678,7 @@ describe('mergeKunRuntimeSettings', () => {
     })
 
     expect(next.storage.backend).toBe('hybrid')
-    expect(next.storage.sqlitePath).toBe('/tmp/kun.sqlite3')
+    expect(next.storage.sqlitePath).toBe('/tmp/magicpocket.sqlite3')
     expect(next.contextCompaction.defaultSoftThreshold).toBe(64000)
     expect(next.contextCompaction.defaultHardThreshold).toBe(64000)
     expect(next.contextCompaction.summaryMode).toBe('model')
@@ -690,10 +690,10 @@ describe('mergeKunRuntimeSettings', () => {
   })
 
   it('normalizes the stream idle timeout (0 disables, out-of-range clamps)', () => {
-    const current = defaultKunRuntimeSettings()
+    const current = defaultMagicPocketRuntimeSettings()
     expect(current.runtimeTuning.streamIdleTimeoutMs).toBe(450000)
 
-    const set = mergeKunRuntimeSettings(current, {
+    const set = mergeMagicPocketRuntimeSettings(current, {
       runtimeTuning: { streamIdleTimeoutMs: 300000 }
     })
     expect(set.runtimeTuning.streamIdleTimeoutMs).toBe(300000)
@@ -702,24 +702,24 @@ describe('mergeKunRuntimeSettings', () => {
 
     // 0 means "disabled" and is preserved rather than coerced to the default.
     expect(
-      mergeKunRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 0 } })
+      mergeMagicPocketRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 0 } })
         .runtimeTuning.streamIdleTimeoutMs
     ).toBe(0)
 
     // Negative falls back to the default; absurdly large clamps to the cap.
     expect(
-      mergeKunRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: -5 } })
+      mergeMagicPocketRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: -5 } })
         .runtimeTuning.streamIdleTimeoutMs
     ).toBe(450000)
     expect(
-      mergeKunRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 999_999_999 } })
+      mergeMagicPocketRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 999_999_999 } })
         .runtimeTuning.streamIdleTimeoutMs
     ).toBe(3_600_000)
   })
 
   it('deep-merges image generation settings and normalizes invalid values', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       imageGeneration: {
         enabled: true,
         baseUrl: ' https://api.siliconflow.cn/v1 ',
@@ -740,7 +740,7 @@ describe('mergeKunRuntimeSettings', () => {
       timeoutMs: 180000
     })
 
-    const sized = mergeKunRuntimeSettings(next, {
+    const sized = mergeMagicPocketRuntimeSettings(next, {
       imageGeneration: { defaultSize: '1536x1024', quality: 'high', timeoutMs: 240000 }
     })
     expect(sized.imageGeneration.defaultSize).toBe('1536x1024')
@@ -748,7 +748,7 @@ describe('mergeKunRuntimeSettings', () => {
     expect(sized.imageGeneration.timeoutMs).toBe(240000)
     expect(sized.imageGeneration.apiKey).toBe('sk-image')
 
-    const invalidSize = mergeKunRuntimeSettings(sized, {
+    const invalidSize = mergeMagicPocketRuntimeSettings(sized, {
       imageGeneration: { defaultSize: 'huge', quality: 'maximum' as never, timeoutMs: -5 }
     })
     expect(invalidSize.imageGeneration.defaultSize).toBe('')
@@ -757,8 +757,8 @@ describe('mergeKunRuntimeSettings', () => {
   })
 
   it('deep-merges media generation settings and normalizes invalid values', () => {
-    const current = defaultKunRuntimeSettings()
-    const next = mergeKunRuntimeSettings(current, {
+    const current = defaultMagicPocketRuntimeSettings()
+    const next = mergeMagicPocketRuntimeSettings(current, {
       textToSpeech: {
         enabled: true,
         protocol: 'minimax-t2a',
@@ -812,7 +812,7 @@ describe('mergeKunRuntimeSettings', () => {
       pollIntervalMs: 20000
     })
 
-    const invalid = mergeKunRuntimeSettings(next, {
+    const invalid = mergeMagicPocketRuntimeSettings(next, {
       textToSpeech: { format: 'aac', timeoutMs: -1 },
       videoGeneration: { defaultDuration: -1, pollIntervalMs: -1 }
     })
@@ -830,8 +830,8 @@ describe('mergeKunRuntimeSettings', () => {
       textToSpeech: _textToSpeech,
       musicGeneration: _musicGeneration,
       videoGeneration: _videoGeneration,
-      ...legacyKun
-    } = defaultKunRuntimeSettings()
+      ...legacyMagicPocket
+    } = defaultMagicPocketRuntimeSettings()
     void _textToSpeech
     void _musicGeneration
     void _videoGeneration
@@ -844,23 +844,23 @@ describe('mergeKunRuntimeSettings', () => {
           minimaxProfile
         ]
       },
-      agents: { kun: legacyKun as AppSettingsV1['agents']['kun'] }
+      agents: { magicpocket: legacyMagicPocket as AppSettingsV1['agents']['magicpocket'] }
     })
-    const resolved = resolveKunRuntimeSettings(normalized)
+    const resolved = resolveMagicPocketRuntimeSettings(normalized)
 
-    expect(normalized.agents.kun.textToSpeech).toEqual(expect.objectContaining({
+    expect(normalized.agents.magicpocket.textToSpeech).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-t2a',
       model: 'speech-2.8-hd'
     }))
-    expect(normalized.agents.kun.musicGeneration).toEqual(expect.objectContaining({
+    expect(normalized.agents.magicpocket.musicGeneration).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-music',
       model: 'music-2.6'
     }))
-    expect(normalized.agents.kun.videoGeneration).toEqual(expect.objectContaining({
+    expect(normalized.agents.magicpocket.videoGeneration).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-video',
@@ -872,25 +872,25 @@ describe('mergeKunRuntimeSettings', () => {
   })
 })
 
-describe('kun envelope helpers', () => {
+describe('magicpocket envelope helpers', () => {
   it('wraps runtime settings and patches into the compatibility shell', () => {
-    const runtime = defaultKunRuntimeSettings()
-    expect(kunSettingsEnvelope(runtime)).toEqual({ kun: runtime })
-    expect(kunSettingsPatch({ model: 'deepseek-reasoner' })).toEqual({
-      kun: { model: 'deepseek-reasoner' }
+    const runtime = defaultMagicPocketRuntimeSettings()
+    expect(magicpocketSettingsEnvelope(runtime)).toEqual({ magicpocket: runtime })
+    expect(magicpocketSettingsPatch({ model: 'deepseek-reasoner' })).toEqual({
+      magicpocket: { model: 'deepseek-reasoner' }
     })
   })
 
-  it('applies a kun patch onto full app settings', () => {
+  it('applies a magicpocket patch onto full app settings', () => {
     const current = settings()
-    const next = applyKunRuntimePatch(current, { model: 'deepseek-reasoner' })
-    expect(next.agents.kun.model).toBe('deepseek-reasoner')
+    const next = applyMagicPocketRuntimePatch(current, { model: 'deepseek-reasoner' })
+    expect(next.agents.magicpocket.model).toBe('deepseek-reasoner')
     expect(next.write).toEqual(current.write)
   })
 })
 
-describe('legacy Kun defaults migration', () => {
-  it('normalizes old master settings without an agents.kun envelope', () => {
+describe('legacy MagicPocket defaults migration', () => {
+  it('normalizes old master settings without an agents.magicpocket envelope', () => {
     const normalized = normalizeAppSettings({
       version: 1,
       locale: 'zh',
@@ -915,7 +915,7 @@ describe('legacy Kun defaults migration', () => {
       claw: defaultClawSettings()
     } as unknown as AppSettingsV1)
 
-    expect(normalized.agents.kun).toEqual(expect.objectContaining({
+    expect(normalized.agents.magicpocket).toEqual(expect.objectContaining({
       binaryPath: '',
       port: 18787,
       autoStart: false,
@@ -931,7 +931,7 @@ describe('legacy Kun defaults migration', () => {
     expect('deepseek' in normalized).toBe(false)
   })
 
-  it('keeps legacy workspace-write permissions during Kun migration', () => {
+  it('keeps legacy workspace-write permissions during MagicPocket migration', () => {
     const normalized = normalizeAppSettings({
       version: 1,
       locale: 'zh',
@@ -956,29 +956,29 @@ describe('legacy Kun defaults migration', () => {
       claw: defaultClawSettings()
     } as unknown as AppSettingsV1)
 
-    expect(normalized.agents.kun).toEqual(expect.objectContaining({
+    expect(normalized.agents.magicpocket).toEqual(expect.objectContaining({
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     }))
   })
 
-  it('moves the legacy local HTTP default port to the Kun default port', () => {
+  it('moves the legacy local HTTP default port to the MagicPocket default port', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agentProvider: 'deepseek-runtime',
       deepseek: {
-        // 这里必须保留旧版真实写入值, 用于升级到当前 Kun 默认端口。
+        // 这里必须保留旧版真实写入值, 用于升级到当前 MagicPocket 默认端口。
         port: 7878
       }
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.kun?.port).toBe(18899)
+    expect(migrated.agents?.magicpocket?.port).toBe(18899)
   })
 
-  it('moves previous Kun local default ports out of the low range', () => {
+  it('moves previous MagicPocket local default ports out of the low range', () => {
     const normalized = normalizeAppSettings({
       ...settings(),
-      agents: { kun: { ...defaultKunRuntimeSettings(), port: 8899 } },
+      agents: { magicpocket: { ...defaultMagicPocketRuntimeSettings(), port: 8899 } },
       claw: {
         ...defaultClawSettings(),
         im: { ...defaultClawSettings().im, port: 8787 }
@@ -993,7 +993,7 @@ describe('legacy Kun defaults migration', () => {
       }
     })
 
-    expect(normalized.agents.kun.port).toBe(18899)
+    expect(normalized.agents.magicpocket.port).toBe(18899)
     expect(normalized.claw.im.port).toBe(18787)
     expect(normalized.schedule.internal.port).toBe(18788)
     expect(normalized.workflow.webhookPort).toBe(18799)
@@ -1006,7 +1006,7 @@ describe('legacy Kun defaults migration', () => {
       deepseek: {}
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.kun?.imageGeneration).toEqual({
+    expect(migrated.agents?.magicpocket?.imageGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'openai-images',
@@ -1023,10 +1023,10 @@ describe('legacy Kun defaults migration', () => {
     const normalized = normalizeAppSettings({
       ...settings(),
       agents: {
-        kun: {
-          ...defaultKunRuntimeSettings(),
+        magicpocket: {
+          ...defaultMagicPocketRuntimeSettings(),
           imageGeneration: {
-            ...defaultKunRuntimeSettings().imageGeneration,
+            ...defaultMagicPocketRuntimeSettings().imageGeneration,
             enabled: true,
             providerId: 'custom',
             protocol: 'codex-responses-image',
@@ -1038,7 +1038,7 @@ describe('legacy Kun defaults migration', () => {
       }
     })
 
-    expect(normalized.agents.kun.imageGeneration).toMatchObject({
+    expect(normalized.agents.magicpocket.imageGeneration).toMatchObject({
       protocol: 'codex-responses-image',
       baseUrl: 'https://chatgpt.com/backend-api/codex',
       apiKey: 'codex-access',
@@ -1053,39 +1053,39 @@ describe('legacy Kun defaults migration', () => {
       deepseek: {}
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.kun?.approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
+    expect(migrated.agents?.magicpocket?.approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
   })
 
-  it('upgrades old persisted Kun defaults to the current defaults', () => {
+  it('upgrades old persisted MagicPocket defaults to the current defaults', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agents: {
-        kun: {
+        magicpocket: {
           dataDir: '~/.deepseekgui/coreagent',
           model: 'deepseek-chat'
         }
       }
     } as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.kun).toEqual(expect.objectContaining({
+    expect(migrated.agents?.magicpocket).toEqual(expect.objectContaining({
       dataDir: DEFAULT_KUN_DATA_DIR,
       model: DEFAULT_KUN_MODEL
     }))
   })
 
-  it('preserves a non-legacy Kun model override', () => {
+  it('preserves a non-legacy MagicPocket model override', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agents: {
-        kun: {
-          dataDir: '/tmp/custom-kun',
+        magicpocket: {
+          dataDir: '/tmp/custom-magicpocket',
           model: 'deepseek-v4-flash'
         }
       }
     } as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.kun).toEqual(expect.objectContaining({
-      dataDir: '/tmp/custom-kun',
+    expect(migrated.agents?.magicpocket).toEqual(expect.objectContaining({
+      dataDir: '/tmp/custom-magicpocket',
       model: 'deepseek-v4-flash'
     }))
   })
@@ -1114,8 +1114,8 @@ describe('legacy Kun defaults migration', () => {
         ]
       },
       agents: {
-        kun: {
-          ...defaultKunRuntimeSettings(),
+        magicpocket: {
+          ...defaultMagicPocketRuntimeSettings(),
           providerId: 'custom-provider-2',
           model: 'custom-model'
         }
@@ -1134,12 +1134,12 @@ describe('legacy Kun defaults migration', () => {
         })
       ])
     )
-    expect(migrated.agents.kun.providerId).toBe('custom-provider-2')
+    expect(migrated.agents.magicpocket.providerId).toBe('custom-provider-2')
     expect(migrated.provider.proxy).toEqual({
       enabled: true,
       url: 'http://127.0.0.1:7890'
     })
-    expect(resolveKunRuntimeSettings(migrated)).toEqual(
+    expect(resolveMagicPocketRuntimeSettings(migrated)).toEqual(
       expect.objectContaining({
         apiKey: 'sk-custom',
         baseUrl: 'https://custom.example/v1',
@@ -1220,14 +1220,14 @@ describe('claw runtime prompts', () => {
     state.claw.channels = [{
       id: 'channel-1',
       provider: 'feishu',
-      label: 'kun',
+      label: 'magicpocket',
       enabled: true,
       model: 'auto',
       threadId: '',
       workspaceRoot: '',
       conversations: [],
       agentProfile: {
-        name: 'kun',
+        name: 'magicpocket',
         description: '',
         identity: '',
         personality: '',
@@ -1241,14 +1241,14 @@ describe('claw runtime prompts', () => {
     const prompt = buildClawRuntimePrompt(state, 'hi', { channel: state.claw.channels[0] })
 
     expect(prompt).toContain('[Claw managed instructions]')
-    expect(prompt).toContain('[Agent name]\nkun')
+    expect(prompt).toContain('[Agent name]\nmagicpocket')
     expect(prompt).not.toContain('gui_schedule')
     expect(prompt).not.toContain('scheduled-task tools')
   })
 
   it('tells Claw agents to use the image tool when image generation is configured', () => {
     const state = settings()
-    state.agents.kun.imageGeneration = {
+    state.agents.magicpocket.imageGeneration = {
       enabled: true,
       providerId: '',
       protocol: 'openai-images',
@@ -1268,7 +1268,7 @@ describe('claw runtime prompts', () => {
 
   it('tells Claw agents to use media tools when media generation is configured', () => {
     const state = settings()
-    state.agents.kun.textToSpeech = {
+    state.agents.magicpocket.textToSpeech = {
       enabled: true,
       providerId: '',
       protocol: 'minimax-t2a',
@@ -1279,7 +1279,7 @@ describe('claw runtime prompts', () => {
       format: 'mp3',
       timeoutMs: 120000
     }
-    state.agents.kun.musicGeneration = {
+    state.agents.magicpocket.musicGeneration = {
       enabled: true,
       providerId: '',
       protocol: 'minimax-music',
@@ -1289,7 +1289,7 @@ describe('claw runtime prompts', () => {
       format: 'mp3',
       timeoutMs: 300000
     }
-    state.agents.kun.videoGeneration = {
+    state.agents.magicpocket.videoGeneration = {
       enabled: true,
       providerId: '',
       protocol: 'minimax-video',
@@ -1319,7 +1319,7 @@ describe('claw runtime prompts', () => {
       '[Claw IM agent instructions]',
       '',
       '[Agent name]',
-      'kun',
+      'magicpocket',
       '',
       '---',
       '[Current user request]',
@@ -1354,15 +1354,15 @@ describe('write inline completion runtime config', () => {
     expect(resolveWriteInlineCompletionBaseUrl(state)).toBe('https://write-only.example/v1')
   })
 
-  it('falls back to the kun model when write keeps the default inline model', () => {
+  it('falls back to the magicpocket model when write keeps the default inline model', () => {
     const state = settings()
-    state.agents.kun.model = 'deepseek-chat'
+    state.agents.magicpocket.model = 'deepseek-chat'
     expect(resolveWriteInlineCompletionModel(state)).toBe('deepseek-chat')
   })
 
   it('keeps an explicit flash override when write disables inheritance', () => {
     const state = settings()
-    state.agents.kun.model = 'deepseek-chat'
+    state.agents.magicpocket.model = 'deepseek-chat'
     state.write.inlineCompletion.inheritModel = false
     state.write.inlineCompletion.model = 'deepseek-v4-flash'
 
@@ -1371,7 +1371,7 @@ describe('write inline completion runtime config', () => {
 
   it('preserves an explicit request model before any fallback', () => {
     const state = settings()
-    state.agents.kun.model = 'deepseek-chat'
+    state.agents.magicpocket.model = 'deepseek-chat'
     expect(resolveWriteInlineCompletionModel(state, 'deepseek-v4-pro')).toBe('deepseek-v4-pro')
   })
 
@@ -1379,7 +1379,7 @@ describe('write inline completion runtime config', () => {
     const state = settings()
     state.provider.apiKey = 'general-key'
     state.provider.baseUrl = 'https://general.example/v1'
-    state.agents.kun.model = 'deepseek-chat'
+    state.agents.magicpocket.model = 'deepseek-chat'
     const legacyInlineCompletion = { ...state.write.inlineCompletion } as Partial<AppSettingsV1['write']['inlineCompletion']>
     delete legacyInlineCompletion.apiKey
     delete legacyInlineCompletion.baseUrl
@@ -1394,7 +1394,7 @@ describe('write inline completion runtime config', () => {
 
   it('treats legacy flash defaults without an inherit flag as inherited', () => {
     const state = settings()
-    state.agents.kun.model = 'deepseek-chat'
+    state.agents.magicpocket.model = 'deepseek-chat'
     const legacyInlineCompletion = {
       ...state.write.inlineCompletion,
       model: 'deepseek-v4-flash'

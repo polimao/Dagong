@@ -434,9 +434,9 @@ export function createNavigationActions(
     const prev = get().runtimeConnection
     if (mode === 'user') set({ runtimeConnection: 'checking' })
     try {
-      if (typeof window.kunGui === 'undefined') {
+      if (typeof window.magicpocketGui === 'undefined') {
         throw new Error(
-          'Preload bridge missing (window.kunGui). Restart the app or check BrowserWindow preload path.'
+          'Preload bridge missing (window.magicpocketGui). Restart the app or check BrowserWindow preload path.'
         )
       }
       const settings = await rendererRuntimeClient.getSettings({ forceRefresh: true })
@@ -486,13 +486,13 @@ export function createNavigationActions(
     if (bootPromise) return bootPromise
     bootPromise = (async () => {
       try {
-        if (typeof window.kunGui === 'undefined') {
+        if (typeof window.magicpocketGui === 'undefined') {
           set({
             error: formatRuntimeError(
-              'Preload bridge missing (window.kunGui). Restart the app or check BrowserWindow preload path.'
+              'Preload bridge missing (window.magicpocketGui). Restart the app or check BrowserWindow preload path.'
             ),
             runtimeConnection: 'offline',
-            runtimeErrorDetail: 'Preload bridge missing (window.kunGui). Restart the app or check BrowserWindow preload path.',
+            runtimeErrorDetail: 'Preload bridge missing (window.magicpocketGui). Restart the app or check BrowserWindow preload path.',
             initialSetupOpen: false,
             initialSetupMode: 'required'
           })
@@ -520,8 +520,8 @@ export function createNavigationActions(
         applyCursorSpotlightColor(settings.cursorSpotlightColor)
         if (settings.write?.typography) applyWriteTypography(settings.write.typography)
         await get().applyI18nFromSettings(settings.locale)
-        if (!runtimeStatusUnsubscribe && typeof window.kunGui.onRuntimeStatus === 'function') {
-          runtimeStatusUnsubscribe = window.kunGui.onRuntimeStatus((status) => {
+        if (!runtimeStatusUnsubscribe && typeof window.magicpocketGui.onRuntimeStatus === 'function') {
+          runtimeStatusUnsubscribe = window.magicpocketGui.onRuntimeStatus((status) => {
             set({ runtimeStatus: status })
             if (status.state === 'restarting' || status.state === 'crashed') {
               set({ error: null, runtimeErrorDetail: null })
@@ -543,8 +543,8 @@ export function createNavigationActions(
             }
           })
         }
-        if (!trayActionUnsubscribe && typeof window.kunGui.onTrayAction === 'function') {
-          trayActionUnsubscribe = window.kunGui.onTrayAction((action) => {
+        if (!trayActionUnsubscribe && typeof window.magicpocketGui.onTrayAction === 'function') {
+          trayActionUnsubscribe = window.magicpocketGui.onTrayAction((action) => {
             set({ route: 'chat' })
             if (action.type === 'open-thread') {
               void get().selectThread(action.threadId)
@@ -553,11 +553,11 @@ export function createNavigationActions(
             }
           })
         }
-        if (!clawChannelActivityUnsubscribe && typeof window.kunGui.onClawChannelActivity === 'function') {
-          clawChannelActivityUnsubscribe = window.kunGui.onClawChannelActivity(({ channelId, threadId }) => {
+        if (!clawChannelActivityUnsubscribe && typeof window.magicpocketGui.onClawChannelActivity === 'function') {
+          clawChannelActivityUnsubscribe = window.magicpocketGui.onClawChannelActivity(({ channelId, threadId }) => {
             void (async () => {
               const state = get()
-              if (typeof window.kunGui === 'undefined') return
+              if (typeof window.magicpocketGui === 'undefined') return
               const settings = await rendererRuntimeClient.getSettings({ forceRefresh: true })
               const channels = settings.claw.channels
               const activeChannelId = channels.some(
@@ -628,10 +628,10 @@ export function createNavigationActions(
   chooseWorkspace: async ({ createThreadAfter = false, selectThreadAfter = true } = {}) => {
     try {
       const wasWriteRoute = get().route === 'write'
-      if (typeof window.kunGui === 'undefined' || typeof window.kunGui.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui === 'undefined' || typeof window.magicpocketGui.pickWorkspaceDirectory !== 'function') {
         throw new Error(i18n.t('common:workspacePickerUnavailable'))
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(get().workspaceRoot || undefined)
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(get().workspaceRoot || undefined)
       if (picked.canceled || !picked.path) {
         if (createThreadAfter) {
           set({ error: i18n.t('common:workspaceRequiredToCreateThread') })
@@ -731,7 +731,7 @@ export function createNavigationActions(
 
   clearWorkspace: async () => {
     try {
-      if (typeof window.kunGui === 'undefined' || typeof window.kunGui.setSettings !== 'function') {
+      if (typeof window.magicpocketGui === 'undefined' || typeof window.magicpocketGui.setSettings !== 'function') {
         return
       }
       const next = await rendererRuntimeClient.setSettings({ workspaceRoot: '' })
@@ -793,7 +793,7 @@ export function createNavigationActions(
       // If the deleted workspace is the current workspaceRoot, clear it.
       if (normalizeWorkspaceRoot(get().workspaceRoot) === normalizedPath) {
         try {
-          if (typeof window.kunGui?.setSettings === 'function') {
+          if (typeof window.magicpocketGui?.setSettings === 'function') {
             const next = await rendererRuntimeClient.setSettings({ workspaceRoot: '' })
             set({
               workspaceRoot: normalizeWorkspaceRoot(next.workspaceRoot),
@@ -838,7 +838,7 @@ export function createNavigationActions(
       const forkRegistry = hydrateThreadForkRegistry(sidebarThreads, readThreadForkRegistry())
       saveThreadForkRegistry(forkRegistry)
       const enrichedThreads = enrichThreadsWithForkInfo(sidebarThreads, forkRegistry)
-      // Preserve the active Kun thread when it is not in the listing yet.
+      // Preserve the active MagicPocket thread when it is not in the listing yet.
       // A brand-new thread can be absent from `listThreads` until the first
       // message is written. Without this, the optimistic thread would be wiped
       // from the sidebar and its live turn aborted by the selection clearing

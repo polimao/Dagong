@@ -1,0 +1,55 @@
+{
+  "version": 2,
+  "rootId": "__root__",
+  "objects": {
+    "__root__": {
+      "id": "__root__",
+      "type": "frame",
+      "name": "Root",
+      "parentId": null,
+      "frameId": null,
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "fills": [],
+      "strokes": [],
+      "cornerRadius": 0,
+      "children": [
+        "s_mreoraz3_1"
+      ]
+    },
+    "s_mreoraz3_1": {
+      "id": "s_mreoraz3_1",
+      "type": "frame",
+      "name": "重设计 · trampoline_jump.html",
+      "parentId": null,
+      "frameId": null,
+      "x": -195,
+      "y": -422,
+      "width": 390,
+      "height": 844,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "fills": [
+        {
+          "type": "solid",
+          "color": "#ffffff",
+          "opacity": 1
+        }
+      ],
+      "strokes": [],
+      "cornerRadius": 0,
+      "children": [],
+      "clipContent": true,
+      "htmlArtifactId": "00f860e1",
+      "devicePreset": "mobile"
+    }
+  }
+}

@@ -67,12 +67,12 @@ describe('chat-store Claw actions helpers', () => {
   })
 
   it('uses the channel threadId when the latest conversation has none', () => {
-    const item = channel({ threadId: 'kun-channel-thread' })
+    const item = channel({ threadId: 'magicpocket-channel-thread' })
     const conversation = { ...item.conversations[0], localThreadId: '' }
-    expect(clawThreadIdForProvider(item, conversation)).toBe('kun-channel-thread')
+    expect(clawThreadIdForProvider(item, conversation)).toBe('magicpocket-channel-thread')
   })
 
-  it('recovers an unmapped Claw managed Kun session before creating a new empty one', () => {
+  it('recovers an unmapped Claw managed MagicPocket session before creating a new empty one', () => {
     const item = channel()
     const recovered = findRecoverableClawThread(
       [
@@ -88,10 +88,10 @@ describe('chat-store Claw actions helpers', () => {
 
   it('writes recovered provider thread ids back to both channel and conversation', () => {
     const now = '2026-06-01T00:03:00.000Z'
-    const next = channelWithClawThreadMapping(channel(), 'kun-thread', now, 'conversation-1')
+    const next = channelWithClawThreadMapping(channel(), 'magicpocket-thread', now, 'conversation-1')
 
-    expect(next.threadId).toBe('kun-thread')
-    expect(next.conversations[0]?.localThreadId).toBe('kun-thread')
+    expect(next.threadId).toBe('magicpocket-thread')
+    expect(next.conversations[0]?.localThreadId).toBe('magicpocket-thread')
   })
 
   it('drops stale configured thread ids and falls back to a recovered thread', () => {
@@ -130,7 +130,7 @@ describe('chat-store Claw actions helpers', () => {
         channels: [channel({ threadId: 'thr_missing', conversations: [] })]
       }
     }
-    const kunGui = {
+    const magicpocketGui = {
       getSettings: vi.fn(async () => settings),
       setSettings: vi.fn(async (patch: { claw?: { channels?: ClawImChannelV1[] } }) => {
         settings = {
@@ -144,7 +144,7 @@ describe('chat-store Claw actions helpers', () => {
         return settings
       })
     }
-    vi.stubGlobal('window', { kunGui })
+    vi.stubGlobal('window', { magicpocketGui })
 
     const provider = {
       createThread: vi.fn(),
@@ -208,7 +208,7 @@ describe('chat-store Claw actions helpers', () => {
     expect(state.activeClawChannelId).toBe('channel-1')
     expect(state.activeThreadId).toBeNull()
     expect(state.error).toBeNull()
-    expect(kunGui.setSettings).toHaveBeenCalledWith({
+    expect(magicpocketGui.setSettings).toHaveBeenCalledWith({
       claw: {
         channels: [expect.objectContaining({ id: 'channel-1', threadId: '' })]
       }

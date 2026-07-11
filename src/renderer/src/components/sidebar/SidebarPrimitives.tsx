@@ -18,6 +18,7 @@ type SidebarTitlebarToggleButtonProps = {
   ariaLabel?: string
   onClick: () => void
   className?: string
+  active?: boolean
   children?: ReactNode
 }
 
@@ -26,6 +27,7 @@ export function SidebarTitlebarToggleButton({
   ariaLabel,
   onClick,
   className,
+  active = false,
   children
 }: SidebarTitlebarToggleButtonProps): ReactElement {
   return (
@@ -34,7 +36,8 @@ export function SidebarTitlebarToggleButton({
       onClick={onClick}
       title={title}
       aria-label={ariaLabel ?? title}
-      className={cx('ds-titlebar-sidebar-toggle ds-no-drag', className)}
+      aria-pressed={active}
+      className={cx('ds-titlebar-sidebar-toggle ds-no-drag', active && 'ds-titlebar-sidebar-toggle--active', className)}
     >
       {children ?? <PanelLeft className="h-4 w-4" strokeWidth={1.75} />}
     </button>

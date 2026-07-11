@@ -65,7 +65,7 @@ type CodeProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & {
 }
 
 export const writeMarkdownHardenOptions = {
-  defaultOrigin: 'https://kun.local',
+  defaultOrigin: 'https://magicpocket.local',
   allowedLinkPrefixes: ['*'],
   allowedImagePrefixes: ['*']
 }
@@ -499,7 +499,7 @@ function WriteMarkdownPreviewContent({ content, isMarkdown, filePath, workspaceR
               onClick={(event) => {
                 if (!href) return
                 event.preventDefault()
-                void window.kunGui?.openExternal?.(href)?.catch(() => undefined)
+                void window.magicpocketGui?.openExternal?.(href)?.catch(() => undefined)
               }}
             >
               {children}

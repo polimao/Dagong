@@ -96,7 +96,7 @@ copy_mac_arch_artifacts() {
   local files=()
 
   shopt -s nullglob
-  files=("${output_dir}"/Kun-*-mac-"${arch}".*)
+  files=("${output_dir}"/MagicPocket-*-mac-"${arch}".*)
   shopt -u nullglob
 
   [[ ${#files[@]} -gt 0 ]] || die "No macOS ${arch} artifacts found in ${output_dir}"
@@ -247,12 +247,12 @@ collect_optional() {
   done
 }
 
-# artifactName: Kun-${version}-mac-${arch}.dmg|zip
-collect "macOS arm64 dmg" "dist/Kun-*-mac-arm64.dmg"
-collect "macOS x64 dmg" "dist/Kun-*-mac-x64.dmg"
-collect "macOS arm64 zip" "dist/Kun-*-mac-arm64.zip"
-collect "macOS x64 zip" "dist/Kun-*-mac-x64.zip"
-collect_optional "macOS blockmap" "dist/Kun-*-mac-*.zip.blockmap"
+# artifactName: MagicPocket-${version}-mac-${arch}.dmg|zip
+collect "macOS arm64 dmg" "dist/MagicPocket-*-mac-arm64.dmg"
+collect "macOS x64 dmg" "dist/MagicPocket-*-mac-x64.dmg"
+collect "macOS arm64 zip" "dist/MagicPocket-*-mac-arm64.zip"
+collect "macOS x64 zip" "dist/MagicPocket-*-mac-x64.zip"
+collect_optional "macOS blockmap" "dist/MagicPocket-*-mac-*.zip.blockmap"
 
 upload_github_assets() {
   local tag="$1"
@@ -308,7 +308,7 @@ This is an unsigned build. macOS Gatekeeper will block first launch.
 Run this after downloading:
 
 ```sh
-xattr -cr "Kun.app"
+xattr -cr "MagicPocket.app"
 # or
 npm run mac:unquarantine
 ```
@@ -357,4 +357,4 @@ green "macOS release ${TAG_NAME} ready (draft)."
 cyan "  Meta: dist/.release-meta.env"
 cyan "  Channel: ${RELEASE_CHANNEL}"
 cyan "  Next on Windows: ./scripts/release-win.sh --tag ${TAG_NAME} --channel ${RELEASE_CHANNEL}"
-cyan "  https://github.com/KunAgent/Kun/releases/tag/${TAG_NAME}"
+cyan "  https://github.com/MagicPocketAgent/MagicPocket/releases/tag/${TAG_NAME}"

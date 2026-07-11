@@ -1,5 +1,5 @@
 name: Bug report / 缺陷反馈
-description: Report a reproducible bug or regression in Kun / 反馈 Kun 中可复现的问题或回归
+description: Report a reproducible bug or regression in MagicPocket / 反馈 MagicPocket 中可复现的问题或回归
 title: "[Bug] "
 labels:
   - bug
@@ -7,10 +7,10 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping us improve Kun.
+        Thanks for helping us improve MagicPocket.
         Please include enough detail for someone else to reproduce the issue.
 
-        感谢你帮助我们改进 Kun。
+        感谢你帮助我们改进 MagicPocket。
         请提供足够的信息，方便其他人复现这个问题。
   - type: textarea
     id: summary
@@ -65,7 +65,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Kun version / Kun 版本
+      label: MagicPocket version / MagicPocket 版本
       placeholder: e.g. v0.1.0 / 例如 v0.1.0
     validations:
       required: true
@@ -83,15 +83,15 @@ body:
       description: |
         Paste relevant logs or stack traces here. Do not paste screenshots in this field; screenshots should go in Actual behavior so they render as images.
 
-        You can find Kun logs in:
+        You can find MagicPocket logs in:
 
-        - macOS: `~/Library/Application Support/Kun/logs`
-        - Windows: `C:\Users\<YourUserName>\AppData\Roaming\Kun\logs`
-        - Linux: `~/.config/Kun/logs`
+        - macOS: `~/Library/Application Support/MagicPocket/logs`
+        - Windows: `C:\Users\<YourUserName>\AppData\Roaming\MagicPocket\logs`
+        - Linux: `~/.config/MagicPocket/logs`
 
-        If you changed the default Linux config directory, check `<your config directory>/Kun/logs` instead.
+        If you changed the default Linux config directory, check `<your config directory>/MagicPocket/logs` instead.
 
-        Please attach the latest `kun-YYYY-MM-DD.log` file. If you upgraded from an older DeepSeek GUI version, also attach the latest `deepseek-gui-YYYY-MM-DD.log` file if it exists.
+        Please attach the latest `magicpocket-YYYY-MM-DD.log` file. If you upgraded from an older DeepSeek GUI version, also attach the latest `deepseek-gui-YYYY-MM-DD.log` file if it exists.
       render: shell
   - type: checkboxes
     id: terms

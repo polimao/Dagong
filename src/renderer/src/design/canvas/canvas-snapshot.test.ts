@@ -11,10 +11,10 @@ function htmlArtifact(id: string): DesignArtifact {
     id,
     kind: 'html',
     title: 'Checkout',
-    relativePath: `.kun-design/doc/${id}/v1.html`,
+    relativePath: `.magicpocket-design/doc/${id}/v1.html`,
     createdAt,
     updatedAt: createdAt,
-    versions: [{ id: `${id}-v1`, relativePath: `.kun-design/doc/${id}/v1.html`, createdAt, summary: '' }],
+    versions: [{ id: `${id}-v1`, relativePath: `.magicpocket-design/doc/${id}/v1.html`, createdAt, summary: '' }],
     direction: { id: 'dir_1', name: 'Checkout refresh', status: 'active' }
   }
 }

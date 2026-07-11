@@ -1,10 +1,10 @@
 import type { GuiUpdateChannel } from './gui-update'
 import type { KeyboardShortcutsConfigV1 } from './keyboard-shortcuts'
 import type { LocalWhisperDownloadSourceId } from './local-whisper'
-import type { ApprovalPolicy, SandboxMode } from '../../kun/src/contracts/policy.js'
-import type { ComputerUseMode } from '../../kun/src/contracts/capabilities.js'
-import type { ModelEndpointFormat } from '../../kun/src/contracts/model-endpoint-format.js'
-import type { ToolOutputLimitsConfig } from '../../kun/src/contracts/tool-output-limits.js'
+import type { ApprovalPolicy, SandboxMode } from '../../magicpocket/src/contracts/policy.js'
+import type { ComputerUseMode } from '../../magicpocket/src/contracts/capabilities.js'
+import type { ModelEndpointFormat } from '../../magicpocket/src/contracts/model-endpoint-format.js'
+import type { ToolOutputLimitsConfig } from '../../magicpocket/src/contracts/tool-output-limits.js'
 export {
   DEFAULT_MODEL_ENDPOINT_FORMAT,
   inferModelEndpointFormatFromUrl,
@@ -14,21 +14,21 @@ export {
   normalizeModelEndpointFormat,
   resolveModelEndpointFormat,
   usesChatCompletionsShape
-} from '../../kun/src/contracts/model-endpoint-format.js'
+} from '../../magicpocket/src/contracts/model-endpoint-format.js'
 export { DEFAULT_GUI_UPDATE_CHANNEL, normalizeGuiUpdateChannel, type GuiUpdateChannel } from './gui-update'
 export {
   DEFAULT_APPROVAL_POLICY,
   DEFAULT_SANDBOX_MODE,
   type ApprovalPolicy,
   type SandboxMode
-} from '../../kun/src/contracts/policy.js'
+} from '../../magicpocket/src/contracts/policy.js'
 export {
   DEFAULT_TOOL_OUTPUT_MAX_BYTES,
   DEFAULT_TOOL_OUTPUT_MAX_LINES,
   type ToolOutputLimitsConfig
-} from '../../kun/src/contracts/tool-output-limits.js'
+} from '../../magicpocket/src/contracts/tool-output-limits.js'
 export const KUN_TOOL_PERMISSION_MODES = ['always-ask', 'read-only', 'sensitive-ask', 'workspace-write', 'bypass'] as const
-export type KunToolPermissionMode = (typeof KUN_TOOL_PERMISSION_MODES)[number]
+export type MagicPocketToolPermissionMode = (typeof KUN_TOOL_PERMISSION_MODES)[number]
 /**
  * Overall UI text scale factor (applied as `zoom` on the app shell).
  * Previously a fixed enum ('small' | 'medium' | 'large'); now a free numeric
@@ -106,12 +106,12 @@ export const MIN_KUN_LOCAL_PORT = 10_000
 export const DEFAULT_SCHEDULE_INTERNAL_PORT = 18788
 // 这些默认目录与 legacy-data-migration.ts 的 HOME_DATA_MIGRATION_MAPPINGS
 // 一一对应:老安装的 ~/.deepseekgui/* 在启动期被搬到这里。
-export const DEFAULT_WRITE_WORKSPACE_ROOT = '~/.kun/write_workspace'
-// 对话工作目录的默认值按平台不同:macOS/Windows 用 ~/Documents/Kun,
-// Linux 用 ~/.local/share/Kun/conversations。该默认值由 main 层
+export const DEFAULT_WRITE_WORKSPACE_ROOT = '~/.magicpocket/write_workspace'
+// 对话工作目录的默认值按平台不同:macOS/Windows 用 ~/Documents/MagicPocket,
+// Linux 用 ~/.local/share/MagicPocket/conversations。该默认值由 main 层
 // (DEFAULT_CONVERSATION_WORKSPACE_ROOT_ABSOLUTE)和 renderer 层
 // (defaultConversationWorkspaceRoot)各自按平台推导。
-export const DEFAULT_KUN_DATA_DIR = '~/.kun/data'
+export const DEFAULT_KUN_DATA_DIR = '~/.magicpocket/data'
 export const DEFAULT_KUN_MODEL = 'deepseek-v4-pro'
 export const DEFAULT_WRITE_INLINE_COMPLETION_BASE_URL = 'https://api.deepseek.com/beta'
 export const DEFAULT_WRITE_INLINE_COMPLETION_MODEL = 'deepseek-v4-flash'
@@ -246,8 +246,8 @@ export type ModelProviderSettingsPatchV1 = Partial<
   providers?: ModelProviderProfilePatchV1[]
 }
 
-export type KunSubagentProfileV1 = {
-  /** Stable key; becomes the Record key in kun SubagentsCapabilityConfig.profiles. */
+export type MagicPocketSubagentProfileV1 = {
+  /** Stable key; becomes the Record key in magicpocket SubagentsCapabilityConfig.profiles. */
   id: string
   enabled: boolean
   name: string
@@ -276,16 +276,16 @@ export type KunSubagentProfileV1 = {
   reasoningEffort?: ModelReasoningEffort
 }
 
-export type KunSubagentsSettingsV1 = {
+export type MagicPocketSubagentsSettingsV1 = {
   enabled: boolean
   maxParallel?: number
   maxChildRuns?: number
   defaultToolPolicy?: 'readOnly' | 'inherit'
   defaultProfile?: string
-  profiles: KunSubagentProfileV1[]
+  profiles: MagicPocketSubagentProfileV1[]
 }
 
-export type KunRuntimeSettingsV1 = {
+export type MagicPocketRuntimeSettingsV1 = {
   binaryPath: string
   port: number
   autoStart: boolean
@@ -304,42 +304,42 @@ export type KunRuntimeSettingsV1 = {
   sandboxMode: SandboxMode
   /** Compress safe tool context before each model call. */
   tokenEconomyMode: boolean
-  /** Detailed token-saving behavior used when building Kun model requests. */
-  tokenEconomy: KunTokenEconomySettingsV1
+  /** Detailed token-saving behavior used when building MagicPocket model requests. */
+  tokenEconomy: MagicPocketTokenEconomySettingsV1
   /** Model-visible output caps for builtin read/bash-style tools. */
-  toolOutputLimits: KunToolOutputLimitsSettingsV1
+  toolOutputLimits: MagicPocketToolOutputLimitsSettingsV1
   /** When true, the runtime skips bearer-token auth. Local dev only. */
   insecure: boolean
-  /** GUI-managed MCP progressive discovery/search settings written into Kun config.json. */
-  mcpSearch: KunMcpSearchSettingsV1
-  /** Persistent store backend used by Kun. */
-  storage: KunStorageSettingsV1
-  /** Fallback compaction thresholds and summary behavior. Per-model thresholds live in Kun config models.profiles. */
-  contextCompaction: KunContextCompactionSettingsV1
+  /** GUI-managed MCP progressive discovery/search settings written into MagicPocket config.json. */
+  mcpSearch: MagicPocketMcpSearchSettingsV1
+  /** Persistent store backend used by MagicPocket. */
+  storage: MagicPocketStorageSettingsV1
+  /** Fallback compaction thresholds and summary behavior. Per-model thresholds live in MagicPocket config models.profiles. */
+  contextCompaction: MagicPocketContextCompactionSettingsV1
   /** Low-level loop guards and model argument repair tuning. */
-  runtimeTuning: KunRuntimeTuningSettingsV1
+  runtimeTuning: MagicPocketRuntimeTuningSettingsV1
   /** OpenAI-compatible image generation provider shared by chat agents and Write image tools. */
-  imageGeneration: KunImageGenerationSettingsV1
+  imageGeneration: MagicPocketImageGenerationSettingsV1
   /** Speech-to-text provider used for voice input in the composer. */
-  speechToText: KunSpeechToTextSettingsV1
+  speechToText: MagicPocketSpeechToTextSettingsV1
   /** Text-to-speech provider exposed to agents as generate_speech. */
-  textToSpeech: KunTextToSpeechSettingsV1
+  textToSpeech: MagicPocketTextToSpeechSettingsV1
   /** Music generation provider exposed to agents as generate_music. */
-  musicGeneration: KunMusicGenerationSettingsV1
+  musicGeneration: MagicPocketMusicGenerationSettingsV1
   /** Video generation provider exposed to agents as generate_video. */
-  videoGeneration: KunVideoGenerationSettingsV1
-  /** GUI-owned model capability profiles written into Kun `models.profiles`. */
+  videoGeneration: MagicPocketVideoGenerationSettingsV1
+  /** GUI-owned model capability profiles written into MagicPocket `models.profiles`. */
   modelProfiles: Record<string, ModelProviderModelProfileV1>
-  /** Whether long-term memory is enabled in the Kun runtime. */
+  /** Whether long-term memory is enabled in the MagicPocket runtime. */
   memoryEnabled: boolean
-  /** Native Kun AGENTS.md instructions injected into every turn. */
-  instructions: KunInstructionSettingsV1
+  /** Native MagicPocket AGENTS.md instructions injected into every turn. */
+  instructions: MagicPocketInstructionSettingsV1
   /** Host computer-use (screenshot + mouse/keyboard control) settings. */
-  computerUse: KunComputerUseSettingsV1
+  computerUse: MagicPocketComputerUseSettingsV1
   /** First-party design-quality linter applied to frontend output. */
-  quality: KunDesignQualitySettingsV1
-  /** GUI-managed subagent profiles written into kun SubagentsCapabilityConfig. */
-  subagents?: KunSubagentsSettingsV1
+  quality: MagicPocketDesignQualitySettingsV1
+  /** GUI-managed subagent profiles written into magicpocket SubagentsCapabilityConfig. */
+  subagents?: MagicPocketSubagentsSettingsV1
   /** Global small-model slot. Title & Summary default to this. Empty = follow main model. */
   smallModel?: string
   /** Provider id paired with smallModel for per-provider routing. */
@@ -364,13 +364,13 @@ export type KunRuntimeSettingsV1 = {
   codeReviewReasoningEffort?: ModelReasoningEffort
 }
 
-export type KunInstructionSettingsV1 = {
+export type MagicPocketInstructionSettingsV1 = {
   enabled: boolean
 }
 
-export function kunToolPermissionModeSettings(
-  mode: KunToolPermissionMode
-): Pick<KunRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'> {
+export function magicpocketToolPermissionModeSettings(
+  mode: MagicPocketToolPermissionMode
+): Pick<MagicPocketRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'> {
   switch (mode) {
     case 'always-ask':
       return { approvalPolicy: 'always', sandboxMode: 'danger-full-access' }
@@ -385,9 +385,9 @@ export function kunToolPermissionModeSettings(
   }
 }
 
-export function kunToolPermissionModeFromSettings(
-  settings: Pick<KunRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'>
-): KunToolPermissionMode {
+export function magicpocketToolPermissionModeFromSettings(
+  settings: Pick<MagicPocketRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'>
+): MagicPocketToolPermissionMode {
   if (settings.approvalPolicy === 'always') return 'always-ask'
   if (settings.approvalPolicy === 'untrusted') return 'sensitive-ask'
   if (
@@ -401,12 +401,12 @@ export function kunToolPermissionModeFromSettings(
 }
 
 /** Detection aggressiveness for the design-quality linter. */
-export type KunDesignQualityStrictness = 'relaxed' | 'standard' | 'strict'
+export type MagicPocketDesignQualityStrictness = 'relaxed' | 'standard' | 'strict'
 
-export type KunDesignQualitySettingsV1 = {
+export type MagicPocketDesignQualitySettingsV1 = {
   /** Master switch. Off means the builtin design-quality hook never fires. */
   enabled: boolean
-  strictness: KunDesignQualityStrictness
+  strictness: MagicPocketDesignQualityStrictness
   /** Rule ids to suppress. */
   ignoreRules: string[]
   /** Relative-path glob patterns to skip. */
@@ -415,7 +415,7 @@ export type KunDesignQualitySettingsV1 = {
   maxFindings: number
 }
 
-export type KunComputerUseSettingsV1 = {
+export type MagicPocketComputerUseSettingsV1 = {
   /** Master switch. Off means the computer_use tool is never registered. */
   enabled: boolean
   /**
@@ -430,7 +430,7 @@ export type KunComputerUseSettingsV1 = {
   maxActionsPerTurn: number
 }
 
-export type KunImageGenerationSettingsV1 = {
+export type MagicPocketImageGenerationSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for image generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -448,7 +448,7 @@ export type KunImageGenerationSettingsV1 = {
   timeoutMs: number
 }
 
-export type KunSpeechToTextSettingsV1 = {
+export type MagicPocketSpeechToTextSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for speech recognition. Empty or "custom" uses the fields below. */
   providerId: string
@@ -466,7 +466,7 @@ export type KunSpeechToTextSettingsV1 = {
   timeoutMs: number
 }
 
-export type KunTextToSpeechSettingsV1 = {
+export type MagicPocketTextToSpeechSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for speech generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -484,7 +484,7 @@ export type KunTextToSpeechSettingsV1 = {
   timeoutMs: number
 }
 
-export type KunMusicGenerationSettingsV1 = {
+export type MagicPocketMusicGenerationSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for music generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -497,7 +497,7 @@ export type KunMusicGenerationSettingsV1 = {
   timeoutMs: number
 }
 
-export type KunVideoGenerationSettingsV1 = {
+export type MagicPocketVideoGenerationSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for video generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -513,27 +513,27 @@ export type KunVideoGenerationSettingsV1 = {
   pollIntervalMs: number
 }
 
-export type KunMcpSearchMode = 'direct' | 'search' | 'auto'
+export type MagicPocketMcpSearchMode = 'direct' | 'search' | 'auto'
 
-export type KunMcpSearchSettingsV1 = {
+export type MagicPocketMcpSearchSettingsV1 = {
   enabled: boolean
-  mode: KunMcpSearchMode
+  mode: MagicPocketMcpSearchMode
   autoThresholdToolCount: number
   topKDefault: number
   topKMax: number
   minScore: number
 }
 
-export type KunStorageBackend = 'hybrid' | 'file'
+export type MagicPocketStorageBackend = 'hybrid' | 'file'
 
-export type KunStorageSettingsV1 = {
-  backend: KunStorageBackend
+export type MagicPocketStorageSettingsV1 = {
+  backend: MagicPocketStorageBackend
   sqlitePath: string
 }
 
-export type KunCompactionSummaryMode = 'heuristic' | 'model'
+export type MagicPocketCompactionSummaryMode = 'heuristic' | 'model'
 
-export type KunHistoryHygieneSettingsV1 = {
+export type MagicPocketHistoryHygieneSettingsV1 = {
   maxToolResultLines: number
   maxToolResultBytes: number
   maxToolResultTokens: number
@@ -542,20 +542,20 @@ export type KunHistoryHygieneSettingsV1 = {
   maxArrayItems: number
 }
 
-export type KunTokenEconomySettingsV1 = {
+export type MagicPocketTokenEconomySettingsV1 = {
   enabled: boolean
   compressToolDescriptions: boolean
   compressToolResults: boolean
   conciseResponses: boolean
-  historyHygiene: KunHistoryHygieneSettingsV1
+  historyHygiene: MagicPocketHistoryHygieneSettingsV1
 }
 
-export type KunToolOutputLimitsSettingsV1 = Required<ToolOutputLimitsConfig>
+export type MagicPocketToolOutputLimitsSettingsV1 = Required<ToolOutputLimitsConfig>
 
-export type KunContextCompactionSettingsV1 = {
+export type MagicPocketContextCompactionSettingsV1 = {
   defaultSoftThreshold: number
   defaultHardThreshold: number
-  summaryMode: KunCompactionSummaryMode
+  summaryMode: MagicPocketCompactionSummaryMode
   summaryTimeoutMs: number
   summaryMaxTokens: number
   summaryInputMaxBytes: number
@@ -565,76 +565,76 @@ export type KunContextCompactionSettingsV1 = {
   summaryProviderId?: string
 }
 
-export type KunToolStormSettingsV1 = {
+export type MagicPocketToolStormSettingsV1 = {
   enabled: boolean
   windowSize: number
   threshold: number
 }
 
-export type KunToolArgumentRepairSettingsV1 = {
+export type MagicPocketToolArgumentRepairSettingsV1 = {
   maxStringBytes: number
 }
 
-export type KunRuntimeTuningSettingsV1 = {
+export type MagicPocketRuntimeTuningSettingsV1 = {
   /**
    * Max idle gap (ms) between streaming chunks before a turn fails with
    * `stream_idle_timeout`. `0` disables the guard — useful for local LLM
    * servers that stay silent while prefilling a very large prompt.
    */
   streamIdleTimeoutMs: number
-  toolStorm: KunToolStormSettingsV1
-  toolArgumentRepair: KunToolArgumentRepairSettingsV1
+  toolStorm: MagicPocketToolStormSettingsV1
+  toolArgumentRepair: MagicPocketToolArgumentRepairSettingsV1
 }
 
 /**
  * Compatibility shell kept because persisted settings still use the
- * `agents.kun` envelope. Prefer operating on the contained
- * `KunRuntimeSettingsV1` directly in new code.
+ * `agents.magicpocket` envelope. Prefer operating on the contained
+ * `MagicPocketRuntimeSettingsV1` directly in new code.
  */
-export type KunSettingsEnvelopeV1 = {
-  kun: KunRuntimeSettingsV1
+export type MagicPocketSettingsEnvelopeV1 = {
+  magicpocket: MagicPocketRuntimeSettingsV1
 }
 
-/** @deprecated Use `KunSettingsEnvelopeV1`. */
-export type AgentRuntimeSettingsMapV1 = KunSettingsEnvelopeV1
+/** @deprecated Use `MagicPocketSettingsEnvelopeV1`. */
+export type AgentRuntimeSettingsMapV1 = MagicPocketSettingsEnvelopeV1
 
-export type KunRuntimeTuningSettingsPatchV1 = {
+export type MagicPocketRuntimeTuningSettingsPatchV1 = {
   streamIdleTimeoutMs?: number
-  toolStorm?: Partial<KunToolStormSettingsV1>
-  toolArgumentRepair?: Partial<KunToolArgumentRepairSettingsV1>
+  toolStorm?: Partial<MagicPocketToolStormSettingsV1>
+  toolArgumentRepair?: Partial<MagicPocketToolArgumentRepairSettingsV1>
 }
 
-export type KunTokenEconomySettingsPatchV1 = Partial<
-  Omit<KunTokenEconomySettingsV1, 'historyHygiene'>
+export type MagicPocketTokenEconomySettingsPatchV1 = Partial<
+  Omit<MagicPocketTokenEconomySettingsV1, 'historyHygiene'>
 > & {
-  historyHygiene?: Partial<KunHistoryHygieneSettingsV1>
+  historyHygiene?: Partial<MagicPocketHistoryHygieneSettingsV1>
 }
 
-export type KunRuntimeSettingsPatchV1 = Partial<
+export type MagicPocketRuntimeSettingsPatchV1 = Partial<
   Omit<
-    KunRuntimeSettingsV1,
+    MagicPocketRuntimeSettingsV1,
     'mcpSearch' | 'storage' | 'contextCompaction' | 'runtimeTuning' | 'tokenEconomy' | 'toolOutputLimits' | 'imageGeneration' | 'speechToText' | 'textToSpeech' | 'musicGeneration' | 'videoGeneration' | 'instructions' | 'computerUse' | 'quality' | 'modelProfiles'
   >
 > & {
-  mcpSearch?: Partial<KunMcpSearchSettingsV1>
-  tokenEconomy?: KunTokenEconomySettingsPatchV1
-  toolOutputLimits?: Partial<KunToolOutputLimitsSettingsV1>
-  storage?: Partial<KunStorageSettingsV1>
-  contextCompaction?: Partial<KunContextCompactionSettingsV1>
-  runtimeTuning?: KunRuntimeTuningSettingsPatchV1
-  imageGeneration?: Partial<KunImageGenerationSettingsV1>
-  speechToText?: Partial<KunSpeechToTextSettingsV1>
-  textToSpeech?: Partial<KunTextToSpeechSettingsV1>
-  musicGeneration?: Partial<KunMusicGenerationSettingsV1>
-  videoGeneration?: Partial<KunVideoGenerationSettingsV1>
-  instructions?: Partial<KunInstructionSettingsV1>
-  computerUse?: Partial<KunComputerUseSettingsV1>
-  quality?: Partial<KunDesignQualitySettingsV1>
+  mcpSearch?: Partial<MagicPocketMcpSearchSettingsV1>
+  tokenEconomy?: MagicPocketTokenEconomySettingsPatchV1
+  toolOutputLimits?: Partial<MagicPocketToolOutputLimitsSettingsV1>
+  storage?: Partial<MagicPocketStorageSettingsV1>
+  contextCompaction?: Partial<MagicPocketContextCompactionSettingsV1>
+  runtimeTuning?: MagicPocketRuntimeTuningSettingsPatchV1
+  imageGeneration?: Partial<MagicPocketImageGenerationSettingsV1>
+  speechToText?: Partial<MagicPocketSpeechToTextSettingsV1>
+  textToSpeech?: Partial<MagicPocketTextToSpeechSettingsV1>
+  musicGeneration?: Partial<MagicPocketMusicGenerationSettingsV1>
+  videoGeneration?: Partial<MagicPocketVideoGenerationSettingsV1>
+  instructions?: Partial<MagicPocketInstructionSettingsV1>
+  computerUse?: Partial<MagicPocketComputerUseSettingsV1>
+  quality?: Partial<MagicPocketDesignQualitySettingsV1>
   modelProfiles?: Record<string, ModelProviderModelProfilePatchV1 | null>
 }
 
-export type KunSettingsEnvelopePatchV1 = {
-  kun?: KunRuntimeSettingsPatchV1
+export type MagicPocketSettingsEnvelopePatchV1 = {
+  magicpocket?: MagicPocketRuntimeSettingsPatchV1
 }
 
 export type LogConfigV1 = {
@@ -648,7 +648,7 @@ export type CheckpointCleanupConfigV1 = {
   /**
    * Optional override for the Git checkpoint storage directory (issue #651).
    * Lets users point checkpoints at another drive with more free space instead
-   * of filling the system drive under the Kun data dir. Absent = default
+   * of filling the system drive under the MagicPocket data dir. Absent = default
    * (`<dataDir>/git-checkpoints`).
    */
   directory?: string
@@ -741,7 +741,7 @@ export type ScheduleSettingsV1 = {
 //
 // A workflow is the multi-step generalization of a scheduled task: instead of a
 // single prompt it is a graph of nodes connected by edges. The "ai-agent" node
-// reuses the exact same Kun-runtime execution path as a scheduled task.
+// reuses the exact same MagicPocket-runtime execution path as a scheduled task.
 // ---------------------------------------------------------------------------
 
 export type WorkflowNodeKind =
@@ -1264,7 +1264,7 @@ export type WorkflowNodeRunResultV1 = {
   inputJson?: string
   /** Retry attempts spent before this result (0/absent = first try). */
   retries?: number
-  /** For ai-agent nodes: the Kun thread it created. */
+  /** For ai-agent nodes: the MagicPocket thread it created. */
   threadId: string
   error: string
 }
@@ -1308,7 +1308,7 @@ export type WorkflowV1 = {
   id: string
   name: string
   enabled: boolean
-  /** When true, the Kun agent may invoke this workflow as a tool (list_workflows / run_workflow). */
+  /** When true, the MagicPocket agent may invoke this workflow as a tool (list_workflows / run_workflow). */
   callableByAgent: boolean
   /** Workflow-scoped variables, exposed to node expressions as {{$env.key}}. */
   env: WorkflowEnvVarV1[]
@@ -1342,7 +1342,7 @@ export type WorkflowNodePresetV1 = {
   config: WorkflowNodeV1['config']
 }
 
-/** The kun agent hook phases a workflow can be bound to. Mirrors kun's HOOK_PHASES. */
+/** The magicpocket agent hook phases a workflow can be bound to. Mirrors magicpocket's HOOK_PHASES. */
 export const WORKFLOW_HOOK_PHASES = [
   'PreToolUse',
   'PostToolUse',
@@ -1357,7 +1357,7 @@ export type WorkflowHookPhase = (typeof WORKFLOW_HOOK_PHASES)[number]
 export const WORKFLOW_HOOK_MODES = ['observe', 'block', 'rewrite'] as const
 export type WorkflowHookMode = (typeof WORKFLOW_HOOK_MODES)[number]
 
-/** Binds a Create Loop workflow to a kun agent hook phase (reactive automation). */
+/** Binds a Create Loop workflow to a magicpocket agent hook phase (reactive automation). */
 export type WorkflowHookTriggerV1 = {
   id: string
   enabled: boolean
@@ -1371,28 +1371,28 @@ export type WorkflowHookTriggerV1 = {
    * rewrite = fold the workflow output into the tool result / injected context.
    */
   mode: WorkflowHookMode
-  /** Hook timeout in ms; 0 uses the kun default. */
+  /** Hook timeout in ms; 0 uses the magicpocket default. */
   timeoutMs: number
 }
 
 export type WorkflowSettingsV1 = {
   enabled: boolean
   defaultWorkspaceRoot: string
-  /** Default model provider for new AI nodes. Empty inherits the Kun runtime provider. */
+  /** Default model provider for new AI nodes. Empty inherits the MagicPocket runtime provider. */
   providerId?: string
   model: string
   mode: ScheduleRunMode
   keepAwake: boolean
   /** Local-only (127.0.0.1) port the webhook-trigger listener binds to. */
   webhookPort: number
-  /** Optional shared secret required on inbound webhook requests (x-kun-secret / Bearer). */
+  /** Optional shared secret required on inbound webhook requests (x-magicpocket-secret / Bearer). */
   webhookSecret: string
   workflows: WorkflowV1[]
   /** Reusable palette items the user saved from configured nodes. */
   presets: WorkflowNodePresetV1[]
   /** User-defined script-backed modules. */
   modules: WorkflowCustomModuleV1[]
-  /** Workflows bound to kun agent hook phases (reactive automation in code mode). */
+  /** Workflows bound to magicpocket agent hook phases (reactive automation in code mode). */
   hookTriggers: WorkflowHookTriggerV1[]
 }
 
@@ -1443,7 +1443,7 @@ export type ClawImSettingsV1 = {
   secret: string
   weixinBridgeUrl: string
   workspaceRoot: string
-  /** Default model provider for IM channels without their own provider. Empty inherits Kun runtime provider. */
+  /** Default model provider for IM channels without their own provider. Empty inherits MagicPocket runtime provider. */
   providerId?: string
   model: string
   mode: ClawRunMode
@@ -1491,7 +1491,7 @@ export type ClawImTelegramPlatformCredentialV1 = {
    * Empty string means "allow all private chats" (group chats are always rejected).
    */
   allowedChatIds: string
-  /** Bot username resolved via getMe, e.g. "my_kun_bot". Cosmetic only. */
+  /** Bot username resolved via getMe, e.g. "my_magicpocket_bot". Cosmetic only. */
   botUsername?: string
   createdAt: string
 }
@@ -1517,7 +1517,7 @@ export type ClawImConversationV1 = {
   latestMessageId: string
   senderId: string
   senderName: string
-  /** Kun thread id this conversation maps to. */
+  /** MagicPocket thread id this conversation maps to. */
   localThreadId: string
   workspaceRoot: string
   createdAt: string
@@ -1534,7 +1534,7 @@ export type ClawImChannelV1 = {
   /** Model provider used by this IM channel. Empty inherits the IM/global provider. */
   providerId?: string
   model: string
-  /** Kun thread id this channel maps to. */
+  /** MagicPocket thread id this channel maps to. */
   threadId: string
   workspaceRoot: string
   agentProfile: ClawImAgentProfileV1
@@ -1559,13 +1559,13 @@ export type WriteInlineCompletionSettingsV1 = {
   enabled: boolean
   retrievalEnabled: boolean
   longCompletionEnabled: boolean
-  /** When true, Write inherits Kun's selected provider instead of using `providerId`. */
+  /** When true, Write inherits MagicPocket's selected provider instead of using `providerId`. */
   inheritProvider: boolean
   /** Selected provider for Write inline completion when `inheritProvider` is false. */
   providerId: string
   apiKey: string
   baseUrl: string
-  /** When true, Write inherits Kun's runtime model instead of using `model` as an override. */
+  /** When true, Write inherits MagicPocket's runtime model instead of using `model` as an override. */
   inheritModel: boolean
   model: string
   debounceMs: number
@@ -1871,9 +1871,9 @@ export type AppSettingsV1 = {
   cursorSpotlight?: boolean
   cursorSpotlightColor?: string
   provider: ModelProviderSettingsV1
-  agents: KunSettingsEnvelopeV1
+  agents: MagicPocketSettingsEnvelopeV1
   workspaceRoot: string
-  /** 对话会话的工作目录根(默认 ~/Documents/Kun),不绑定项目文件夹。 */
+  /** 对话会话的工作目录根(默认 ~/Documents/MagicPocket),不绑定项目文件夹。 */
   conversationWorkspaceRoot: string
   log: LogConfigV1
   checkpointCleanup: CheckpointCleanupConfigV1
@@ -1898,7 +1898,7 @@ export type AppSettingsPatch = Partial<
   Omit<AppSettingsV1, 'provider' | 'agents' | 'log' | 'checkpointCleanup' | 'notifications' | 'appBehavior' | 'keyboardShortcuts' | 'write' | 'claw' | 'schedule' | 'design' | 'workflow' | 'guiUpdate' | 'terminal'>
 > & {
   provider?: ModelProviderSettingsPatchV1
-  agents?: KunSettingsEnvelopePatchV1
+  agents?: MagicPocketSettingsEnvelopePatchV1
   log?: Partial<LogConfigV1>
   checkpointCleanup?: Partial<CheckpointCleanupConfigV1>
   notifications?: Partial<NotificationConfigV1>

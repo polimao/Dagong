@@ -37,8 +37,8 @@ const manifest = {
 }
 
 beforeEach(async () => {
-  userDataDir = await mkdtemp(join(tmpdir(), 'kun-ui-plugin-data-'))
-  sourceDir = await mkdtemp(join(tmpdir(), 'kun-ui-plugin-src-'))
+  userDataDir = await mkdtemp(join(tmpdir(), 'magicpocket-ui-plugin-data-'))
+  sourceDir = await mkdtemp(join(tmpdir(), 'magicpocket-ui-plugin-src-'))
 })
 
 afterEach(async () => {
@@ -110,13 +110,13 @@ describe('removeUiPlugin', () => {
   })
 })
 
-describe('seedUiPlugin (bundled plugins like ikun)', () => {
+describe('seedUiPlugin (bundled plugins like imagicpocket)', () => {
   it('seeds a plugin from in-memory bytes and it lists/loads like any other', async () => {
     const result = await seedUiPlugin(
       userDataDir,
       {
-        id: 'ikun',
-        name: 'iKun 模式',
+        id: 'imagicpocket',
+        name: 'iMagicPocket 模式',
         version: '1.0.0',
         figures: { swim: 'img/dribble.png', greet: 'img/wave.png' },
         features: { cameos: true }
@@ -126,9 +126,9 @@ describe('seedUiPlugin (bundled plugins like ikun)', () => {
     expect(result.ok, JSON.stringify(result)).toBe(true)
 
     const plugins = await listUiPlugins(userDataDir)
-    expect(plugins.map((p) => p.manifest.id)).toContain('ikun')
+    expect(plugins.map((p) => p.manifest.id)).toContain('imagicpocket')
 
-    const loaded = await loadUiPluginFigures(userDataDir, 'ikun')
+    const loaded = await loadUiPluginFigures(userDataDir, 'imagicpocket')
     expect(loaded.ok).toBe(true)
     if (!loaded.ok) return
     expect(loaded.figures.swim?.startsWith('data:image/png;base64,')).toBe(true)
@@ -138,7 +138,7 @@ describe('seedUiPlugin (bundled plugins like ikun)', () => {
   it('rejects seeding when figure bytes are missing', async () => {
     const result = await seedUiPlugin(
       userDataDir,
-      { id: 'ikun', name: 'x', version: '1.0.0', figures: { swim: 'img/a.png' } },
+      { id: 'imagicpocket', name: 'x', version: '1.0.0', figures: { swim: 'img/a.png' } },
       {}
     )
     expect(result.ok).toBe(false)
@@ -154,7 +154,7 @@ describe('bundled starlight example', () => {
     const loaded = await loadUiPluginFigures(userDataDir, 'starlight')
     expect(loaded.ok).toBe(true)
     if (!loaded.ok) return
-    expect(loaded.manifest.name).toBe('星夜 Kun')
+    expect(loaded.manifest.name).toBe('星夜 MagicPocket')
     expect(loaded.figures.swim?.startsWith('data:image/png;base64,')).toBe(true)
     expect(loaded.manifest.features?.cameos).toBe(true)
     expect(loaded.manifest.tokens?.light?.['--ds-accent']).toBe('#7a5fd0')

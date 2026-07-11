@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Code2, Plus, Trash2 } from 'lucide-react'
 import {
+  createBlankMcpKeyValue,
   createBlankMcpServer,
+  GUI_SCHEDULE_MCP_SERVER_ID,
   isMcpTransport,
   parseMcpConfigText,
   serializeMcpConfig,
@@ -157,7 +159,8 @@ export function McpServersEditor({
           <McpServerCard
             key={server.rowId}
             server={server}
-            disabled={disabled}
+            disabled={disabled || server.name === GUI_SCHEDULE_MCP_SERVER_ID}
+            systemManaged={server.name === GUI_SCHEDULE_MCP_SERVER_ID}
             onChange={(patch) => updateServer(server.rowId, patch)}
             onRemove={() => removeServer(server.rowId)}
             fieldError={(field) => fieldError(server.rowId, field)}
@@ -182,12 +185,14 @@ export function McpServersEditor({
 function McpServerCard({
   server,
   disabled,
+  systemManaged,
   onChange,
   onRemove,
   fieldError
 }: {
   server: McpFormServer
   disabled: boolean
+  systemManaged: boolean
   onChange: (patch: Partial<McpFormServer>) => void
   onRemove: () => void
   fieldError: (field: McpServerFieldError['field']) => string | null
@@ -242,16 +247,22 @@ function McpServerCard({
           />
           {t('mcpFormEnabled')}
         </label>
-        <button
-          type="button"
-          onClick={onRemove}
-          disabled={disabled}
-          aria-label={t('mcpFormRemoveServer')}
-          title={t('mcpFormRemoveServer')}
-          className="mb-1 rounded-lg p-1.5 text-ds-muted transition hover:bg-red-500/10 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-55 dark:hover:text-red-300"
-        >
-          <Trash2 className="h-4 w-4" strokeWidth={1.8} />
-        </button>
+        {systemManaged ? (
+          <span className="mb-1 self-end rounded-md bg-ds-subtle px-2 py-1 text-[11px] font-medium text-ds-muted">
+            {t('mcpFormSystemManaged')}
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={onRemove}
+            disabled={disabled}
+            aria-label={t('mcpFormRemoveServer')}
+            title={t('mcpFormRemoveServer')}
+            className="mb-1 rounded-lg p-1.5 text-ds-muted transition hover:bg-red-500/10 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-55 dark:hover:text-red-300"
+          >
+            <Trash2 className="h-4 w-4" strokeWidth={1.8} />
+          </button>
+        )}
       </div>
       {nameError ? <FieldError message={nameError} /> : null}
 
@@ -404,38 +415,38 @@ function KeyValueEditor({
   disabled: boolean
   onChange: (entries: McpKeyValue[]) => void
 }): ReactElement {
-  const updateEntry = (index: number, patch: Partial<McpKeyValue>): void => {
-    onChange(entries.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)))
+  const updateEntry = (rowId: string, patch: Partial<McpKeyValue>): void => {
+    onChange(entries.map((entry) => (entry.rowId === rowId ? { ...entry, ...patch } : entry)))
   }
-  const removeEntry = (index: number): void => {
-    onChange(entries.filter((_, i) => i !== index))
+  const removeEntry = (rowId: string): void => {
+    onChange(entries.filter((entry) => entry.rowId !== rowId))
   }
   const addEntry = (): void => {
-    onChange([...entries, { key: '', value: '' }])
+    onChange([...entries, createBlankMcpKeyValue()])
   }
 
   return (
     <div className="flex flex-col gap-2">
       <span className="text-[12px] font-medium text-ds-muted">{label}</span>
-      {entries.map((entry, index) => (
-        <div key={index} className="flex items-center gap-2">
+      {entries.map((entry) => (
+        <div key={entry.rowId} className="flex items-center gap-2">
           <input
             value={entry.key}
             disabled={disabled}
             placeholder={keyPlaceholder}
-            onChange={(e) => updateEntry(index, { key: e.target.value })}
+            onChange={(e) => updateEntry(entry.rowId, { key: e.target.value })}
             className={`${inputClass} flex-1`}
           />
           <input
             value={entry.value}
             disabled={disabled}
             placeholder={valuePlaceholder}
-            onChange={(e) => updateEntry(index, { value: e.target.value })}
+            onChange={(e) => updateEntry(entry.rowId, { value: e.target.value })}
             className={`${inputClass} flex-1`}
           />
           <button
             type="button"
-            onClick={() => removeEntry(index)}
+            onClick={() => removeEntry(entry.rowId)}
             disabled={disabled}
             className="shrink-0 rounded-lg p-1.5 text-ds-muted transition hover:bg-red-500/10 hover:text-red-600 disabled:opacity-55 dark:hover:text-red-300"
           >

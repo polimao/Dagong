@@ -90,7 +90,7 @@ describe('chat-store-thread-actions queued messages', () => {
     const guiPlan: GuiPlanMessageContext = {
       operation: 'draft',
       workspaceRoot: '/workspace/deepseek-gui',
-      relativePath: '.kunsdd/plan/feature.md',
+      relativePath: '.magicpocketsdd/plan/feature.md',
       planId: 'plan-1',
       sourceRequest: 'feature'
     }
@@ -120,7 +120,7 @@ describe('chat-store-thread-actions queued messages', () => {
         guiPlan: {
           operation: 'draft',
           workspaceRoot: '/workspace/deepseek-gui',
-          relativePath: '.kunsdd/plan/one.md',
+          relativePath: '.magicpocketsdd/plan/one.md',
           planId: 'plan-1'
         }
       },
@@ -165,14 +165,14 @@ describe('chat-store-thread-actions queued messages', () => {
     }
     registryMock.getProvider.mockReturnValue(provider)
     const setSettings = vi.fn(async () => ({
-      agents: { kun: { providerId: 'xiaomi-token-plan', model: 'mimo-v2.5' } },
+      agents: { magicpocket: { providerId: 'xiaomi-token-plan', model: 'mimo-v2.5' } },
       codePromptPrefix: ''
     }))
     const restartRuntime = vi.fn(async () => undefined)
     vi.stubGlobal('window', {
-      kunGui: {
+      magicpocketGui: {
         getSettings: vi.fn(async () => ({
-          agents: { kun: { providerId: 'minimax-token-plan', model: 'MiniMax-M2' } },
+          agents: { magicpocket: { providerId: 'minimax-token-plan', model: 'MiniMax-M2' } },
           codePromptPrefix: ''
         })),
         setSettings,
@@ -209,9 +209,9 @@ describe('chat-store-thread-actions queued messages', () => {
     }
     registryMock.getProvider.mockReturnValue(provider)
     vi.stubGlobal('window', {
-      kunGui: {
+      magicpocketGui: {
         getSettings: vi.fn(async () => ({
-          agents: { kun: { providerId: 'deepseek', model: 'deepseek-v4-pro' } },
+          agents: { magicpocket: { providerId: 'deepseek', model: 'deepseek-v4-pro' } },
           codePromptPrefix: ''
         })),
         logError: vi.fn(async () => undefined)
@@ -243,14 +243,14 @@ describe('chat-store-thread-actions queued messages', () => {
     }
     registryMock.getProvider.mockReturnValue(provider)
     const setSettings = vi.fn(async () => ({
-      agents: { kun: { providerId: 'minimax-token-plan', model: 'MiniMax-M3' } },
+      agents: { magicpocket: { providerId: 'minimax-token-plan', model: 'MiniMax-M3' } },
       codePromptPrefix: ''
     }))
     const restartRuntime = vi.fn(async () => undefined)
     vi.stubGlobal('window', {
-      kunGui: {
+      magicpocketGui: {
         getSettings: vi.fn(async () => ({
-          agents: { kun: { providerId: 'deepseek', model: 'deepseek-v4-pro' } },
+          agents: { magicpocket: { providerId: 'deepseek', model: 'deepseek-v4-pro' } },
           codePromptPrefix: ''
         })),
         setSettings,
@@ -483,7 +483,7 @@ describe('chat-store-thread-actions createThread conversation mode', () => {
   })
 
   it('creates a conversation thread bound to the auto-created timestamped workspace', async () => {
-    const createdPath = '/home/alice/.local/share/Kun/conversations/20260626-153012'
+    const createdPath = '/home/alice/.local/share/MagicPocket/conversations/20260626-153012'
     const selectThread = vi.fn(async () => undefined)
     const refreshThreads = vi.fn(async () => undefined)
     const createThreadProvider = vi.fn(async () => ({
@@ -498,7 +498,7 @@ describe('chat-store-thread-actions createThread conversation mode', () => {
     registryMock.getProvider.mockReturnValue({ createThread: createThreadProvider })
 
     vi.stubGlobal('window', {
-      kunGui: {
+      magicpocketGui: {
         platform: 'linux',
         getSettings: vi.fn(async () => ({
           version: 1,
@@ -507,9 +507,9 @@ describe('chat-store-thread-actions createThread conversation mode', () => {
           uiFontScale: 0.82,
     chatContentMaxWidthPx: 896,
           provider: { providers: [], apiKey: '', baseUrl: '', proxy: { enabled: false } },
-          agents: { kun: { model: 'deepseek-v4-pro', apiKey: 'k', baseUrl: '' } },
+          agents: { magicpocket: { model: 'deepseek-v4-pro', apiKey: 'k', baseUrl: '' } },
           workspaceRoot: '/tmp/workspace',
-          conversationWorkspaceRoot: '~/.local/share/Kun/conversations',
+          conversationWorkspaceRoot: '~/.local/share/MagicPocket/conversations',
           log: { enabled: false, retentionDays: 7 },
           checkpointCleanup: { enabled: false, intervalDays: 3 },
           notifications: { turnComplete: true },
@@ -534,7 +534,7 @@ describe('chat-store-thread-actions createThread conversation mode', () => {
 
     await actions.createThread({ conversation: true })
 
-    expect(window.kunGui.createConversationWorkspace).toHaveBeenCalled()
+    expect(window.magicpocketGui.createConversationWorkspace).toHaveBeenCalled()
     expect(createThreadProvider).toHaveBeenCalledWith(expect.objectContaining({ workspace: createdPath }))
     expect(state.activeThreadId).toBe('thr_new')
     expect(selectThread).toHaveBeenCalledWith('thr_new')

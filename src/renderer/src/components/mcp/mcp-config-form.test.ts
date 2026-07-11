@@ -29,7 +29,7 @@ describe('parseMcpConfigText', () => {
     expect(model.preserved).toEqual({})
   })
 
-  it('parses a kun-format stdio server', () => {
+  it('parses a magicpocket-format stdio server', () => {
     const model = expectOk(
       parseMcpConfigText(
         JSON.stringify({
@@ -52,7 +52,7 @@ describe('parseMcpConfigText', () => {
     expect(server.command).toBe('npx')
     expect(server.cwd).toBe('/workspace/project')
     expect(server.args).toEqual(['-y', 'gh-mcp'])
-    expect(server.env).toEqual([{ key: 'TOKEN', value: 'abc' }])
+    expect(server.env.map(({ key, value }) => ({ key, value }))).toEqual([{ key: 'TOKEN', value: 'abc' }])
     // No explicit trustScope / roots -> defaults to user.
     expect(server.trustScope).toBe('user')
   })
@@ -74,7 +74,7 @@ describe('parseMcpConfigText', () => {
     const server = model.servers[0]
     expect(server.transport).toBe('streamable-http')
     expect(server.url).toBe('https://example.com/mcp')
-    expect(server.headers).toEqual([{ key: 'Authorization', value: 'Bearer x' }])
+    expect(server.headers.map(({ key, value }) => ({ key, value }))).toEqual([{ key: 'Authorization', value: 'Bearer x' }])
   })
 
   it('parses workspace visibility roots separately from trust roots', () => {
@@ -199,10 +199,10 @@ describe('serializeMcpConfig', () => {
       command: 'run',
       cwd: '/workspace/project',
       args: ['--flag'],
-      env: [{ key: 'K', value: 'V' }],
+      env: [{ rowId: 'r1', key: 'K', value: 'V' }],
       // url/headers should be ignored for stdio
       url: 'https://ignored',
-      headers: [{ key: 'H', value: 'V' }]
+      headers: [{ rowId: 'r2', key: 'H', value: 'V' }]
     }
     expect(serializeMcpServer(stdio)).toEqual({
       transport: 'stdio',
@@ -217,12 +217,12 @@ describe('serializeMcpConfig', () => {
       ...createBlankMcpServer('streamable-http'),
       name: 'h',
       url: 'https://h/mcp',
-      headers: [{ key: 'Authorization', value: 'Bearer x' }],
+      headers: [{ rowId: 'r3', key: 'Authorization', value: 'Bearer x' }],
       // command/args/env should be ignored for http
       command: 'ignored',
       cwd: '/ignored',
       args: ['ignored'],
-      env: [{ key: 'IGN', value: 'V' }]
+      env: [{ rowId: 'r4', key: 'IGN', value: 'V' }]
     }
     expect(serializeMcpServer(http)).toEqual({
       transport: 'streamable-http',
@@ -258,7 +258,7 @@ describe('serializeMcpConfig', () => {
       ...createBlankMcpServer('stdio'),
       name: 's',
       command: 'run',
-      env: [{ key: '', value: 'orphan' }, { key: 'K', value: 'V' }]
+      env: [{ rowId: 'r5', key: '', value: 'orphan' }, { rowId: 'r6', key: 'K', value: 'V' }]
     }
     expect(serializeMcpServer(server).env).toEqual({ K: 'V' })
   })

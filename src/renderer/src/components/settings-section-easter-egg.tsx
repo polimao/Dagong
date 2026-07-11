@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { BookOpen, FolderPlus, Palette, Trash2 } from 'lucide-react'
 import { UI_MODE_DEFAULT, UI_MODE_RETROMA } from '../lib/ui-mode'
 import { useUiPluginStore } from '../store/ui-plugin-store'
-import kunBirdFigure from '../../../asset/img/kun_bird.png'
+import magicpocketBirdFigure from '../../../asset/img/magicpocket_bird.png'
 import { SettingsCard, SettingRow } from './settings-controls'
 
 type ModeCard = {
@@ -33,7 +33,7 @@ function ModeCardButton({
   busy: boolean
   onActivate: () => void
   onRemove?: () => void
-  /** 切换 Retroma 羊皮纸配色(仅默认 Kun 卡片提供) */
+  /** 切换 Retroma 羊皮纸配色(仅默认 MagicPocket 卡片提供) */
   onTogglePalette?: () => void
   /** Retroma 配色当前是否开启 */
   paletteOn?: boolean
@@ -134,13 +134,13 @@ export function EasterEggSettingsSection({ ctx }: { ctx: Record<string, any> }):
     void refreshUiPlugins()
   }, [initUiPlugins, refreshUiPlugins])
 
-  // 内置只有「默认 Kun」;iKun 是预装的示例插件,从已安装列表自然出现
+  // 内置只有「默认 MagicPocket」;iMagicPocket 是预装的示例插件,从已安装列表自然出现
   const builtinCards: ModeCard[] = [
     {
       mode: UI_MODE_DEFAULT,
       title: t('uiModeDefaultTitle'),
       subtitle: t('uiModeDefaultSubtitle'),
-      preview: kunBirdFigure,
+      preview: magicpocketBirdFigure,
       removable: false
     }
   ]
@@ -172,7 +172,7 @@ export function EasterEggSettingsSection({ ctx }: { ctx: Record<string, any> }):
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[...builtinCards, ...pluginCards].map((card) => {
                 const isBuiltin = card.mode === UI_MODE_DEFAULT
-                // 默认 Kun 卡承载 Retroma 配色:default 或 retroma 均视为该卡激活
+                // 默认 MagicPocket 卡承载 Retroma 配色:default 或 retroma 均视为该卡激活
                 const cardActive =
                   isBuiltin ? uiMode === UI_MODE_DEFAULT || uiMode === UI_MODE_RETROMA : uiMode === card.mode
                 const retromaOn = uiMode === UI_MODE_RETROMA

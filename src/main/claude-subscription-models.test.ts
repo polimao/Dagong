@@ -54,23 +54,23 @@ describe('fetchSdkModels', () => {
     return c
   }
 
-  // A kun root that actually has the SDK package dir, so resolveKunDir picks it.
-  function kunRootWithSdk(): { root: string; cleanup: () => void } {
-    const root = join(tmpdir(), `kun-models-test-${process.pid}`)
+  // A magicpocket root that actually has the SDK package dir, so resolveMagicPocketDir picks it.
+  function magicpocketRootWithSdk(): { root: string; cleanup: () => void } {
+    const root = join(tmpdir(), `magicpocket-models-test-${process.pid}`)
     mkdirSync(join(root, 'node_modules', '@anthropic-ai', 'claude-agent-sdk'), { recursive: true })
     return { root, cleanup: () => rmSync(root, { recursive: true, force: true }) }
   }
 
-  test('returns [] immediately when no kun root has the SDK', async () => {
-    expect(await fetchSdkModels({ kunRoots: [join(tmpdir(), 'nope')] })).toEqual([])
+  test('returns [] immediately when no magicpocket root has the SDK', async () => {
+    expect(await fetchSdkModels({ magicpocketRoots: [join(tmpdir(), 'nope')] })).toEqual([])
   })
 
   test('parses the model ids the subprocess prints', async () => {
-    const { root, cleanup } = kunRootWithSdk()
+    const { root, cleanup } = magicpocketRootWithSdk()
     try {
       const child = fakeChild()
       const promise = fetchSdkModels({
-        kunRoots: [root],
+        magicpocketRoots: [root],
         token: 'sk-ant-oat01-x',
         spawnFn: (() => child) as never
       })
@@ -83,10 +83,10 @@ describe('fetchSdkModels', () => {
   })
 
   test('resolves [] on subprocess error', async () => {
-    const { root, cleanup } = kunRootWithSdk()
+    const { root, cleanup } = magicpocketRootWithSdk()
     try {
       const child = fakeChild()
-      const promise = fetchSdkModels({ kunRoots: [root], spawnFn: (() => child) as never })
+      const promise = fetchSdkModels({ magicpocketRoots: [root], spawnFn: (() => child) as never })
       child.emit('error', new Error('boom'))
       expect(await promise).toEqual([])
     } finally {

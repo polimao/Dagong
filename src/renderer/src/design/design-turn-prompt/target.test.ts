@@ -20,11 +20,11 @@ function htmlArtifact(id: string, title: string): DesignArtifact {
     id,
     kind: 'html',
     title,
-    relativePath: `.kun-design/doc/${id}/v1.html`,
-    designMdPath: `.kun-design/doc/${id}/DESIGN.md`,
+    relativePath: `.magicpocket-design/doc/${id}/v1.html`,
+    designMdPath: `.magicpocket-design/doc/${id}/DESIGN.md`,
     createdAt: now,
     updatedAt: now,
-    versions: [{ id: `${id}-v1`, relativePath: `.kun-design/doc/${id}/v1.html`, createdAt: now, summary: '' }]
+    versions: [{ id: `${id}-v1`, relativePath: `.magicpocket-design/doc/${id}/v1.html`, createdAt: now, summary: '' }]
   }
 }
 
@@ -33,10 +33,10 @@ function boardArtifact(): DesignArtifact {
     id: 'board',
     kind: 'canvas',
     title: 'Board',
-    relativePath: '.kun-design/doc/board/canvas.json',
+    relativePath: '.magicpocket-design/doc/board/canvas.json',
     createdAt: now,
     updatedAt: now,
-    versions: [{ id: 'board-v1', relativePath: '.kun-design/doc/board/canvas.json', createdAt: now, summary: '' }]
+    versions: [{ id: 'board-v1', relativePath: '.magicpocket-design/doc/board/canvas.json', createdAt: now, summary: '' }]
   }
 }
 
@@ -52,9 +52,9 @@ function workspaceState(artifacts: DesignArtifact[]): Pick<
       const artifactId = options?.artifactId ?? 'fresh'
       return {
         artifactId,
-        relativePath: `.kun-design/doc/${artifactId}/v2.html`,
-        basePath: `.kun-design/doc/${artifactId}/v1.html`,
-        designMdPath: `.kun-design/doc/${artifactId}/DESIGN.md`
+        relativePath: `.magicpocket-design/doc/${artifactId}/v2.html`,
+        basePath: `.magicpocket-design/doc/${artifactId}/v1.html`,
+        designMdPath: `.magicpocket-design/doc/${artifactId}/DESIGN.md`
       }
     })
   }
@@ -80,10 +80,10 @@ describe('design turn target resolver', () => {
 
     expect(resolved).toMatchObject({
       target: 'screen',
-      artifactRelativePath: '.kun-design/doc/home/v2.html',
-      basePath: '.kun-design/doc/home/v1.html',
+      artifactRelativePath: '.magicpocket-design/doc/home/v2.html',
+      basePath: '.magicpocket-design/doc/home/v1.html',
       htmlArtifactId: 'home',
-      designNotesPath: '.kun-design/doc/home/DESIGN.md',
+      designNotesPath: '.magicpocket-design/doc/home/DESIGN.md',
       targetAutoRepairKey: 'artifact:home',
       selectedFrame: { id: 'frame_home' },
       htmlFrameContext: { name: 'Home frame', width: 1280, height: 800 }
@@ -120,7 +120,7 @@ describe('design turn target resolver', () => {
       nextIntentMode: 'modify',
       htmlElementContext: {
         selector: '#cta',
-        artifactRelativePath: '.kun-design/doc/home/v1.html'
+        artifactRelativePath: '.magicpocket-design/doc/home/v1.html'
       }
     })
   })
@@ -158,7 +158,7 @@ describe('design turn target resolver', () => {
 
     expect(resolved).toMatchObject({
       target: 'canvas',
-      artifactRelativePath: '.kun-design/doc/board/canvas.json',
+      artifactRelativePath: '.magicpocket-design/doc/board/canvas.json',
       nextIntentMode: 'generate',
       targetAutoRepairKey: ''
     })

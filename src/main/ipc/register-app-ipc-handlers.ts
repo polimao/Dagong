@@ -29,7 +29,7 @@ import type {
   TurnCompleteNotificationPayload,
   UpstreamModelsResult,
   WorkspacePickResult
-} from '../../shared/kun-gui-api'
+} from '../../shared/magicpocket-gui-api'
 import type { WorkspaceFileSaveAsResult } from '../../shared/workspace-file'
 import type { GuiUpdateDownloadResult, GuiUpdateInfo, GuiUpdateInstallResult, GuiUpdateState } from '../../shared/gui-update'
 import {
@@ -103,7 +103,7 @@ import {
 } from './app-ipc-schemas'
 import {
   DEFAULT_KUN_DATA_DIR,
-  resolveKunRuntimeSettings,
+  resolveMagicPocketRuntimeSettings,
   resolveModelProviderProxyUrl
 } from '../../shared/app-settings'
 import { detectLegacySessions, importLegacySessions } from '../services/legacy-session-import-service'
@@ -238,8 +238,8 @@ type RegisterAppIpcHandlersOptions = {
   pollFeishuInstall: (deviceCode: string) => Promise<ClawImInstallPollResult>
   startWeixinInstallQrcode: (weixinBridgeUrl?: string) => Promise<ClawImInstallQrResult>
   pollWeixinInstall: (deviceCode: string, weixinBridgeUrl?: string) => Promise<ClawImInstallPollResult>
-  resolveKunConfigPath: () => string
-  onKunMcpConfigWritten?: (path: string, content: string) => Promise<void> | void
+  resolveMagicPocketConfigPath: () => string
+  onMagicPocketMcpConfigWritten?: (path: string, content: string) => Promise<void> | void
   showTurnCompleteNotification: (
     payload: TurnCompleteNotificationPayload
   ) => Promise<SystemNotificationResult>
@@ -410,8 +410,8 @@ function runDesktopCommand(
 }
 
 export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): void {
-  // Seed the built-in "design system & craft" skill into ~/.kun/skills/ once.
-  void ensureBundledSkills(join(homedir(), '.kun'))
+  // Seed the built-in "design system & craft" skill into ~/.magicpocket/skills/ once.
+  void ensureBundledSkills(join(homedir(), '.magicpocket'))
   const {
     store,
     getMainWindow,
@@ -427,8 +427,8 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     pollFeishuInstall,
     startWeixinInstallQrcode,
     pollWeixinInstall,
-    resolveKunConfigPath,
-    onKunMcpConfigWritten,
+    resolveMagicPocketConfigPath,
+    onMagicPocketMcpConfigWritten,
     showTurnCompleteNotification,
     getAppVersion,
     readGuiUpdateState,
@@ -528,16 +528,16 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
   // OAuth; we only detect it / capture the setup-token).
   ipcMain.handle('claude-subscription:status', async () => claudeSubscriptionStatus())
   // The Claude Code binary (~222MB) is NOT bundled — it's downloaded on demand
-  // into userData/agent-sdk and resolved from there (or kun/node_modules in dev).
-  const claudeSubKunDirs = (): string[] =>
+  // into userData/agent-sdk and resolved from there (or magicpocket/node_modules in dev).
+  const claudeSubMagicPocketDirs = (): string[] =>
     [
       app.isPackaged ? app.getAppPath().replace(/app\.asar$/, 'app.asar.unpacked') : app.getAppPath(),
       process.cwd()
-    ].map((root) => join(root, 'kun'))
+    ].map((root) => join(root, 'magicpocket'))
   const claudeSubBinary = (): string | undefined =>
-    resolveClaudeBinary(app.getPath('userData'), claudeSubKunDirs())
+    resolveClaudeBinary(app.getPath('userData'), claudeSubMagicPocketDirs())
   ipcMain.handle('claude-subscription:sdk-status', async () => ({
-    ...agentSdkStatus(app.getPath('userData'), claudeSubKunDirs()),
+    ...agentSdkStatus(app.getPath('userData'), claudeSubMagicPocketDirs()),
     download: agentSdkDownloadState()
   }))
   ipcMain.handle('claude-subscription:sdk-install', async () =>
@@ -552,7 +552,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
   ipcMain.handle('claude-subscription:models', async (_event, token: unknown) =>
     fetchSdkModels({
       token: typeof token === 'string' ? token : undefined,
-      kunRoots: claudeSubKunDirs(),
+      magicpocketRoots: claudeSubMagicPocketDirs(),
       binaryPath: claudeSubBinary()
     })
   )
@@ -954,9 +954,9 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
   })
 
   ipcMain.handle('ui-plugin:list', async () => {
-    const kunHomeDir = join(homedir(), '.kun')
-    await ensureBundledUiPlugins(kunHomeDir)
-    return { plugins: await listUiPlugins(kunHomeDir) }
+    const magicpocketHomeDir = join(homedir(), '.magicpocket')
+    await ensureBundledUiPlugins(magicpocketHomeDir)
+    return { plugins: await listUiPlugins(magicpocketHomeDir) }
   })
 
   ipcMain.handle('ui-plugin:install', async () => {
@@ -972,7 +972,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     if (picked.canceled || !sourceDir) {
       return { canceled: true as const }
     }
-    const result = await installUiPluginFromDirectory(join(homedir(), '.kun'), sourceDir)
+    const result = await installUiPluginFromDirectory(join(homedir(), '.magicpocket'), sourceDir)
     if (!result.ok) {
       return { canceled: false as const, ok: false as const, errors: result.errors }
     }
@@ -981,18 +981,18 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
 
   ipcMain.handle('ui-plugin:remove', async (_, payload: unknown) => {
     const request = parseIpcPayload('ui-plugin:remove', uiPluginIdPayloadSchema, payload)
-    return { ok: await removeUiPlugin(join(homedir(), '.kun'), request.id) }
+    return { ok: await removeUiPlugin(join(homedir(), '.magicpocket'), request.id) }
   })
 
   ipcMain.handle('ui-plugin:load', async (_, payload: unknown) => {
     const request = parseIpcPayload('ui-plugin:load', uiPluginIdPayloadSchema, payload)
-    const kunHomeDir = join(homedir(), '.kun')
-    await ensureBundledUiPlugins(kunHomeDir)
-    return loadUiPluginFigures(kunHomeDir, request.id)
+    const magicpocketHomeDir = join(homedir(), '.magicpocket')
+    await ensureBundledUiPlugins(magicpocketHomeDir)
+    return loadUiPluginFigures(magicpocketHomeDir, request.id)
   })
 
-  ipcMain.handle('kun:config:read', async () => {
-    const path = resolveKunConfigPath()
+  ipcMain.handle('magicpocket:config:read', async () => {
+    const path = resolveMagicPocketConfigPath()
     try {
       const content = await readFile(path, 'utf8')
       return { path, content, exists: true as const }
@@ -1004,18 +1004,18 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     }
   })
 
-  ipcMain.handle('kun:config:write', async (_, content: unknown) => {
+  ipcMain.handle('magicpocket:config:write', async (_, content: unknown) => {
     const validatedContent = parseIpcPayload(
-      'kun:config:write',
+      'magicpocket:config:write',
       deepseekConfigContentSchema,
       content
     )
-    const path = resolveKunConfigPath()
+    const path = resolveMagicPocketConfigPath()
     validateMcpConfigContent(validatedContent)
     await mkdir(dirname(path), { recursive: true })
     await writeFile(path, validatedContent, 'utf8')
     try {
-      await onKunMcpConfigWritten?.(path, validatedContent)
+      await onMagicPocketMcpConfigWritten?.(path, validatedContent)
     } catch (error: unknown) {
       logError('mcp-config', 'Failed to apply MCP config change after write', {
         path,
@@ -1025,9 +1025,9 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     return { ok: true as const, path }
   })
 
-  ipcMain.handle('kun:config:open-dir', async () => {
+  ipcMain.handle('magicpocket:config:open-dir', async () => {
     try {
-      const path = resolveKunConfigPath()
+      const path = resolveMagicPocketConfigPath()
       const dirPath = dirname(path)
       await mkdir(dirPath, { recursive: true })
       return openPathWithShell(dirPath)
@@ -1039,9 +1039,9 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     }
   })
 
-  const resolveKunThreadsDataDir = async (): Promise<string> => {
+  const resolveMagicPocketThreadsDataDir = async (): Promise<string> => {
     const settings = await store.load()
-    const runtime = resolveKunRuntimeSettings(settings)
+    const runtime = resolveMagicPocketRuntimeSettings(settings)
     return expandHomePath(runtime.dataDir?.trim() || DEFAULT_KUN_DATA_DIR)
   }
 
@@ -1055,16 +1055,16 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     ...(cfg.maxPerThread !== undefined ? { maxPerThread: cfg.maxPerThread } : {})
   })
 
-  ipcMain.handle('kun:sessions:detect-legacy', async () =>
-    detectLegacySessions({ homeDir: homedir(), destDataDir: await resolveKunThreadsDataDir() })
+  ipcMain.handle('magicpocket:sessions:detect-legacy', async () =>
+    detectLegacySessions({ homeDir: homedir(), destDataDir: await resolveMagicPocketThreadsDataDir() })
   )
 
-  ipcMain.handle('kun:sessions:import-legacy', async (_, payload: unknown) => {
-    const request = parseIpcPayload('kun:sessions:import-legacy', legacySessionImportPayloadSchema, payload)
+  ipcMain.handle('magicpocket:sessions:import-legacy', async (_, payload: unknown) => {
+    const request = parseIpcPayload('magicpocket:sessions:import-legacy', legacySessionImportPayloadSchema, payload)
     try {
       const summary = await importLegacySessions({
         homeDir: homedir(),
-        destDataDir: await resolveKunThreadsDataDir(),
+        destDataDir: await resolveMagicPocketThreadsDataDir(),
         ...(request.sourceDir ? { sourceDir: request.sourceDir } : {}),
         log: (message, detail) => logError('legacy-session-import', message, detail)
       })
@@ -1077,7 +1077,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     }
   })
 
-  ipcMain.handle('kun:sessions:pick-source-dir', async (): Promise<WorkspacePickResult> => {
+  ipcMain.handle('magicpocket:sessions:pick-source-dir', async (): Promise<WorkspacePickResult> => {
     const options: Electron.OpenDialogOptions = {
       title: 'Select a folder containing previous conversations',
       properties: ['openDirectory', 'dontAddToRecent']
@@ -1117,7 +1117,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     const request = parseIpcPayload('git:checkpoint:create', gitCheckpointCreatePayloadSchema, payload)
     const settings = await store.load()
     return createGitCheckpoint({
-      dataDir: await resolveKunThreadsDataDir(),
+      dataDir: await resolveMagicPocketThreadsDataDir(),
       workspaceRoot: request.workspaceRoot,
       threadId: request.threadId,
       storage: resolveCheckpointStorageOptions(settings.checkpointCleanup)
@@ -1127,7 +1127,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     const request = parseIpcPayload('git:checkpoint:restore', gitCheckpointRestorePayloadSchema, payload)
     const settings = await store.load()
     return restoreGitCheckpoint({
-      dataDir: await resolveKunThreadsDataDir(),
+      dataDir: await resolveMagicPocketThreadsDataDir(),
       checkpointId: request.checkpointId,
       ...(request.allowPartialRestore ? { allowPartialRestore: true } : {}),
       storage: resolveCheckpointStorageOptions(settings.checkpointCleanup),

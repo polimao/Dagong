@@ -101,9 +101,9 @@ export function createWriteFileActions({
       const requestedRoot = normalizePath(path || workspaceRoot)
       const targetKey = path ? requestedRoot : '__root__'
       set((state) => ({ loadingDirs: { ...state.loadingDirs, [targetKey]: true } }))
-      let result: Awaited<ReturnType<typeof window.kunGui.listWorkspaceDirectory>>
+      let result: Awaited<ReturnType<typeof window.magicpocketGui.listWorkspaceDirectory>>
       try {
-        result = await window.kunGui.listWorkspaceDirectory({ workspaceRoot, path })
+        result = await window.magicpocketGui.listWorkspaceDirectory({ workspaceRoot, path })
       } catch (error) {
         set((state) => ({
           loadingDirs: withoutLoadingDirs(state.loadingDirs, [targetKey, requestedRoot]),
@@ -183,7 +183,7 @@ export function createWriteFileActions({
       set({ fileLoading: true, fileError: null })
       try {
         if (isWriteImageFilePath(path)) {
-          const result = await window.kunGui.readWorkspaceImage({ path, workspaceRoot })
+          const result = await window.magicpocketGui.readWorkspaceImage({ path, workspaceRoot })
           if (!result.ok) {
             set({ fileLoading: false, fileError: result.message })
             return
@@ -211,7 +211,7 @@ export function createWriteFileActions({
         }
 
         if (isWritePdfFilePath(path)) {
-          const result = await window.kunGui.readWorkspacePdf({ path, workspaceRoot })
+          const result = await window.magicpocketGui.readWorkspacePdf({ path, workspaceRoot })
           if (!result.ok) {
             set({ fileLoading: false, fileError: result.message })
             return
@@ -238,7 +238,7 @@ export function createWriteFileActions({
           return
         }
 
-        const result = await window.kunGui.readWorkspaceFile({ path, workspaceRoot })
+        const result = await window.magicpocketGui.readWorkspaceFile({ path, workspaceRoot })
         if (!result.ok) {
           set({ fileLoading: false, fileError: result.message })
           return
@@ -295,9 +295,9 @@ export function createWriteFileActions({
     },
 
     createFile: async (workspaceRoot, path, content = '') => {
-      let result: Awaited<ReturnType<typeof window.kunGui.createWorkspaceFile>>
+      let result: Awaited<ReturnType<typeof window.magicpocketGui.createWorkspaceFile>>
       try {
-        result = await window.kunGui.createWorkspaceFile({ workspaceRoot, path, content })
+        result = await window.magicpocketGui.createWorkspaceFile({ workspaceRoot, path, content })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return null
@@ -312,9 +312,9 @@ export function createWriteFileActions({
     },
 
     createDirectory: async (workspaceRoot, path) => {
-      let result: Awaited<ReturnType<typeof window.kunGui.createWorkspaceDirectory>>
+      let result: Awaited<ReturnType<typeof window.magicpocketGui.createWorkspaceDirectory>>
       try {
-        result = await window.kunGui.createWorkspaceDirectory({ workspaceRoot, path })
+        result = await window.magicpocketGui.createWorkspaceDirectory({ workspaceRoot, path })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return null
@@ -335,9 +335,9 @@ export function createWriteFileActions({
     renameEntry: async (workspaceRoot, path, newName) => {
       cancelExternalSyncAnimation()
       const nextName = ensureMarkdownRenameExtension(path, newName.trim())
-      let result: Awaited<ReturnType<typeof window.kunGui.renameWorkspaceEntry>>
+      let result: Awaited<ReturnType<typeof window.magicpocketGui.renameWorkspaceEntry>>
       try {
-        result = await window.kunGui.renameWorkspaceEntry({ workspaceRoot, path, newName: nextName })
+        result = await window.magicpocketGui.renameWorkspaceEntry({ workspaceRoot, path, newName: nextName })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return null
@@ -397,9 +397,9 @@ export function createWriteFileActions({
 
     deleteEntry: async (workspaceRoot, path) => {
       cancelExternalSyncAnimation()
-      let result: Awaited<ReturnType<typeof window.kunGui.deleteWorkspaceEntry>>
+      let result: Awaited<ReturnType<typeof window.magicpocketGui.deleteWorkspaceEntry>>
       try {
-        result = await window.kunGui.deleteWorkspaceEntry({ workspaceRoot, path })
+        result = await window.magicpocketGui.deleteWorkspaceEntry({ workspaceRoot, path })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return false

@@ -129,9 +129,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: |
-            dist/Kun-*-mac-*.dmg
-            dist/Kun-*-mac-*.zip
-            dist/Kun-*-mac-*.blockmap
+            dist/MagicPocket-*-mac-*.dmg
+            dist/MagicPocket-*-mac-*.zip
+            dist/MagicPocket-*-mac-*.blockmap
             dist/latest-mac.yml
 
   build-windows:
@@ -171,8 +171,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: |
-            dist/Kun-*-win-x64.exe
-            dist/Kun-*-win-x64.exe.blockmap
+            dist/MagicPocket-*-win-x64.exe
+            dist/MagicPocket-*-win-x64.exe.blockmap
             dist/latest.yml
 
   build-linux:
@@ -219,8 +219,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: |
-            dist/Kun-*-linux-x86_64.AppImage
-            dist/Kun-*-linux-x86_64.AppImage.blockmap
+            dist/MagicPocket-*-linux-x86_64.AppImage
+            dist/MagicPocket-*-linux-x86_64.AppImage.blockmap
             dist/latest-linux.yml
 
   publish:
@@ -274,12 +274,12 @@ jobs:
         run: |
           set -euo pipefail
           required=(
-            "Kun-*-mac-arm64.dmg"
-            "Kun-*-mac-x64.dmg"
-            "Kun-*-mac-arm64.zip"
-            "Kun-*-mac-x64.zip"
-            "Kun-*-win-x64.exe"
-            "Kun-*-linux-x86_64.AppImage"
+            "MagicPocket-*-mac-arm64.dmg"
+            "MagicPocket-*-mac-x64.dmg"
+            "MagicPocket-*-mac-arm64.zip"
+            "MagicPocket-*-mac-x64.zip"
+            "MagicPocket-*-win-x64.exe"
+            "MagicPocket-*-linux-x86_64.AppImage"
             "latest-mac.yml"
             "latest.yml"
             "latest-linux.yml"
@@ -357,7 +357,7 @@ jobs:
           set -euo pipefail
           mapfile -d '' assets < <(
             find release-artifacts -type f \
-              \( -name 'Kun-*' -o -name 'latest*.yml' \) \
+              \( -name 'MagicPocket-*' -o -name 'latest*.yml' \) \
               -print0
           )
 

@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -32,10 +32,10 @@ function settings(endpointFormat: ModelEndpointFormat): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider,
     agents: {
-      kun: defaultKunRuntimeSettings()
+      magicpocket: defaultMagicPocketRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },

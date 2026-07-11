@@ -16,7 +16,7 @@ import {
   type ModelUsageState,
   useModelUsageState
 } from '../../hooks/use-model-usage'
-import { KunHeroStage } from './KunHeroStage'
+import { MagicPocketHeroStage } from './MagicPocketHeroStage'
 
 type CalendarCell = DailyUsageBucket | null
 type CalendarWeek = {
@@ -44,6 +44,9 @@ const MODEL_USAGE_BREAKDOWN_COLORS = {
   output: '#245fd7'
 } as const
 const EMPTY_DAILY_USAGE_BUCKETS: DailyUsageBucket[] = []
+
+const BRAND_NAME = 'MagicPocket'
+const BRAND_SLOGAN = '你的超能力'
 
 export const USAGE_HEATMAP_INTENSITY_CLASSES = [
   'border-ds-border-muted bg-ds-subtle',
@@ -684,6 +687,19 @@ function UsageHeroToggle({
   )
 }
 
+function MagicPocketBrandWordmark(): ReactElement {
+  return (
+    <div className="flex flex-col items-center gap-1.5 px-4 pt-3 text-center">
+      <span className="text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] text-ds-ink">
+        {BRAND_NAME}
+      </span>
+      <span className="text-[30px] font-semibold leading-[1.15] tracking-[0.01em] text-ds-ink">
+        {BRAND_SLOGAN}
+      </span>
+    </div>
+  )
+}
+
 function UsageHeroSection({
   title,
   sub,
@@ -696,7 +712,7 @@ function UsageHeroSection({
   return (
     <div className="flex w-full min-w-0 flex-col items-center text-center">
       <div>
-        <KunHeroStage />
+        <MagicPocketHeroStage />
       </div>
       {showText ? (
         <>
@@ -744,7 +760,7 @@ export function InitialSessionUsageHeatmap({
       modelState={modelState}
       rangeKey={rangeKey}
       hideHero={hideHero}
-      initialCollapsed={!hideHero}
+      initialCollapsed={true}
       onRangeChange={setRangeKey}
       onRefresh={() => setRefreshKey((value) => value + 1)}
     />
@@ -815,10 +831,10 @@ export function InitialSessionUsageHeatmapView({
 
   useEffect(() => {
     let cancelled = false
-    if (typeof window === 'undefined' || typeof window.kunGui?.getSettings !== 'function') return
-    void window.kunGui.getSettings()
+    if (typeof window === 'undefined' || typeof window.magicpocketGui?.getSettings !== 'function') return
+    void window.magicpocketGui.getSettings()
       .then((settings) => {
-        if (!cancelled) setModelLabel(settings.agents.kun.model.trim())
+        if (!cancelled) setModelLabel(settings.agents.magicpocket.model.trim())
       })
       .catch(() => {
         if (!cancelled) setModelLabel('')
@@ -831,6 +847,7 @@ export function InitialSessionUsageHeatmapView({
   return (
     <div className="ds-initial-usage-heatmap ds-no-drag mx-auto flex min-h-[min(620px,calc(100dvh-220px))] w-full items-center justify-center px-3 py-6 text-left sm:px-5 sm:py-8">
       <div className="ds-chat-content-max-width flex w-full min-w-0 flex-col gap-5">
+        <MagicPocketBrandWordmark />
         {!hideHero ? (
           <UsageHeroSection
             title={heroTitle}

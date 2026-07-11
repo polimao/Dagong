@@ -59,11 +59,11 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const load = useCallback(async (): Promise<void> => {
-    if (!root || typeof window.kunGui?.getGitBranches !== 'function') return
+    if (!root || typeof window.magicpocketGui?.getGitBranches !== 'function') return
     setLoading(true)
     setError(null)
     try {
-      const next = await window.kunGui.getGitBranches(root)
+      const next = await window.magicpocketGui.getGitBranches(root)
       setResult(next)
       if (!next.ok) setError(next.message)
     } catch (e) {
@@ -188,7 +188,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('switch')
     setError(null)
     try {
-      const next = await window.kunGui.switchGitBranch(root, branch)
+      const next = await window.magicpocketGui.switchGitBranch(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -262,7 +262,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('switch')
     setError(null)
     try {
-      const next = await window.kunGui.createAndSwitchGitBranch(root, branch)
+      const next = await window.magicpocketGui.createAndSwitchGitBranch(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -284,7 +284,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('worktree')
     setError(null)
     try {
-      const next = await window.kunGui.checkoutGitBranchWorktree(root, branch)
+      const next = await window.magicpocketGui.checkoutGitBranchWorktree(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -312,7 +312,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('worktree')
     setError(null)
     try {
-      const next = await window.kunGui.createGitBranchWorktree(root, branch)
+      const next = await window.magicpocketGui.createGitBranchWorktree(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -334,6 +334,11 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
   }
 
   if (!root) return null
+
+  // Only surface the branch picker once Git is actually detected. While the
+  // lookup is pending or when no Git repository is found (label would read
+  // "未检测到 Git"), we hide the trigger entirely.
+  if (result?.ok !== true) return null
 
   return (
     <div ref={wrapRef} className="ds-git-branch-picker ds-no-drag relative min-w-0">

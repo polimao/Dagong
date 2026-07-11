@@ -42,6 +42,7 @@ type UseWorkbenchNavigationControllerParams = {
   openPlugins: ChatState['openPlugins']
   openSchedule: ChatState['openSchedule']
   openWorkflow: ChatState['openWorkflow']
+  openExperts: ChatState['openExperts']
   openWrite: ChatState['openWrite']
   openSddRequirementDraftFromHistory: (draft: SddDraft) => Promise<void>
   selectThread: ChatState['selectThread']
@@ -60,6 +61,7 @@ export type WorkbenchNavigationController = {
   exploreSddRequirementInDesign: () => void
   openCodeMode: () => void
   openPluginsView: () => void
+  openExpertsView: () => void
   openScheduleView: () => void
   openThread: (id: string) => void
   openWorkflowView: () => void
@@ -98,6 +100,7 @@ export function useWorkbenchNavigationController({
   openPlugins,
   openSchedule,
   openWorkflow,
+  openExperts,
   openWrite,
   openSddRequirementDraftFromHistory,
   selectThread,
@@ -216,6 +219,11 @@ export function useWorkbenchNavigationController({
     openWorkflow()
   }, [openWorkflow, setConnectPhoneSidebarOpen])
 
+  const openExpertsView = useCallback((): void => {
+    setConnectPhoneSidebarOpen(false)
+    openExperts()
+  }, [openExperts, setConnectPhoneSidebarOpen])
+
   const toggleConnectPhone = useCallback((): void => {
     if (activeSddDraft) dismissActiveSddDraft({ closeAssistant: true })
     openClaw()
@@ -262,10 +270,10 @@ export function useWorkbenchNavigationController({
     try {
       const writeState = useWriteWorkspaceStore.getState()
       writeState.setFileError(null)
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(
         writeState.workspaceRoot || writeState.defaultWorkspaceRoot || workspaceRoot || undefined
       )
       if (!picked.canceled && picked.path) {
@@ -282,6 +290,7 @@ export function useWorkbenchNavigationController({
     exploreSddRequirementInDesign,
     openCodeMode,
     openPluginsView,
+    openExpertsView,
     openScheduleView,
     openThread,
     openWorkflowView,

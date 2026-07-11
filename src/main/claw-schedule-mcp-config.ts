@@ -23,16 +23,16 @@ type ClawScheduleMcpConfigPaths = {
   mcpJsonPath?: string
 }
 
-export function resolveKunConfigPath(): string {
-  return join(homedir(), '.kun', 'config.toml')
+export function resolveMagicPocketConfigPath(): string {
+  return join(homedir(), '.magicpocket', 'config.toml')
 }
 
 export function resolveDeepseekConfigPath(): string {
-  return resolveKunConfigPath()
+  return resolveMagicPocketConfigPath()
 }
 
-export function resolveKunMcpJsonPath(): string {
-  return join(homedir(), '.kun', 'mcp.json')
+export function resolveMagicPocketMcpJsonPath(): string {
+  return join(homedir(), '.magicpocket', 'mcp.json')
 }
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -202,7 +202,7 @@ async function readJsonFile(path: string): Promise<unknown | null> {
     return JSON.parse(raw) as unknown
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to parse Kun MCP config at ${path}: ${message}`, { cause: error })
+    throw new Error(`Failed to parse MagicPocket MCP config at ${path}: ${message}`, { cause: error })
   }
 }
 
@@ -234,8 +234,8 @@ export async function syncClawScheduleMcpConfig(
   launch: ClawScheduleMcpLaunchConfig,
   paths: ClawScheduleMcpConfigPaths = {}
 ): Promise<void> {
-  const configTomlPath = paths.configTomlPath ?? resolveKunConfigPath()
-  const mcpJsonPath = paths.mcpJsonPath ?? resolveKunMcpJsonPath()
+  const configTomlPath = paths.configTomlPath ?? resolveMagicPocketConfigPath()
+  const mcpJsonPath = paths.mcpJsonPath ?? resolveMagicPocketMcpJsonPath()
 
   await cleanupLegacyTomlConfig(configTomlPath)
 

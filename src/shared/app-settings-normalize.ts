@@ -25,14 +25,14 @@ import {
 } from './app-settings-types'
 import { normalizeKeyboardShortcuts, type KeyboardShortcutsConfigV1 } from './keyboard-shortcuts'
 import {
-  defaultKunRuntimeSettings,
-  getKunRuntimeSettings,
-  kunSettingsEnvelope,
-  mergeKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
+  getMagicPocketRuntimeSettings,
+  magicpocketSettingsEnvelope,
+  mergeMagicPocketRuntimeSettings,
   migrateLegacyAppSettings
-} from './app-settings-kun'
+} from './app-settings-magicpocket'
 import {
-  defaultMiniMaxMediaGenerationKunPatch,
+  defaultMiniMaxMediaGenerationMagicPocketPatch,
   normalizeModelProviderSettings
 } from './app-settings-provider'
 import { normalizeDeepseekBaseUrl } from './app-settings-normalizers'
@@ -62,17 +62,17 @@ export function normalizeAppSettings(settings: AppSettingsV1): AppSettingsV1 {
     terminal?: TerminalSettingsPatchV1
   }
   const providerSettings = normalizeModelProviderSettings(maybeSettings.provider)
-  const runtime = getKunRuntimeSettings(maybeSettings)
-  const rawKun = maybeSettings.agents?.kun
-  const rawMediaPatch: Parameters<typeof defaultMiniMaxMediaGenerationKunPatch>[0]['kunPatch'] = {
-    ...(rawKun?.textToSpeech !== undefined ? { textToSpeech: rawKun.textToSpeech } : {}),
-    ...(rawKun?.musicGeneration !== undefined ? { musicGeneration: rawKun.musicGeneration } : {}),
-    ...(rawKun?.videoGeneration !== undefined ? { videoGeneration: rawKun.videoGeneration } : {})
+  const runtime = getMagicPocketRuntimeSettings(maybeSettings)
+  const rawMagicPocket = maybeSettings.agents?.magicpocket
+  const rawMediaPatch: Parameters<typeof defaultMiniMaxMediaGenerationMagicPocketPatch>[0]['magicpocketPatch'] = {
+    ...(rawMagicPocket?.textToSpeech !== undefined ? { textToSpeech: rawMagicPocket.textToSpeech } : {}),
+    ...(rawMagicPocket?.musicGeneration !== undefined ? { musicGeneration: rawMagicPocket.musicGeneration } : {}),
+    ...(rawMagicPocket?.videoGeneration !== undefined ? { videoGeneration: rawMagicPocket.videoGeneration } : {})
   }
-  const miniMaxMediaDefaults = defaultMiniMaxMediaGenerationKunPatch({
+  const miniMaxMediaDefaults = defaultMiniMaxMediaGenerationMagicPocketPatch({
     providers: providerSettings.providers,
-    currentKun: runtime,
-    kunPatch: rawMediaPatch
+    currentMagicPocket: runtime,
+    magicpocketPatch: rawMediaPatch
   })
   return {
     ...migrated,
@@ -87,7 +87,7 @@ export function normalizeAppSettings(settings: AppSettingsV1): AppSettingsV1 {
     cursorSpotlight: maybeSettings.cursorSpotlight !== false,
     cursorSpotlightColor: normalizeCursorSpotlightColor(maybeSettings.cursorSpotlightColor),
     provider: providerSettings,
-    agents: kunSettingsEnvelope(mergeKunRuntimeSettings(defaultKunRuntimeSettings(), {
+    agents: magicpocketSettingsEnvelope(mergeMagicPocketRuntimeSettings(defaultMagicPocketRuntimeSettings(), {
       ...runtime,
       baseUrl: runtime.baseUrl.trim() ? normalizeDeepseekBaseUrl(runtime.baseUrl) : '',
       ...(miniMaxMediaDefaults ?? {})
@@ -229,16 +229,16 @@ function shouldMigrateLegacySettings(settings: AppSettingsV1): boolean {
     agentProvider?: unknown
     deepseek?: unknown
     agents?: {
-      kun?: Partial<ReturnType<typeof defaultKunRuntimeSettings>>
+      magicpocket?: Partial<ReturnType<typeof defaultMagicPocketRuntimeSettings>>
       codewhale?: unknown
       reasonix?: unknown
     }
   }
-  if (!raw.agents?.kun) return true
+  if (!raw.agents?.magicpocket) return true
   if ('agentProvider' in raw || 'deepseek' in raw) return true
   if (raw.agents.codewhale || raw.agents.reasonix) return true
-  const dataDir = typeof raw.agents.kun.dataDir === 'string'
-    ? raw.agents.kun.dataDir.replace(/\\/g, '/').toLowerCase()
+  const dataDir = typeof raw.agents.magicpocket.dataDir === 'string'
+    ? raw.agents.magicpocket.dataDir.replace(/\\/g, '/').toLowerCase()
     : ''
   return dataDir === '~/.deepseekgui/coreagent' || dataDir.endsWith('/.deepseekgui/coreagent')
 }

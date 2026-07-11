@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src/asset/img/kun.png" width="104" alt="Kun icon">
+  <img src="src/asset/img/magicpocket.png" width="104" alt="MagicPocket icon">
 </p>
 
-<h1 align="center">Kun</h1>
+<h1 align="center">MagicPocket</h1>
 
 <p align="center">
   <strong>An experiment in requirement-first coding for the next programming paradigm.</strong><br>
@@ -14,7 +14,7 @@
   &nbsp;·&nbsp;
   <strong>English</strong>
   &nbsp;·&nbsp;
-  <a href="https://github.com/KunAgent/Kun/releases">Download</a>
+  <a href="https://github.com/MagicPocketAgent/MagicPocket/releases">Download</a>
   &nbsp;·&nbsp;
   <a href="#documentation-map">Docs</a>
   &nbsp;·&nbsp;
@@ -22,64 +22,64 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/KunAgent/Kun/releases"><img src="https://img.shields.io/github/v/release/KunAgent/Kun?label=release" alt="GitHub release"></a>
+  <a href="https://github.com/MagicPocketAgent/MagicPocket/releases"><img src="https://img.shields.io/github/v/release/MagicPocketAgent/MagicPocket?label=release" alt="GitHub release"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue" alt="License: PolyForm Noncommercial 1.0.0"></a>
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platform">
   <img src="https://img.shields.io/badge/Electron-34-47848F?logo=electron&logoColor=white" alt="Electron 34">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
 </p>
 
-Kun is a product experiment for the future of programming: instead of starting from “ask the agent to edit code,” it starts from requirement clarification and connects requirement documents, Design drafts, interactive prototypes, implementation plans, todos, agent coding, and change review in one GUI workflow.
+MagicPocket is a product experiment for the future of programming: instead of starting from “ask the agent to edit code,” it starts from requirement clarification and connects requirement documents, Design drafts, interactive prototypes, implementation plans, todos, agent coding, and change review in one GUI workflow.
 
-Kun is for users who want to put AI agents into real everyday work. It is not just a chat client, and it is not only a CLI shell for programmers: in Code mode you can hand it a local folder for code, requirements, plans, and change review; in Design mode you can generate and iterate UI drafts, interactive prototypes, and a shared design system; in Write mode you can work on long-form Markdown, editing, and document export.
+MagicPocket is for users who want to put AI agents into real everyday work. It is not just a chat client, and it is not only a CLI shell for programmers: in Code mode you can hand it a local folder for code, requirements, plans, and change review; in Design mode you can generate and iterate UI drafts, interactive prototypes, and a shared design system; in Write mode you can work on long-form Markdown, editing, and document export.
 
-This is also why Kun treats DeepSeek, Xiaomi MiMo, and MiniMax as the default first-class model stack, not just ordinary optional providers. Requirement-first coding requires more rounds of clarification, research, structuring, planning, execution, and verification. If model cost is too high, that richer workflow cannot become an everyday habit. Kun chooses three cost-efficient Chinese model providers so the full loop is affordable to run, repeat, and refine.
+This is also why MagicPocket treats DeepSeek, Xiaomi MiMo, and MiniMax as the default first-class model stack, not just ordinary optional providers. Requirement-first coding requires more rounds of clarification, research, structuring, planning, execution, and verification. If model cost is too high, that richer workflow cannot become an everyday habit. MagicPocket chooses three cost-efficient Chinese model providers so the full loop is affordable to run, repeat, and refine.
 
-Kun includes the local `kun serve` runtime for the desktop app. Preferences, sessions, logs, and runtime config stay on your machine; model calls use your own provider credentials. For workflows that can read/write files or run commands, Kun gives you tool approvals, filesystem permission modes, inline diffs, and a change-review panel.
+MagicPocket includes the local `magicpocket serve` runtime for the desktop app. Preferences, sessions, logs, and runtime config stay on your machine; model calls use your own provider credentials. For workflows that can read/write files or run commands, MagicPocket gives you tool approvals, filesystem permission modes, inline diffs, and a change-review panel.
 
 ---
 
 <p align="center">
   <a href="src/asset/img/code.mp4">
-    <img src="src/asset/img/code.gif" width="410" alt="Kun Code mode demo">
+    <img src="src/asset/img/code.gif" width="410" alt="MagicPocket Code mode demo">
   </a>
   <a href="src/asset/img/write.mp4">
-    <img src="src/asset/img/write.gif" width="410" alt="Kun Write mode demo">
+    <img src="src/asset/img/write.gif" width="410" alt="MagicPocket Write mode demo">
   </a>
 </p>
 
 ## Requirement-First Coding
 
-Kun explores a next-generation programming workflow: **requirement -> design -> plan -> code -> verify**. It is not just a chat box attached to an IDE.
+MagicPocket explores a next-generation programming workflow: **requirement -> design -> plan -> code -> verify**. It is not just a chat box attached to an IDE.
 
-That workflow is carried by three first-class modes: **Code** for real repositories and shipping changes, **Design** for UI direction, prototypes, and design systems, and **Write** for long-form documents, requirements, release notes, and essays. All three share the same Kun runtime, provider config, approvals, and thread capabilities.
+That workflow is carried by three first-class modes: **Code** for real repositories and shipping changes, **Design** for UI direction, prototypes, and design systems, and **Write** for long-form documents, requirements, release notes, and essays. All three share the same MagicPocket runtime, provider config, approvals, and thread capabilities.
 
-| Stage | Kun's approach |
+| Stage | MagicPocket's approach |
 | --- | --- |
 | **Clarify** | Create requirement drafts in the GUI and ask Requirement AI to find missing questions, research options, and shape boundaries |
-| **Document** | Save drafts as `.kunsdd/draft/.../requirement.md`, with structured requirement blocks, acceptance criteria, and requirement history |
+| **Document** | Save drafts as `.magicpocketsdd/draft/.../requirement.md`, with structured requirement blocks, acceptance criteria, and requirement history |
 | **Design** | Enter Design mode to generate UI drafts, infographics, interactive HTML prototypes, and a shared design system from requirement selections, so requirements become more than text |
-| **Plan** | Use `/plan` and `create_plan` to produce GUI-owned `.kunsdd/plan/...` implementation plans linked back to requirements |
-| **Code** | Move from plan into todos, file edits, command execution, and change review; when requirements change, Kun can surface affected replanning |
+| **Plan** | Use `/plan` and `create_plan` to produce GUI-owned `.magicpocketsdd/plan/...` implementation plans linked back to requirements |
+| **Code** | Move from plan into todos, file edits, command execution, and change review; when requirements change, MagicPocket can surface affected replanning |
 | **Verify** | Bring requirement blocks, acceptance criteria, plan state, and `/review` back together to answer whether the original requirement is done |
 
-This is Kun's most important product direction: moving AI coding from instant Q&A into a requirement-driven software production workflow. Code, Design, Write, models, planning, review, and automation all serve that line.
+This is MagicPocket's most important product direction: moving AI coding from instant Q&A into a requirement-driven software production workflow. Code, Design, Write, models, planning, review, and automation all serve that line.
 
 ## Core Model Stack
 
-Kun optimizes for **complete capability + extreme cost efficiency**. A requirement-first workflow is longer than ordinary chat and depends on repeated model calls; first-run setup and provider settings are organized around three Chinese model providers so users can cover more agent scenarios with lower model cost.
+MagicPocket optimizes for **complete capability + extreme cost efficiency**. A requirement-first workflow is longer than ordinary chat and depends on repeated model calls; first-run setup and provider settings are organized around three Chinese model providers so users can cover more agent scenarios with lower model cost.
 
-| Provider | Role in Kun |
+| Provider | Role in MagicPocket |
 | --- | --- |
 | **DeepSeek** | Default text and reasoning provider with `deepseek-v4-pro` / `deepseek-v4-flash`, powering coding, planning, review, long-context sessions, and auto model routing |
 | **Xiaomi MiMo** | Cost-efficient multimodal and speech entry point, covering long-context text models, vision input, ASR transcription, TTS generation, and Token Plan |
 | **MiniMax** | Full media generation complement, covering Anthropic Messages text models, image generation, speech generation, music generation, video generation, and Token Plan |
 
-This stack lets Kun route different jobs to the right capability: fast models for lightweight clarification, stronger models for complex coding and reasoning, speech for writing and IM flows, and image/music/video generation for design and creative work. You can still add OpenAI-compatible, self-hosted, or other custom providers, but Kun's default experience is built around these three cost-efficient model services.
+This stack lets MagicPocket route different jobs to the right capability: fast models for lightweight clarification, stronger models for complex coding and reasoning, speech for writing and IM flows, and image/music/video generation for design and creative work. You can still add OpenAI-compatible, self-hosted, or other custom providers, but MagicPocket's default experience is built around these three cost-efficient model services.
 
-## Why Kun
+## Why MagicPocket
 
-| You want | Kun provides |
+| You want | MagicPocket provides |
 | --- | --- |
 | A next-generation coding workflow | Requirement clarification, requirement documents, design drafts, implementation plans, agent coding, and verification in one line |
 | Design in the same app | Design mode generates UI drafts, interactive HTML prototypes, node-based design flows, and a shared `DESIGN_SYSTEM.md`, then hands approved work to Code |
@@ -101,11 +101,11 @@ This stack lets Kun route different jobs to the right capability: fast models fo
 - **Controlled changes**: inline diffs, a change-review panel, tool approvals, and filesystem permission modes.
 - **Write mode**: dedicated Markdown workspaces with a file tree, Live / Source / Split / Preview modes, completion, selection-based inline agent actions, and `HTML / PDF / DOC / DOCX` export.
 - **Connect phone**: Feishu / Lark / WeChat IM agents, local webhook / relay support, and one-time, daily, interval, or manual scheduled tasks.
-- **Visual workflows (Create Loop)**: an n8n / dify-style node canvas on top of scheduled tasks that turns multi-step agent flows into runnable, reusable workflows — rich triggers and nodes, typed dataflow, a local run API, exposable to Kun as a tool, and bindable to hook phases.
+- **Visual workflows (Create Loop)**: an n8n / dify-style node canvas on top of scheduled tasks that turns multi-step agent flows into runnable, reusable workflows — rich triggers and nodes, typed dataflow, a local run API, exposable to MagicPocket as a tool, and bindable to hook phases.
 - **Model-stack-first**: first-run setup, provider presets, and capability auto-wiring are designed around DeepSeek, Xiaomi MiMo, and MiniMax as a cost-efficient full agent stack.
 - **Multimodal and media capabilities**: image attachments, vision input, speech transcription, image generation, speech generation, music generation, and video generation, enabled by provider configuration.
-- **MCP and Skills**: Model Context Protocol servers and project/global Skills give Kun specialized tools and workflows for different tasks.
-- **Local runtime**: `kun serve` provides the HTTP/SSE boundary with a cache-first agent loop, append-only event logs, usage tracking, and context compaction.
+- **MCP and Skills**: Model Context Protocol servers and project/global Skills give MagicPocket specialized tools and workflows for different tasks.
+- **Local runtime**: `magicpocket serve` provides the HTTP/SSE boundary with a cache-first agent loop, append-only event logs, usage tracking, and context compaction.
 
 ## More Demos
 
@@ -124,17 +124,17 @@ This stack lets Kun route different jobs to the right capability: fast models fo
 <p align="center"><em>Requirement clarification, requirement documents, and planning demo</em></p>
 
 <p align="center">
-  <a href="src/asset/img/ikun-ui-plugin.mp4">
-    <img src="src/asset/img/ikun-ui-plugin.gif" width="680" alt="iKun UI plugin demo">
+  <a href="src/asset/img/imagicpocket-ui-plugin.mp4">
+    <img src="src/asset/img/imagicpocket-ui-plugin.gif" width="680" alt="iMagicPocket UI plugin demo">
   </a>
 </p>
-<p align="center"><em>iKun UI plugin demo</em></p>
+<p align="center"><em>iMagicPocket UI plugin demo</em></p>
 
 ## Quick Start
 
 ### Path A: Download a Release
 
-Download the latest build from [GitHub Releases](https://github.com/KunAgent/Kun/releases).
+Download the latest build from [GitHub Releases](https://github.com/MagicPocketAgent/MagicPocket/releases).
 
 | Platform | Package | Architecture |
 | --- | --- | --- |
@@ -160,8 +160,8 @@ Requirements:
 | Model credentials | At least one of DeepSeek / Xiaomi MiMo / MiniMax / custom provider |
 
 ```bash
-git clone https://github.com/KunAgent/Kun.git
-cd Kun
+git clone https://github.com/MagicPocketAgent/MagicPocket.git
+cd MagicPocket
 npm install
 npm run dev
 ```
@@ -176,7 +176,7 @@ npm install --registry=https://registry.npmmirror.com
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Build the Kun runtime and start the Electron dev app |
+| `npm run dev` | Build the MagicPocket runtime and start the Electron dev app |
 | `npm run build` | Production build |
 | `npm run typecheck` | TypeScript type checking |
 | `npm run lint` | ESLint checks |
@@ -189,16 +189,16 @@ npm install --registry=https://registry.npmmirror.com
 
 - Preferences, sessions, logs, runtime config, and local runtime data stay on your machine by default.
 - Model calls use the provider credentials you configure; provider presets are editable starting points.
-- Code / Design / Write / Connect Phone share the same `kun` runtime boundary for sessions, approvals, tools, and usage tracking.
+- Code / Design / Write / Connect Phone share the same `magicpocket` runtime boundary for sessions, approvals, tools, and usage tracking.
 - File writes, command execution, MCP tools, and media generation are governed by permissions and configuration.
 
 ## Documentation Map
 
 | Doc | Contents |
 | --- | --- |
-| [kun/README.md](kun/README.md) | Kun runtime, CLI, environment variables, HTTP API |
-| [docs/kun-architecture.en.md](docs/kun-architecture.en.md) | Runtime architecture and GUI integration |
-| [docs/kun-cache-optimization.en.md](docs/kun-cache-optimization.en.md) | Cache optimization and token economy |
+| [magicpocket/README.md](magicpocket/README.md) | MagicPocket runtime, CLI, environment variables, HTTP API |
+| [docs/magicpocket-architecture.en.md](docs/magicpocket-architecture.en.md) | Runtime architecture and GUI integration |
+| [docs/magicpocket-cache-optimization.en.md](docs/magicpocket-cache-optimization.en.md) | Cache optimization and token economy |
 | [docs/DESIGN_MODE.md](docs/DESIGN_MODE.md) | Design mode, canvas, prototypes, design systems, and the Design -> Code loop |
 | [docs/model-provider-presets.md](docs/model-provider-presets.md) | Model provider presets |
 | [docs/workflow-loop.en.md](docs/workflow-loop.en.md) | The Loop node and the loop-agent idea (Create Loop workflows) |
@@ -217,9 +217,9 @@ Project conventions:
 - Before opening a PR, run `npm run typecheck`, `npm run build`, and `npm run test` when possible.
 - External contributions require acceptance of the [Contributor License Agreement](./CLA.md).
 
-### Join Kun Builder
+### Join MagicPocket Builder
 
-If you want to become a Kun Builder, start by contributing through the normal pull request flow. After you have **5 pull requests reviewed and merged normally**, you can email [zhongxingyuemail@gmail.com](mailto:zhongxingyuemail@gmail.com) to apply.
+If you want to become a MagicPocket Builder, start by contributing through the normal pull request flow. After you have **5 pull requests reviewed and merged normally**, you can email [zhongxingyuemail@gmail.com](mailto:zhongxingyuemail@gmail.com) to apply.
 
 Include your GitHub username, links to the 5 merged pull requests, and the areas where you want to keep contributing, such as Code, Design, Write, runtime, model providers, workflows, documentation, or localization.
 
@@ -227,8 +227,8 @@ Include your GitHub username, links to the 5 merged pull requests, and the areas
 
 Thanks to [LobsterAI](https://github.com/netease-youdao/LobsterAI), DeepSeek, Xiaomi MiMo, MiniMax, and everyone who contributes issues, ideas, code, and documentation.
 
-<a href="https://github.com/KunAgent/Kun/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=KunAgent/Kun" />
+<a href="https://github.com/MagicPocketAgent/MagicPocket/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=MagicPocketAgent/MagicPocket" />
 </a>
 
 ## License
@@ -239,4 +239,4 @@ Educational institutions and public-interest educational organizations may use t
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/chart?repos=KunAgent/Kun&type=date&legend=top-left)](https://www.star-history.com/?repos=KunAgent%2FKun&type=date&logscale=&legend=top-left)
+[![Star History Chart](https://api.star-history.com/chart?repos=MagicPocketAgent/MagicPocket&type=date&legend=top-left)](https://www.star-history.com/?repos=MagicPocketAgent%2FMagicPocket&type=date&logscale=&legend=top-left)

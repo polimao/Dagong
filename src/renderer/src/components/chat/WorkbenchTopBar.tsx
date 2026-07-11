@@ -93,9 +93,9 @@ export function WorkbenchSideRail({
 
   useEffect(() => {
     let cancelled = false
-    if (typeof window.kunGui?.listEditors !== 'function') return
+    if (typeof window.magicpocketGui?.listEditors !== 'function') return
 
-    void window.kunGui.listEditors()
+    void window.magicpocketGui.listEditors()
       .then((result) => {
         if (cancelled) return
         const available = result.editors.filter((editor) => editor.available)
@@ -127,13 +127,13 @@ export function WorkbenchSideRail({
   }, [editorMenuOpen])
 
   useEffect(() => {
-    if (typeof window.kunGui?.onGuiUpdateState !== 'function') return
+    if (typeof window.magicpocketGui?.onGuiUpdateState !== 'function') return
     const applyState = (state: GuiUpdateState): void => {
       setGuiUpdateState(state)
     }
-    const unsubscribe = window.kunGui.onGuiUpdateState(applyState)
-    if (typeof window.kunGui?.getGuiUpdateState === 'function') {
-      void window.kunGui.getGuiUpdateState().then(applyState).catch(() => undefined)
+    const unsubscribe = window.magicpocketGui.onGuiUpdateState(applyState)
+    if (typeof window.magicpocketGui?.getGuiUpdateState === 'function') {
+      void window.magicpocketGui.getGuiUpdateState().then(applyState).catch(() => undefined)
     }
     return unsubscribe
   }, [])
@@ -220,14 +220,14 @@ export function WorkbenchSideRail({
   const runGuiUpdateAction = async (): Promise<void> => {
     if (!guiUpdateAction || guiUpdateBusy) return
     if (guiUpdateAction.manualOnly) {
-      if (typeof window.kunGui?.openExternal === 'function') {
-        await window.kunGui.openExternal(guiUpdateAction.releaseUrl)
+      if (typeof window.magicpocketGui?.openExternal === 'function') {
+        await window.magicpocketGui.openExternal(guiUpdateAction.releaseUrl)
       }
       return
     }
     if (
-      typeof window.kunGui?.downloadGuiUpdate !== 'function' ||
-      typeof window.kunGui?.installGuiUpdate !== 'function'
+      typeof window.magicpocketGui?.downloadGuiUpdate !== 'function' ||
+      typeof window.magicpocketGui?.installGuiUpdate !== 'function'
     ) {
       return
     }
@@ -235,19 +235,19 @@ export function WorkbenchSideRail({
     setApplyingGuiUpdate(true)
     try {
       if (!guiUpdateAction.downloaded && guiUpdateState.status !== 'downloaded') {
-        const downloadResult = await window.kunGui.downloadGuiUpdate(guiUpdateAction.channel)
+        const downloadResult = await window.magicpocketGui.downloadGuiUpdate(guiUpdateAction.channel)
         if (!downloadResult.ok) return
       }
-      const installResult = await window.kunGui.installGuiUpdate()
-      if (!installResult.ok && typeof window.kunGui?.logError === 'function') {
-        await window.kunGui.logError('gui-update', 'Failed to install GUI update from workbench top bar', {
+      const installResult = await window.magicpocketGui.installGuiUpdate()
+      if (!installResult.ok && typeof window.magicpocketGui?.logError === 'function') {
+        await window.magicpocketGui.logError('gui-update', 'Failed to install GUI update from workbench top bar', {
           version: guiUpdateAction.latestVersion,
           message: installResult.message
         })
       }
     } catch (error) {
-      if (typeof window.kunGui?.logError === 'function') {
-        await window.kunGui.logError('gui-update', 'Failed to apply GUI update from workbench top bar', {
+      if (typeof window.magicpocketGui?.logError === 'function') {
+        await window.magicpocketGui.logError('gui-update', 'Failed to apply GUI update from workbench top bar', {
           version: guiUpdateAction.latestVersion,
           message: error instanceof Error ? error.message : String(error)
         })

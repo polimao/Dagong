@@ -9,7 +9,7 @@ import { createEmptyDesignSystem, type DesignSystem } from './design-system-type
 
 describe('design-system-persistence', () => {
   it('puts design-system.json at the doc dir (baseDir)', () => {
-    expect(designSystemPath('.kun-design/doc_123')).toBe('.kun-design/doc_123/design-system.json')
+    expect(designSystemPath('.magicpocket-design/doc_123')).toBe('.magicpocket-design/doc_123/design-system.json')
   })
 
   it('round-trips a design system through serialize/parse', () => {
@@ -38,7 +38,7 @@ describe('design-system-persistence', () => {
     it('does not let one design-system file cancel another design-system save', () => {
       vi.useFakeTimers()
       const writeWorkspaceFile = vi.fn(async () => ({ ok: true as const }))
-      vi.stubGlobal('window', { kunGui: { writeWorkspaceFile } })
+      vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
       const designSystem: DesignSystem = {
         tokens: {
           'brand/primary': { name: 'brand/primary', kind: 'color', value: '#3b82d8' }
@@ -52,18 +52,18 @@ describe('design-system-persistence', () => {
         components: {}
       }
 
-      persistDesignSystem('/workspace', designSystem, '.kun-design/doc-1')
-      persistDesignSystem('/workspace', codeSystem, '.kun-canvas/code-thread-1')
+      persistDesignSystem('/workspace', designSystem, '.magicpocket-design/doc-1')
+      persistDesignSystem('/workspace', codeSystem, '.magicpocket-canvas/code-thread-1')
       vi.advanceTimersByTime(600)
 
       expect(writeWorkspaceFile).toHaveBeenCalledTimes(2)
       expect(writeWorkspaceFile).toHaveBeenCalledWith({
-        path: designSystemPath('.kun-design/doc-1'),
+        path: designSystemPath('.magicpocket-design/doc-1'),
         workspaceRoot: '/workspace',
         content: serializeDesignSystem(designSystem)
       })
       expect(writeWorkspaceFile).toHaveBeenCalledWith({
-        path: designSystemPath('.kun-canvas/code-thread-1'),
+        path: designSystemPath('.magicpocket-canvas/code-thread-1'),
         workspaceRoot: '/workspace',
         content: serializeDesignSystem(codeSystem)
       })
@@ -72,7 +72,7 @@ describe('design-system-persistence', () => {
     it('keeps debouncing repeated saves for the same design-system file', () => {
       vi.useFakeTimers()
       const writeWorkspaceFile = vi.fn(async () => ({ ok: true as const }))
-      vi.stubGlobal('window', { kunGui: { writeWorkspaceFile } })
+      vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
       const firstSystem = createEmptyDesignSystem()
       const latestSystem: DesignSystem = {
         tokens: {
@@ -81,13 +81,13 @@ describe('design-system-persistence', () => {
         components: {}
       }
 
-      persistDesignSystem('/workspace', firstSystem, '.kun-canvas/code-thread-1')
-      persistDesignSystem('/workspace', latestSystem, '.kun-canvas/code-thread-1')
+      persistDesignSystem('/workspace', firstSystem, '.magicpocket-canvas/code-thread-1')
+      persistDesignSystem('/workspace', latestSystem, '.magicpocket-canvas/code-thread-1')
       vi.advanceTimersByTime(600)
 
       expect(writeWorkspaceFile).toHaveBeenCalledTimes(1)
       expect(writeWorkspaceFile).toHaveBeenCalledWith({
-        path: designSystemPath('.kun-canvas/code-thread-1'),
+        path: designSystemPath('.magicpocket-canvas/code-thread-1'),
         workspaceRoot: '/workspace',
         content: serializeDesignSystem(latestSystem)
       })

@@ -74,11 +74,11 @@ export async function pasteClipboardImageToCanvas(options: {
   workspaceRoot?: string
   imageDirectory?: string
 }): Promise<CanvasImageImportResult> {
-  if (typeof window.kunGui?.readClipboardImage !== 'function') {
+  if (typeof window.magicpocketGui?.readClipboardImage !== 'function') {
     return { ok: false, message: 'Clipboard image reading is unavailable.' }
   }
 
-  const image = await window.kunGui.readClipboardImage()
+  const image = await window.magicpocketGui.readClipboardImage()
   if (!image.ok) {
     return { ok: false, message: image.message }
   }
@@ -89,7 +89,7 @@ export async function pasteClipboardImageToCanvas(options: {
   // bomb the model or be passed verbatim into reference_image_paths.
   let persistedRelativePath: string | null = null
   const workspaceRoot = options.workspaceRoot?.trim()
-  if (workspaceRoot && typeof window.kunGui?.saveWorkspaceClipboardImage === 'function') {
+  if (workspaceRoot && typeof window.magicpocketGui?.saveWorkspaceClipboardImage === 'function') {
     try {
       // saveWorkspaceClipboardImage needs a currentFilePath to anchor its
       // markdownPath. We pass workspaceRoot itself; dirname(workspaceRoot) is
@@ -98,7 +98,7 @@ export async function pasteClipboardImageToCanvas(options: {
       // saved.path — if that fails, leave persistedRelativePath null so we
       // fall back to the data: URL (the snapshot safety-net drops it before
       // it reaches the AI).
-      const saved = await window.kunGui.saveWorkspaceClipboardImage({
+      const saved = await window.magicpocketGui.saveWorkspaceClipboardImage({
         workspaceRoot,
         currentFilePath: workspaceRoot,
         ...(options.imageDirectory ? { imageDirectory: options.imageDirectory } : {})
@@ -145,11 +145,11 @@ export async function importWorkspaceImageToCanvas(options: {
   if (!workspaceRoot) {
     return { ok: false, message: 'Workspace root is required.' }
   }
-  if (typeof window.kunGui?.pickWorkspaceImage !== 'function') {
+  if (typeof window.magicpocketGui?.pickWorkspaceImage !== 'function') {
     return { ok: false, message: 'Image picker is unavailable.' }
   }
 
-  const picked = await window.kunGui
+  const picked = await window.magicpocketGui
     .pickWorkspaceImage({
       workspaceRoot,
       ...(options.imageDirectory ? { imageDirectory: options.imageDirectory } : {})

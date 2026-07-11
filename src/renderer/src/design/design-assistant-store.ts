@@ -35,7 +35,7 @@ type DesignAssistantState = {
   markAiAffected: (ids: string[]) => void
 }
 
-const DESIGN_THREAD_KEY = 'kun.design-assistant.threadRegistry.v1'
+const DESIGN_THREAD_KEY = 'magicpocket.design-assistant.threadRegistry.v1'
 
 function readDesignAssistantThreadId(workspaceRoot: string): string | null {
   try {

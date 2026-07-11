@@ -11,7 +11,6 @@ import {
   Plus,
   RefreshCw,
   Settings,
-  Smartphone,
   Trash2
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -27,7 +26,6 @@ import {
   writeRelativeToWorkspace
 } from '../../write/write-workspace-store'
 import { ConnectPhoneSidebarPanel } from '../chat/ConnectPhoneView'
-import { WorkspaceModeTabs } from '../chat/WorkspaceModeTabs'
 import {
   SidebarCommandRow,
   SidebarFrame,
@@ -35,16 +33,15 @@ import {
   SidebarSectionHeader,
   SidebarTreeRow
 } from '../sidebar/SidebarPrimitives'
+import { SidebarMoreMenu } from '../sidebar/SidebarMoreMenu'
 import { WriteFileTree } from './WriteFileTree'
 
 type Props = {
-  activeView: 'chat' | 'write' | 'claw' | 'schedule'
   connectPhoneSidebarOpen: boolean
-  onCodeOpen: () => void
-  onWriteOpen: () => void
-  onDesignOpen: () => void
   onOpenSettings: (section?: SettingsRouteSection) => void
   onToggleConnectPhone: () => void
+  onOpenWrite: () => void
+  onOpenDesign: () => void
 }
 
 type EntryDialog =
@@ -56,13 +53,11 @@ type EntryDialog =
 type Translate = (key: string, opts?: Record<string, unknown>) => string
 
 export function WriteSidebar({
-  activeView,
   connectPhoneSidebarOpen,
-  onCodeOpen,
-  onWriteOpen,
-  onDesignOpen,
   onOpenSettings,
-  onToggleConnectPhone
+  onToggleConnectPhone,
+  onOpenWrite,
+  onOpenDesign
 }: Props): ReactElement {
   const { t } = useTranslation('common')
   const clawChannels = useChatStore((s) => s.clawChannels)
@@ -219,10 +214,10 @@ export function WriteSidebar({
   const pickWriteWorkspace = async (): Promise<void> => {
     try {
       setFileError(null)
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(workspaceRoot || defaultWorkspaceRoot || undefined)
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(workspaceRoot || defaultWorkspaceRoot || undefined)
       if (!picked.canceled && picked.path) {
         await addWriteWorkspace(picked.path)
         if (runtimeConnection === 'ready') void ensureWriteThreadForWorkspace(picked.path)
@@ -262,13 +257,6 @@ export function WriteSidebar({
       footer={
         <div className="space-y-1">
           <SidebarCommandRow
-            icon={<Smartphone className="h-4 w-4" strokeWidth={1.75} />}
-            label={t('claw')}
-            onClick={onToggleConnectPhone}
-            active={connectPhoneSidebarOpen}
-            variant="footer"
-          />
-          <SidebarCommandRow
             icon={<Settings className="h-4 w-4" strokeWidth={1.75} />}
             label={t('settings')}
             onClick={() => onOpenSettings('write')}
@@ -278,12 +266,6 @@ export function WriteSidebar({
       }
     >
       <div className="ds-no-drag flex flex-col px-0.5">
-        <WorkspaceModeTabs
-          activeView={activeView}
-          onCodeOpen={onCodeOpen}
-          onWriteOpen={onWriteOpen}
-          onDesignOpen={onDesignOpen}
-        />
         <SidebarCommandRow
           icon={<FilePlus2 className="h-4 w-4" strokeWidth={1.9} />}
           label={t('writeCreateFile')}
@@ -294,6 +276,13 @@ export function WriteSidebar({
           icon={<FolderOpen className="h-4 w-4" strokeWidth={1.75} />}
           label={t('writeAddWorkspace')}
           onClick={() => void pickWriteWorkspace()}
+        />
+        <SidebarMoreMenu
+          connectPhoneSidebarOpen={connectPhoneSidebarOpen}
+          currentView="write"
+          onToggleConnectPhone={onToggleConnectPhone}
+          onOpenWrite={onOpenWrite}
+          onOpenDesign={onOpenDesign}
         />
       </div>
 

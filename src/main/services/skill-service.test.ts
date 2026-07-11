@@ -6,7 +6,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -236,7 +236,7 @@ describe('skill-service', () => {
   it('recognizes roots under ~/.codex/plugins/cache as Codex plugin caches', () => {
     expect(isCodexPluginCacheRoot(join(tempRoot, '.codex', 'plugins', 'cache', 'vercel', '2.1', 'skills'))).toBe(true)
     expect(isCodexPluginCacheRoot(join(tempRoot, '.codex', 'skills'))).toBe(false)
-    expect(isCodexPluginCacheRoot(join(tempRoot, '.kun', 'skills'))).toBe(false)
+    expect(isCodexPluginCacheRoot(join(tempRoot, '.magicpocket', 'skills'))).toBe(false)
   })
 
   it('rejects a skill.json whose entry escapes the package directory (path traversal)', async () => {
@@ -293,9 +293,9 @@ describe('skill-service', () => {
       uiFontScale: 0.82,
     chatContentMaxWidthPx: 896,
       provider: defaultModelProviderSettings(),
-      agents: { kun: defaultKunRuntimeSettings() },
+      agents: { magicpocket: defaultMagicPocketRuntimeSettings() },
       workspaceRoot,
-      conversationWorkspaceRoot: '~/Documents/Kun',
+      conversationWorkspaceRoot: '~/Documents/MagicPocket',
       log: { enabled: false, retentionDays: 7 },
       checkpointCleanup: { enabled: false, intervalDays: 3 },
       notifications: { turnComplete: true },

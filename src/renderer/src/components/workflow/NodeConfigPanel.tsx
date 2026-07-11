@@ -59,7 +59,7 @@ function buildWorkflowRunCurl(settings: AppSettingsV1, name: string): string {
     `curl -X POST http://127.0.0.1:${port}/workflow/run \\`,
     `  -H "Content-Type: application/json" \\`
   ]
-  if (secret) lines.push(`  -H "x-kun-secret: ${secret}" \\`)
+  if (secret) lines.push(`  -H "x-magicpocket-secret: ${secret}" \\`)
   // Shell-escape single quotes in the JSON so a workflow name with a quote can't break out of the -d '...' arg.
   const payload = JSON.stringify({ workflow: name, input: '' }).replace(/'/g, "'\\''")
   lines.push(`  -d '${payload}'`)
@@ -780,7 +780,7 @@ export function NodeConfigPanel({
     }
     let cancelled = false
     const handle = setTimeout(() => {
-      window.kunGui
+      window.magicpocketGui
         .checkWorkflowCode(codeLanguage, codeValue)
         .then((result) => {
           if (!cancelled) setCodeCheck(result)
@@ -2300,7 +2300,7 @@ function TestNodeDialog({
     setResult(null)
     try {
       await onBeforeTest?.()
-      const response = await window.kunGui.testWorkflowNode(workflowId, node.id, mock)
+      const response = await window.magicpocketGui.testWorkflowNode(workflowId, node.id, mock)
       if (response.ok) setResult(response.result)
       else setError(response.message)
     } catch (caught) {

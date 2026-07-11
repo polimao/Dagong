@@ -53,7 +53,7 @@ export function Workbench(): ReactElement {
     route, pluginHostRoute, workspaceRoot, conversationWorkspaceRoot, runtimeConnection,
     setRoute, openCode, openWrite, openDesign, ensureWriteThreadForWorkspace,
     ensureDesignThreadForWorkspace, createWriteThread, createDesignThread, openSettings,
-    openPlugins, openClaw, openSchedule, openWorkflow, chooseWorkspace, clawChannels,
+    openPlugins, openClaw, openSchedule, openWorkflow, openExperts, chooseWorkspace, clawChannels,
     activeClawChannelId, selectClawChannel, resetClawChannelSession, setClawChannelModel,
     appendLocalClawTurn, setError, sendMessage, reviewActiveThread, queuedMessages,
     removeQueuedMessage, interrupt, probeRuntime, composerModel, composerProviderId,
@@ -145,10 +145,11 @@ export function Workbench(): ReactElement {
     runtimeConnection
   })
   const {
-    beginLeftResize, beginRightResize, beginTerminalResize, filePreviewTarget,
+    beginRightResize, beginTerminalResize, filePreviewTarget,
     leftSidebarCollapsed, leftSidebarWidth, openDevPreview, rightPanelMode, rightPanelVisible,
-    rightSidebarWidth, setFilePreviewTarget, setRightPanelMode, setRightSidebarWidth, shellRef,
-    terminalHeight, terminalOpen, toggleLeftSidebar, toggleRightPanelMode, toggleTerminal,
+    rightRailCollapsed, rightSidebarWidth, setFilePreviewTarget, setRightPanelMode,
+    setRightSidebarWidth, shellRef, terminalHeight, terminalOpen, toggleLeftSidebar,
+    toggleRightPanelMode, toggleRightRail, toggleTerminal,
   } = useWorkbenchLayout({
     activeThreadId,
     designAssistantOpen,
@@ -182,7 +183,7 @@ export function Workbench(): ReactElement {
     activeSddDraft, sddDraftContent, sddDraftOperationStatus, dismissActiveSddDraft,
     ensureSddAssistantThreadForDraft, findSddDraftForSidebarThread, openSddAssistantPanel,
     openSddRequirementDraftFromHistory, quoteToSddAssistant, renameSddAssistantThreadToDraft,
-    startNewSddAssistantConversation: startNewSddThreadConversation, startNewSddRequirement,
+    startNewSddAssistantConversation: startNewSddThreadConversation,
     toggleSddAssistantPanel
   } = useWorkbenchSddThreadController({
     activeThreadId,
@@ -383,16 +384,16 @@ export function Workbench(): ReactElement {
   })
 
   const {
-    closeRightPanel, exploreSddRequirementInDesign, openCodeMode, openPluginsView, openScheduleView,
-    openThread, openWorkflowView, openWriteMode, pickWriteAssistantWorkspace, sidebarView,
+    closeRightPanel, exploreSddRequirementInDesign, openPluginsView, openExpertsView, openScheduleView,
+    openThread, pickWriteAssistantWorkspace, sidebarView,
     startNewChat, startNewChatInWorkspace, startNewConversation, startNewWriteAssistantConversation,
-    toggleConnectPhone
+    toggleConnectPhone, openWriteMode
   } = useWorkbenchNavigationController({
     activeSddDraft: Boolean(activeSddDraft), activeThreadId, pluginHostRoute, rightPanelMode, route,
     runtimeConnection, sddDraftContent, threads, useWorktreePool, workspaceRoot, worktreeBranch,
     clearFilePreviewTargets, createConversation, createThread, createWriteThread, dismissActiveSddDraft,
     ensureWriteThreadForWorkspace, findSddDraftForSidebarThread, openClaw, openCode, openDesign,
-    openPlugins, openSchedule, openWorkflow, openWrite, openSddRequirementDraftFromHistory,
+    openPlugins, openSchedule, openWorkflow, openExperts, openWrite, openSddRequirementDraftFromHistory,
     selectThread, setConnectPhoneSidebarOpen, setDesignAssistantOpen, setFilePreviewTarget, setInput,
     setRightPanelMode, setRoute, setUseWorktreePool, setWriteAssistantOpen
   })
@@ -576,19 +577,16 @@ export function Workbench(): ReactElement {
         onRestoreThread={(id) => archiveThread(id, false)}
         onNewChat={startNewChat}
         onNewChatInWorkspace={startNewChatInWorkspace}
-        onNewRequirement={() => void startNewSddRequirement()}
         onOpenRequirementDraft={(draft) => void openSddRequirementDraftFromHistory(draft)}
         onOpenSettings={(section) => openSettings(section)}
         onOpenPlugins={openPluginsView}
+        onOpenExperts={openExpertsView}
         onToggleTheme={toggleTheme}
         onToggleConnectPhone={toggleConnectPhone}
-        onCodeOpen={openCodeMode}
-        onWriteOpen={openWriteMode}
-        onDesignOpen={openDesignMode}
         onScheduleOpen={openScheduleView}
-        onWorkflowOpen={openWorkflowView}
+        onOpenWrite={openWriteMode}
+        onOpenDesign={() => openDesign()}
         onNewConversation={startNewConversation}
-        onBeginResize={beginLeftResize}
       />
 
       <WorkbenchStageRouter
@@ -672,7 +670,9 @@ export function Workbench(): ReactElement {
               if (activeThreadParentId) void selectThread(activeThreadParentId)
             },
             onBeginTerminalResize: beginTerminalResize,
-            onToggleTerminal: toggleTerminal
+            onToggleTerminal: toggleTerminal,
+            rightRailCollapsed,
+            onToggleRightRail: toggleRightRail
           },
           sideChat: {
             open: sidePanel.open,
@@ -703,6 +703,8 @@ export function Workbench(): ReactElement {
             planPanelEnabled: Boolean(activeGuiPlan),
             terminalOpen,
             onToggleTerminal: toggleTerminal,
+            collapsed: rightRailCollapsed,
+            onToggleCollapsed: toggleRightRail,
             onToggleFileTree: toggleFileTreeSidePanel
           }
         }}

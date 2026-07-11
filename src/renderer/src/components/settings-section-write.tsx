@@ -64,7 +64,7 @@ export function WriteSettingsSection({ ctx }: { ctx: Record<string, any> }): Rea
     t,
     form,
     provider,
-    kun,
+    magicpocket,
     update,
     selectControlClass,
     compactHomePath,
@@ -101,7 +101,7 @@ export function WriteSettingsSection({ ctx }: { ctx: Record<string, any> }): Rea
     (!writeInlineProviderInherited && form.write.inlineCompletion.providerId?.trim()
       ? writeInlineProviderModels[0]
       : undefined)
-    || (kun?.model?.trim() || DEFAULT_WRITE_INLINE_COMPLETION_MODEL)
+    || (magicpocket?.model?.trim() || DEFAULT_WRITE_INLINE_COMPLETION_MODEL)
 
   return (
             <>

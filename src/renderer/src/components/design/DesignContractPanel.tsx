@@ -80,7 +80,7 @@ export function DesignContractPanel({ workspaceRoot, document, onSeedPrompt }: P
 
   const exportContract = async (): Promise<void> => {
     if (!model.canExport || exportState.status === 'exporting') return
-    if (typeof window.kunGui?.writeWorkspaceFile !== 'function') {
+    if (typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') {
       setExportState({ status: 'error', message: t('designContractUnavailable') })
       return
     }
@@ -100,7 +100,7 @@ export function DesignContractPanel({ workspaceRoot, document, onSeedPrompt }: P
         designContext: workspaceState.designContext,
         artifacts: latestDocument.artifacts
       })
-      await window.kunGui.writeWorkspaceFile({
+      await window.magicpocketGui.writeWorkspaceFile({
         path: model.path,
         workspaceRoot,
         content

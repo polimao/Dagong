@@ -4,7 +4,7 @@ import type { DesignArtifact, DesignDocument, DesignPrototypeLink } from '../des
 import { buildDesignGraphFromCanvasDocument } from '../graph/design-graph-from-canvas'
 import { collectCanvasImageAssets } from '../assets/design-asset-inventory'
 
-export const PENPOT_HANDOFF_PACKAGE_PATH = '.kun-design/penpot-package.json'
+export const PENPOT_HANDOFF_PACKAGE_PATH = '.magicpocket-design/penpot-package.json'
 
 export type PenpotHandoffToken = {
   name: string
@@ -42,8 +42,8 @@ export type PenpotHandoffAsset = {
 
 export type PenpotHandoffPackage = {
   version: 1
-  kind: 'kun.penpot.handoff'
-  source: 'kun-design-mode'
+  kind: 'magicpocket.penpot.handoff'
+  source: 'magicpocket-design-mode'
   updatedAt: string
   document: {
     id: string
@@ -102,7 +102,7 @@ function buildFrames(options: BuildPenpotHandoffPackageOptions): PenpotHandoffFr
   const artifacts = options.artifacts ?? options.document?.artifacts ?? []
   const artifactsById = artifactMap(artifacts)
   const graph = buildDesignGraphFromCanvasDocument(options.canvasDocument, {
-    projectId: options.document?.id ?? options.canvasDocument.graph?.projectId ?? 'kun-design',
+    projectId: options.document?.id ?? options.canvasDocument.graph?.projectId ?? 'magicpocket-design',
     artifacts: [...artifacts],
     designSystem: options.designSystem,
     updatedAt: options.updatedAt
@@ -144,19 +144,19 @@ function buildAssets(options: BuildPenpotHandoffPackageOptions): PenpotHandoffAs
 export function buildPenpotHandoffPackage(options: BuildPenpotHandoffPackageOptions): PenpotHandoffPackage {
   const artifacts = options.artifacts ?? options.document?.artifacts ?? []
   const graph = buildDesignGraphFromCanvasDocument(options.canvasDocument, {
-    projectId: options.document?.id ?? options.canvasDocument.graph?.projectId ?? 'kun-design',
+    projectId: options.document?.id ?? options.canvasDocument.graph?.projectId ?? 'magicpocket-design',
     artifacts: [...artifacts],
     designSystem: options.designSystem,
     updatedAt: options.updatedAt
   })
   return {
     version: 1,
-    kind: 'kun.penpot.handoff',
-    source: 'kun-design-mode',
+    kind: 'magicpocket.penpot.handoff',
+    source: 'magicpocket-design-mode',
     updatedAt: options.updatedAt ?? new Date().toISOString(),
     document: {
-      id: options.document?.id ?? 'kun-design',
-      title: options.document?.title ?? 'Kun design project',
+      id: options.document?.id ?? 'magicpocket-design',
+      title: options.document?.title ?? 'MagicPocket design project',
       artifactCount: artifacts.length
     },
     graph: {

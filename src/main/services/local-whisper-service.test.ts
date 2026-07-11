@@ -19,7 +19,7 @@ describe('local-whisper-service helpers', () => {
   let rootDir = ''
 
   beforeEach(async () => {
-    rootDir = await mkdtemp(join(tmpdir(), 'kun-local-whisper-'))
+    rootDir = await mkdtemp(join(tmpdir(), 'magicpocket-local-whisper-'))
     vi.mocked(app.getPath).mockReturnValue(rootDir)
     _internals.setLocalWhisperDownloadStateForTest(null)
   })

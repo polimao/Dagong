@@ -1,9 +1,9 @@
-import type { KunGuiApi } from '../shared/kun-gui-api'
+import type { MagicPocketGuiApi } from '../shared/magicpocket-gui-api'
 
-export type * from '../shared/kun-gui-api'
+export type * from '../shared/magicpocket-gui-api'
 
 declare global {
   interface Window {
-    kunGui: KunGuiApi
+    magicpocketGui: MagicPocketGuiApi
   }
 }

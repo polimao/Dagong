@@ -21,7 +21,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWriteSettings,
@@ -44,9 +44,9 @@ import {
   type WorkflowRuntime
 } from './workflow-runtime'
 
-// The generate-image node lazily imports the kun image client. Replace it with a
+// The generate-image node lazily imports the magicpocket image client. Replace it with a
 // stub so the test never hits a real provider (and never pulls native deps in).
-vi.mock('../../kun/src/adapters/tool/image-gen-tool-provider.js', () => ({
+vi.mock('../../magicpocket/src/adapters/tool/image-gen-tool-provider.js', () => ({
   createImageGenClient: () => ({
     generate: async () => ({ data: Buffer.from('PNG-BYTES'), mimeType: 'image/png' })
   })
@@ -109,9 +109,9 @@ function buildSettings(
     uiFontScale: 0.82,
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
-    agents: { kun: { ...defaultKunRuntimeSettings(), model: 'test-model', apiKey: 'test-key' } },
+    agents: { magicpocket: { ...defaultMagicPocketRuntimeSettings(), model: 'test-model', apiKey: 'test-key' } },
     workspaceRoot: '/tmp/workflow-workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: true, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -227,7 +227,7 @@ function callBody(call: unknown): Record<string, unknown> {
   return init?.body ? (JSON.parse(init.body) as Record<string, unknown>) : {}
 }
 
-/** The prompt the AI node actually sent to the kun runtime (from the /turns request). */
+/** The prompt the AI node actually sent to the magicpocket runtime (from the /turns request). */
 function turnPrompt(rr: ReturnType<typeof vi.fn>): string {
   const call = rr.mock.calls.find((c) => String((c as unknown[])[1]).includes('/turns'))
   return call ? String(callBody(call).prompt ?? '') : ''
@@ -382,7 +382,7 @@ describe('webhook-trigger', () => {
 // ===========================================================================
 
 describe('ai-agent', () => {
-  it('runs the prompt through the kun runtime and returns the reply', async () => {
+  it('runs the prompt through the magicpocket runtime and returns the reply', async () => {
     cover('ai-agent')
     const result = await testNode(
       { id: 'a', type: 'ai-agent', config: { prompt: 'say hi', model: 'test-model' } },
@@ -398,23 +398,23 @@ describe('ai-agent', () => {
     const rr = aiRuntimeRequest('ok')
     await testNode(
       { id: 'a', type: 'ai-agent', config: { prompt: 'echo {{json.name}}', model: 'test-model' } },
-      '{"name":"Kun"}',
+      '{"name":"MagicPocket"}',
       { runtimeRequest: rr }
     )
     // The template wins verbatim — the raw input is NOT also appended.
-    expect(turnPrompt(rr)).toBe('echo Kun')
+    expect(turnPrompt(rr)).toBe('echo MagicPocket')
   }, 15_000)
 
   it('appends the upstream input to the prompt when it uses no {{ }}', async () => {
     const rr = aiRuntimeRequest('ok')
     await testNode(
       { id: 'a', type: 'ai-agent', config: { prompt: 'say hi', model: 'test-model' } },
-      '{"name":"Kun"}',
+      '{"name":"MagicPocket"}',
       { runtimeRequest: rr }
     )
     const prompt = turnPrompt(rr)
     expect(prompt).toContain('say hi')
-    expect(prompt).toContain('Kun')
+    expect(prompt).toContain('MagicPocket')
   }, 15_000)
 
   it('leaves the prompt alone when there is no meaningful upstream input', async () => {
@@ -478,10 +478,10 @@ describe('generate-image', () => {
           patch: (s) => ({
             ...s,
             agents: {
-              kun: {
-                ...s.agents.kun,
+              magicpocket: {
+                ...s.agents.magicpocket,
                 imageGeneration: {
-                  ...s.agents.kun.imageGeneration,
+                  ...s.agents.magicpocket.imageGeneration,
                   enabled: true,
                   providerId: '',
                   baseUrl: 'https://img.test/v1',
@@ -1083,12 +1083,12 @@ describe('output', () => {
   }, 15_000)
 
   it('drills into a json path (json mode)', async () => {
-    const result = await testNode({ id: 'o', type: 'output', config: { mode: 'json', jsonPath: 'user.name' } }, '{"user":{"name":"Kun"}}')
-    expect(parseOut(result)).toBe('Kun')
+    const result = await testNode({ id: 'o', type: 'output', config: { mode: 'json', jsonPath: 'user.name' } }, '{"user":{"name":"MagicPocket"}}')
+    expect(parseOut(result)).toBe('MagicPocket')
   }, 15_000)
 
   it('coerces a missing json path to null (json mode)', async () => {
-    const result = await testNode({ id: 'o', type: 'output', config: { mode: 'json', jsonPath: 'user.missing.deep' } }, '{"user":{"name":"Kun"}}')
+    const result = await testNode({ id: 'o', type: 'output', config: { mode: 'json', jsonPath: 'user.missing.deep' } }, '{"user":{"name":"MagicPocket"}}')
     expect(result.status).toBe('success')
     // The node coerces the missing value to null; safeJson(null) serializes to ''.
     expect(result.outputJson).toBe('')
@@ -1368,11 +1368,11 @@ describe('custom', () => {
       fields: [{ key: 'who', label: 'Who', type: 'text', defaultValue: 'world', options: [], placeholder: '' }],
       code: 'return { greeting: "hi " + $fields.who }'
     }
-    const result = await testNode({ id: 'c', type: 'custom', config: { moduleId: 'mod-greet', values: { who: 'Kun' } } }, '{}', {
+    const result = await testNode({ id: 'c', type: 'custom', config: { moduleId: 'mod-greet', values: { who: 'MagicPocket' } } }, '{}', {
       modules: [module]
     })
     expect(result.status).toBe('success')
-    expect(parseOut(result)).toEqual({ greeting: 'hi Kun' })
+    expect(parseOut(result)).toEqual({ greeting: 'hi MagicPocket' })
   }, 15_000)
 
   it('errors when the module was deleted', async () => {

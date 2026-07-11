@@ -1,7 +1,7 @@
-import type { KunRuntimeStatusPayload } from '@shared/kun-gui-api'
+import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
 
 export function shouldSuppressRuntimeErrorBanner(
-  status: KunRuntimeStatusPayload | null | undefined
+  status: MagicPocketRuntimeStatusPayload | null | undefined
 ): boolean {
   return status?.state === 'restarting' || status?.state === 'crashed'
 }

@@ -3,12 +3,12 @@ const { chmodSync, existsSync, readdirSync, rmSync } = require('node:fs')
 const { join } = require('node:path')
 
 const KUN_RUNTIME_REQUIRED_PATHS = [
-  'kun/dist/cli/serve-entry.js',
-  'kun/package.json',
-  'kun/package-lock.json',
-  'kun/node_modules/zod/package.json',
-  'kun/node_modules/diff/package.json',
-  'kun/node_modules/@modelcontextprotocol/sdk/package.json'
+  'magicpocket/dist/cli/serve-entry.js',
+  'magicpocket/package.json',
+  'magicpocket/package-lock.json',
+  'magicpocket/node_modules/zod/package.json',
+  'magicpocket/node_modules/diff/package.json',
+  'magicpocket/node_modules/@modelcontextprotocol/sdk/package.json'
 ]
 
 function normalizePlatform(platform) {
@@ -46,17 +46,17 @@ function npmCommand(args, platform = process.platform) {
   return { command: 'npm', args }
 }
 
-function prunePackedKunDependencies(context) {
+function prunePackedMagicPocketDependencies(context) {
   const root = unpackedAppRoot(context)
-  const kunDir = join(root, 'kun')
-  if (!existsSync(kunDir)) return
+  const magicpocketDir = join(root, 'magicpocket')
+  if (!existsSync(magicpocketDir)) return
 
-  assertExists(join(kunDir, 'package.json'), 'Kun package manifest')
-  assertExists(join(kunDir, 'node_modules'), 'Kun node_modules')
+  assertExists(join(magicpocketDir, 'package.json'), 'MagicPocket package manifest')
+  assertExists(join(magicpocketDir, 'node_modules'), 'MagicPocket node_modules')
 
   const prune = npmCommand(['prune', '--omit=dev', '--ignore-scripts'])
   execFileSync(prune.command, prune.args, {
-    cwd: kunDir,
+    cwd: magicpocketDir,
     env: {
       ...process.env,
       npm_config_audit: 'false',
@@ -71,10 +71,10 @@ function prunePackedKunDependencies(context) {
     join(root, 'node_modules', 'better-sqlite3', 'package.json'),
     'root better-sqlite3 dependency'
   )
-  rmSync(join(kunDir, 'node_modules', 'better-sqlite3'), { recursive: true, force: true })
+  rmSync(join(magicpocketDir, 'node_modules', 'better-sqlite3'), { recursive: true, force: true })
 }
 
-function validateBundledKunRuntime(context) {
+function validateBundledMagicPocketRuntime(context) {
   const root = unpackedAppRoot(context)
   for (const relativePath of KUN_RUNTIME_REQUIRED_PATHS) {
     assertExists(join(root, relativePath), relativePath)
@@ -150,8 +150,8 @@ function prunePackedWhisperResources(context) {
 }
 
 async function afterPack(context) {
-  prunePackedKunDependencies(context)
-  validateBundledKunRuntime(context)
+  prunePackedMagicPocketDependencies(context)
+  validateBundledMagicPocketRuntime(context)
   prunePackedWhisperResources(context)
   ensureNodePtyHelpersExecutable(context)
   maybeAdhocSignMacApp(context)
@@ -163,8 +163,8 @@ exports._internals = {
   packedResourcesDir,
   unpackedAppRoot,
   npmCommand,
-  prunePackedKunDependencies,
-  validateBundledKunRuntime,
+  prunePackedMagicPocketDependencies,
+  validateBundledMagicPocketRuntime,
   normalizeArch,
   prunePackedWhisperResources,
   ensureNodePtyHelpersExecutable

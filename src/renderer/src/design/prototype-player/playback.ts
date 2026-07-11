@@ -12,8 +12,8 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
   return `
 (() => {
   try {
-  const key = '__kunPrototypeNavCaptureInstalled';
-  const titleKey = '__kunPrototypeNavCaptureTitles';
+  const key = '__magicpocketPrototypeNavCaptureInstalled';
+  const titleKey = '__magicpocketPrototypeNavCaptureTitles';
   const hrefs = ${JSON.stringify(hrefs)};
   const targetTitles = ${JSON.stringify(targetTitles)};
   const normalize = (value) => {
@@ -197,15 +197,15 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
     signalBack(steps);
     return true;
   };
-  if (!window.__kunPrototypeNavListenerInstalled) {
-    window.__kunPrototypeNavListenerInstalled = true;
-    window.__kunPrototypeOriginalOpen = window.__kunPrototypeOriginalOpen || window.open;
-    if (!window.__kunPrototypeWindowOpenPatched && typeof window.__kunPrototypeOriginalOpen === 'function') {
-      window.__kunPrototypeWindowOpenPatched = true;
+  if (!window.__magicpocketPrototypeNavListenerInstalled) {
+    window.__magicpocketPrototypeNavListenerInstalled = true;
+    window.__magicpocketPrototypeOriginalOpen = window.__magicpocketPrototypeOriginalOpen || window.open;
+    if (!window.__magicpocketPrototypeWindowOpenPatched && typeof window.__magicpocketPrototypeOriginalOpen === 'function') {
+      window.__magicpocketPrototypeWindowOpenPatched = true;
       window.open = function(url, target, features) {
         const raw = String(url || '').trim();
         if (raw && navigate(raw, { preventDefault() {}, stopPropagation() {} })) return null;
-        return window.__kunPrototypeOriginalOpen.call(window, url, target, features);
+        return window.__magicpocketPrototypeOriginalOpen.call(window, url, target, features);
       };
     }
     const patchHistoryMethod = (methodName, originalKey, patchedKey) => {
@@ -218,12 +218,12 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
         return window[originalKey].apply(window.history, arguments);
       };
     };
-    patchHistoryMethod('pushState', '__kunPrototypeOriginalPushState', '__kunPrototypePushStatePatched');
-    patchHistoryMethod('replaceState', '__kunPrototypeOriginalReplaceState', '__kunPrototypeReplaceStatePatched');
-    if (window.history && !window.__kunPrototypeBackPatched) {
-      window.__kunPrototypeBackPatched = true;
-      window.__kunPrototypeOriginalBack = window.__kunPrototypeOriginalBack || window.history.back;
-      window.__kunPrototypeOriginalGo = window.__kunPrototypeOriginalGo || window.history.go;
+    patchHistoryMethod('pushState', '__magicpocketPrototypeOriginalPushState', '__magicpocketPrototypePushStatePatched');
+    patchHistoryMethod('replaceState', '__magicpocketPrototypeOriginalReplaceState', '__magicpocketPrototypeReplaceStatePatched');
+    if (window.history && !window.__magicpocketPrototypeBackPatched) {
+      window.__magicpocketPrototypeBackPatched = true;
+      window.__magicpocketPrototypeOriginalBack = window.__magicpocketPrototypeOriginalBack || window.history.back;
+      window.__magicpocketPrototypeOriginalGo = window.__magicpocketPrototypeOriginalGo || window.history.go;
       if (typeof window.history.back === 'function') {
         window.history.back = function() {
           return signalBack(1);
@@ -233,7 +233,7 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
         window.history.go = function(delta) {
           const steps = Number(delta);
           if (Number.isFinite(steps) && steps < 0) return signalBack(Math.abs(steps));
-          return window.__kunPrototypeOriginalGo.apply(window.history, arguments);
+          return window.__magicpocketPrototypeOriginalGo.apply(window.history, arguments);
         };
       }
     }

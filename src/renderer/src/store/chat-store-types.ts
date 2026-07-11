@@ -12,7 +12,7 @@ import type {
   UserFileReference,
   UserInputAnswer
 } from '../agent/types'
-import type { KunRuntimeStatusPayload } from '@shared/kun-gui-api'
+import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
 import type {
   ClawImAgentProfileV1,
   ClawImChannelV1,
@@ -21,7 +21,7 @@ import type {
   ClawImSettingsV1,
   ClawModel
 } from '@shared/app-settings'
-import type { ModelProviderModelGroup } from '@shared/kun-gui-api'
+import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
 
 export type QueuedUserMessage = {
   id: string
@@ -36,7 +36,7 @@ export type QueuedUserMessage = {
   attachments?: AttachmentReference[]
   fileReferences?: UserFileReference[]
   /**
-   * Optional GUI plan context forwarded to Kun. The renderer
+   * Optional GUI plan context forwarded to MagicPocket. The renderer
    * attaches it for plan/refine turns so the runtime can advertise
    * the native `create_plan` tool and gate the write to the reserved
    * plan artifact.
@@ -54,7 +54,7 @@ export type QueuedUserMessage = {
 
 /**
  * GUI plan context attached to a send-message call. Mirrors the
- * Kun `GuiPlanContextSchema` and is forwarded to the runtime
+ * MagicPocket `GuiPlanContextSchema` and is forwarded to the runtime
  * request body so plan/refine turns are scoped to a reserved path.
  */
 export type GuiPlanMessageContext = {
@@ -99,8 +99,16 @@ export type SettingsRouteSection =
   | 'claw'
   | 'updates'
   | 'terminal'
-export type AppRoute = 'chat' | 'write' | 'design' | 'settings' | 'plugins' | 'claw' | 'schedule' | 'workflow'
+export type AppRoute = 'chat' | 'write' | 'design' | 'settings' | 'plugins' | 'claw' | 'schedule' | 'workflow' | 'experts'
 export type PluginHostRoute = 'chat' | 'claw'
+
+export interface CollaborationContext {
+  type: 'expert' | 'team'
+  name: string
+  emoji: string
+  systemPrompt: string
+  threadId: string
+}
 
 /**
  * A side conversation ("by-the-way") running alongside the active
@@ -145,10 +153,10 @@ export type ChatState = {
   initialSetupMode: InitialSetupMode
   workspaceRoot: string
   workspaceLabel: string
-  /** 对话会话的工作目录根(默认 ~/Documents/Kun),供侧边栏对话区块和项目保护使用。 */
+  /** 对话会话的工作目录根(默认 ~/Documents/MagicPocket),供侧边栏对话区块和项目保护使用。 */
   conversationWorkspaceRoot: string
   runtimeConnection: RuntimeConnectionStatus
-  runtimeStatus: KunRuntimeStatusPayload | null
+  runtimeStatus: MagicPocketRuntimeStatusPayload | null
   codeWorkspaceRoots: string[]
   threads: NormalizedThread[]
   threadSearch: string
@@ -206,6 +214,7 @@ export type ChatState = {
    * thread / next-turn override. Empty = use the runtime default.
    */
   composerAgentId: string
+  collaborationContext: CollaborationContext | null
   disabledSkillIds: string[]
   queuedMessages: QueuedUserMessage[]
   watchTurnCompletion: Record<string, boolean>
@@ -237,6 +246,8 @@ export type ChatState = {
   openClaw: () => void
   openSchedule: () => void
   openWorkflow: () => void
+  openExperts: () => void
+  setCollaborationContext: (ctx: CollaborationContext | null) => void
   openDesign: () => void
   clearActiveThreadSelection: () => void
   refreshClawChannels: () => Promise<void>
@@ -286,6 +297,10 @@ export type ChatState = {
      * 自动创建一个时间戳子目录作为工作目录。
      */
     conversation?: boolean
+    /** Optional thread-level systemPrompt override (appended to base prefix). */
+    systemPrompt?: string
+    /** Optional custom thread title. Falls back to default title when empty. */
+    title?: string
   }) => Promise<void>
   createConversation: () => Promise<void>
   selectThread: (id: string) => Promise<void>

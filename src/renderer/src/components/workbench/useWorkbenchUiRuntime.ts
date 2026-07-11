@@ -11,9 +11,9 @@ export function useWorkbenchUiRuntime() {
   const [runtimeLogPath, setRuntimeLogPath] = useState('')
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.kunGui?.getLogPath !== 'function') return
+    if (typeof window === 'undefined' || typeof window.magicpocketGui?.getLogPath !== 'function') return
     let cancelled = false
-    void window.kunGui
+    void window.magicpocketGui
       .getLogPath()
       .then((path) => {
         if (!cancelled) setRuntimeLogPath(path)

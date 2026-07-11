@@ -83,8 +83,8 @@ export function DesignCodeSyncPanel({ workspaceRoot, onSeedPrompt, canvasDocumen
   const applyLatest = async (): Promise<void> => {
     if (!model.canApply || applyState.status === 'applying') return
     if (
-      typeof window.kunGui?.readWorkspaceFile !== 'function' ||
-      typeof window.kunGui?.writeWorkspaceFile !== 'function'
+      typeof window.magicpocketGui?.readWorkspaceFile !== 'function' ||
+      typeof window.magicpocketGui?.writeWorkspaceFile !== 'function'
     ) {
       setApplyState({ status: 'error', message: t('designCodeSyncUnavailable') })
       return
@@ -96,8 +96,8 @@ export function DesignCodeSyncPanel({ workspaceRoot, onSeedPrompt, canvasDocumen
         workspaceRoot,
         document: useCanvasShapeStore.getState().document,
         adapter: {
-          readWorkspaceFile: window.kunGui.readWorkspaceFile,
-          writeWorkspaceFile: window.kunGui.writeWorkspaceFile
+          readWorkspaceFile: window.magicpocketGui.readWorkspaceFile,
+          writeWorkspaceFile: window.magicpocketGui.writeWorkspaceFile
         }
       })
     } catch (error) {

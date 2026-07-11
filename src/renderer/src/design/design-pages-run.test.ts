@@ -38,7 +38,7 @@ describe('runDesignPages parallel fanout', () => {
   const writeWorkspaceFile = vi.fn(async (_payload: { path?: string }) => ({ ok: true as const }))
 
   beforeEach(() => {
-    vi.stubGlobal('window', { kunGui: { writeWorkspaceFile } })
+    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
     writeWorkspaceFile.mockClear()
     useChatStore.setState({
       blocks: [],
@@ -142,7 +142,7 @@ describe('runDesignPages parallel fanout', () => {
     expect(htmlWrites).toHaveLength(2)
     const projectDesignMdWrite = writeWorkspaceFile.mock.calls.find((call) => {
       const payload = call[0] as { path?: string; content?: string } | undefined
-      return payload?.path === '.kun-design/DESIGN.md'
+      return payload?.path === '.magicpocket-design/DESIGN.md'
     })?.[0] as { content?: string } | undefined
     expect(projectDesignMdWrite?.content).toContain('# DESIGN.md: Doc')
     expect(projectDesignMdWrite?.content).toContain('IKUN community')

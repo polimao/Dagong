@@ -29,7 +29,7 @@ import type {
   WorkflowScheduleV1,
   WorkflowV1
 } from '../shared/app-settings'
-import { resolveKunImageGenerationSettings } from '../shared/app-settings'
+import { resolveMagicPocketImageGenerationSettings } from '../shared/app-settings'
 import { MAX_WORKFLOW_RUNS } from '../shared/app-settings-workflow'
 import {
   SCHEDULER_INTERVAL_MS,
@@ -61,7 +61,7 @@ type NodeOutcome = {
   message: string
   /** For condition nodes: which outgoing handle to follow ('true' | 'false'). */
   branch?: string
-  /** For ai-agent nodes: the Kun thread created. */
+  /** For ai-agent nodes: the MagicPocket thread created. */
   threadId?: string
 }
 
@@ -582,26 +582,26 @@ function resolveWorkflowImageGen(
   settings: AppSettingsV1,
   nodeProviderId: string,
   nodeModel: string
-): ReturnType<typeof resolveKunImageGenerationSettings> {
+): ReturnType<typeof resolveMagicPocketImageGenerationSettings> {
   const providerId = nodeProviderId.trim()
   const model = nodeModel.trim()
-  if (!providerId && !model) return resolveKunImageGenerationSettings(settings)
-  const kun = settings.agents.kun
+  if (!providerId && !model) return resolveMagicPocketImageGenerationSettings(settings)
+  const magicpocket = settings.agents.magicpocket
   const patched: AppSettingsV1 = {
     ...settings,
     agents: {
       ...settings.agents,
-      kun: {
-        ...kun,
+      magicpocket: {
+        ...magicpocket,
         imageGeneration: {
-          ...kun.imageGeneration,
+          ...magicpocket.imageGeneration,
           ...(providerId ? { providerId } : {}),
           ...(model ? { model } : {})
         }
       }
     }
   }
-  return resolveKunImageGenerationSettings(patched)
+  return resolveMagicPocketImageGenerationSettings(patched)
 }
 
 /** Coerce a custom node's stored string values into typed $fields for its module. */
@@ -1005,7 +1005,7 @@ export class WorkflowRuntime {
       const pathname = new URL(req.url ?? '/', 'http://127.0.0.1').pathname
       const secret = settings.workflow.webhookSecret.trim()
       if (secret) {
-        const rawHeader = req.headers['x-kun-secret']
+        const rawHeader = req.headers['x-magicpocket-secret']
         const headerSecret = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
         if (req.headers.authorization !== `Bearer ${secret}` && headerSecret !== secret) {
           writeJson(res, 401, { ok: false, message: 'Unauthorized.' })
@@ -1013,7 +1013,7 @@ export class WorkflowRuntime {
         }
       }
       // Internal endpoints used by the GUI-hosted workflow MCP server (agent tool)
-      // and the kun hook bridge.
+      // and the magicpocket hook bridge.
       if (
         pathname === '/workflow/internal/list' ||
         pathname === '/workflow/internal/run' ||
@@ -1105,7 +1105,7 @@ export class WorkflowRuntime {
     }
     const workspaceOverride = typeof parsed.workspaceRoot === 'string' ? parsed.workspaceRoot : undefined
     if (pathname === '/workflow/internal/hook-run') {
-      // The hook payload (the kun invocation) is the workflow input; nodes read it via {{json.*}}.
+      // The hook payload (the magicpocket invocation) is the workflow input; nodes read it via {{json.*}}.
       const result = await this.runForHook(idOrName, parsed.payload ?? parsed.input, workspaceOverride)
       writeJson(res, 200, result)
       return
@@ -1114,7 +1114,7 @@ export class WorkflowRuntime {
     writeJson(res, result.ok ? 200 : 400, result)
   }
 
-  /** Run a workflow on behalf of the Kun agent tool: resolve by id/name, await it, return its output. */
+  /** Run a workflow on behalf of the MagicPocket agent tool: resolve by id/name, await it, return its output. */
   async runWorkflowForTool(
     idOrName: string,
     input?: unknown,
@@ -1132,7 +1132,7 @@ export class WorkflowRuntime {
   }
 
   /**
-   * Run a workflow triggered by a kun agent hook. Resolves by id (no callableByAgent
+   * Run a workflow triggered by a magicpocket agent hook. Resolves by id (no callableByAgent
    * gate — the trigger binding is the gate). Reentrancy-guarded: while one hook run is
    * in flight, further hook runs are skipped so a workflow that edits files can't loop.
    */
@@ -1848,7 +1848,7 @@ export class WorkflowRuntime {
           settings,
           {
             providerId: node.config.providerId,
-            model: node.config.model.trim() || settings.agents.kun.model,
+            model: node.config.model.trim() || settings.agents.magicpocket.model,
             reasoningEffort: node.config.reasoningEffort
           },
           settings.workflow.providerId?.trim() || ''
@@ -1890,8 +1890,8 @@ export class WorkflowRuntime {
           settings.workspaceRoot
         ).trim()
         const outputDir = resolveImageOutputDir(workspace, interpolate(node.config.outputDir, payload, scope))
-        // Lazy import keeps the kun image module out of the unit-test graph.
-        const { createImageGenClient } = await import('../../kun/src/adapters/tool/image-gen-tool-provider.js')
+        // Lazy import keeps the magicpocket image module out of the unit-test graph.
+        const { createImageGenClient } = await import('../../magicpocket/src/adapters/tool/image-gen-tool-provider.js')
         const imageAuth = resolveCodexOAuthApiKey(imageGen.apiKey)
         const client = createImageGenClient({
           ...imageGen,
@@ -2163,7 +2163,7 @@ export class WorkflowRuntime {
       case 'parameter-extractor': {
         const modelConfig = resolveScheduleModelConfig(
           settings,
-          { providerId: node.config.providerId, model: node.config.model.trim() || settings.agents.kun.model, reasoningEffort: node.config.reasoningEffort },
+          { providerId: node.config.providerId, model: node.config.model.trim() || settings.agents.magicpocket.model, reasoningEffort: node.config.reasoningEffort },
           settings.workflow.providerId?.trim() || ''
         )
         const workspace =
@@ -2204,7 +2204,7 @@ export class WorkflowRuntime {
         if (categories.length === 0) return { payload, message: 'no categories' }
         const modelConfig = resolveScheduleModelConfig(
           settings,
-          { providerId: node.config.providerId, model: node.config.model.trim() || settings.agents.kun.model, reasoningEffort: node.config.reasoningEffort },
+          { providerId: node.config.providerId, model: node.config.model.trim() || settings.agents.magicpocket.model, reasoningEffort: node.config.reasoningEffort },
           settings.workflow.providerId?.trim() || ''
         )
         const workspace =

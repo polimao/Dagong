@@ -1,4 +1,4 @@
-import { Suspense, type ComponentProps, type PointerEventHandler, type ReactElement } from 'react'
+import { Suspense, type ComponentProps, type ReactElement } from 'react'
 import type { SettingsRouteSection } from '../../store/chat-store'
 import { DesignSidebar } from '../design/DesignSidebar'
 import { Sidebar } from '../chat/Sidebar'
@@ -28,19 +28,16 @@ export type WorkbenchLeftSidebarProps = {
   onRestoreThread: CodeSidebarProps['onRestoreThread']
   onNewChat: CodeSidebarProps['onNewChat']
   onNewChatInWorkspace: CodeSidebarProps['onNewChatInWorkspace']
-  onNewRequirement: CodeSidebarProps['onNewRequirement']
   onOpenRequirementDraft: CodeSidebarProps['onOpenRequirementDraft']
   onOpenSettings: (section?: SettingsRouteSection) => void
   onOpenPlugins: CodeSidebarProps['onOpenPlugins']
+  onOpenExperts: CodeSidebarProps['onOpenExperts']
   onToggleTheme: CodeSidebarProps['onToggleTheme']
   onToggleConnectPhone: CodeSidebarProps['onToggleConnectPhone']
-  onCodeOpen: CodeSidebarProps['onCodeOpen']
-  onWriteOpen: CodeSidebarProps['onWriteOpen']
-  onDesignOpen: CodeSidebarProps['onDesignOpen']
   onScheduleOpen: CodeSidebarProps['onScheduleOpen']
-  onWorkflowOpen: CodeSidebarProps['onWorkflowOpen']
+  onOpenWrite: CodeSidebarProps['onOpenWrite']
+  onOpenDesign: CodeSidebarProps['onOpenDesign']
   onNewConversation: CodeSidebarProps['onNewConversation']
-  onBeginResize: PointerEventHandler<HTMLDivElement>
 }
 
 function SidebarFallback(): ReactElement {
@@ -69,42 +66,38 @@ export function WorkbenchLeftSidebar({
   onRestoreThread,
   onNewChat,
   onNewChatInWorkspace,
-  onNewRequirement,
   onOpenRequirementDraft,
   onOpenSettings,
   onOpenPlugins,
+  onOpenExperts,
   onToggleTheme,
   onToggleConnectPhone,
-  onCodeOpen,
-  onWriteOpen,
-  onDesignOpen,
   onScheduleOpen,
-  onWorkflowOpen,
-  onNewConversation,
-  onBeginResize
-}: WorkbenchLeftSidebarProps): ReactElement | null {
+  onOpenWrite,
+    onOpenDesign,
+    onNewConversation
+  }: WorkbenchLeftSidebarProps): ReactElement | null {
   if (collapsed) return null
   return (
     <>
       <div className="min-h-0 shrink-0" style={{ width }}>
         {route === 'design' ? (
           <DesignSidebar
-            onCodeOpen={onCodeOpen}
-            onWriteOpen={onWriteOpen}
-            onDesignOpen={onDesignOpen}
             onOpenSettings={onOpenSettings}
             onToggleTheme={onToggleTheme}
+            connectPhoneSidebarOpen={connectPhoneSidebarOpen}
+            onToggleConnectPhone={onToggleConnectPhone}
+            onOpenWrite={onOpenWrite}
+            onOpenDesign={onOpenDesign}
           />
         ) : route === 'write' ? (
           <Suspense fallback={<SidebarFallback />}>
             <WriteSidebar
-              activeView="write"
               connectPhoneSidebarOpen={connectPhoneSidebarOpen}
-              onCodeOpen={onCodeOpen}
-              onWriteOpen={onWriteOpen}
-              onDesignOpen={onDesignOpen}
               onOpenSettings={onOpenSettings}
               onToggleConnectPhone={onToggleConnectPhone}
+              onOpenWrite={onOpenWrite}
+              onOpenDesign={onOpenDesign}
             />
           </Suspense>
         ) : (
@@ -114,6 +107,7 @@ export function WorkbenchLeftSidebar({
             activeView={sidebarView}
             connectPhoneSidebarOpen={connectPhoneSidebarOpen}
             pluginsActive={route === 'plugins'}
+            expertsActive={route === 'experts'}
             runtimeReady={runtimeReady}
             threadSearch={threadSearch}
             showArchivedThreads={showArchivedThreads}
@@ -126,19 +120,17 @@ export function WorkbenchLeftSidebar({
             onRestoreThread={onRestoreThread}
             onNewChat={onNewChat}
             onNewChatInWorkspace={onNewChatInWorkspace}
-            onNewRequirement={onNewRequirement}
             onOpenRequirementDraft={onOpenRequirementDraft}
             onOpenSettings={onOpenSettings}
             onOpenPlugins={onOpenPlugins}
+            onOpenExperts={onOpenExperts}
             onToggleTheme={onToggleTheme}
             focusModeEnabled={focusModeEnabled}
             onFocusModeChange={onFocusModeChange}
             onToggleConnectPhone={onToggleConnectPhone}
-            onCodeOpen={onCodeOpen}
-            onWriteOpen={onWriteOpen}
-            onDesignOpen={onDesignOpen}
             onScheduleOpen={onScheduleOpen}
-            onWorkflowOpen={onWorkflowOpen}
+            onOpenWrite={onOpenWrite}
+            onOpenDesign={onOpenDesign}
             onNewConversation={onNewConversation}
           />
         )}
@@ -146,8 +138,7 @@ export function WorkbenchLeftSidebar({
       <div
         role="separator"
         aria-orientation="vertical"
-        className="ds-workbench-divider ds-no-drag relative z-20 shrink-0 cursor-col-resize"
-        onPointerDown={onBeginResize}
+        className="relative z-0 w-px shrink-0 bg-ds-border-muted"
       />
     </>
   )

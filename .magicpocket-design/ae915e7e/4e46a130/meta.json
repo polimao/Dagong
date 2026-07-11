@@ -1,0 +1,24 @@
+{
+  "id": "4e46a130",
+  "kind": "canvas",
+  "title": "Design board",
+  "relativePath": ".magicpocket-design/ae915e7e/4e46a130/canvas.json",
+  "createdAt": "2026-07-10T08:40:44.333Z",
+  "updatedAt": "2026-07-10T08:40:44.333Z",
+  "versions": [
+    {
+      "id": "4e46a130-v1",
+      "relativePath": ".magicpocket-design/ae915e7e/4e46a130/canvas.json",
+      "createdAt": "2026-07-10T08:40:44.333Z",
+      "summary": ""
+    }
+  ],
+  "node": {
+    "x": 660,
+    "y": 150,
+    "width": 420,
+    "height": 340,
+    "sizeMode": "auto",
+    "viewMode": "preview"
+  }
+}

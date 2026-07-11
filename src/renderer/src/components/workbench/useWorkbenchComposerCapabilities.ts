@@ -3,8 +3,8 @@ import {
   modelSupportsImageInput,
   type ModelProviderModelProfileV1
 } from '@shared/app-settings'
-import type { ModelProviderModelGroup } from '@shared/kun-gui-api'
-import type { CoreRuntimeInfoJson } from '../../agent/kun-contract'
+import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { CoreRuntimeInfoJson } from '../../agent/magicpocket-contract'
 import { resolveComposerContextWindowTokens } from '../../store/chat-store-helpers'
 import type { RightPanelMode } from '../chat/WorkbenchTopBar'
 

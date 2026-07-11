@@ -21,7 +21,7 @@ describe('workbench plan controller helpers', () => {
     const plan = createGuiPlanArtifact({
       workspaceRoot: '/Users/codex/app/',
       threadId: 'thread-current',
-      relativePath: '.kunsdd/plan/checkout.md',
+      relativePath: '.magicpocketsdd/plan/checkout.md',
       sourceRequest: 'Improve checkout',
       now: 1
     })
@@ -30,8 +30,8 @@ describe('workbench plan controller helpers', () => {
       guiPlan: {
         operation: 'refine',
         workspaceRoot: '/Users/codex/app',
-        relativePath: '.kunsdd/plan/checkout.md',
-        planId: '/Users/codex/app:.kunsdd/plan/checkout.md',
+        relativePath: '.magicpocketsdd/plan/checkout.md',
+        planId: '/Users/codex/app:.magicpocketsdd/plan/checkout.md',
         sourceRequest: 'Improve checkout'
       }
     })
@@ -54,14 +54,14 @@ describe('workbench plan controller helpers', () => {
       request: 'Build Login: OAuth / SSO?',
       workspaceRoot: '/Users/codex/app/',
       activeThreadId: 'thread-current',
-      existingRelativePaths: ['.kunsdd/plan/build-login-oauth-sso.md']
+      existingRelativePaths: ['.magicpocketsdd/plan/build-login-oauth-sso.md']
     })
 
     expect(result.guiPlan).toEqual({
       operation: 'draft',
       workspaceRoot: '/Users/codex/app',
-      relativePath: '.kunsdd/plan/build-login-oauth-sso-2.md',
-      planId: '/Users/codex/app:.kunsdd/plan/build-login-oauth-sso-2.md',
+      relativePath: '.magicpocketsdd/plan/build-login-oauth-sso-2.md',
+      planId: '/Users/codex/app:.magicpocketsdd/plan/build-login-oauth-sso-2.md',
       sourceRequest: 'Build Login: OAuth / SSO?',
       title: 'build-login-oauth-sso-2'
     })

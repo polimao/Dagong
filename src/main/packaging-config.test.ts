@@ -82,7 +82,7 @@ function createMacPackContext(root: string): {
     electronPlatformName: 'darwin',
     packager: {
       appInfo: {
-        productFilename: 'Kun'
+        productFilename: 'MagicPocket'
       }
     }
   }
@@ -95,18 +95,18 @@ afterEach(() => {
   }
 })
 
-describe('electron-builder Kun packaging', () => {
-  it('includes Kun runtime dependencies in the packaged app', () => {
+describe('electron-builder MagicPocket packaging', () => {
+  it('includes MagicPocket runtime dependencies in the packaged app', () => {
     expect(builderConfig.files).toEqual(expect.arrayContaining([
-      'kun/dist/**/*',
-      'kun/package.json',
-      'kun/package-lock.json',
-      'kun/node_modules/**/*'
+      'magicpocket/dist/**/*',
+      'magicpocket/package.json',
+      'magicpocket/package-lock.json',
+      'magicpocket/node_modules/**/*'
     ]))
     expect(builderConfig.asarUnpack).toEqual(expect.arrayContaining([
-      '**/kun/dist/**/*',
-      '**/kun/package*.json',
-      '**/kun/node_modules/**/*'
+      '**/magicpocket/dist/**/*',
+      '**/magicpocket/package*.json',
+      '**/magicpocket/node_modules/**/*'
     ]))
     expect(builderConfig.asarUnpack).not.toEqual(expect.arrayContaining([
       '**/node_modules/node-bin-darwin-*/*',
@@ -123,7 +123,7 @@ describe('electron-builder Kun packaging', () => {
     ]))
   })
 
-  it('validates the unpacked Kun runtime before release artifacts are created', () => {
+  it('validates the unpacked MagicPocket runtime before release artifacts are created', () => {
     const root = tempRoot()
     const context = createMacPackContext(root)
     const unpackedRoot = afterPack._internals.unpackedAppRoot(context)
@@ -133,12 +133,12 @@ describe('electron-builder Kun packaging', () => {
     }
     touch(join(unpackedRoot, 'node_modules/better-sqlite3/package.json'))
 
-    expect(() => afterPack._internals.validateBundledKunRuntime(context)).not.toThrow()
+    expect(() => afterPack._internals.validateBundledMagicPocketRuntime(context)).not.toThrow()
 
-    rmSync(join(unpackedRoot, 'kun/node_modules/zod'), { recursive: true, force: true })
+    rmSync(join(unpackedRoot, 'magicpocket/node_modules/zod'), { recursive: true, force: true })
 
-    expect(() => afterPack._internals.validateBundledKunRuntime(context)).toThrow(
-      /kun\/node_modules\/zod\/package\.json/
+    expect(() => afterPack._internals.validateBundledMagicPocketRuntime(context)).toThrow(
+      /magicpocket\/node_modules\/zod\/package\.json/
     )
   })
 
@@ -153,11 +153,11 @@ describe('electron-builder Kun packaging', () => {
     })
   })
 
-  it('uses the rounded Kun icon for Windows installers and shortcuts', () => {
+  it('uses the rounded MagicPocket icon for Windows installers and shortcuts', () => {
     // Windows ships a multi-size .ico (16/24/32/48/64/72/96/128/256) generated
-    // from the rounded kun_mac.png so Explorer/desktop render crisp small icons
+    // from the rounded magicpocket_mac.png so Explorer/desktop render crisp small icons
     // instead of downscaling a single 1024px PNG (#222). The .ico still carries
-    // the rounded Kun artwork — it is derived from kun_mac.png.
+    // the rounded MagicPocket artwork — it is derived from magicpocket_mac.png.
     expect(builderConfig.win.icon).toBe('./build/icon.ico')
   })
 
@@ -168,7 +168,7 @@ describe('electron-builder Kun packaging', () => {
     expect(installerScript).toContain('customCheckAppRunning')
     expect(installerScript).toContain('customUnInstallCheck')
     expect(installerScript).toContain('customUnInstallCheckCurrentUser')
-    expect(installerScript).toContain('kunContinueAfterOldUninstallerFailure')
+    expect(installerScript).toContain('magicpocketContinueAfterOldUninstallerFailure')
     expect(installerScript).toContain('KUN_INSTALLER_UNINSTALL_EXE')
     expect(installerScript).toContain('${UNINSTALL_FILENAME}')
     expect(installerScript).toContain('old-uninstaller.exe')
@@ -201,8 +201,8 @@ describe('electron-builder Kun packaging', () => {
 
   it('checks timestamp candidates across nested macOS signed code', () => {
     const root = tempRoot()
-    const appBundle = join(root, 'Kun.app')
-    const mainExecutable = join(appBundle, 'Contents/MacOS/Kun')
+    const appBundle = join(root, 'MagicPocket.app')
+    const mainExecutable = join(appBundle, 'Contents/MacOS/MagicPocket')
     const framework = join(appBundle, 'Contents/Frameworks/Electron Framework.framework')
     const nativeAddon = join(
       appBundle,

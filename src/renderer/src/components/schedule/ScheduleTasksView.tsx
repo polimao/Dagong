@@ -23,7 +23,7 @@ import {
   DEFAULT_SCHEDULE_MODEL,
   DEFAULT_SCHEDULE_REASONING_EFFORT,
   SCHEDULE_REASONING_EFFORT_IDS,
-  getKunRuntimeSettings,
+  getMagicPocketRuntimeSettings,
   getModelProviderSettings,
   isComposerChatModelId,
   listNonTextModelIds,
@@ -142,7 +142,7 @@ function preferredScheduleProviderId(
 ): string {
   const configured = configuredProviderId?.trim() ?? ''
   if (providers.some((provider) => provider.providerId === configured)) return configured
-  const runtimeProviderId = getKunRuntimeSettings(settings).providerId.trim()
+  const runtimeProviderId = getMagicPocketRuntimeSettings(settings).providerId.trim()
   if (providers.some((provider) => provider.providerId === runtimeProviderId)) return runtimeProviderId
   return providers[0]?.providerId ?? ''
 }
@@ -400,8 +400,8 @@ export function ScheduleTasksView({
     try {
       const [nextSettings, nextStatus] = await Promise.all([
         rendererRuntimeClient.getSettings({ forceRefresh: true }),
-        typeof window.kunGui?.getScheduleStatus === 'function'
-          ? window.kunGui.getScheduleStatus()
+        typeof window.magicpocketGui?.getScheduleStatus === 'function'
+          ? window.magicpocketGui.getScheduleStatus()
           : Promise.resolve(null)
       ])
       setSettings(nextSettings)
@@ -437,8 +437,8 @@ export function ScheduleTasksView({
     setSettings({ ...settings, schedule: nextSchedule })
     const saved = await rendererRuntimeClient.setSettings({ schedule: nextSchedule })
     setSettings(saved)
-    if (typeof window.kunGui?.getScheduleStatus === 'function') {
-      setStatus(await window.kunGui.getScheduleStatus())
+    if (typeof window.magicpocketGui?.getScheduleStatus === 'function') {
+      setStatus(await window.magicpocketGui.getScheduleStatus())
     }
   }
 
@@ -489,10 +489,10 @@ export function ScheduleTasksView({
   const pickDialogWorkspace = async (): Promise<void> => {
     if (!dialog) return
     try {
-      if (typeof window.kunGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error(t('workspacePickerUnavailable'))
       }
-      const picked = await window.kunGui.pickWorkspaceDirectory(
+      const picked = await window.magicpocketGui.pickWorkspaceDirectory(
         expandHomePathForSettingsUse(resolveDialogWorkspaceRoot(dialog.draft.workspaceRoot)) || undefined
       )
       if (picked.canceled || !picked.path) return
@@ -581,8 +581,8 @@ export function ScheduleTasksView({
   }
 
   const runTask = async (taskId: string): Promise<void> => {
-    if (typeof window.kunGui?.runScheduleTask !== 'function') return
-    const result = await window.kunGui.runScheduleTask(taskId)
+    if (typeof window.magicpocketGui?.runScheduleTask !== 'function') return
+    const result = await window.magicpocketGui.runScheduleTask(taskId)
     if (!result.ok) {
       setError(result.message)
       return

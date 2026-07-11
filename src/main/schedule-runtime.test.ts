@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -88,13 +88,13 @@ function settingsWith(
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      kun: {
-        ...defaultKunRuntimeSettings(),
+      magicpocket: {
+        ...defaultMagicPocketRuntimeSettings(),
         apiKey: 'test-key'
       }
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: true, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -250,7 +250,7 @@ describe('ScheduleRuntime', () => {
     expect(store.read().claw.tasks).toEqual([])
   })
 
-  it('starts a Kun thread with a Schedule title and records running status', async () => {
+  it('starts a MagicPocket thread with a Schedule title and records running status', async () => {
     const task = makeTask({ reasoningEffort: 'max' })
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {
@@ -344,7 +344,7 @@ describe('ScheduleRuntime', () => {
     expect(turnBody.prompt).toContain('Run the task')
   })
 
-  it('reads assistant text from the real Kun thread detail shape', async () => {
+  it('reads assistant text from the real MagicPocket thread detail shape', async () => {
     const task = makeTask()
     const runtimeRequest = vi.fn(async (_settings, path, init) => {
       if (path === '/v1/threads') {

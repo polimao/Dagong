@@ -16,7 +16,7 @@ type Harness = {
 }
 
 class FakeProvider implements AgentProvider {
-  readonly id = 'kun' as const
+  readonly id = 'magicpocket' as const
   readonly displayName = 'Fake'
   forkMock = vi.fn()
   sendMock = vi.fn()
@@ -235,7 +235,7 @@ function buildHarness(overrides: Partial<ChatState> = {}): Harness {
 describe('chat-store-side-actions', () => {
   beforeEach(() => {
     ;(globalThis as { window?: unknown }).window = {
-      kunGui: {
+      magicpocketGui: {
         runtimeRequest: vi.fn(async () => ({ ok: true, status: 200, body: '{}' }))
       }
     }
@@ -309,7 +309,7 @@ describe('chat-store-side-actions', () => {
     )
   })
 
-  it('uses the Kun default model when side creation has no parent or composer model to inherit', async () => {
+  it('uses the MagicPocket default model when side creation has no parent or composer model to inherit', async () => {
     const { actions, state } = buildHarness({
       threads: [],
       activeThreadId: 'thr_missing',
@@ -352,7 +352,7 @@ describe('chat-store-side-actions', () => {
   it('promoteSideConversation clears the relation by PATCH /v1/threads/{id} and refreshes the thread list', async () => {
     const { actions, state } = buildHarness()
     const id = (await actions.spawnSideConversation())!
-    const runtimeRequest = globalThis.window.kunGui.runtimeRequest as ReturnType<typeof vi.fn>
+    const runtimeRequest = globalThis.window.magicpocketGui.runtimeRequest as ReturnType<typeof vi.fn>
     runtimeRequest.mockClear()
 
     await actions.promoteSideConversation(id)

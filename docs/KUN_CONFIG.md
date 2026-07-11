@@ -1,44 +1,44 @@
-# Kun Agent 与模型配置说明
+# MagicPocket Agent 与模型配置说明
 
-本文说明 Kun（桌面应用与运行时）的本地配置文件在哪里、哪些字段由 UI 管理、哪些字段适合手工扩展，以及模型上下文压缩阈值应该如何配置。
+本文说明 MagicPocket（桌面应用与运行时）的本地配置文件在哪里、哪些字段由 UI 管理、哪些字段适合手工扩展，以及模型上下文压缩阈值应该如何配置。
 
 ## 配置文件分层
 
-Kun 有两层配置。
+MagicPocket 有两层配置。
 
 1. GUI settings
 
    这是桌面应用自己的设置文件，保存设置页里的 Agent 运行时选项。
 
-   - macOS: `~/Library/Application Support/Kun/kun-settings.json`
-   - Windows: `%APPDATA%/Kun/kun-settings.json`
-   - Linux: `~/.config/Kun/kun-settings.json`
+   - macOS: `~/Library/Application Support/MagicPocket/magicpocket-settings.json`
+   - Windows: `%APPDATA%/MagicPocket/magicpocket-settings.json`
+   - Linux: `~/.config/MagicPocket/magicpocket-settings.json`
 
-   Agent 运行时设置在 `agents.kun` 下，例如端口、data dir、默认模型、审批策略、sandbox、token economy 等。多数用户通过设置页修改这些字段。
+   Agent 运行时设置在 `agents.magicpocket` 下，例如端口、data dir、默认模型、审批策略、sandbox、token economy 等。多数用户通过设置页修改这些字段。
 
-2. Kun runtime config
+2. MagicPocket runtime config
 
-   这是 Kun 本地运行时读取的高级配置文件。默认路径是：
+   这是 MagicPocket 本地运行时读取的高级配置文件。默认路径是：
 
    ```text
-   ~/.kun/data/config.json
+   ~/.magicpocket/data/config.json
    ```
 
-   如果 `agents.kun.dataDir` 改成了别的目录，实际路径就是：
+   如果 `agents.magicpocket.dataDir` 改成了别的目录，实际路径就是：
 
    ```text
    <dataDir>/config.json
    ```
 
-   `kun serve --config <path>` 可以显式指定配置文件；如果没有指定，Kun 会尝试读取 `{dataDir}/config.json`。
+   `magicpocket serve --config <path>` 可以显式指定配置文件；如果没有指定，MagicPocket 会尝试读取 `{dataDir}/config.json`。
 
 ## 启动时的读取顺序
 
-GUI 启动 Kun 时会按下面的顺序合并配置。
+GUI 启动 MagicPocket 时会按下面的顺序合并配置。
 
-1. GUI 读取 `kun-settings.json`（旧版 `deepseek-gui-settings.json` 会自动迁移），得到 `agents.kun` 和通用 provider 配置。
-2. GUI 在启动 Kun 前同步 `<dataDir>/config.json`，写入 UI 管理的 token economy、默认压缩摘要参数、默认模型 profiles、runtime tuning、MCP search 和附件能力。
-3. Kun serve 读取 `<dataDir>/config.json` 或 `--config` 指定的文件。
+1. GUI 读取 `magicpocket-settings.json`（旧版 `deepseek-gui-settings.json` 会自动迁移），得到 `agents.magicpocket` 和通用 provider 配置。
+2. GUI 在启动 MagicPocket 前同步 `<dataDir>/config.json`，写入 UI 管理的 token economy、默认压缩摘要参数、默认模型 profiles、runtime tuning、MCP search 和附件能力。
+3. MagicPocket serve 读取 `<dataDir>/config.json` 或 `--config` 指定的文件。
 4. CLI 参数和环境变量会覆盖 `serve` 里的基础启动字段，例如 `--model`、`--port`、`KUN_MODEL`、`KUN_PORT`。
 5. AgentLoop、review loop 和子 Agent 都从同一份模型配置加载模型能力与上下文压缩阈值。
 
@@ -49,7 +49,7 @@ GUI 启动 Kun 时会按下面的顺序合并配置。
   "serve": {
     "host": "127.0.0.1",
     "port": 18899,
-    "dataDir": "~/.kun/data",
+    "dataDir": "~/.magicpocket/data",
     "runtimeToken": "<local-access-token>",
     "apiKey": "",
     "baseUrl": "https://api.deepseek.com/beta",
@@ -134,7 +134,7 @@ GUI 管理的运行时会在 `runtimeToken` 为空时自动生成并保存本地
 
 ## 默认模型 profile
 
-Kun 内置 DeepSeek V4 默认模型画像：
+MagicPocket 内置 DeepSeek V4 默认模型画像：
 
 ```json
 {
@@ -198,16 +198,16 @@ Kun 内置 DeepSeek V4 默认模型画像：
 
 ## Agent 配置写在哪里
 
-普通 Agent 运行时配置由 GUI settings 的 `agents.kun` 管理。主要字段：
+普通 Agent 运行时配置由 GUI settings 的 `agents.magicpocket` 管理。主要字段：
 
 ```json
 {
   "agents": {
-    "kun": {
+    "magicpocket": {
       "binaryPath": "",
       "port": 18899,
       "autoStart": true,
-      "dataDir": "~/.kun/data",
+      "dataDir": "~/.magicpocket/data",
       "model": "deepseek-v4-pro",
       "approvalPolicy": "auto",
       "sandboxMode": "workspace-write",
@@ -218,11 +218,11 @@ Kun 内置 DeepSeek V4 默认模型画像：
 }
 ```
 
-设置页会保存这些字段。GUI 模式下默认模型以 `agents.kun.model` 为准；`config.json` 里的 `serve.model` 更适合 standalone `kun serve` 使用，因为 GUI 启动时会把设置页里的模型作为启动参数传给 Kun。
+设置页会保存这些字段。GUI 模式下默认模型以 `agents.magicpocket.model` 为准；`config.json` 里的 `serve.model` 更适合 standalone `magicpocket serve` 使用，因为 GUI 启动时会把设置页里的模型作为启动参数传给 MagicPocket。
 
 ## Hooks 配置写在哪里
 
-Hooks 写在 `config.json` 顶层的 `hooks` 数组里，GUI 启动 Kun 时通过
+Hooks 写在 `config.json` 顶层的 `hooks` 数组里，GUI 启动 MagicPocket 时通过
 `--data-dir` 自动加载，无需额外开关：
 
 ```json
@@ -231,10 +231,10 @@ Hooks 写在 `config.json` 顶层的 `hooks` 数组里，GUI 启动 Kun 时通�
     {
       "phase": "PreToolUse",
       "matcher": "bash|write_file|mcp__*",
-      "command": "node ~/.kun-hooks/guard.js",
+      "command": "node ~/.magicpocket-hooks/guard.js",
       "timeoutMs": 10000
     },
-    { "phase": "UserPromptSubmit", "command": "~/.kun-hooks/prompt-context.sh" }
+    { "phase": "UserPromptSubmit", "command": "~/.magicpocket-hooks/prompt-context.sh" }
   ]
 }
 ```
@@ -244,7 +244,7 @@ Hooks 写在 `config.json` 顶层的 `hooks` 数组里，GUI 启动 Kun 时通�
 上下文）、`TurnStart`、`TurnEnd`、`PreCompact`（只读通知）。命令通过
 stdin 收到 JSON invocation，退出码 `0` + stdout JSON 返回结构化结果，
 退出码 `2` 阻断动作，其余非零只产生 `hook_warning` 事件。完整参考
-（各阶段载荷、失败语义、示例脚本）见 [kun-hooks.md](kun-hooks.md)。
+（各阶段载荷、失败语义、示例脚本）见 [magicpocket-hooks.md](magicpocket-hooks.md)。
 
 ## 用户如何自定义
 
@@ -252,8 +252,8 @@ stdin 收到 JSON invocation，退出码 `0` + stdout JSON 返回结构化结果
 
 1. 在设置页修改端口、data dir、默认模型、审批策略、sandbox 和 token economy。
 2. 打开 `<dataDir>/config.json`，在 `models.profiles` 里增加或覆盖模型 profile。
-3. 如果要把自定义模型作为 GUI 默认模型，把 `agents.kun.model` 改成该模型 ID。
-4. 重启 Kun runtime，让新配置生效。
+3. 如果要把自定义模型作为 GUI 默认模型，把 `agents.magicpocket.model` 改成该模型 ID。
+4. 重启 MagicPocket runtime，让新配置生效。
 
 自定义 1M 模型并在 950k 左右开始压缩：
 
@@ -326,10 +326,10 @@ stdin 收到 JSON invocation，退出码 `0` + stdout JSON 返回结构化结果
 
 ## 相关源码
 
-- 默认 GUI Agent 设置：`src/shared/app-settings-kun.ts`
-- GUI 同步 `<dataDir>/config.json`：`src/main/kun-process.ts`
-- Kun config schema：`kun/src/config/kun-config.ts`
-- 模型 profile 解析：`kun/src/loop/model-context-profile.ts`
-- 上下文压缩器：`kun/src/loop/context-compactor.ts`
-- serve 解析入口：`kun/src/cli/serve.ts`
-- 示例配置：`kun/config.example.json`
+- 默认 GUI Agent 设置：`src/shared/app-settings-magicpocket.ts`
+- GUI 同步 `<dataDir>/config.json`：`src/main/magicpocket-process.ts`
+- MagicPocket config schema：`magicpocket/src/config/magicpocket-config.ts`
+- 模型 profile 解析：`magicpocket/src/loop/model-context-profile.ts`
+- 上下文压缩器：`magicpocket/src/loop/context-compactor.ts`
+- serve 解析入口：`magicpocket/src/cli/serve.ts`
+- 示例配置：`magicpocket/config.example.json`

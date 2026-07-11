@@ -97,7 +97,7 @@ describe('code thread classification', () => {
     const designWorkspaceThread = makeThread({
       id: 'thr_design_workspace',
       title: 'Design Assistant',
-      workspace: '/Users/zxy/.kun/design-workspace'
+      workspace: '/Users/zxy/.magicpocket/design-workspace'
     })
 
     expect(isCodeSidebarThread(designWorkspaceThread)).toBe(false)

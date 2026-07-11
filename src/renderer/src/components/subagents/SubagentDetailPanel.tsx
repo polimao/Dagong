@@ -3,21 +3,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { Bot, Check, ChevronDown, ChevronLeft, ChevronRight, Pencil, Plug, Plus, Power, Search, Sparkles, Trash2, Wrench, X } from 'lucide-react'
-import type { KunSubagentProfileV1, KunSubagentsSettingsV1, ModelReasoningEffort, ModelProviderModelProfileV1 } from '@shared/app-settings'
-import type { ModelProviderModelGroup } from '@shared/kun-gui-api'
-import { KUN_RUNTIME_TOOLS_PATH } from '@shared/kun-endpoints'
-import type { CoreRuntimeToolDiagnosticsJson } from '../../agent/kun-contract'
+import type { MagicPocketSubagentProfileV1, MagicPocketSubagentsSettingsV1, ModelReasoningEffort, ModelProviderModelProfileV1 } from '@shared/app-settings'
+import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import { KUN_RUNTIME_TOOLS_PATH } from '@shared/magicpocket-endpoints'
+import type { CoreRuntimeToolDiagnosticsJson } from '../../agent/magicpocket-contract'
 import { rendererRuntimeClient } from '../../agent/runtime-client'
 import { confirmDialog } from '../../lib/confirm-dialog'
 import { useChatStore } from '../../store/chat-store'
-import { AgentKun } from './AgentKun'
+import { AgentMagicPocket } from './AgentMagicPocket'
 
 type Props = { className?: string; onCollapse: () => void }
 
-const EMPTY_SUBAGENTS: KunSubagentsSettingsV1 = { enabled: true, profiles: [] }
+const EMPTY_SUBAGENTS: MagicPocketSubagentsSettingsV1 = { enabled: true, profiles: [] }
 const PRESET_COLORS = ['#3b82d8', '#1d9e75', '#e8943a', '#7f77dd', '#d4537e', '#d85a30']
 
-/** kun's built-in tool names (mirror kun/src/adapters/tool/builtin-tool-types.ts). Small,
+/** magicpocket's built-in tool names (mirror magicpocket/src/adapters/tool/builtin-tool-types.ts). Small,
  *  stable set — a static catalog gives nicer labels than parsing the loose diagnostics shape. */
 const BUILTIN_TOOL_NAMES = ['read', 'grep', 'find', 'ls', 'edit', 'write', 'bash', 'lsp'] as const
 
@@ -26,7 +26,7 @@ type CapabilityCatalog = {
   skills: Array<{ id: string; name: string; description?: string }>
 }
 
-/** Fetch the live MCP-server + skill catalog from kun for the permission picker.
+/** Fetch the live MCP-server + skill catalog from magicpocket for the permission picker.
  *  Built-in tools come from the static list above; this only needs the dynamic bits.
  *  Returns empty lists on any failure so the dialog still renders. */
 async function loadCapabilityCatalog(): Promise<CapabilityCatalog> {
@@ -55,16 +55,16 @@ async function loadCapabilityCatalog(): Promise<CapabilityCatalog> {
   }
 }
 
-/** kun's REAL built-in delegatable subagents (mirror kun/src/delegation/builtin-profiles.ts). */
+/** magicpocket's REAL built-in delegatable subagents (mirror magicpocket/src/delegation/builtin-profiles.ts). */
 const BUILTIN_IDS = new Set(['general', 'explore', 'design-reviewer', 'over-engineering-reviewer'])
-const BUILTIN_AGENTS: KunSubagentProfileV1[] = [
+const BUILTIN_AGENTS: MagicPocketSubagentProfileV1[] = [
   { id: 'general', enabled: true, name: '', mode: 'subagent', toolPolicy: 'inherit', color: '#3b82d8' },
   { id: 'explore', enabled: true, name: '', mode: 'subagent', toolPolicy: 'readOnly', color: '#1d9e75' },
   { id: 'design-reviewer', enabled: true, name: '', mode: 'subagent', toolPolicy: 'readOnly', color: '#7f77dd' },
   { id: 'over-engineering-reviewer', enabled: true, name: '', mode: 'subagent', toolPolicy: 'readOnly', color: '#e8943a' }
 ]
 
-function newProfile(): KunSubagentProfileV1 {
+function newProfile(): MagicPocketSubagentProfileV1 {
   return { id: crypto.randomUUID(), enabled: true, name: '', mode: 'subagent', toolPolicy: 'readOnly' }
 }
 
@@ -123,11 +123,11 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
   const { t } = useTranslation('common')
   const composerModelGroups = useChatStore((s) => s.composerModelGroups)
   const loadComposerModels = useChatStore((s) => s.loadComposerModels)
-  const [subagents, setSubagents] = useState<KunSubagentsSettingsV1>(EMPTY_SUBAGENTS)
+  const [subagents, setSubagents] = useState<MagicPocketSubagentsSettingsV1>(EMPTY_SUBAGENTS)
   // Compaction always runs in model mode (the heuristic fold is only a silent
   // fallback when the model call fails), so there is no user-facing mode toggle.
   // The model lives under contextCompaction.summaryModel (distinct from the
-  // top-level kun.summaryModel, which drives the session-summary role).
+  // top-level magicpocket.summaryModel, which drives the session-summary role).
   const [compactionSlot, setCompactionSlot] = useState<RoleSlot>({ model: '', providerId: '' })
   const [smallModel, setSmallModel] = useState<RoleSlot>({ model: '', providerId: '' })
   const [titleSlot, setTitleSlot] = useState<RoleSlot>({ model: '', providerId: '' })
@@ -138,24 +138,24 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
   const [summaryReasoning, setSummaryReasoning] = useState<ModelReasoningEffort>('off')
   const [codeReviewReasoning, setCodeReviewReasoning] = useState<ModelReasoningEffort>('off')
   const [loading, setLoading] = useState(true)
-  const [dialog, setDialog] = useState<{ profile: KunSubagentProfileV1; isNew: boolean } | null>(null)
+  const [dialog, setDialog] = useState<{ profile: MagicPocketSubagentProfileV1; isNew: boolean } | null>(null)
 
   const load = useCallback(async (): Promise<void> => {
     try {
       const settings = await rendererRuntimeClient.getSettings({ forceRefresh: true })
-      const kun = settings.agents?.kun
-      setSubagents(kun?.subagents ?? EMPTY_SUBAGENTS)
+      const magicpocket = settings.agents?.magicpocket
+      setSubagents(magicpocket?.subagents ?? EMPTY_SUBAGENTS)
       setCompactionSlot({
-        model: kun?.contextCompaction?.summaryModel ?? '',
-        providerId: kun?.contextCompaction?.summaryProviderId ?? ''
+        model: magicpocket?.contextCompaction?.summaryModel ?? '',
+        providerId: magicpocket?.contextCompaction?.summaryProviderId ?? ''
       })
-      setSmallModel({ model: kun?.smallModel ?? '', providerId: kun?.smallModelProviderId ?? '' })
-      setTitleSlot({ model: kun?.titleModel ?? '', providerId: kun?.titleProviderId ?? '' })
-      setSummarySlot({ model: kun?.summaryModel ?? '', providerId: kun?.summaryProviderId ?? '' })
-      setCodeReviewSlot({ model: kun?.codeReviewModel ?? '', providerId: kun?.codeReviewProviderId ?? '' })
-      setTitleReasoning(kun?.titleReasoningEffort ?? 'off')
-      setSummaryReasoning(kun?.summaryReasoningEffort ?? 'off')
-      setCodeReviewReasoning(kun?.codeReviewReasoningEffort ?? 'off')
+      setSmallModel({ model: magicpocket?.smallModel ?? '', providerId: magicpocket?.smallModelProviderId ?? '' })
+      setTitleSlot({ model: magicpocket?.titleModel ?? '', providerId: magicpocket?.titleProviderId ?? '' })
+      setSummarySlot({ model: magicpocket?.summaryModel ?? '', providerId: magicpocket?.summaryProviderId ?? '' })
+      setCodeReviewSlot({ model: magicpocket?.codeReviewModel ?? '', providerId: magicpocket?.codeReviewProviderId ?? '' })
+      setTitleReasoning(magicpocket?.titleReasoningEffort ?? 'off')
+      setSummaryReasoning(magicpocket?.summaryReasoningEffort ?? 'off')
+      setCodeReviewReasoning(magicpocket?.codeReviewReasoningEffort ?? 'off')
     } finally {
       setLoading(false)
     }
@@ -164,15 +164,15 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
   useEffect(() => { void load() }, [load])
   useEffect(() => { void loadComposerModels() }, [loadComposerModels])
 
-  const persistProfiles = useCallback(async (profiles: KunSubagentProfileV1[]): Promise<void> => {
+  const persistProfiles = useCallback(async (profiles: MagicPocketSubagentProfileV1[]): Promise<void> => {
     const next = { ...subagents, profiles }
     setSubagents(next)
-    const saved = await rendererRuntimeClient.setSettings({ agents: { kun: { subagents: next } } })
-    if (saved.agents?.kun?.subagents) setSubagents(saved.agents.kun.subagents)
+    const saved = await rendererRuntimeClient.setSettings({ agents: { magicpocket: { subagents: next } } })
+    if (saved.agents?.magicpocket?.subagents) setSubagents(saved.agents.magicpocket.subagents)
   }, [subagents])
 
   // Built-ins may not be in settings yet — upsert so configuring one persists it for the first time.
-  const upsertProfile = useCallback((id: string, patch: Partial<KunSubagentProfileV1>): void => {
+  const upsertProfile = useCallback((id: string, patch: Partial<MagicPocketSubagentProfileV1>): void => {
     const baseline = subagents.profiles.find((p) => p.id === id) ?? BUILTIN_AGENTS.find((p) => p.id === id)
     if (!baseline) return
     const next = { ...baseline, ...patch }
@@ -188,7 +188,7 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
   }, [upsertProfile])
 
   // Per-profile reasoning depth. 'off' is the default → store undefined so the
-  // round-trip omits it (mergeKunRuntimeSettings strips 'off'/invalid).
+  // round-trip omits it (mergeMagicPocketRuntimeSettings strips 'off'/invalid).
   const setProfileReasoning = useCallback((id: string, effort: ModelReasoningEffort): void => {
     upsertProfile(id, { reasoningEffort: effort === 'off' ? undefined : effort })
   }, [upsertProfile])
@@ -204,7 +204,7 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
     void persistProfiles(subagents.profiles.filter((x) => x.id !== id))
   }, [subagents.profiles, persistProfiles, t])
 
-  const saveDialog = useCallback((profile: KunSubagentProfileV1): void => {
+  const saveDialog = useCallback((profile: MagicPocketSubagentProfileV1): void => {
     const exists = subagents.profiles.some((p) => p.id === profile.id)
     void persistProfiles(exists
       ? subagents.profiles.map((p) => (p.id === profile.id ? profile : p))
@@ -213,18 +213,18 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
   }, [subagents.profiles, persistProfiles])
 
   // Compaction model override is nested under contextCompaction (not a flat
-  // kun.* key), so it needs its own patch. Empty string clears it → compaction
+  // magicpocket.* key), so it needs its own patch. Empty string clears it → compaction
   // falls back to the main conversation model.
   const persistCompactionSlot = useCallback(async (model: string, providerId: string): Promise<void> => {
     setCompactionSlot({ model, providerId })
     await rendererRuntimeClient.setSettings({
-      agents: { kun: { contextCompaction: { summaryModel: model, summaryProviderId: providerId } } }
+      agents: { magicpocket: { contextCompaction: { summaryModel: model, summaryProviderId: providerId } } }
     })
   }, [])
 
-  // Each role slot patches its own agents.kun.* override fields. The model/
-  // provider keys are typed pairs on KunRuntimeSettingsV1; empty string clears
-  // them server-side (mergeKunRuntimeSettings omits blank slots).
+  // Each role slot patches its own agents.magicpocket.* override fields. The model/
+  // provider keys are typed pairs on MagicPocketRuntimeSettingsV1; empty string clears
+  // them server-side (mergeMagicPocketRuntimeSettings omits blank slots).
   const persistRoleSlot = useCallback(
     async (
       apply: (s: RoleSlot) => void,
@@ -235,14 +235,14 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
     ): Promise<void> => {
       apply({ model, providerId })
       await rendererRuntimeClient.setSettings({
-        agents: { kun: { [modelKey]: model, [providerKey]: providerId } }
+        agents: { magicpocket: { [modelKey]: model, [providerKey]: providerId } }
       })
     },
     []
   )
 
-  // Persist a role-level reasoning slot to agents.kun.*. 'off' is the default;
-  // mergeKunRuntimeSettings strips 'off'/invalid, so the field round-trips clean.
+  // Persist a role-level reasoning slot to agents.magicpocket.*. 'off' is the default;
+  // mergeMagicPocketRuntimeSettings strips 'off'/invalid, so the field round-trips clean.
   const persistRoleReasoning = useCallback(
     async (
       apply: (effort: ModelReasoningEffort) => void,
@@ -250,7 +250,7 @@ export function SubagentDetailPanel({ className, onCollapse }: Props): ReactElem
       effort: ModelReasoningEffort
     ): Promise<void> => {
       apply(effort)
-      await rendererRuntimeClient.setSettings({ agents: { kun: { [key]: effort } } })
+      await rendererRuntimeClient.setSettings({ agents: { magicpocket: { [key]: effort } } })
     },
     []
   )
@@ -466,7 +466,7 @@ function Row({
         className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full"
         style={{ background: 'radial-gradient(circle at 50% 36%, #fff 0%, rgba(238,244,251,0.9) 78%)', boxShadow: 'inset 0 0 0 1px rgba(188,214,245,0.7)' }}
       >
-        <AgentKun id={roleId} disabled={disabled} className="h-9 w-9" />
+        <AgentMagicPocket id={roleId} disabled={disabled} className="h-9 w-9" />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-1.5">
@@ -711,19 +711,19 @@ function ProfileDialog({
   onSave,
   onCancel
 }: {
-  profile: KunSubagentProfileV1
+  profile: MagicPocketSubagentProfileV1
   isNew: boolean
   builtin: boolean
   groups: ModelProviderModelGroup[]
-  onSave: (p: KunSubagentProfileV1) => void
+  onSave: (p: MagicPocketSubagentProfileV1) => void
   onCancel: () => void
 }): ReactElement {
   const { t } = useTranslation('common')
-  const [d, setD] = useState<KunSubagentProfileV1>(initial)
+  const [d, setD] = useState<MagicPocketSubagentProfileV1>(initial)
   const [tab, setTab] = useState<'basic' | 'permissions'>('basic')
   const [catalog, setCatalog] = useState<CapabilityCatalog | null>(null)
   const [catalogLoading, setCatalogLoading] = useState(false)
-  const set = <K extends keyof KunSubagentProfileV1>(k: K, v: KunSubagentProfileV1[K]): void =>
+  const set = <K extends keyof MagicPocketSubagentProfileV1>(k: K, v: MagicPocketSubagentProfileV1[K]): void =>
     setD((p) => ({ ...p, [k]: v }))
 
   // Lazily fetch the MCP/skill catalog the first time the Permissions tab opens —
@@ -809,7 +809,7 @@ function ProfileDialog({
           <Field label={t('agentsView.fMode', 'Mode')}>
             <select
               value={d.mode}
-              onChange={(e) => set('mode', e.target.value as KunSubagentProfileV1['mode'])}
+              onChange={(e) => set('mode', e.target.value as MagicPocketSubagentProfileV1['mode'])}
               className="w-full rounded-md border border-ds-border bg-[var(--ds-surface-elevated)] px-3 py-1.5 text-sm"
             >
               <option value="subagent">{t('agentsView.modeDelegate', 'delegate')}</option>
@@ -893,8 +893,8 @@ function TabButton({ active, onClick, badge, children }: {
  * REMOVES capabilities, so the child can never exceed the main agent.
  */
 function PermissionsTab({ d, setD, catalog, loading, t }: {
-  d: KunSubagentProfileV1
-  setD: Dispatch<SetStateAction<KunSubagentProfileV1>>
+  d: MagicPocketSubagentProfileV1
+  setD: Dispatch<SetStateAction<MagicPocketSubagentProfileV1>>
   catalog: CapabilityCatalog | null
   loading: boolean
   t: TFunction<'common'>

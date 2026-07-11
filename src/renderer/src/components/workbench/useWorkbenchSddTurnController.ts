@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { buildGuiPlanId, buildPlanRelativePath } from '@shared/gui-plan'
 import { sddDraftTraceRelativePath } from '@shared/sdd'
 import { buildSddTraceSnapshot } from '@shared/sdd-trace'
-import type { ModelProviderModelGroup } from '@shared/kun-gui-api'
+import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
 import type { AttachmentReference, ChatBlock, RuntimeConnectionStatus } from '../../agent/types'
-import type { CoreRuntimeInfoJson } from '../../agent/kun-contract'
+import type { CoreRuntimeInfoJson } from '../../agent/magicpocket-contract'
 import { getProvider } from '../../agent/registry'
 import { useChatStore } from '../../store/chat-store'
 import type { ChatState, SendMessageOverrides } from '../../store/chat-store-types'
@@ -357,7 +357,7 @@ export function useWorkbenchSddTurnController({
     let attachmentIds: string[] = []
     if (payload.image) {
       try {
-        const read = await window.kunGui.readWorkspaceImage({
+        const read = await window.magicpocketGui.readWorkspaceImage({
           path: payload.image.absolutePath,
           workspaceRoot: draft.workspaceRoot
         })
@@ -529,7 +529,7 @@ export function useWorkbenchSddTurnController({
     }
     const tracePath = sddDraftTraceRelativePath(draft.relativePath)
     if (tracePath) {
-      await window.kunGui
+      await window.magicpocketGui
         .writeWorkspaceFile({
           workspaceRoot: draft.workspaceRoot,
           path: tracePath,

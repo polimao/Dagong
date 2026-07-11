@@ -9,9 +9,10 @@ import { useTranslation } from 'react-i18next'
 import type { ChatBlock, RuntimeConnectionStatus } from '../../agent/types'
 import { FloatingComposer } from '../chat/FloatingComposer'
 import { SubagentReturnBar } from '../chat/message-timeline-empty'
-import { IkunCameoLayer, KunCelebrationLayer } from '../chat/AnimatedWorkLogo'
+import { ImagicpocketCameoLayer, MagicPocketCelebrationLayer } from '../chat/AnimatedWorkLogo'
 import { DevPreviewLaunchCard } from '../DevPreviewLaunchCard'
 import { SessionHeader } from '../SessionHeader'
+import { PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { SidebarTitlebarToggleButton } from '../sidebar/SidebarPrimitives'
 
 const MessageTimeline = lazy(() =>
@@ -26,6 +27,7 @@ type FloatingComposerProps = ComponentProps<typeof FloatingComposer>
 export type WorkbenchChatStageProps = {
   stageInsetClass: string
   leftSidebarCollapsed: boolean
+  rightRailCollapsed: boolean
   busy: boolean
   focusModeEnabled: boolean
   uiModeCameosEnabled: boolean
@@ -46,6 +48,7 @@ export type WorkbenchChatStageProps = {
   terminalWorkspaceRoot: string
   terminalHeight: number
   onToggleLeftSidebar: () => void
+  onToggleRightRail: () => void
   onRetryConnection: () => void
   onOpenSettings: () => void
   onSelectSuggestion: (text: string) => void
@@ -64,6 +67,7 @@ function WorkbenchPaneFallback(): ReactElement {
 export function WorkbenchChatStage({
   stageInsetClass,
   leftSidebarCollapsed,
+  rightRailCollapsed,
   busy,
   focusModeEnabled,
   uiModeCameosEnabled,
@@ -84,6 +88,7 @@ export function WorkbenchChatStage({
   terminalWorkspaceRoot,
   terminalHeight,
   onToggleLeftSidebar,
+  onToggleRightRail,
   onRetryConnection,
   onOpenSettings,
   onSelectSuggestion,
@@ -118,6 +123,18 @@ export function WorkbenchChatStage({
                   {t('running')}
                 </span>
               ) : null}
+              <SidebarTitlebarToggleButton
+                onClick={onToggleRightRail}
+                active={!rightRailCollapsed}
+                title={rightRailCollapsed ? t('rightPanelExpand') : t('rightPanelCollapse')}
+                ariaLabel={rightRailCollapsed ? t('rightPanelExpand') : t('rightPanelCollapse')}
+              >
+                {rightRailCollapsed ? (
+                  <PanelRightOpen className="h-4 w-4" strokeWidth={1.75} />
+                ) : (
+                  <PanelRightClose className="h-4 w-4" strokeWidth={1.75} />
+                )}
+              </SidebarTitlebarToggleButton>
             </div>
           </div>
         </header>
@@ -148,8 +165,8 @@ export function WorkbenchChatStage({
               }
             />
           </Suspense>
-          {uiModeCameosEnabled && !focusModeEnabled ? <IkunCameoLayer /> : null}
-          {!focusModeEnabled ? <KunCelebrationLayer active={busy} suppressed={Boolean(runtimeError)} /> : null}
+          {uiModeCameosEnabled && !focusModeEnabled ? <ImagicpocketCameoLayer /> : null}
+          {!focusModeEnabled ? <MagicPocketCelebrationLayer active={busy} suppressed={Boolean(runtimeError)} /> : null}
         </div>
         <div className="ds-no-drag relative flex shrink-0 justify-center px-2 pb-3 pt-0 sm:px-4 md:px-6 lg:px-8">
           {showReturnBar ? (

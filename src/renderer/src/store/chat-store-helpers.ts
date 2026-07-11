@@ -1,6 +1,6 @@
 import type { ChatBlock, NormalizedThread } from '../agent/types'
 import { DEFAULT_COMPOSER_MODEL_IDS } from '@shared/default-composer-models'
-import type { ModelProviderModelGroup } from '@shared/kun-gui-api'
+import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
 import {
   CLAW_MANAGED_INSTRUCTIONS_HEADING,
   CLAW_MODEL_IDS,
@@ -23,13 +23,13 @@ import {
 import { shouldOmitFromCodeWorkspaceRoots } from '../lib/worktree-project-path'
 import { readBrowserStorageItem, writeBrowserStorageItem } from '../lib/browser-storage'
 
-const COMPOSER_MODEL_STORAGE_KEY = 'kun.composerModel'
-const COMPOSER_PROVIDER_STORAGE_KEY = 'kun.composerProviderId'
-const THREAD_COMPOSER_SELECTION_STORAGE_KEY = 'kun.threadComposerSelection.v1'
-const THREAD_COMPOSER_MODE_STORAGE_KEY = 'kun.threadComposerMode.v1'
-const COMPOSER_MODE_STORAGE_KEY = 'kun.composerMode'
-const TURN_MODEL_STORAGE_KEY = 'kun.turnModelLabel'
-const CODE_WORKSPACE_ROOTS_STORAGE_KEY = 'kun.codeWorkspaceRoots.v1'
+const COMPOSER_MODEL_STORAGE_KEY = 'magicpocket.composerModel'
+const COMPOSER_PROVIDER_STORAGE_KEY = 'magicpocket.composerProviderId'
+const THREAD_COMPOSER_SELECTION_STORAGE_KEY = 'magicpocket.threadComposerSelection.v1'
+const THREAD_COMPOSER_MODE_STORAGE_KEY = 'magicpocket.threadComposerMode.v1'
+const COMPOSER_MODE_STORAGE_KEY = 'magicpocket.composerMode'
+const TURN_MODEL_STORAGE_KEY = 'magicpocket.turnModelLabel'
+const CODE_WORKSPACE_ROOTS_STORAGE_KEY = 'magicpocket.codeWorkspaceRoots.v1'
 export const MAX_CODE_WORKSPACE_ROOTS = 30
 export const MAX_THREAD_COMPOSER_SELECTIONS = 500
 export const MAX_TURN_MODEL_LABELS = 500
@@ -208,7 +208,7 @@ export function canSwitchComposerModel(
 // actually carries image content that a text-only model could not consume.
 // Locking on the mere presence of a user message (regardless of attachments)
 // made every text model unselectable whenever a vision model was active — see
-// https://github.com/KunAgent/Kun/issues/579. Document attachments are
+// https://github.com/MagicPocketAgent/MagicPocket/issues/579. Document attachments are
 // text-extractable and therefore safe to downgrade with; only image (or
 // unknown-kind, e.g. restored-session) attachments keep the lock engaged.
 export function conversationHasVisionAttachments(blocks: readonly ChatBlock[]): boolean {

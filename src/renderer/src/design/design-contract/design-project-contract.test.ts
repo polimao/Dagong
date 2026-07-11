@@ -21,11 +21,11 @@ function artifact(id: string, title: string): DesignArtifact {
     id,
     kind: 'html',
     title,
-    relativePath: `.kun-design/doc/${id}/v1.html`,
-    designMdPath: `.kun-design/doc/${id}/DESIGN.md`,
+    relativePath: `.magicpocket-design/doc/${id}/v1.html`,
+    designMdPath: `.magicpocket-design/doc/${id}/DESIGN.md`,
     createdAt: now,
     updatedAt: now,
-    versions: [{ id: `${id}-v1`, relativePath: `.kun-design/doc/${id}/v1.html`, createdAt: now, summary: '' }],
+    versions: [{ id: `${id}-v1`, relativePath: `.magicpocket-design/doc/${id}/v1.html`, createdAt: now, summary: '' }],
     direction: { id: 'dir_1', name: 'Ops direction', status: 'active', createdAt: now }
   }
 }
@@ -54,7 +54,7 @@ function canvasDocument(): CanvasDocument {
     id: 'asset_logo',
     name: 'Logo',
     parentId: ROOT_SHAPE_ID,
-    imageUrl: '.kun-design/assets/logo.png'
+    imageUrl: '.magicpocket-design/assets/logo.png'
   }
   doc.objects[ROOT_SHAPE_ID] = { ...doc.objects[ROOT_SHAPE_ID], children: [frame.id, image.id] }
   doc.objects[frame.id] = frame
@@ -119,7 +119,7 @@ describe('design project contract', () => {
     })
 
     expect(markdown).toContain('# DESIGN.md: Ops app')
-    expect(markdown).toContain('Project brief: `.kun-design/doc/design.md`')
+    expect(markdown).toContain('Project brief: `.magicpocket-design/doc/design.md`')
     expect(markdown).toContain('## Design Document')
     expect(markdown).toContain('- Document: Ops app (`doc`)')
     expect(markdown).toContain('## Design Mode')
@@ -138,7 +138,7 @@ describe('design project contract', () => {
     expect(markdown).toContain('## Code Bindings')
     expect(markdown).toContain('`frame_home` -> component (active); `src/pages/Home.tsx`; component `HomeView`; route `/`')
     expect(markdown).toContain('## Assets')
-    expect(markdown).toContain('`asset_logo` image: Logo; `.kun-design/assets/logo.png`; workspace; model-ready; 100x100')
+    expect(markdown).toContain('`asset_logo` image: Logo; `.magicpocket-design/assets/logo.png`; workspace; model-ready; 100x100')
     expect(markdown).toContain('## Agent Contract')
     expect(markdown).toContain('### Tool Protocol')
     expect(markdown).toContain('design.ops (operations): Apply validated Design Operations')
@@ -157,7 +157,7 @@ describe('design project contract', () => {
     })
 
     expect(summary).toMatchObject({
-      path: '.kun-design/DESIGN.md',
+      path: '.magicpocket-design/DESIGN.md',
       title: 'Ops app',
       artifactCount: 1,
       screenCount: 1,
@@ -205,7 +205,7 @@ describe('design project contract', () => {
       toolInputSeed: {
         format: 'package',
         title: 'Ops app',
-        designMdPath: '.kun-design/DESIGN.md'
+        designMdPath: '.magicpocket-design/DESIGN.md'
       }
     })
     expect(ready.toolAction.prompt).toContain('Suggested tool call: design.export')

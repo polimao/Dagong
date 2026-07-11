@@ -9,7 +9,7 @@
 
 export const UI_PLUGIN_MANIFEST_FILENAME = 'manifest.json'
 
-/** 形象槽位:缺失的槽位回退默认 Kun 美术(允许"半皮肤") */
+/** 形象槽位:缺失的槽位回退默认 MagicPocket 美术(允许"半皮肤") */
 export const UI_PLUGIN_FIGURE_SLOTS = [
   'swim',
   'surf',
@@ -77,14 +77,14 @@ export const UI_PLUGIN_LIMITS = {
 const UI_PLUGIN_ID_PATTERN = /^[a-z0-9][a-z0-9-]{1,39}$/
 /**
  * 与内置模式、DOM 属性值保留字互斥。
- * 注意:'ikun' 不在保留字里 —— 内置的 iKun 模式本身就是一个预装 UI 插件
- * (见 src/main/ui-plugin-bundled.ts),id 为 'ikun' 时额外点亮
- * data-ikun-mode 的手工 CSS 机制。
+ * 注意:'imagicpocket' 不在保留字里 —— 内置的 iMagicPocket 模式本身就是一个预装 UI 插件
+ * (见 src/main/ui-plugin-bundled.ts),id 为 'imagicpocket' 时额外点亮
+ * data-imagicpocket-mode 的手工 CSS 机制。
  */
-const UI_PLUGIN_RESERVED_IDS = new Set(['default', 'kun', 'on', 'off', 'none'])
+const UI_PLUGIN_RESERVED_IDS = new Set(['default', 'magicpocket', 'on', 'off', 'none'])
 
-/** 预装示例插件(iKun)的 id:激活时会同时启用 data-ikun-mode 手工动画机制 */
-export const UI_PLUGIN_BUNDLED_IKUN_ID = 'ikun'
+/** 预装示例插件(iMagicPocket)的 id:激活时会同时启用 data-imagicpocket-mode 手工动画机制 */
+export const UI_PLUGIN_BUNDLED_IKUN_ID = 'imagicpocket'
 const UI_PLUGIN_VERSION_PATTERN = /^\d+\.\d+\.\d+(?:[-+][\w.-]{0,40})?$/
 const UI_PLUGIN_FIGURE_PATH_PATTERN = /^[\w][\w./-]{0,200}$/
 const UI_PLUGIN_FIGURE_EXTENSIONS = new Set(['png', 'webp', 'jpg', 'jpeg', 'gif'])
@@ -267,8 +267,8 @@ export function normalizeUiPluginManifest(raw: unknown): UiPluginValidationResul
  * 这些容器会在 dark 下的嵌套作用域里整体重声明 palette token
  * (base-shell.css 的 `[data-theme='dark'] .ds-workbench-shell`),从而遮蔽
  * 注入在 <html> 上的插件 token —— 这正是对话区(Workbench)在 dark 下不吃
- * 插件配色的根因。对应 iKun 既有的
- * `[data-theme='dark'][data-ikun-mode='on'] .ds-workbench-shell` 处理。
+ * 插件配色的根因。对应 iMagicPocket 既有的
+ * `[data-theme='dark'][data-imagicpocket-mode='on'] .ds-workbench-shell` 处理。
  * '' = <html> 根自身;日后若有新容器整体重声明 token,在此追加后缀即可。
  */
 const TOKEN_SCOPE_ROOTS = ['', ' .ds-workbench-shell'] as const

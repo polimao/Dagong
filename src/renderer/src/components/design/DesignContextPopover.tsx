@@ -100,13 +100,13 @@ export function DesignContextPopover({
 
   const importDesignMd = (): void => {
     if (importing) return
-    if (!workspaceRoot || typeof window.kunGui?.readWorkspaceFile !== 'function') {
+    if (!workspaceRoot || typeof window.magicpocketGui?.readWorkspaceFile !== 'function') {
       setFileError(t('designImportDesignMdUnavailable'))
       return
     }
     setImporting(true)
     setFileError(null)
-    void window.kunGui
+    void window.magicpocketGui
       .readWorkspaceFile({ path: STITCH_DESIGN_MD_PATH, workspaceRoot })
       .then((res) => {
         if (!res.ok) {

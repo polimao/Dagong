@@ -18,13 +18,13 @@ import {
 const now = '2026-06-29T00:00:00.000Z'
 
 function artifact(): DesignArtifact {
-  const relativePath = '.kun-design/doc/home/v1.html'
+  const relativePath = '.magicpocket-design/doc/home/v1.html'
   return {
     id: 'home',
     kind: 'html',
     title: 'Home',
     relativePath,
-    designMdPath: '.kun-design/doc/home/DESIGN.md',
+    designMdPath: '.magicpocket-design/doc/home/DESIGN.md',
     createdAt: now,
     updatedAt: now,
     versions: [{ id: 'home-v1', relativePath, createdAt: now, summary: '' }],
@@ -77,7 +77,7 @@ function canvasDocument(): CanvasDocument {
     id: 'asset_logo',
     name: 'Logo',
     parentId: ROOT_SHAPE_ID,
-    imageUrl: '.kun-design/assets/logo.png'
+    imageUrl: '.magicpocket-design/assets/logo.png'
   }
   doc.objects[ROOT_SHAPE_ID] = { ...doc.objects[ROOT_SHAPE_ID], children: [frame.id, liveFrame.id, image.id] }
   doc.objects[frame.id] = frame
@@ -114,7 +114,7 @@ const designSystem: DesignSystem = {
 
 describe('design resource surface', () => {
   it('uses the stable resource-surface path', () => {
-    expect(DESIGN_RESOURCE_SURFACE_PATH).toBe('.kun-design/design-resources.json')
+    expect(DESIGN_RESOURCE_SURFACE_PATH).toBe('.magicpocket-design/design-resources.json')
   })
 
   it('exports MCP-like board, frame, token, component, and direction resources', () => {
@@ -129,20 +129,20 @@ describe('design resource surface', () => {
 
     expect(surface).toMatchObject({
       version: 1,
-      kind: 'kun.design.resources',
+      kind: 'magicpocket.design.resources',
       document: { id: 'doc', title: 'Ops app' },
       counts: { board: 1, frame: 2, asset: 1, token: 1, component: 1, direction: 1, tool: 1, mode: 1 }
     })
     expect(surface.resources.map((resource) => resource.uri)).toEqual([
-      'kun-design://documents/doc/boards/main',
-      'kun-design://documents/doc/frames/frame_home',
-      'kun-design://documents/doc/frames/frame_live',
-      'kun-design://documents/doc/assets/asset_logo',
-      'kun-design://documents/doc/tokens/brand%2Fprimary',
-      'kun-design://documents/doc/components/card',
-      'kun-design://documents/doc/directions/dir_1',
-      'kun-design://documents/doc/modes/design-mode-surface',
-      'kun-design://documents/doc/tools/design-tool-protocol'
+      'magicpocket-design://documents/doc/boards/main',
+      'magicpocket-design://documents/doc/frames/frame_home',
+      'magicpocket-design://documents/doc/frames/frame_live',
+      'magicpocket-design://documents/doc/assets/asset_logo',
+      'magicpocket-design://documents/doc/tokens/brand%2Fprimary',
+      'magicpocket-design://documents/doc/components/card',
+      'magicpocket-design://documents/doc/directions/dir_1',
+      'magicpocket-design://documents/doc/modes/design-mode-surface',
+      'magicpocket-design://documents/doc/tools/design-tool-protocol'
     ])
 
     const board = JSON.parse(surface.resources[0].text)
@@ -168,7 +168,7 @@ describe('design resource surface', () => {
     expect(frame).toMatchObject({
       id: 'frame_home',
       kind: 'html-frame',
-      htmlPath: '.kun-design/doc/home/v1.html',
+      htmlPath: '.magicpocket-design/doc/home/v1.html',
       codeBindings: [{ id: 'binding_1', kind: 'component', status: 'active' }]
     })
     expect(liveFrame).toMatchObject({
@@ -183,7 +183,7 @@ describe('design resource surface', () => {
     expect(asset).toMatchObject({
       id: 'asset_logo',
       kind: 'image',
-      path: '.kun-design/assets/logo.png',
+      path: '.magicpocket-design/assets/logo.png',
       sourceKind: 'workspace',
       modelReady: true
     })
@@ -200,21 +200,21 @@ describe('design resource surface', () => {
       {
         id: 'home',
         title: 'Home',
-        htmlPath: '.kun-design/doc/home/v1.html',
-        designMdPath: '.kun-design/doc/home/DESIGN.md',
+        htmlPath: '.magicpocket-design/doc/home/v1.html',
+        designMdPath: '.magicpocket-design/doc/home/DESIGN.md',
         prototypeLinks: [{ targetTitle: 'Settings', targetArtifactId: 'settings', href: '../settings/v1.html' }]
       }
     ])
     expect(modeSurface).toMatchObject({
-      kind: 'kun.design.mode-surface',
+      kind: 'magicpocket.design.mode-surface',
       recommendedSurfaceId: 'whiteboard',
       counts: { screenCount: 1, directionCount: 1, activeBindingCount: 1 },
       workflow: {
-        kind: 'kun.design.mode-workflow',
+        kind: 'magicpocket.design.mode-workflow',
         recommendedStepId: 'critique-current-direction'
       }
     })
-    expect(toolProtocol.kind).toBe('kun.design.tool-protocol')
+    expect(toolProtocol.kind).toBe('magicpocket.design.tool-protocol')
     expect(toolProtocol.tools).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: 'design.plan' }),
       expect.objectContaining({ id: 'design.ops' })
@@ -232,6 +232,6 @@ describe('design resource surface', () => {
     )
 
     expect(content.endsWith('\n')).toBe(true)
-    expect(JSON.parse(content)).toMatchObject({ kind: 'kun.design.resources' })
+    expect(JSON.parse(content)).toMatchObject({ kind: 'magicpocket.design.resources' })
   })
 })

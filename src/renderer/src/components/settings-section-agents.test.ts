@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import {
   DEFAULT_MODEL_PROVIDER_ID,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   getModelProviderPreset,
   modelProviderPresetProfile,
@@ -20,9 +20,9 @@ const labels: Record<string, string> = {
   agents: 'Agents',
   providers: 'Providers',
   providersDesc: 'Providers description',
-  kunProvider: 'Provider',
-  kunProviderDesc: 'Provider description',
-  kunProviderSelectDesc: 'Provider select description',
+  magicpocketProvider: 'Provider',
+  magicpocketProviderDesc: 'Provider description',
+  magicpocketProviderSelectDesc: 'Provider select description',
   modelProviderAdd: 'Add provider',
   modelProviderAddMenuCustom: 'Custom provider…',
   modelProviderSectionBasics: 'Provider basics',
@@ -63,123 +63,123 @@ const labels: Record<string, string> = {
   imageGenModel: 'Image model',
   imageGenBaseUrlPlaceholder: 'https://api.example.com/v1',
   baseUrlPlaceholder: 'https://api.example.com/v1',
-  kunApiKey: 'Kun API key',
-  kunApiKeyDesc: 'Kun API key description',
-  kunApiKeyPlaceholder: 'Inherit API key',
-  kunApiKeyInherited: 'Inherited API key',
-  kunApiKeyMissing: 'Missing API key',
-  kunApiKeyOverride: 'Override API key',
-  kunBaseUrl: 'Kun base URL',
-  kunBaseUrlDesc: 'Kun base URL description',
-  kunBaseUrlPlaceholder: 'Inherit base URL',
-  kunBaseUrlOfficial: 'Official base URL',
-  kunBaseUrlInherited: 'Inherited base URL',
-  kunBaseUrlOverride: 'Override base URL',
-  kunAssistantAdvanced: 'Assistant advanced settings',
-  kunAssistantAdvancedDesc: 'Assistant advanced settings description',
+  magicpocketApiKey: 'MagicPocket API key',
+  magicpocketApiKeyDesc: 'MagicPocket API key description',
+  magicpocketApiKeyPlaceholder: 'Inherit API key',
+  magicpocketApiKeyInherited: 'Inherited API key',
+  magicpocketApiKeyMissing: 'Missing API key',
+  magicpocketApiKeyOverride: 'Override API key',
+  magicpocketBaseUrl: 'MagicPocket base URL',
+  magicpocketBaseUrlDesc: 'MagicPocket base URL description',
+  magicpocketBaseUrlPlaceholder: 'Inherit base URL',
+  magicpocketBaseUrlOfficial: 'Official base URL',
+  magicpocketBaseUrlInherited: 'Inherited base URL',
+  magicpocketBaseUrlOverride: 'Override base URL',
+  magicpocketAssistantAdvanced: 'Assistant advanced settings',
+  magicpocketAssistantAdvancedDesc: 'Assistant advanced settings description',
   autoStart: 'Auto start',
   autoStartDesc: 'Auto start description',
   port: 'Port',
   portDesc: 'Port description',
-  kunBinary: 'Kun binary',
-  kunBinaryDesc: 'Kun binary description',
-  kunBinaryPlaceholder: 'Bundled Kun',
-  kunDataDir: 'Data dir',
-  kunDataDirDesc: 'Data dir description',
-  kunModel: 'Model',
-  kunModelDesc: 'Model description',
-  kunTokenEconomy: 'Token-saving mode',
-  kunTokenEconomyDesc: 'Token-saving mode description',
-  kunTokenEconomySavings: 'Saved {{tokens}} tokens',
-  kunTokenEconomySavingsLoading: 'Loading savings',
-  kunTokenEconomySavingsEmpty: 'Savings empty',
-  kunTokenEconomyAdvanced: 'Token-saving advanced settings',
-  kunTokenEconomyAdvancedDesc: 'Token-saving advanced settings description',
-  kunTokenEconomyOptions: 'Token-saving options',
-  kunTokenEconomyOptionsDesc: 'Token-saving options description',
-  kunCompressToolDescriptions: 'Compress tool descriptions',
-  kunCompressToolResults: 'Compress tool results',
-  kunConciseResponses: 'Concise responses',
-  kunHistoryHygiene: 'History guard',
-  kunHistoryHygieneDesc: 'History guard description',
-  kunHistoryMaxResultLines: 'Max result lines',
-  kunHistoryMaxResultBytes: 'Max result bytes',
-  kunHistoryMaxResultTokens: 'Max result tokens',
-  kunHistoryMaxArgumentBytes: 'Max argument bytes',
-  kunHistoryMaxArgumentTokens: 'Max argument tokens',
-  kunHistoryMaxArrayItems: 'Max array items',
+  magicpocketBinary: 'MagicPocket binary',
+  magicpocketBinaryDesc: 'MagicPocket binary description',
+  magicpocketBinaryPlaceholder: 'Bundled MagicPocket',
+  magicpocketDataDir: 'Data dir',
+  magicpocketDataDirDesc: 'Data dir description',
+  magicpocketModel: 'Model',
+  magicpocketModelDesc: 'Model description',
+  magicpocketTokenEconomy: 'Token-saving mode',
+  magicpocketTokenEconomyDesc: 'Token-saving mode description',
+  magicpocketTokenEconomySavings: 'Saved {{tokens}} tokens',
+  magicpocketTokenEconomySavingsLoading: 'Loading savings',
+  magicpocketTokenEconomySavingsEmpty: 'Savings empty',
+  magicpocketTokenEconomyAdvanced: 'Token-saving advanced settings',
+  magicpocketTokenEconomyAdvancedDesc: 'Token-saving advanced settings description',
+  magicpocketTokenEconomyOptions: 'Token-saving options',
+  magicpocketTokenEconomyOptionsDesc: 'Token-saving options description',
+  magicpocketCompressToolDescriptions: 'Compress tool descriptions',
+  magicpocketCompressToolResults: 'Compress tool results',
+  magicpocketConciseResponses: 'Concise responses',
+  magicpocketHistoryHygiene: 'History guard',
+  magicpocketHistoryHygieneDesc: 'History guard description',
+  magicpocketHistoryMaxResultLines: 'Max result lines',
+  magicpocketHistoryMaxResultBytes: 'Max result bytes',
+  magicpocketHistoryMaxResultTokens: 'Max result tokens',
+  magicpocketHistoryMaxArgumentBytes: 'Max argument bytes',
+  magicpocketHistoryMaxArgumentTokens: 'Max argument tokens',
+  magicpocketHistoryMaxArrayItems: 'Max array items',
   runtimeToken: 'Runtime token',
   runtimeTokenDesc: 'Runtime token description',
   showSecret: 'Show',
   hideSecret: 'Hide',
-  kunInsecure: 'Insecure',
-  kunInsecureDesc: 'Insecure description',
-  kunInsecureForcedDesc: 'Insecure forced',
-  kunAdvanced: 'Advanced runtime settings',
-  kunAdvancedDetails: 'Storage, model context, and tool guards',
-  kunAdvancedDetailsDesc: 'Per-model context policy comes from models.profiles',
-  kunStorageBackend: 'Storage backend',
-  kunStorageBackendDesc: 'Storage backend description',
-  kunStorageHybrid: 'Hybrid storage',
-  kunStorageFile: 'Pure JSONL file storage',
-  kunStorageSqlitePath: 'SQLite path',
-  kunStorageSqlitePathDesc: 'SQLite path description',
-  kunStorageSqlitePathPlaceholder: 'Automatic SQLite path',
-  kunModelContextProfile: 'Current model context policy',
-  kunModelContextProfileDesc: 'Current model context policy description',
-  kunModelContextModel: 'Matched model',
-  kunModelContextWindow: 'Context window',
-  kunModelContextSoft: 'Model soft threshold',
-  kunModelContextHard: 'Model hard threshold',
-  kunModelContextSourceBuiltIn: 'Built-in model config',
-  kunModelContextSourceFallback: 'Fallback model config',
-  kunCompactionThresholds: 'Fallback compaction thresholds',
-  kunCompactionThresholdsDesc: 'Fallback compaction thresholds description',
-  kunCompactionSoftThreshold: 'Fallback soft threshold',
-  kunCompactionHardThreshold: 'Fallback hard threshold',
-  kunCompactionSummary: 'Compaction summary',
-  kunCompactionSummaryDesc: 'Compaction summary description',
-  kunCompactionSummaryMode: 'Summary mode',
-  kunCompactionSummaryHeuristic: 'Heuristic summary',
-  kunCompactionSummaryModel: 'Model summary',
-  kunCompactionSummaryTimeout: 'Summary timeout',
-  kunCompactionSummaryMaxTokens: 'Summary max tokens',
-  kunCompactionSummaryInputBytes: 'Summary input bytes',
-  kunToolStorm: 'Tool storm',
-  kunToolStormDesc: 'Tool storm description',
-  kunToolStormLimits: 'Tool storm limits',
-  kunToolStormLimitsDesc: 'Tool storm limits description',
-  kunToolStormWindowSize: 'Tool storm window',
-  kunToolStormThreshold: 'Tool storm threshold',
-  kunToolOutputLimits: 'Tool output limits',
-  kunToolOutputLimitsDesc: 'Tool output limits description',
-  kunToolOutputMaxLines: 'Tool output max lines',
-  kunToolOutputMaxBytes: 'Tool output max bytes',
-  kunToolArgumentRepair: 'Tool argument repair',
-  kunToolArgumentRepairDesc: 'Tool argument repair description',
-  kunInstructions: 'AGENTS.md instructions',
-  kunInstructionsDesc: 'AGENTS.md instructions description',
-  kunInstructionsDiagnostics: '1 source injected last turn',
-  kunDiagnostics: 'Kun diagnostics',
-  kunDiagnosticsAdvanced: 'Detailed diagnostics',
-  kunDiagnosticsAdvancedDesc: 'Detailed diagnostics description',
-  kunRuntimeCapabilities: 'Runtime capabilities',
-  kunRuntimeCapabilitiesDesc: 'Runtime capabilities description',
-  kunRuntimeModel: 'Runtime model',
-  kunRuntimePid: 'Runtime PID',
-  kunDiagnosticsRefresh: 'Refresh diagnostics',
-  kunToolDiagnostics: 'Tool diagnostics',
-  kunToolDiagnosticsDesc: 'Tool diagnostics description',
-  kunDiagnosticsProviders: 'Providers',
-  kunDiagnosticsMcpServers: 'MCP servers',
-  kunDiagnosticsSkills: 'Discovered Skills',
-  kunDiagnosticsAttachments: 'Attachments',
-  kunMemoryRecords: 'Memory records',
-  kunMemoryRecordsDesc: 'Memory records description',
-  kunMemoryEmpty: 'No memories',
-  kunMemoryDisable: 'Disable memory',
-  kunMemoryDelete: 'Delete memory',
-  kunMemoryDisabled: 'Disabled',
+  magicpocketInsecure: 'Insecure',
+  magicpocketInsecureDesc: 'Insecure description',
+  magicpocketInsecureForcedDesc: 'Insecure forced',
+  magicpocketAdvanced: 'Advanced runtime settings',
+  magicpocketAdvancedDetails: 'Storage, model context, and tool guards',
+  magicpocketAdvancedDetailsDesc: 'Per-model context policy comes from models.profiles',
+  magicpocketStorageBackend: 'Storage backend',
+  magicpocketStorageBackendDesc: 'Storage backend description',
+  magicpocketStorageHybrid: 'Hybrid storage',
+  magicpocketStorageFile: 'Pure JSONL file storage',
+  magicpocketStorageSqlitePath: 'SQLite path',
+  magicpocketStorageSqlitePathDesc: 'SQLite path description',
+  magicpocketStorageSqlitePathPlaceholder: 'Automatic SQLite path',
+  magicpocketModelContextProfile: 'Current model context policy',
+  magicpocketModelContextProfileDesc: 'Current model context policy description',
+  magicpocketModelContextModel: 'Matched model',
+  magicpocketModelContextWindow: 'Context window',
+  magicpocketModelContextSoft: 'Model soft threshold',
+  magicpocketModelContextHard: 'Model hard threshold',
+  magicpocketModelContextSourceBuiltIn: 'Built-in model config',
+  magicpocketModelContextSourceFallback: 'Fallback model config',
+  magicpocketCompactionThresholds: 'Fallback compaction thresholds',
+  magicpocketCompactionThresholdsDesc: 'Fallback compaction thresholds description',
+  magicpocketCompactionSoftThreshold: 'Fallback soft threshold',
+  magicpocketCompactionHardThreshold: 'Fallback hard threshold',
+  magicpocketCompactionSummary: 'Compaction summary',
+  magicpocketCompactionSummaryDesc: 'Compaction summary description',
+  magicpocketCompactionSummaryMode: 'Summary mode',
+  magicpocketCompactionSummaryHeuristic: 'Heuristic summary',
+  magicpocketCompactionSummaryModel: 'Model summary',
+  magicpocketCompactionSummaryTimeout: 'Summary timeout',
+  magicpocketCompactionSummaryMaxTokens: 'Summary max tokens',
+  magicpocketCompactionSummaryInputBytes: 'Summary input bytes',
+  magicpocketToolStorm: 'Tool storm',
+  magicpocketToolStormDesc: 'Tool storm description',
+  magicpocketToolStormLimits: 'Tool storm limits',
+  magicpocketToolStormLimitsDesc: 'Tool storm limits description',
+  magicpocketToolStormWindowSize: 'Tool storm window',
+  magicpocketToolStormThreshold: 'Tool storm threshold',
+  magicpocketToolOutputLimits: 'Tool output limits',
+  magicpocketToolOutputLimitsDesc: 'Tool output limits description',
+  magicpocketToolOutputMaxLines: 'Tool output max lines',
+  magicpocketToolOutputMaxBytes: 'Tool output max bytes',
+  magicpocketToolArgumentRepair: 'Tool argument repair',
+  magicpocketToolArgumentRepairDesc: 'Tool argument repair description',
+  magicpocketInstructions: 'AGENTS.md instructions',
+  magicpocketInstructionsDesc: 'AGENTS.md instructions description',
+  magicpocketInstructionsDiagnostics: '1 source injected last turn',
+  magicpocketDiagnostics: 'MagicPocket diagnostics',
+  magicpocketDiagnosticsAdvanced: 'Detailed diagnostics',
+  magicpocketDiagnosticsAdvancedDesc: 'Detailed diagnostics description',
+  magicpocketRuntimeCapabilities: 'Runtime capabilities',
+  magicpocketRuntimeCapabilitiesDesc: 'Runtime capabilities description',
+  magicpocketRuntimeModel: 'Runtime model',
+  magicpocketRuntimePid: 'Runtime PID',
+  magicpocketDiagnosticsRefresh: 'Refresh diagnostics',
+  magicpocketToolDiagnostics: 'Tool diagnostics',
+  magicpocketToolDiagnosticsDesc: 'Tool diagnostics description',
+  magicpocketDiagnosticsProviders: 'Providers',
+  magicpocketDiagnosticsMcpServers: 'MCP servers',
+  magicpocketDiagnosticsSkills: 'Discovered Skills',
+  magicpocketDiagnosticsAttachments: 'Attachments',
+  magicpocketMemoryRecords: 'Memory records',
+  magicpocketMemoryRecordsDesc: 'Memory records description',
+  magicpocketMemoryEmpty: 'No memories',
+  magicpocketMemoryDisable: 'Disable memory',
+  magicpocketMemoryDelete: 'Delete memory',
+  magicpocketMemoryDisabled: 'Disabled',
   skill: 'Skill',
   skillsLocation: 'Skill location',
   skillsLocationDesc: 'Skill location description',
@@ -272,8 +272,8 @@ function baseCtx(): Record<string, unknown> {
   const noop = () => undefined
   const asyncNoop = async () => undefined
   const ref = { current: null }
-  const kun = {
-    ...defaultKunRuntimeSettings(),
+  const magicpocket = {
+    ...defaultMagicPocketRuntimeSettings(),
     autoStart: true,
     runtimeToken: '',
     insecure: true
@@ -282,10 +282,10 @@ function baseCtx(): Record<string, unknown> {
     t,
     tCommon: t,
     form: { claw: { skills: { extraDirs: ['/tmp/project/.agents/skills'] } } },
-    kun,
+    magicpocket,
     activeApiKey: '',
     update: noop,
-    updateKun: noop,
+    updateMagicPocket: noop,
     updateSharedCredential: noop,
     sharedApiKey: '',
     sharedBaseUrl: '',
@@ -336,7 +336,7 @@ function baseCtx(): Record<string, unknown> {
     skillNotice: null,
     openSkillRoot: asyncNoop,
     openPlugins: noop,
-    mcpConfigPath: '/tmp/project/.kun/mcp.json',
+    mcpConfigPath: '/tmp/project/.magicpocket/mcp.json',
     mcpConfigExists: true,
     mcpConfigText: '{"mcpServers":{}}',
     setMcpConfigText: noop,
@@ -351,7 +351,7 @@ function baseCtx(): Record<string, unknown> {
     memoryRecords: [],
     runtimeDiagnosticsBusy: false,
     runtimeDiagnosticsNotice: null,
-    refreshKunDiagnostics: asyncNoop,
+    refreshMagicPocketDiagnostics: asyncNoop,
     disableMemoryRecord: asyncNoop,
     deleteMemoryRecord: asyncNoop,
     pickClawWorkspace: asyncNoop,
@@ -362,7 +362,7 @@ function baseCtx(): Record<string, unknown> {
   }
 }
 
-describe('AgentsSettingsSection Kun diagnostics smoke', () => {
+describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
   it('builds a single patch when adding and selecting a model provider', () => {
     const provider = defaultModelProviderSettings()
     const customProvider = {
@@ -378,13 +378,13 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: [...provider.providers, customProvider],
-      kun: { providerId: customProvider.id }
+      magicpocket: { providerId: customProvider.id }
     })
 
     expect(patch.provider?.providers).toEqual([...provider.providers, customProvider])
-    expect(patch.agents?.kun?.providerId).toBe(customProvider.id)
-    expect(patch.agents?.kun?.apiKey).toBe('')
-    expect(patch.agents?.kun?.baseUrl).toBe('')
+    expect(patch.agents?.magicpocket?.providerId).toBe(customProvider.id)
+    expect(patch.agents?.magicpocket?.apiKey).toBe('')
+    expect(patch.agents?.magicpocket?.baseUrl).toBe('')
   })
 
   it('builds a single patch when removing the active model provider', () => {
@@ -407,13 +407,13 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
         ]
       },
       providers: provider.providers,
-      kun: { providerId: DEFAULT_MODEL_PROVIDER_ID }
+      magicpocket: { providerId: DEFAULT_MODEL_PROVIDER_ID }
     })
 
     expect(patch.provider?.providers).toEqual(provider.providers)
-    expect(patch.agents?.kun?.providerId).toBe(DEFAULT_MODEL_PROVIDER_ID)
-    expect(patch.agents?.kun?.apiKey).toBe('')
-    expect(patch.agents?.kun?.baseUrl).toBe('')
+    expect(patch.agents?.magicpocket?.providerId).toBe(DEFAULT_MODEL_PROVIDER_ID)
+    expect(patch.agents?.magicpocket?.apiKey).toBe('')
+    expect(patch.agents?.magicpocket?.baseUrl).toBe('')
   })
 
   it('builds a single patch when adding a preset model provider', () => {
@@ -425,7 +425,7 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: [...provider.providers, xiaomiProvider],
-      kun: {
+      magicpocket: {
         providerId: xiaomiProvider.id,
         model: xiaomiProvider.models[0]
       }
@@ -439,7 +439,7 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
         models: expect.arrayContaining(['mimo-v2.5'])
       })
     ]))
-    expect(patch.agents?.kun).toEqual(expect.objectContaining({
+    expect(patch.agents?.magicpocket).toEqual(expect.objectContaining({
       providerId: 'xiaomi',
       model: xiaomiProvider.models[0]
     }))
@@ -454,14 +454,14 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: [...provider.providers, minimaxProvider],
-      currentKun: defaultKunRuntimeSettings(),
-      kun: {
+      currentMagicPocket: defaultMagicPocketRuntimeSettings(),
+      magicpocket: {
         providerId: minimaxProvider.id,
         model: minimaxProvider.models[0]
       }
     })
 
-    expect(patch.agents?.kun).toEqual(expect.objectContaining({
+    expect(patch.agents?.magicpocket).toEqual(expect.objectContaining({
       providerId: 'minimax',
       model: minimaxProvider.models[0],
       textToSpeech: expect.objectContaining({
@@ -500,8 +500,8 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
           ...provider,
           providers: [...provider.providers, customProvider]
         },
-        kun: {
-          ...defaultKunRuntimeSettings(),
+        magicpocket: {
+          ...defaultMagicPocketRuntimeSettings(),
           providerId: customProvider.id
         }
       }
@@ -535,8 +535,8 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
           ...provider,
           providers: [...provider.providers, modelProviderPresetProfile(xiaomi!)]
         },
-        kun: {
-          ...defaultKunRuntimeSettings(),
+        magicpocket: {
+          ...defaultMagicPocketRuntimeSettings(),
           providerId: 'xiaomi'
         }
       }
@@ -554,7 +554,7 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
       ctx: {
         ...baseCtx(),
         provider: defaultModelProviderSettings(),
-        kun: defaultKunRuntimeSettings()
+        magicpocket: defaultMagicPocketRuntimeSettings()
       }
     }))
 
@@ -655,7 +655,7 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
 
     const html = renderToStaticMarkup(createElement(AgentsSettingsSection, { ctx }))
 
-    expect(html).toContain('Kun diagnostics')
+    expect(html).toContain('MagicPocket diagnostics')
     expect(html).toContain('MCP')
     expect(html).toContain('available')
     expect(html).toContain('2/2')
@@ -675,7 +675,7 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
     const html = renderToStaticMarkup(createElement(AgentsSettingsSection, { ctx: baseCtx() }))
 
     expect(html).toContain('External tool config path')
-    expect(html).toContain('/tmp/project/.kun/mcp.json')
+    expect(html).toContain('/tmp/project/.magicpocket/mcp.json')
     expect(html).toContain('Model and API credentials do not live in this MCP file')
     expect(html).not.toContain('DeepSeek auth')
     expect(html).not.toContain('Base URL are stored in this file')
@@ -701,9 +701,9 @@ describe('AgentsSettingsSection Kun diagnostics smoke', () => {
           skillCount: 2
         },
         {
-          id: 'global-kun',
-          disableKey: 'global-kun',
-          path: '/home/me/.kun/skills',
+          id: 'global-magicpocket',
+          disableKey: 'global-magicpocket',
+          path: '/home/me/.magicpocket/skills',
           scope: 'global',
           source: 'common',
           exists: true,

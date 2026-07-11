@@ -122,6 +122,9 @@ export function createThreadActions(
       set({ error: i18n.t('common:runtimeActionNeedsConnection') })
       return
     }
+    if (!options.systemPrompt?.trim()) {
+      set({ collaborationContext: null })
+    }
     try {
       const p = getProvider()
       const settings = await rendererRuntimeClient.getSettings()
@@ -132,11 +135,11 @@ export function createThreadActions(
       // 对话会话:不绑定项目文件夹,在 conversationWorkspaceRoot 下自动创建
       // 一个时间戳子目录作为工作目录(主进程负责实际建目录)。
       if (options.conversation) {
-        if (typeof window.kunGui === 'undefined' || typeof window.kunGui.createConversationWorkspace !== 'function') {
+        if (typeof window.magicpocketGui === 'undefined' || typeof window.magicpocketGui.createConversationWorkspace !== 'function') {
           set({ error: i18n.t('common:workspacePickerUnavailable') })
           return
         }
-        const created = await window.kunGui.createConversationWorkspace(
+        const created = await window.magicpocketGui.createConversationWorkspace(
           settings.conversationWorkspaceRoot || undefined
         )
         if (!created.ok || !created.path) {
@@ -145,7 +148,7 @@ export function createThreadActions(
         }
         const pickedAgentId = options.agentId?.trim() || get().composerAgentId?.trim() || ''
         const personaProfile = pickedAgentId
-          ? settings.agents?.kun?.subagents?.profiles?.find(
+          ? settings.agents?.magicpocket?.subagents?.profiles?.find(
             (profile) => profile.id === pickedAgentId &&
               profile.enabled &&
               (profile.mode === 'primary' || profile.mode === 'all')
@@ -153,14 +156,15 @@ export function createThreadActions(
           : undefined
         const t = await p.createThread({
           workspace: created.path,
-          title: getDefaultThreadTitle(),
+          title: options.title?.trim() || getDefaultThreadTitle(),
           mode: 'agent',
           ...(personaProfile ? {
             agentId: personaProfile.id,
             ...(personaProfile.providerId ? { providerId: personaProfile.providerId } : {}),
             ...(personaProfile.model ? { model: personaProfile.model } : {}),
             ...(personaProfile.systemPrompt ? { systemPrompt: personaProfile.systemPrompt } : {})
-          } : {})
+          } : {}),
+          ...(options.systemPrompt?.trim() ? { systemPrompt: options.systemPrompt.trim() } : {})
         })
         set((s) => ({
           activeThreadId: t.id,
@@ -208,13 +212,13 @@ export function createThreadActions(
         try {
           let branch = options.worktreeBranch?.trim() ?? ''
           if (!branch) {
-            const branches = await window.kunGui.getGitBranches(workspaceRoot)
+            const branches = await window.magicpocketGui.getGitBranches(workspaceRoot)
             if (branches.ok) branch = branches.currentBranch ?? ''
           }
           if (!branch) {
             throw new Error(i18n.t('common:worktreeBranchRequired'))
           }
-          const wt = await window.kunGui.checkoutGitBranchWorktree(workspaceRoot, branch)
+          const wt = await window.magicpocketGui.checkoutGitBranchWorktree(workspaceRoot, branch)
           if (!wt.ok) {
             throw new Error(wt.message)
           }
@@ -234,7 +238,7 @@ export function createThreadActions(
       // at create time so later agent edits don't drift the thread.
       const pickedAgentId = options.agentId?.trim() || get().composerAgentId?.trim() || ''
       const personaProfile = pickedAgentId
-        ? settings.agents?.kun?.subagents?.profiles?.find(
+        ? settings.agents?.magicpocket?.subagents?.profiles?.find(
             (profile) => profile.id === pickedAgentId &&
               profile.enabled &&
               (profile.mode === 'primary' || profile.mode === 'all')
@@ -242,17 +246,18 @@ export function createThreadActions(
         : undefined
       const t = await p.createThread({
         workspace: workspaceRoot,
-        title: getDefaultThreadTitle(),
+        title: options.title?.trim() || getDefaultThreadTitle(),
         mode: 'agent',
         ...(personaProfile ? {
           agentId: personaProfile.id,
           ...(personaProfile.providerId ? { providerId: personaProfile.providerId } : {}),
           ...(personaProfile.model ? { model: personaProfile.model } : {}),
           ...(personaProfile.systemPrompt ? { systemPrompt: personaProfile.systemPrompt } : {})
-        } : {})
+        } : {}),
+        ...(options.systemPrompt?.trim() ? { systemPrompt: options.systemPrompt.trim() } : {})
       })
       // Register + activate optimistically before refreshing. A freshly created
-      // Kun thread may not be listed until the first message is written.
+      // MagicPocket thread may not be listed until the first message is written.
       // Setting it active first lets refreshThreads preserve it in the sidebar.
       set((s) => ({
         activeThreadId: t.id,
@@ -313,7 +318,7 @@ export function createThreadActions(
       // The server has settled but a tool/approval/user_input block may still be
       // open (e.g. a delegate_task interrupted by a runtime restart). Settle it,
       // otherwise threadHasPendingRuntimeWork stays true and the queued message
-      // we are recovering re-queues forever instead of draining (KunAgent/Kun#621).
+      // we are recovering re-queues forever instead of draining (MagicPocketAgent/MagicPocket#621).
       const blocks = busy ? loaded : settlePendingRuntimeWorkAfterInterrupt(loaded)
       const currentTurnUserId = busy
         ? state.currentTurnUserId ?? latestUserMessageId ?? findLatestUserBlockId(blocks)
@@ -820,7 +825,7 @@ export function createThreadActions(
         }))
         void get().refreshThreads()
       } catch (e) {
-        void window.kunGui.logError('create-thread', 'Failed to create thread', {
+        void window.magicpocketGui.logError('create-thread', 'Failed to create thread', {
           message: e instanceof Error ? e.message : String(e)
         }).catch(() => undefined)
         set({
@@ -860,9 +865,9 @@ export function createThreadActions(
       if (
         checkpointWorkspaceRoot &&
         !checkpointGitUnavailableWorkspaces.has(checkpointWorkspaceKey) &&
-        typeof window.kunGui.createGitCheckpoint === 'function'
+        typeof window.magicpocketGui.createGitCheckpoint === 'function'
       ) {
-        const checkpoint = await window.kunGui.createGitCheckpoint({
+        const checkpoint = await window.magicpocketGui.createGitCheckpoint({
           workspaceRoot: checkpointWorkspaceRoot,
           threadId: activeThreadId
         }).catch((error) => ({
@@ -876,7 +881,7 @@ export function createThreadActions(
           if (checkpoint.reason === 'git_unavailable') {
             checkpointGitUnavailableWorkspaces.add(checkpointWorkspaceKey)
           }
-          void window.kunGui.logError(
+          void window.magicpocketGui.logError(
             'git-checkpoint',
             checkpoint.reason === 'git_unavailable'
               ? 'Git checkpoint disabled for this workspace because Git was not found'
@@ -967,8 +972,8 @@ export function createThreadActions(
           })()
         }))
       }
-      if (channel && typeof window.kunGui?.mirrorClawChannelMessage === 'function') {
-        const userMirror = await window.kunGui.mirrorClawChannelMessage(
+      if (channel && typeof window.magicpocketGui?.mirrorClawChannelMessage === 'function') {
+        const userMirror = await window.magicpocketGui.mirrorClawChannelMessage(
           activeThreadId,
           trimmedText,
           'user'
@@ -1011,7 +1016,7 @@ export function createThreadActions(
       return true
     } catch (e) {
       clearBusyWatchdog()
-      void window.kunGui.logError('send-message', 'Failed to send message', {
+      void window.magicpocketGui.logError('send-message', 'Failed to send message', {
         message: e instanceof Error ? e.message : String(e),
         threadId: activeThreadId
       }).catch(() => undefined)

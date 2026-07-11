@@ -4,7 +4,7 @@ import { normalizeRunningAppUrl } from './running-app-frame'
 import type { DesignOperation, DesignOperationJournalEntry } from '../graph/design-graph-types'
 import type { DesignCodeBinding, DesignCodeBindingTarget } from '../code-binding/code-binding-types'
 
-const DESIGN_DIR = '.kun-design'
+const DESIGN_DIR = '.magicpocket-design'
 
 export function canvasDocPath(artifactId: string, baseDir: string = DESIGN_DIR): string {
   return `${baseDir}/${artifactId}/canvas.json`
@@ -337,14 +337,14 @@ export function persistCanvasDocument(
   doc: CanvasDocument,
   baseDir?: string
 ): void {
-  if (!workspaceRoot || typeof window.kunGui?.writeWorkspaceFile !== 'function') return
+  if (!workspaceRoot || typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') return
 
   const key = canvasSaveKey(workspaceRoot, artifactId, baseDir)
   const existingTimer = _saveTimers.get(key)
   if (existingTimer) clearTimeout(existingTimer)
   const timer = setTimeout(() => {
     _saveTimers.delete(key)
-    void window.kunGui
+    void window.magicpocketGui
       .writeWorkspaceFile({
         path: canvasDocPath(artifactId, baseDir),
         workspaceRoot,
@@ -360,9 +360,9 @@ export async function loadCanvasDocument(
   artifactId: string,
   baseDir?: string
 ): Promise<CanvasDocument | null> {
-  if (!workspaceRoot || typeof window.kunGui?.readWorkspaceFile !== 'function') return null
+  if (!workspaceRoot || typeof window.magicpocketGui?.readWorkspaceFile !== 'function') return null
   try {
-    const result = await window.kunGui.readWorkspaceFile({
+    const result = await window.magicpocketGui.readWorkspaceFile({
       path: canvasDocPath(artifactId, baseDir),
       workspaceRoot
     })

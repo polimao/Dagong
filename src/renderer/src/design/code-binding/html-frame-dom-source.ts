@@ -44,13 +44,13 @@ export const HTML_FRAME_DOM_SOURCE_GUEST_SRC = `(() => {
         rect: rectFor(element)
       };
       const id = element.getAttribute('id') || '';
-      const domId = attr(element, ['data-kun-source-id', 'data-dom-id']) || id;
+      const domId = attr(element, ['data-magicpocket-source-id', 'data-dom-id']) || id;
       const onlookId = attr(element, ['data-onlook-id']);
-      const sourceFile = attr(element, ['data-kun-source-file', 'data-source-file', 'data-onlook-source-file']);
-      const componentName = attr(element, ['data-kun-component', 'data-component', 'data-onlook-component']);
-      const exportName = attr(element, ['data-kun-export', 'data-export']);
-      const astPath = attr(element, ['data-kun-ast-path', 'data-ast-path']);
-      const routePath = attr(element, ['data-kun-route', 'data-route']);
+      const sourceFile = attr(element, ['data-magicpocket-source-file', 'data-source-file', 'data-onlook-source-file']);
+      const componentName = attr(element, ['data-magicpocket-component', 'data-component', 'data-onlook-component']);
+      const exportName = attr(element, ['data-magicpocket-export', 'data-export']);
+      const astPath = attr(element, ['data-magicpocket-ast-path', 'data-ast-path']);
+      const routePath = attr(element, ['data-magicpocket-route', 'data-route']);
       if (id) node.id = id;
       if (domId) node.domId = domId;
       if (onlookId) node.onlookId = onlookId;
@@ -68,9 +68,9 @@ export const HTML_FRAME_DOM_SOURCE_GUEST_SRC = `(() => {
       return node;
     };
     const root = document.body || document.documentElement;
-    const routePath = attr(root, ['data-kun-route', 'data-route']) ||
+    const routePath = attr(root, ['data-magicpocket-route', 'data-route']) ||
       ((location.protocol === 'http:' || location.protocol === 'https:') ? location.pathname : '');
-    const sourceFile = attr(root, ['data-kun-source-file', 'data-source-file', 'data-onlook-source-file']);
+    const sourceFile = attr(root, ['data-magicpocket-source-file', 'data-source-file', 'data-onlook-source-file']);
     return {
       capturedAt: new Date().toISOString(),
       routePath: routePath || undefined,

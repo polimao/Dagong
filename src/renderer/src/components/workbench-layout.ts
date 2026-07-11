@@ -1,5 +1,5 @@
 import type { PointerEvent as ReactPointerEvent } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { WorkspaceFileTarget } from '@shared/workspace-file'
 import type { AppRoute } from '../store/chat-store-types'
 import {
@@ -10,12 +10,13 @@ import {
 import { WORKSPACE_FILE_PREVIEW_EVENT, type WorkspaceFilePreviewDetail } from '../lib/workspace-file-preview'
 import type { RightPanelMode } from './chat/WorkbenchTopBar'
 
-const LEFT_PANEL_WIDTH_KEY = 'kun.layout.leftSidebarWidth'
-const LEFT_PANEL_COLLAPSED_KEY = 'kun.layout.leftSidebarCollapsed'
-const RIGHT_PANEL_WIDTH_KEY = 'kun.layout.rightInspectorWidth'
-const RIGHT_PANEL_MODE_KEY = 'kun.layout.rightPanelMode'
-const TERMINAL_OPEN_KEY = 'kun.layout.terminalOpen'
-const TERMINAL_HEIGHT_KEY = 'kun.layout.terminalHeight'
+const LEFT_PANEL_WIDTH_KEY = 'magicpocket.layout.leftSidebarWidth'
+const LEFT_PANEL_COLLAPSED_KEY = 'magicpocket.layout.leftSidebarCollapsed'
+const RIGHT_PANEL_WIDTH_KEY = 'magicpocket.layout.rightInspectorWidth'
+const RIGHT_RAIL_COLLAPSED_KEY = 'magicpocket.layout.rightRailCollapsed'
+const RIGHT_PANEL_MODE_KEY = 'magicpocket.layout.rightPanelMode'
+const TERMINAL_OPEN_KEY = 'magicpocket.layout.terminalOpen'
+const TERMINAL_HEIGHT_KEY = 'magicpocket.layout.terminalHeight'
 const LEFT_PANEL_DEFAULT = 304
 const RIGHT_PANEL_DEFAULT = 360
 export const CODE_PANEL_PREFERRED = 560
@@ -208,6 +209,9 @@ export function useWorkbenchLayout({
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() =>
     readStoredBoolean(LEFT_PANEL_COLLAPSED_KEY, false)
   )
+  const [rightRailCollapsed, setRightRailCollapsed] = useState(() =>
+    readStoredBoolean(RIGHT_RAIL_COLLAPSED_KEY, false)
+  )
   const [rightSidebarWidth, setRightSidebarWidth] = useState(() =>
     readStoredWidth(RIGHT_PANEL_WIDTH_KEY, RIGHT_PANEL_DEFAULT)
   )
@@ -218,11 +222,12 @@ export function useWorkbenchLayout({
   const shellRef = useRef<HTMLDivElement | null>(null)
   const previewThreadId = useRef<string | null>(activeThreadId)
   const autoOpenedPreviewUrlRef = useRef<string | null>(null)
-  const rightPanelVisible = route === 'write'
-    ? writeAssistantOpen
-    : route === 'design'
-      ? designAssistantOpen || designImplementOpen
-      : rightPanelMode !== null
+  const rightPanelVisible =
+    route === 'write'
+      ? writeAssistantOpen
+      : route === 'design'
+        ? designAssistantOpen || designImplementOpen
+        : rightPanelMode !== null
   const widthConstraints = workbenchWidthConstraintsForRightPanel(route, rightPanelMode)
 
   useEffect(() => {
@@ -232,6 +237,10 @@ export function useWorkbenchLayout({
   useEffect(() => {
     persistBoolean(LEFT_PANEL_COLLAPSED_KEY, leftSidebarCollapsed)
   }, [leftSidebarCollapsed])
+
+  useEffect(() => {
+    persistBoolean(RIGHT_RAIL_COLLAPSED_KEY, rightRailCollapsed)
+  }, [rightRailCollapsed])
 
   useEffect(() => {
     persistWidth(RIGHT_PANEL_WIDTH_KEY, rightSidebarWidth)
@@ -292,7 +301,7 @@ export function useWorkbenchLayout({
     const sync = (): void => {
       const containerWidth =
         (shellRef.current?.clientWidth ?? window.innerWidth) -
-        (route === 'write' || route === 'design' ? 0 : RAIL_WIDTH)
+        (route === 'write' || route === 'design' || rightRailCollapsed ? 0 : RAIL_WIDTH)
       const next = fitWorkbenchWidths(
         containerWidth,
         leftSidebarWidth,
@@ -314,16 +323,16 @@ export function useWorkbenchLayout({
     leftSidebarWidth,
     rightPanelMode,
     rightPanelVisible,
+    rightRailCollapsed,
     rightSidebarWidth,
     route,
     widthConstraints
   ])
 
   const toggleRightPanelMode = (nextMode: Exclude<RightPanelMode, null>): void => {
-    const willOpen = rightPanelMode !== nextMode
     setRightPanelMode((current) => (current === nextMode ? null : nextMode))
     // The canvas wants room — bump the panel to the wider preview width on open.
-    if (willOpen && nextMode === 'canvas') {
+    if (nextMode === 'canvas') {
       setRightSidebarWidth((width) => Math.max(width, CODE_PANEL_PREFERRED))
     }
   }
@@ -332,52 +341,15 @@ export function useWorkbenchLayout({
     setLeftSidebarCollapsed((current) => !current)
   }
 
+  const toggleRightRail = useCallback((): void => {
+    setRightRailCollapsed((current) => !current)
+  }, [])
+
   const openDevPreview = (): void => {
     if (latestDevPreviewUrl) {
       autoOpenedPreviewUrlRef.current = latestDevPreviewUrl
     }
     setRightPanelMode('browser')
-  }
-
-  const beginLeftResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
-    if (leftSidebarCollapsed || event.button !== 0) return
-    event.preventDefault()
-    const startX = event.clientX
-    const startLeft = leftSidebarWidth
-    const startRight = rightSidebarWidth
-    const prevCursor = document.body.style.cursor
-    const prevUserSelect = document.body.style.userSelect
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
-
-    const onMove = (moveEvent: PointerEvent): void => {
-      const containerWidth =
-        (shellRef.current?.clientWidth ?? window.innerWidth) -
-        (route === 'write' || route === 'design' ? 0 : RAIL_WIDTH)
-      const delta = moveEvent.clientX - startX
-      const next = fitWorkbenchWidths(
-        containerWidth,
-        startLeft + delta,
-        startRight,
-        {
-          leftPanelVisible: true,
-          rightPanelVisible
-        },
-        widthConstraints
-      )
-      setLeftSidebarWidth(next.left)
-      if (next.right !== rightSidebarWidth) setRightSidebarWidth(next.right)
-    }
-
-    const onUp = (): void => {
-      document.body.style.cursor = prevCursor
-      document.body.style.userSelect = prevUserSelect
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-    }
-
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
   }
 
   const beginRightResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
@@ -394,7 +366,7 @@ export function useWorkbenchLayout({
     const onMove = (moveEvent: PointerEvent): void => {
       const containerWidth =
         (shellRef.current?.clientWidth ?? window.innerWidth) -
-        (route === 'write' || route === 'design' ? 0 : RAIL_WIDTH)
+        (route === 'write' || route === 'design' || rightRailCollapsed ? 0 : RAIL_WIDTH)
       const delta = moveEvent.clientX - startX
       const next = fitWorkbenchWidths(
         containerWidth,
@@ -457,7 +429,6 @@ export function useWorkbenchLayout({
   }
 
   return {
-    beginLeftResize,
     beginRightResize,
     beginTerminalResize,
     filePreviewTarget,
@@ -466,6 +437,7 @@ export function useWorkbenchLayout({
     openDevPreview,
     rightPanelMode,
     rightPanelVisible,
+    rightRailCollapsed,
     rightSidebarWidth,
     setFilePreviewTarget,
     setRightPanelMode,
@@ -475,6 +447,7 @@ export function useWorkbenchLayout({
     terminalOpen,
     toggleLeftSidebar,
     toggleRightPanelMode,
+    toggleRightRail,
     toggleTerminal
   }
 }

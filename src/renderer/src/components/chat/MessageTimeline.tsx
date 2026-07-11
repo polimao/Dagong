@@ -16,7 +16,7 @@ import {
   AnimatedWorkLogo,
   IKUN_WORK_LOGO_VARIANT_LABEL_KEYS,
   WORK_LOGO_SWIM_MODE_LABEL_KEYS,
-  useIkunWorkLogoVariant,
+  useImagicpocketWorkLogoVariant,
   useWorkLogoSwimMode
 } from './AnimatedWorkLogo'
 import type { UiPluginLabelKey } from '@shared/ui-plugin'
@@ -583,7 +583,7 @@ function MessageTurn({
   // (Feishu bot streaming) to appear only after turn_completed, which the
   // user perceives as a long delay.
   // Note: `live` is the generic SSE sink output across ALL channels
-  // (Kun runtime turns, claw channel replies from feishu/weixin/etc),
+  // (MagicPocket runtime turns, claw channel replies from feishu/weixin/etc),
   // not feishu-specific. Removing the !isProcessing gate is intentional
   // for all streaming paths, not just feishu.
   const showLiveAssistant = !!liveContent.trim()
@@ -729,12 +729,12 @@ function MessageTurn({
 function LiveTurnProgressRow({ hasActiveGoal }: { hasActiveGoal: boolean }): ReactElement {
   const { t, i18n } = useTranslation('common')
   const swimMode = useWorkLogoSwimMode(true)
-  const ikunVariant = useIkunWorkLogoVariant(true)
-  // iKun 模式是全局 html 属性;进行行每个回合重新挂载,挂载时读取即可
-  const [ikunModeOn] = useState(
+  const imagicpocketVariant = useImagicpocketWorkLogoVariant(true)
+  // iMagicPocket 模式是全局 html 属性;进行行每个回合重新挂载,挂载时读取即可
+  const [imagicpocketModeOn] = useState(
     () =>
       typeof document !== 'undefined' &&
-      document.documentElement.getAttribute('data-ikun-mode') === 'on'
+      document.documentElement.getAttribute('data-imagicpocket-mode') === 'on'
   )
   const swimLabelKey = WORK_LOGO_SWIM_MODE_LABEL_KEYS[swimMode]
   // UI 插件可声明自己的进行中文案(按泳姿键、按语言),未声明则用默认文案
@@ -742,14 +742,14 @@ function LiveTurnProgressRow({ hasActiveGoal }: { hasActiveGoal: boolean }): Rea
     swimLabelKey as UiPluginLabelKey,
     i18n.language ?? 'zh'
   )
-  const label = ikunModeOn
-    ? t(IKUN_WORK_LOGO_VARIANT_LABEL_KEYS[ikunVariant])
+  const label = imagicpocketModeOn
+    ? t(IKUN_WORK_LOGO_VARIANT_LABEL_KEYS[imagicpocketVariant])
     : pluginLabel ?? t(swimLabelKey)
 
   return (
     <div className={liveTurnProgressClass(hasActiveGoal)}>
       <span className="ds-work-logo-slot ds-work-logo-slot-sm mr-0.5">
-        <AnimatedWorkLogo active ikunVariant={ikunVariant} mode={swimMode} phase="trail" size="sm" />
+        <AnimatedWorkLogo active imagicpocketVariant={imagicpocketVariant} mode={swimMode} phase="trail" size="sm" />
       </span>
       <span className="ds-shiny-text">{label}</span>
     </div>

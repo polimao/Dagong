@@ -13,7 +13,7 @@ import { readdir, readFile, stat } from 'node:fs/promises'
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const PRODUCT_NAME = 'Kun'
+const PRODUCT_NAME = 'MagicPocket'
 const DEFAULT_RELEASE_PREFIX = 'deepseek-gui'
 const DEFAULT_RELEASE_CHANNEL = 'frontier'
 const PLATFORMS = ['mac', 'win', 'linux']
@@ -24,15 +24,15 @@ const ROOT = resolve(SCRIPT_DIR, '..')
 const PLATFORM_SPECS = {
   mac: {
     updateFile: 'latest-mac.yml',
-    assetPattern: /^Kun-.+-mac-(arm64|x64)\.(dmg|zip)(\.blockmap)?$/
+    assetPattern: /^MagicPocket-.+-mac-(arm64|x64)\.(dmg|zip)(\.blockmap)?$/
   },
   win: {
     updateFile: 'latest.yml',
-    assetPattern: /^Kun-.+-win-x64\.exe(\.blockmap)?$/
+    assetPattern: /^MagicPocket-.+-win-x64\.exe(\.blockmap)?$/
   },
   linux: {
     updateFile: 'latest-linux.yml',
-    assetPattern: /^Kun-.+-linux-x86_64\.AppImage(\.blockmap)?$/
+    assetPattern: /^MagicPocket-.+-linux-x86_64\.AppImage(\.blockmap)?$/
   }
 }
 
@@ -633,7 +633,7 @@ async function promoteRelease({ flags, dryRun }) {
       tag,
       releaseDate,
       generatedAt: new Date().toISOString(),
-      githubReleaseUrl: `https://github.com/KunAgent/Kun/releases/tag/${tag}`,
+      githubReleaseUrl: `https://github.com/MagicPocketAgent/MagicPocket/releases/tag/${tag}`,
       updateBaseUrl: joinUrl(config.publicBaseUrl, target.basePath, 'latest') + '/',
       updateMetadata: Object.fromEntries(
         platformManifests.map((manifest) => [

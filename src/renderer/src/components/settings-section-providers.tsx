@@ -2,8 +2,8 @@ import { useEffect, useRef, useState, type ReactElement, type ReactNode } from '
 import type {
   AppSettingsPatch,
   ImageGenerationProtocol,
-  KunRuntimeSettingsPatchV1,
-  KunRuntimeSettingsV1,
+  MagicPocketRuntimeSettingsPatchV1,
+  MagicPocketRuntimeSettingsV1,
   MusicGenerationProtocol,
   ModelEndpointFormat,
   ModelProviderImageCapabilityV1,
@@ -28,7 +28,7 @@ import {
   MODEL_ENDPOINT_FORMATS,
   MODEL_PROVIDER_PRESETS,
   TOKEN_PLAN_PROVIDER_ID_SUFFIX,
-  defaultMiniMaxMediaGenerationKunPatch,
+  defaultMiniMaxMediaGenerationMagicPocketPatch,
   defaultModelProviderSettings,
   getModelProviderPreset,
   modelProviderPresetProfile,
@@ -38,7 +38,7 @@ import {
   tokenPlanProviderId
 } from '@shared/app-settings'
 import type { ModelProviderPreset } from '@shared/model-provider-presets'
-import type { ModelProviderProbeResult } from '@shared/kun-gui-api'
+import type { ModelProviderProbeResult } from '@shared/magicpocket-gui-api'
 import {
   AudioLines,
   ChevronDown,
@@ -108,20 +108,20 @@ const VIDEO_GENERATION_PROTOCOL_LABEL_KEYS: Record<VideoGenerationProtocol, stri
 export function modelProvidersSettingsPatch(input: {
   provider: ModelProviderSettingsV1
   providers: ModelProviderProfileV1[]
-  kun?: KunRuntimeSettingsPatchV1
-  currentKun?: Partial<KunRuntimeSettingsV1>
+  magicpocket?: MagicPocketRuntimeSettingsPatchV1
+  currentMagicPocket?: Partial<MagicPocketRuntimeSettingsV1>
 }): AppSettingsPatch {
   const defaultProvider = input.providers.find((item) => item.id === DEFAULT_MODEL_PROVIDER_ID)
-  const miniMaxMediaDefaults = defaultMiniMaxMediaGenerationKunPatch({
+  const miniMaxMediaDefaults = defaultMiniMaxMediaGenerationMagicPocketPatch({
     providers: input.providers,
-    currentKun: input.currentKun,
-    kunPatch: input.kun
+    currentMagicPocket: input.currentMagicPocket,
+    magicpocketPatch: input.magicpocket
   })
-  const baseKunPatch = input.kun?.providerId?.trim()
-    ? { ...input.kun, apiKey: '', baseUrl: '' }
-    : input.kun ?? {}
-  const kunPatch = {
-    ...baseKunPatch,
+  const baseMagicPocketPatch = input.magicpocket?.providerId?.trim()
+    ? { ...input.magicpocket, apiKey: '', baseUrl: '' }
+    : input.magicpocket ?? {}
+  const magicpocketPatch = {
+    ...baseMagicPocketPatch,
     ...(miniMaxMediaDefaults ?? {})
   }
   return {
@@ -131,7 +131,7 @@ export function modelProvidersSettingsPatch(input: {
       proxy: input.provider.proxy,
       providers: input.providers
     },
-    ...(Object.keys(kunPatch).length > 0 ? { agents: { kun: kunPatch } } : {})
+    ...(Object.keys(magicpocketPatch).length > 0 ? { agents: { magicpocket: magicpocketPatch } } : {})
   }
 }
 
@@ -378,7 +378,7 @@ function CodexLoginSection({
     runId?: number
     fallbackNotice?: InlineNotice | null
   } = {}): Promise<void> => {
-    if (typeof window.kunGui?.startCodexAuth !== 'function') {
+    if (typeof window.magicpocketGui?.startCodexAuth !== 'function') {
       if (!isCurrentLoginRun(runId)) return
       setPhase('error')
       setError('Codex 登录不可用，请重启应用')
@@ -389,7 +389,7 @@ function CodexLoginSection({
     setError('')
     setNotice(fallbackNotice)
     try {
-      const result = await window.kunGui.startCodexAuth()
+      const result = await window.magicpocketGui.startCodexAuth()
       if (!isCurrentLoginRun(runId)) return
       if (!result.ok) {
         setPhase('error')
@@ -409,9 +409,9 @@ function CodexLoginSection({
           clearPoll()
           return
         }
-        if (typeof window.kunGui?.pollCodexAuth !== 'function') return
+        if (typeof window.magicpocketGui?.pollCodexAuth !== 'function') return
         try {
-          const poll = await window.kunGui.pollCodexAuth(deviceCode, uc)
+          const poll = await window.magicpocketGui.pollCodexAuth(deviceCode, uc)
           if (!isCurrentLoginRun(runId)) return
           if (poll.done) {
             clearPoll()
@@ -442,7 +442,7 @@ function CodexLoginSection({
 
   const startBrowserLogin = async (): Promise<void> => {
     const runId = beginLoginRun()
-    if (typeof window.kunGui?.startCodexBrowserAuth !== 'function') {
+    if (typeof window.magicpocketGui?.startCodexBrowserAuth !== 'function') {
       setPhase('error')
       setError('Codex 浏览器登录不可用，请重启应用')
       setNotice(null)
@@ -452,7 +452,7 @@ function CodexLoginSection({
     setError('')
     setNotice(null)
     try {
-      const result = await window.kunGui.startCodexBrowserAuth()
+      const result = await window.magicpocketGui.startCodexBrowserAuth()
       if (!isCurrentLoginRun(runId)) return
       if (result.ok) {
         setNotice(null)
@@ -498,8 +498,8 @@ function CodexLoginSection({
 
   const openVerifyUrl = (): void => {
     if (!verifyUrl) return
-    if (typeof window.kunGui?.openExternal === 'function') {
-      void window.kunGui.openExternal(verifyUrl).catch(() => {
+    if (typeof window.magicpocketGui?.openExternal === 'function') {
+      void window.magicpocketGui.openExternal(verifyUrl).catch(() => {
         window.open(verifyUrl, '_blank', 'noopener,noreferrer')
       })
       return
@@ -769,7 +769,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     t,
     form,
     provider: providerFromContext,
-    kun,
+    magicpocket,
     update,
     showApiKey,
     setShowApiKey,
@@ -778,7 +778,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
   const provider = providerFromContext ?? defaultModelProviderSettings()
   const modelProviders = provider.providers as ModelProviderProfileV1[]
   const [selectedProviderId, setSelectedProviderId] = useState<string>(
-    kun.providerId?.trim() || modelProviders[0]?.id || DEFAULT_MODEL_PROVIDER_ID
+    magicpocket.providerId?.trim() || modelProviders[0]?.id || DEFAULT_MODEL_PROVIDER_ID
   )
   const [addMenuOpen, setAddMenuOpen] = useState(false)
   const addMenuRef = useRef<HTMLDivElement>(null)
@@ -822,7 +822,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     !getModelProviderPreset(activeProvider.id) &&
     !tokenPlanPresetForProfileId(activeProvider.id)
   )
-  const activeKunProviderId: string = kun.providerId?.trim() || DEFAULT_MODEL_PROVIDER_ID
+  const activeMagicPocketProviderId: string = magicpocket.providerId?.trim() || DEFAULT_MODEL_PROVIDER_ID
   const providerProxy = provider.proxy ?? { enabled: false, url: '' }
 
   const updateProviderProxy = (patch: Partial<typeof providerProxy>): void => {
@@ -842,21 +842,21 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     confirmLabel?: string
     cancelLabel?: string
   }): Promise<boolean> => {
-    if (typeof window.kunGui?.confirmDialog === 'function') {
-      return window.kunGui.confirmDialog(options)
+    if (typeof window.magicpocketGui?.confirmDialog === 'function') {
+      return window.magicpocketGui.confirmDialog(options)
     }
     return true
   }
 
   const updateModelProviders = (
     providers: ModelProviderProfileV1[],
-    kunPatch?: KunRuntimeSettingsPatchV1
+    magicpocketPatch?: MagicPocketRuntimeSettingsPatchV1
   ): void => {
     update(modelProvidersSettingsPatch({
       provider,
       providers,
-      kun: kunPatch,
-      currentKun: kun
+      magicpocket: magicpocketPatch,
+      currentMagicPocket: magicpocket
     }))
   }
 
@@ -1000,7 +1000,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     setSelectedProviderId(nextId)
     updateModelProviders(
       modelProviders.map((item) => item.id === id ? { ...item, id: nextId } : item),
-      kun.providerId === id ? { providerId: nextId } : undefined
+      magicpocket.providerId === id ? { providerId: nextId } : undefined
     )
   }
 
@@ -1015,7 +1015,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     updateModelProviders(
       [...modelProviders, draftProvider],
       hasKey
-        ? { providerId: draftProvider.id, model: draftProvider.models[0] ?? kun.model }
+        ? { providerId: draftProvider.id, model: draftProvider.models[0] ?? magicpocket.model }
         : undefined
     )
     setDraftProvider(null)
@@ -1025,7 +1025,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
   const cancelProviderDraft = (): void => {
     if (!draftProvider) return
     setDraftProvider(null)
-    setSelectedProviderId(activeKunProviderId)
+    setSelectedProviderId(activeMagicPocketProviderId)
   }
 
   const addModelProvider = (): void => {
@@ -1093,7 +1093,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     updateModelProviders(
       nextProviders,
       nextProvider.apiKey.trim()
-        ? { providerId: nextProvider.id, model: nextProvider.models[0] ?? kun.model }
+        ? { providerId: nextProvider.id, model: nextProvider.models[0] ?? magicpocket.model }
         : undefined
     )
   }
@@ -1102,12 +1102,12 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     if (id === DEFAULT_MODEL_PROVIDER_ID) return
     const target = modelProviders.find((item) => item.id === id)
     if (!target) return
-    const usedByChat = activeKunProviderId === id
-    const usedByImage = (kun.imageGeneration?.providerId ?? '').trim() === id
-    const usedBySpeech = (kun.speechToText?.providerId ?? '').trim() === id
-    const usedByTextToSpeech = (kun.textToSpeech?.providerId ?? '').trim() === id
-    const usedByMusic = (kun.musicGeneration?.providerId ?? '').trim() === id
-    const usedByVideo = (kun.videoGeneration?.providerId ?? '').trim() === id
+    const usedByChat = activeMagicPocketProviderId === id
+    const usedByImage = (magicpocket.imageGeneration?.providerId ?? '').trim() === id
+    const usedBySpeech = (magicpocket.speechToText?.providerId ?? '').trim() === id
+    const usedByTextToSpeech = (magicpocket.textToSpeech?.providerId ?? '').trim() === id
+    const usedByMusic = (magicpocket.musicGeneration?.providerId ?? '').trim() === id
+    const usedByVideo = (magicpocket.videoGeneration?.providerId ?? '').trim() === id
     const writeInline = form?.write?.inlineCompletion
     const usedByWrite = Boolean(
       writeInline && !writeInline.inheritProvider && writeInline.providerId === id
@@ -1129,7 +1129,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     })
     if (!confirmed) return
     const nextProviders = modelProviders.filter((item) => item.id !== id)
-    const kunPatch: KunRuntimeSettingsPatchV1 | undefined =
+    const magicpocketPatch: MagicPocketRuntimeSettingsPatchV1 | undefined =
       usedByChat || usedByImage || usedBySpeech || usedByTextToSpeech || usedByMusic || usedByVideo
         ? {
             ...(usedByChat ? { providerId: DEFAULT_MODEL_PROVIDER_ID } : {}),
@@ -1143,8 +1143,8 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: nextProviders,
-      kun: kunPatch,
-      currentKun: kun
+      magicpocket: magicpocketPatch,
+      currentMagicPocket: magicpocket
     })
     if (usedByWrite) {
       patch.write = { inlineCompletion: { inheritProvider: true, providerId: '' } }
@@ -1154,7 +1154,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
   }
 
   const runProbe = async (target: ModelProviderProfileV1, mode: 'test' | 'fetch'): Promise<void> => {
-    if (typeof window.kunGui?.probeModelProvider !== 'function') return
+    if (typeof window.magicpocketGui?.probeModelProvider !== 'function') return
     const fingerprint = providerConnectionFingerprint(target)
     // Subscription (agent-sdk) providers have no HTTP /models endpoint — the turn
     // is delegated to the Claude Agent SDK. "Test" reports login readiness instead
@@ -1165,7 +1165,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
         // No HTTP /models endpoint — list the subscription's models via the SDK.
         let modelIds: string[] = []
         try {
-          modelIds = await window.kunGui.claudeSubscriptionModels(target.apiKey.trim() || undefined)
+          modelIds = await window.magicpocketGui.claudeSubscriptionModels(target.apiKey.trim() || undefined)
         } catch {
           modelIds = []
         }
@@ -1187,7 +1187,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
       let ready = target.apiKey.trim().length > 0
       if (!ready) {
         try {
-          ready = (await window.kunGui.claudeSubscriptionStatus()).loggedIn
+          ready = (await window.magicpocketGui.claudeSubscriptionStatus()).loggedIn
         } catch {
           ready = false
         }
@@ -1215,7 +1215,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
     setProbeStates((prev) => ({ ...prev, [target.id]: { fingerprint, mode, status: 'busy' } }))
     let result: ModelProviderProbeResult
     try {
-      result = await window.kunGui.probeModelProvider({
+      result = await window.magicpocketGui.probeModelProvider({
         baseUrl: target.baseUrl,
         apiKey: target.apiKey,
         endpointFormat: target.endpointFormat
@@ -1374,7 +1374,7 @@ export function ProvidersSettingsSection({ ctx }: { ctx: Record<string, any> }):
   const renderProviderButton = (item: ModelProviderProfileV1): ReactElement => {
     const selected = activeProvider?.id === item.id
     const isDraft = draftProvider?.id === item.id
-    const inUse = !isDraft && activeKunProviderId === item.id
+    const inUse = !isDraft && activeMagicPocketProviderId === item.id
     const missingKey = !item.apiKey.trim()
     return (
       <button

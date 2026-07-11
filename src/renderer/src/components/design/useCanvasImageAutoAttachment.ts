@@ -68,8 +68,8 @@ export function useCanvasImageAutoAttachment(
       try {
         let imageData = parseCanvasImageDataUrl(candidate.imageUrl)
         if (!imageData) {
-          if (typeof window.kunGui?.readWorkspaceImage !== 'function') return
-          const result = await window.kunGui.readWorkspaceImage({
+          if (typeof window.magicpocketGui?.readWorkspaceImage !== 'function') return
+          const result = await window.magicpocketGui.readWorkspaceImage({
             path: candidate.imageUrl,
             workspaceRoot: dynamicRef.current.workspaceRoot
           })

@@ -11,7 +11,7 @@ import {
 
 /**
  * Mirrors Design Assistant conversations into the owning design document dir:
- * `.kun-design/<docId>/chat/<threadId>.md` plus `chat/meta.json`.
+ * `.magicpocket-design/<docId>/chat/<threadId>.md` plus `chat/meta.json`.
  *
  * The runtime remains the live source of truth. These files make a design
  * document self-contained for review, backup, and physical deletion.
@@ -39,7 +39,7 @@ function safePathSegment(value: string): string {
 
 export function designChatDir(docId: string): string | null {
   const safeDocId = safePathSegment(docId)
-  return safeDocId ? `.kun-design/${safeDocId}/chat` : null
+  return safeDocId ? `.magicpocket-design/${safeDocId}/chat` : null
 }
 
 export function designChatMetaPath(docId: string): string | null {
@@ -137,9 +137,9 @@ export async function hydrateDesignChatMetaForDoc(input: {
   docId: string
 }): Promise<boolean> {
   const metaPath = designChatMetaPath(input.docId)
-  if (!metaPath || typeof window.kunGui?.readWorkspaceFile !== 'function') return false
+  if (!metaPath || typeof window.magicpocketGui?.readWorkspaceFile !== 'function') return false
   try {
-    const read = await window.kunGui.readWorkspaceFile({
+    const read = await window.magicpocketGui.readWorkspaceFile({
       workspaceRoot: input.workspaceRoot,
       path: metaPath
     })
@@ -184,15 +184,15 @@ export async function persistDesignChatMetaForDoc(input: {
   const record = recordForDesignDoc(input.workspaceRoot, input.docId)
   if (!metaPath || !record) return false
   if (
-    typeof window.kunGui?.writeWorkspaceFile !== 'function' ||
-    typeof window.kunGui?.readWorkspaceFile !== 'function'
+    typeof window.magicpocketGui?.writeWorkspaceFile !== 'function' ||
+    typeof window.magicpocketGui?.readWorkspaceFile !== 'function'
   ) {
     return false
   }
 
   let previous: DesignChatMeta | null = null
   try {
-    const existing = await window.kunGui.readWorkspaceFile({
+    const existing = await window.magicpocketGui.readWorkspaceFile({
       workspaceRoot: input.workspaceRoot,
       path: metaPath
     })
@@ -214,7 +214,7 @@ export async function persistDesignChatMetaForDoc(input: {
   }
 
   try {
-    const written = await window.kunGui.writeWorkspaceFile({
+    const written = await window.magicpocketGui.writeWorkspaceFile({
       workspaceRoot: input.workspaceRoot,
       path: metaPath,
       content: `${JSON.stringify(meta, null, 2)}\n`
@@ -231,11 +231,11 @@ export async function writeDesignChatTranscriptForThread(input: {
   threadId: string
   blocks: ChatBlock[]
 }): Promise<boolean> {
-  if (typeof window.kunGui?.writeWorkspaceFile !== 'function') return false
+  if (typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') return false
   const transcriptPath = designChatTranscriptRelativePath(input.docId, input.threadId)
   if (!transcriptPath) return false
   try {
-    const written = await window.kunGui.writeWorkspaceFile({
+    const written = await window.magicpocketGui.writeWorkspaceFile({
       workspaceRoot: input.workspaceRoot,
       path: transcriptPath,
       content: serializeDesignChatTranscript(input.blocks, {

@@ -1,5 +1,5 @@
 // Structured model + (de)serialization for the MCP server config edited in
-// settings. The on-disk file (`~/.kun/mcp.json`) is the single source of
+// settings. The on-disk file (`~/.magicpocket/mcp.json`) is the single source of
 // truth; this module is the lossless-ish bridge between that JSON text and a
 // form the user can fill in without knowing the schema.
 //
@@ -10,12 +10,12 @@
 // Cursor copy-paste format works too: we accept `mcpServers` (not just
 // `servers`) and `type` (not just `transport`) with `http` aliased to
 // `streamable-http`. This mirrors the leniency in the GUI importer
-// (src/main/kun-process.ts normalizeGuiManagedMcpServer) so what the form
+// (src/main/magicpocket-process.ts normalizeGuiManagedMcpServer) so what the form
 // accepts is what the runtime will actually load.
 
 export type McpTransport = 'stdio' | 'streamable-http' | 'sse'
 
-export type McpKeyValue = { key: string; value: string }
+export type McpKeyValue = { rowId: string; key: string; value: string }
 
 export type McpFormServer = {
   /** Stable React key; NOT persisted. Lets the name field be edited freely. */
@@ -52,6 +52,9 @@ export type McpParseResult =
 
 const TRANSPORTS: readonly McpTransport[] = ['stdio', 'streamable-http', 'sse']
 
+/** System-managed MCP server id (e.g. gui_schedule) — read-only in the editor. */
+export const GUI_SCHEDULE_MCP_SERVER_ID = 'gui_schedule'
+
 let rowIdCounter = 0
 function nextRowId(): string {
   rowIdCounter += 1
@@ -75,7 +78,7 @@ function asStringArray(value: unknown): string[] {
 
 function asKeyValues(value: unknown): McpKeyValue[] {
   if (!isRecord(value)) return []
-  return Object.entries(value).map(([key, raw]) => ({ key, value: asString(raw) }))
+  return Object.entries(value).map(([key, raw]) => ({ rowId: nextRowId(), key, value: asString(raw) }))
 }
 
 function normalizeTransport(
@@ -99,7 +102,7 @@ function parseServerEntry(name: string, raw: unknown): McpFormServer {
   const record = isRecord(raw) ? raw : {}
   const command = asString(record.command).trim()
   const url = asString(record.url).trim()
-  // Accept both `transport` (kun) and `type` (Claude Desktop) field names.
+  // Accept both `transport` (magicpocket) and `type` (Claude Desktop) field names.
   const transport = normalizeTransport(record.transport ?? record.type, command, url)
   const workspaceRoots = asStringArray(record.workspaceRoots)
   const trustedWorkspaceRoots = asStringArray(record.trustedWorkspaceRoots)
@@ -155,6 +158,11 @@ export function createBlankMcpServer(transport: McpTransport = 'stdio'): McpForm
   }
 }
 
+/** Build a blank key-value row for env/headers editors. */
+export function createBlankMcpKeyValue(): McpKeyValue {
+  return { rowId: nextRowId(), key: '', value: '' }
+}
+
 /**
  * Parse the raw mcp.json text into the form model. An empty / whitespace-only
  * string is valid and yields an empty model. Invalid JSON or a non-object
@@ -175,7 +183,7 @@ export function parseMcpConfigText(text: string): McpParseResult {
     return { ok: false, error: 'Config root must be a JSON object.' }
   }
 
-  // Servers can live at the top level under `servers` (kun) or `mcpServers`
+  // Servers can live at the top level under `servers` (magicpocket) or `mcpServers`
   // (Claude Desktop / Cursor). Everything else at the top level is preserved.
   const serversSource = isRecord(parsed.servers)
     ? parsed.servers

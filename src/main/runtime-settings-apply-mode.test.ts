@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultTerminalSettings,
@@ -22,10 +22,10 @@ function settings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      kun: defaultKunRuntimeSettings()
+      magicpocket: defaultMagicPocketRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -55,7 +55,7 @@ describe('runtimeSettingsApplyMode', () => {
     const prev = settings()
     const withModel = {
       ...prev,
-      agents: { kun: { ...prev.agents.kun, model: 'deepseek-reasoner' } }
+      agents: { magicpocket: { ...prev.agents.magicpocket, model: 'deepseek-reasoner' } }
     }
     const withProviderKey = {
       ...prev,
@@ -63,15 +63,15 @@ describe('runtimeSettingsApplyMode', () => {
     }
     const withApproval = {
       ...prev,
-      agents: { kun: { ...prev.agents.kun, approvalPolicy: 'never' as const, sandboxMode: 'read-only' as const } }
+      agents: { magicpocket: { ...prev.agents.magicpocket, approvalPolicy: 'never' as const, sandboxMode: 'read-only' as const } }
     }
     const withMedia = {
       ...prev,
       agents: {
-        kun: {
-          ...prev.agents.kun,
+        magicpocket: {
+          ...prev.agents.magicpocket,
           imageGeneration: {
-            ...prev.agents.kun.imageGeneration,
+            ...prev.agents.magicpocket.imageGeneration,
             enabled: true,
             providerId: 'deepseek',
             model: 'image-model'
@@ -88,7 +88,7 @@ describe('runtimeSettingsApplyMode', () => {
     }
     const withMemory = {
       ...prev,
-      agents: { kun: { ...prev.agents.kun, memoryEnabled: true } }
+      agents: { magicpocket: { ...prev.agents.magicpocket, memoryEnabled: true } }
     }
 
     expect(runtimeSettingsApplyMode(prev, withModel)).toBe('hot')
@@ -104,22 +104,22 @@ describe('runtimeSettingsApplyMode', () => {
 
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
-      agents: { kun: { ...prev.agents.kun, port: prev.agents.kun.port + 1 } }
+      agents: { magicpocket: { ...prev.agents.magicpocket, port: prev.agents.magicpocket.port + 1 } }
     })).toBe('restart')
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
-      agents: { kun: { ...prev.agents.kun, dataDir: '/tmp/kun-next' } }
+      agents: { magicpocket: { ...prev.agents.magicpocket, dataDir: '/tmp/magicpocket-next' } }
     })).toBe('restart')
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
-      agents: { kun: { ...prev.agents.kun, runtimeToken: 'tok-next' } }
+      agents: { magicpocket: { ...prev.agents.magicpocket, runtimeToken: 'tok-next' } }
     })).toBe('restart')
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
       agents: {
-        kun: {
-          ...prev.agents.kun,
-          storage: { ...prev.agents.kun.storage, backend: 'file' as const }
+        magicpocket: {
+          ...prev.agents.magicpocket,
+          storage: { ...prev.agents.magicpocket.storage, backend: 'file' as const }
         }
       }
     })).toBe('restart')

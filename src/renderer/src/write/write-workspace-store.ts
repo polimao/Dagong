@@ -128,9 +128,9 @@ export const useWriteWorkspaceStore = create<WriteWorkspaceState>((set, get) => 
     let size = options.size
     let truncated = options.truncated
     if (typeof content !== 'string') {
-      let result: Awaited<ReturnType<typeof window.kunGui.readWorkspaceFile>>
+      let result: Awaited<ReturnType<typeof window.magicpocketGui.readWorkspaceFile>>
       try {
-        result = await window.kunGui.readWorkspaceFile({
+        result = await window.magicpocketGui.readWorkspaceFile({
           path: snapshot.activeFilePath,
           workspaceRoot
         })
@@ -262,7 +262,7 @@ export const useWriteWorkspaceStore = create<WriteWorkspaceState>((set, get) => 
     if (path && !pathsEqual(path, snapshot.activeFilePath)) return false
 
     try {
-      const result = await window.kunGui.readWorkspaceImage({
+      const result = await window.magicpocketGui.readWorkspaceImage({
         path: snapshot.activeFilePath,
         workspaceRoot
       })
@@ -313,7 +313,7 @@ export const useWriteWorkspaceStore = create<WriteWorkspaceState>((set, get) => 
     }
     set({ saveStatus: 'saving' })
     try {
-      const result = await window.kunGui.writeWorkspaceFile({
+      const result = await window.magicpocketGui.writeWorkspaceFile({
         path: state.activeFilePath,
         workspaceRoot,
         content: state.fileContent

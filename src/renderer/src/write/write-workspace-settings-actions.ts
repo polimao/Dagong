@@ -1,6 +1,6 @@
 import {
-  resolveKunImageGenerationSettings,
-  resolveKunRuntimeSettings,
+  resolveMagicPocketImageGenerationSettings,
+  resolveMagicPocketRuntimeSettings,
   resolveWriteInlineCompletionApiKey
 } from '@shared/app-settings'
 import { rendererRuntimeClient } from '../agent/runtime-client'
@@ -27,8 +27,8 @@ function applyWriteSettingsState(
   settings: Awaited<ReturnType<typeof rendererRuntimeClient.getSettings>>
 ): ReturnType<typeof withResolvedInlineCompletionSettings> {
   const write = withResolvedInlineCompletionSettings(normalizeWriteSettings(settings.write), settings)
-  const imageGeneration = resolveKunImageGenerationSettings(settings)
-  const runtime = resolveKunRuntimeSettings(settings)
+  const imageGeneration = resolveMagicPocketImageGenerationSettings(settings)
+  const runtime = resolveMagicPocketRuntimeSettings(settings)
   set({
     defaultWorkspaceRoot: write.defaultWorkspaceRoot,
     workspaceRoots: write.workspaces,

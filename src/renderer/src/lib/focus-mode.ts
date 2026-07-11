@@ -1,9 +1,11 @@
 import { readBrowserStorageItem, writeBrowserStorageItem } from './browser-storage'
 
-export const FOCUS_MODE_STORAGE_KEY = 'kun.focusMode'
+export const FOCUS_MODE_STORAGE_KEY = 'magicpocket.focusMode'
 
 export function readFocusModePreference(): boolean {
-  const value = readBrowserStorageItem(FOCUS_MODE_STORAGE_KEY)?.trim().toLowerCase()
+  const raw = readBrowserStorageItem(FOCUS_MODE_STORAGE_KEY)
+  if (raw == null) return true
+  const value = raw.trim().toLowerCase()
   return value === '1' || value === 'true' || value === 'on'
 }
 

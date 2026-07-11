@@ -1,13 +1,13 @@
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { DesktopCommand } from '@shared/kun-gui-api'
+import type { DesktopCommand } from '@shared/magicpocket-gui-api'
 import {
   resolveKeyboardShortcutBindings,
   type KeyboardShortcutBindingsV1,
   type KeyboardShortcutCommandId
 } from '@shared/keyboard-shortcuts'
-import kunLogo from '../../../asset/img/kun.png'
+import magicpocketLogo from '../../../asset/img/magicpocket.png'
 import { useKeyboardShortcutSettings } from '../lib/keyboard-shortcut-settings'
 import { useChatStore } from '../store/chat-store'
 
@@ -48,21 +48,21 @@ type Props = {
 }
 
 function currentPlatform(): string {
-  return typeof window !== 'undefined' ? window.kunGui?.platform ?? 'unknown' : 'unknown'
+  return typeof window !== 'undefined' ? window.magicpocketGui?.platform ?? 'unknown' : 'unknown'
 }
 
 function defaultRunDesktopCommand(command: DesktopCommand): Promise<void> {
-  if (typeof window === 'undefined' || typeof window.kunGui?.runDesktopCommand !== 'function') {
+  if (typeof window === 'undefined' || typeof window.magicpocketGui?.runDesktopCommand !== 'function') {
     return Promise.resolve()
   }
-  return window.kunGui.runDesktopCommand(command)
+  return window.magicpocketGui.runDesktopCommand(command)
 }
 
 function defaultOpenLogDir(): Promise<void> {
-  if (typeof window === 'undefined' || typeof window.kunGui?.openLogDir !== 'function') {
+  if (typeof window === 'undefined' || typeof window.magicpocketGui?.openLogDir !== 'function') {
     return Promise.resolve()
   }
-  return window.kunGui.openLogDir().then(() => undefined)
+  return window.magicpocketGui.openLogDir().then(() => undefined)
 }
 
 export function supportsDesktopTitleBar(platform: string): boolean {
@@ -197,8 +197,8 @@ export function WindowsTitleBar({ platform, actions }: Props): ReactElement | nu
     openLogDir: defaultOpenLogDir,
     showAbout: async () => {
       const version =
-        typeof window !== 'undefined' && typeof window.kunGui?.getAppVersion === 'function'
-          ? await window.kunGui.getAppVersion().catch(() => '')
+        typeof window !== 'undefined' && typeof window.magicpocketGui?.getAppVersion === 'function'
+          ? await window.magicpocketGui.getAppVersion().catch(() => '')
           : ''
       const message = t('windowsMenuAboutMessage', {
         version: version || t('windowsMenuUnknownVersion')
@@ -279,7 +279,7 @@ export function WindowsTitleBar({ platform, actions }: Props): ReactElement | nu
   return (
     <div ref={rootRef} data-cursor-spotlight-target className="ds-windows-titlebar ds-drag">
       <div className="ds-windows-titlebar-content">
-        <img src={kunLogo} alt="" aria-hidden="true" className="ds-windows-titlebar-icon" />
+        <img src={magicpocketLogo} alt="" aria-hidden="true" className="ds-windows-titlebar-icon" />
         <nav className="ds-windows-menu ds-no-drag" aria-label={t('windowsMenuAriaLabel')}>
           {menus.map((menu) => {
             const open = activeMenuId === menu.id

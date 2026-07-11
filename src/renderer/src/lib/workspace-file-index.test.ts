@@ -27,7 +27,7 @@ function installListDirectory(
   impl: (options: { workspaceRoot: string; path?: string }) => unknown
 ): ReturnType<typeof vi.fn> {
   const fn = vi.fn(async (options: { workspaceRoot: string; path?: string }) => impl(options))
-  vi.stubGlobal('window', { kunGui: { listWorkspaceDirectory: fn } })
+  vi.stubGlobal('window', { magicpocketGui: { listWorkspaceDirectory: fn } })
   return fn
 }
 
@@ -122,7 +122,7 @@ describe('loadWorkspaceFileIndex design document references', () => {
     const root = '/ws-design-doc-index'
     const listWorkspaceDirectory = vi.fn(async () => ({ ok: true as const, root, entries: [] }))
     const readWorkspaceFile = vi.fn(async (options: { path: string }) => {
-      if (options.path !== '.kun-design/documents.json') return { ok: false as const, message: 'missing' }
+      if (options.path !== '.magicpocket-design/documents.json') return { ok: false as const, message: 'missing' }
       return {
         ok: true as const,
         content: JSON.stringify({
@@ -139,13 +139,13 @@ describe('loadWorkspaceFileIndex design document references', () => {
         })
       }
     })
-    vi.stubGlobal('window', { kunGui: { listWorkspaceDirectory, readWorkspaceFile } })
+    vi.stubGlobal('window', { magicpocketGui: { listWorkspaceDirectory, readWorkspaceFile } })
 
     const index = await loadWorkspaceFileIndex(root)
 
     expect(index.directories).toContainEqual(expect.objectContaining({
-      path: `${root}/.kun-design/doc_1`,
-      relativePath: '.kun-design/doc_1',
+      path: `${root}/.magicpocket-design/doc_1`,
+      relativePath: '.magicpocket-design/doc_1',
       name: 'doc_1',
       type: 'directory',
       workspaceRoot: root
@@ -157,38 +157,38 @@ describe('loadWorkspaceDirectoryContextFiles', () => {
   it('recursively lists mentionable text files under the referenced directory', async () => {
     const root = '/ws-design-dir-context'
     const listWorkspaceDirectory = installListDirectory((options) => {
-      if (options.path === '.kun-design/doc_1') {
+      if (options.path === '.magicpocket-design/doc_1') {
         return {
           ok: true,
-          root: `${root}/.kun-design/doc_1`,
+          root: `${root}/.magicpocket-design/doc_1`,
           entries: [
-            entry(`${root}/.kun-design/doc_1/design.md`, 'file'),
-            entry(`${root}/.kun-design/doc_1/home`, 'directory'),
-            entry(`${root}/.kun-design/doc_1/preview.png`, 'file')
+            entry(`${root}/.magicpocket-design/doc_1/design.md`, 'file'),
+            entry(`${root}/.magicpocket-design/doc_1/home`, 'directory'),
+            entry(`${root}/.magicpocket-design/doc_1/preview.png`, 'file')
           ]
         }
       }
-      if (options.path === '.kun-design/doc_1/home') {
+      if (options.path === '.magicpocket-design/doc_1/home') {
         return {
           ok: true,
-          root: `${root}/.kun-design/doc_1/home`,
+          root: `${root}/.magicpocket-design/doc_1/home`,
           entries: [
-            entry(`${root}/.kun-design/doc_1/home/DESIGN.md`, 'file'),
-            entry(`${root}/.kun-design/doc_1/home/v1.html`, 'file'),
-            entry(`${root}/.kun-design/doc_1/home/screenshot.png`, 'file')
+            entry(`${root}/.magicpocket-design/doc_1/home/DESIGN.md`, 'file'),
+            entry(`${root}/.magicpocket-design/doc_1/home/v1.html`, 'file'),
+            entry(`${root}/.magicpocket-design/doc_1/home/screenshot.png`, 'file')
           ]
         }
       }
       return { ok: false, message: 'missing' }
     })
 
-    const files = await loadWorkspaceDirectoryContextFiles(root, '.kun-design/doc_1', 10)
+    const files = await loadWorkspaceDirectoryContextFiles(root, '.magicpocket-design/doc_1', 10)
 
-    expect(listWorkspaceDirectory).toHaveBeenCalledWith({ workspaceRoot: root, path: '.kun-design/doc_1' })
+    expect(listWorkspaceDirectory).toHaveBeenCalledWith({ workspaceRoot: root, path: '.magicpocket-design/doc_1' })
     expect(files.map((file) => file.relativePath)).toEqual([
-      '.kun-design/doc_1/design.md',
-      '.kun-design/doc_1/home/DESIGN.md',
-      '.kun-design/doc_1/home/v1.html'
+      '.magicpocket-design/doc_1/design.md',
+      '.magicpocket-design/doc_1/home/DESIGN.md',
+      '.magicpocket-design/doc_1/home/v1.html'
     ])
   })
 })

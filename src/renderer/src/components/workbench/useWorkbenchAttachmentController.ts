@@ -82,15 +82,15 @@ export function useWorkbenchAttachmentController({
       for (const [index, file] of files.entries()) {
         const localFilePath =
           options.localFilePaths?.[index] ||
-          (typeof window.kunGui?.getPathForFile === 'function' ? window.kunGui.getPathForFile(file) : '')
+          (typeof window.magicpocketGui?.getPathForFile === 'function' ? window.magicpocketGui.getPathForFile(file) : '')
         if (isPdfAttachmentFile(file)) {
-          if (!localFilePath || typeof window.kunGui?.readLocalPdfText !== 'function') {
+          if (!localFilePath || typeof window.magicpocketGui?.readLocalPdfText !== 'function') {
             throw new Error(t('composerPdfAttachmentUnavailable'))
           }
           if (!attachmentCapabilities || typeof provider.uploadAttachment !== 'function') {
             throw new Error(t('composerAttachmentUnavailable'))
           }
-          const result = await window.kunGui.readLocalPdfText({ path: localFilePath })
+          const result = await window.magicpocketGui.readLocalPdfText({ path: localFilePath })
           if (!result.ok) throw new Error(result.message)
           const documentText = result.text.trim()
           if (!documentText) throw new Error(t('composerPdfAttachmentNoText'))
@@ -167,11 +167,11 @@ export function useWorkbenchAttachmentController({
 
   async function handlePasteClipboardImage(options: { silentNoImage?: boolean } = {}): Promise<void> {
     if (!attachmentUploadEnabled) return
-    if (typeof window.kunGui?.readClipboardImage !== 'function') {
+    if (typeof window.magicpocketGui?.readClipboardImage !== 'function') {
       setAttachmentUploadError(t('composerAttachmentUnavailable'))
       return
     }
-    const image = await window.kunGui.readClipboardImage()
+    const image = await window.magicpocketGui.readClipboardImage()
     if (!image.ok) {
       if (options.silentNoImage) return
       setAttachmentUploadError(image.message)

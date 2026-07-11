@@ -1,10 +1,10 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { KunGuiApi } from '../shared/kun-gui-api'
+import type { MagicPocketGuiApi } from '../shared/magicpocket-gui-api'
 
 // The preload runs sandboxed (webPreferences.sandbox = true), so it cannot
 // require node built-ins like node:os. The home dir is passed in from the main
 // process via additionalArguments and read off process.argv instead.
-const HOME_DIR_ARG = '--kun-home-dir='
+const HOME_DIR_ARG = '--magicpocket-home-dir='
 const homeDirFromArgs =
   process.argv.find((arg) => arg.startsWith(HOME_DIR_ARG))?.slice(HOME_DIR_ARG.length) ?? ''
 
@@ -71,11 +71,11 @@ const api = {
   confirmDialog: (options) =>
     ipcRenderer.invoke('dialog:confirm', options),
   detectLegacySessions: () =>
-    ipcRenderer.invoke('kun:sessions:detect-legacy'),
+    ipcRenderer.invoke('magicpocket:sessions:detect-legacy'),
   importLegacySessions: (sourceDir) =>
-    ipcRenderer.invoke('kun:sessions:import-legacy', { sourceDir }),
+    ipcRenderer.invoke('magicpocket:sessions:import-legacy', { sourceDir }),
   pickLegacySessionDir: () =>
-    ipcRenderer.invoke('kun:sessions:pick-source-dir'),
+    ipcRenderer.invoke('magicpocket:sessions:pick-source-dir'),
   listSkills: (workspaceRoot) =>
     ipcRenderer.invoke('skill:list', { workspaceRoot }),
   listSkillRoots: (workspaceRoot) =>
@@ -94,12 +94,12 @@ const api = {
     ipcRenderer.invoke('ui-plugin:remove', { id }),
   loadUiPlugin: (id) =>
     ipcRenderer.invoke('ui-plugin:load', { id }),
-  getKunConfigFile: () =>
-    ipcRenderer.invoke('kun:config:read'),
-  setKunConfigFile: (content) =>
-    ipcRenderer.invoke('kun:config:write', content),
-  openKunConfigDir: () =>
-    ipcRenderer.invoke('kun:config:open-dir'),
+  getMagicPocketConfigFile: () =>
+    ipcRenderer.invoke('magicpocket:config:read'),
+  setMagicPocketConfigFile: (content) =>
+    ipcRenderer.invoke('magicpocket:config:write', content),
+  openMagicPocketConfigDir: () =>
+    ipcRenderer.invoke('magicpocket:config:open-dir'),
   getGitBranches: (workspaceRoot) =>
     ipcRenderer.invoke('git:branches', workspaceRoot),
   switchGitBranch: (workspaceRoot, branch) =>
@@ -355,6 +355,6 @@ const api = {
     ipcRenderer.on('terminal:exit', wrapped)
     return () => ipcRenderer.removeListener('terminal:exit', wrapped)
   }
-} satisfies KunGuiApi
+} satisfies MagicPocketGuiApi
 
-contextBridge.exposeInMainWorld('kunGui', api)
+contextBridge.exposeInMainWorld('magicpocketGui', api)

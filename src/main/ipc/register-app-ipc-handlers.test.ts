@@ -7,7 +7,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultKunRuntimeSettings,
+  defaultMagicPocketRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -41,10 +41,10 @@ function settings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      kun: defaultKunRuntimeSettings()
+      magicpocket: defaultMagicPocketRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/Kun',
+    conversationWorkspaceRoot: '~/Documents/MagicPocket',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -80,7 +80,7 @@ function registerOptions(overrides: Partial<Parameters<typeof import('./register
     pollFeishuInstall: vi.fn() as never,
     startWeixinInstallQrcode: vi.fn() as never,
     pollWeixinInstall: vi.fn() as never,
-    resolveKunConfigPath: () => '/tmp/kun.json',
+    resolveMagicPocketConfigPath: () => '/tmp/magicpocket.json',
     showTurnCompleteNotification: vi.fn() as never,
     getAppVersion: () => '0.1.0',
     readGuiUpdateState: vi.fn() as never,
@@ -105,7 +105,7 @@ describe('registerAppIpcHandlers', () => {
     const handler = handlers.get('settings:set')
     expect(handler).toBeTypeOf('function')
     await expect(
-      handler?.({}, { agents: { kun: { mysteryFlag: true } } })
+      handler?.({}, { agents: { magicpocket: { mysteryFlag: true } } })
     ).rejects.toThrow(/Invalid payload for settings:set/)
     expect(applySettingsPatch).not.toHaveBeenCalled()
   })
@@ -119,7 +119,7 @@ describe('registerAppIpcHandlers', () => {
     const payload = {
       theme: 'dark' as const,
       agents: {
-        kun: {
+        magicpocket: {
           port: 19000
         }
       }
@@ -188,7 +188,7 @@ describe('registerAppIpcHandlers', () => {
             kind: 'telegram' as const,
             botToken: '123456:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi',
             allowedChatIds: '123456789',
-            botUsername: 'kun_test_bot',
+            botUsername: 'magicpocket_test_bot',
             createdAt: '2026-06-19T00:00:00.000Z'
           },
           conversations: [],
@@ -216,7 +216,7 @@ describe('registerAppIpcHandlers', () => {
   it('saves generated files to a user-selected path', async () => {
     const { dialog } = await import('electron')
     const { registerAppIpcHandlers } = await import('./register-app-ipc-handlers')
-    const temp = mkdtempSync(join(tmpdir(), 'kun-save-as-'))
+    const temp = mkdtempSync(join(tmpdir(), 'magicpocket-save-as-'))
     const source = join(temp, 'source.png')
     const target = join(temp, 'downloaded.png')
     writeFileSync(source, 'generated-image')
@@ -289,7 +289,7 @@ describe('registerAppIpcHandlers', () => {
     const { registerAppIpcHandlers } = await import('./register-app-ipc-handlers')
     const tempRoot = mkdtempSync(join(tmpdir(), 'deepseek-gui-ipc-'))
     const configPath = join(tempRoot, 'mcp.json')
-    const onKunMcpConfigWritten = vi.fn(async () => undefined)
+    const onMagicPocketMcpConfigWritten = vi.fn(async () => undefined)
     const content = `${JSON.stringify({
       servers: {
         filesystem: {
@@ -301,16 +301,16 @@ describe('registerAppIpcHandlers', () => {
 
     try {
       registerAppIpcHandlers(registerOptions({
-        resolveKunConfigPath: () => configPath,
-        onKunMcpConfigWritten
+        resolveMagicPocketConfigPath: () => configPath,
+        onMagicPocketMcpConfigWritten
       }))
 
-      await expect(handlers.get('kun:config:write')?.({}, content)).resolves.toEqual({
+      await expect(handlers.get('magicpocket:config:write')?.({}, content)).resolves.toEqual({
         ok: true,
         path: configPath
       })
       expect(readFileSync(configPath, 'utf8')).toBe(content)
-      expect(onKunMcpConfigWritten).toHaveBeenCalledWith(configPath, content)
+      expect(onMagicPocketMcpConfigWritten).toHaveBeenCalledWith(configPath, content)
     } finally {
       rmSync(tempRoot, { recursive: true, force: true })
     }
@@ -320,22 +320,22 @@ describe('registerAppIpcHandlers', () => {
     const { registerAppIpcHandlers } = await import('./register-app-ipc-handlers')
     const tempRoot = mkdtempSync(join(tmpdir(), 'deepseek-gui-ipc-'))
     const configPath = join(tempRoot, 'mcp.json')
-    const onKunMcpConfigWritten = vi.fn(async () => undefined)
+    const onMagicPocketMcpConfigWritten = vi.fn(async () => undefined)
 
     try {
       registerAppIpcHandlers(registerOptions({
-        resolveKunConfigPath: () => configPath,
-        onKunMcpConfigWritten
+        resolveMagicPocketConfigPath: () => configPath,
+        onMagicPocketMcpConfigWritten
       }))
 
-      await expect(handlers.get('kun:config:write')?.({}, '{')).rejects.toThrow(
+      await expect(handlers.get('magicpocket:config:write')?.({}, '{')).rejects.toThrow(
         /MCP config must be JSON/
       )
-      await expect(handlers.get('kun:config:write')?.({}, '[]')).rejects.toThrow(
+      await expect(handlers.get('magicpocket:config:write')?.({}, '[]')).rejects.toThrow(
         /MCP config must be a JSON object/
       )
       expect(existsSync(configPath)).toBe(false)
-      expect(onKunMcpConfigWritten).not.toHaveBeenCalled()
+      expect(onMagicPocketMcpConfigWritten).not.toHaveBeenCalled()
     } finally {
       rmSync(tempRoot, { recursive: true, force: true })
     }
@@ -464,7 +464,7 @@ describe('registerAppIpcHandlers', () => {
 
   it('creates a unique conversation workspace, suffixing on timestamp collision', async () => {
     const { registerAppIpcHandlers } = await import('./register-app-ipc-handlers')
-    const root = mkdtempSync(join(tmpdir(), 'kun-conv-'))
+    const root = mkdtempSync(join(tmpdir(), 'magicpocket-conv-'))
     try {
       registerAppIpcHandlers(registerOptions({
         store: { load: vi.fn(async () => ({ ...settings(), conversationWorkspaceRoot: root })) } as never

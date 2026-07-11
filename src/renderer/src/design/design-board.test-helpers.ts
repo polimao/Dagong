@@ -9,7 +9,7 @@ export function artifact(
   extra: Partial<DesignArtifact> = {}
 ): DesignArtifact {
   const relativePath =
-    kind === 'canvas' ? `.kun-design/doc/${id}/canvas.json` : `.kun-design/doc/${id}/v1.html`
+    kind === 'canvas' ? `.magicpocket-design/doc/${id}/canvas.json` : `.magicpocket-design/doc/${id}/v1.html`
   return {
     id,
     kind,

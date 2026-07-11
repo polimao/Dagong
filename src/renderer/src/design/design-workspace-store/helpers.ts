@@ -15,21 +15,21 @@ import { createDesignDocumentId, defaultDesignArtifactNode } from '../design-typ
 import type { DesignArtifact, DesignCanvasView, DesignDocument, DesignViewport } from '../design-types'
 import type { DesignWorkspaceState } from '../design-workspace-store-types'
 
-const DESIGN_DIR = '.kun-design'
+const DESIGN_DIR = '.magicpocket-design'
 
-export const CANVAS_VIEW_KEY = 'kun.design.canvasView.v1'
-export const VIEWPORT_KEY = 'kun.design.viewport.v1'
-export const AI_RAIL_COLLAPSED_KEY = 'kun.design.aiRailCollapsed.v1'
-export const CANVAS_ASSISTANT_OPEN_KEY = 'kun.design.canvasAssistantOpen.v1'
-export const CANVAS_INSPECTOR_PINNED_KEY = 'kun.design.canvasInspectorPinned.v1'
-export const ASSISTANT_MODEL_KEY = 'kun.design.assistantModel.v1'
-export const ASSISTANT_PROVIDER_KEY = 'kun.design.assistantProvider.v1'
-export const MULTI_PAGE_MODE_KEY = 'kun.design.multiPageMode.v1'
-export const DESIGN_TARGET_KEY = 'kun.design.target.v1'
+export const CANVAS_VIEW_KEY = 'magicpocket.design.canvasView.v1'
+export const VIEWPORT_KEY = 'magicpocket.design.viewport.v1'
+export const AI_RAIL_COLLAPSED_KEY = 'magicpocket.design.aiRailCollapsed.v1'
+export const CANVAS_ASSISTANT_OPEN_KEY = 'magicpocket.design.canvasAssistantOpen.v1'
+export const CANVAS_INSPECTOR_PINNED_KEY = 'magicpocket.design.canvasInspectorPinned.v1'
+export const ASSISTANT_MODEL_KEY = 'magicpocket.design.assistantModel.v1'
+export const ASSISTANT_PROVIDER_KEY = 'magicpocket.design.assistantProvider.v1'
+export const MULTI_PAGE_MODE_KEY = 'magicpocket.design.multiPageMode.v1'
+export const DESIGN_TARGET_KEY = 'magicpocket.design.target.v1'
 
 export function builtinDesignWorkspaceRoot(): string {
-  const homeDir = typeof window !== 'undefined' ? (window.kunGui?.homeDir ?? '') : ''
-  return homeDir ? `${homeDir}/.kun/design-workspace` : ''
+  const homeDir = typeof window !== 'undefined' ? (window.magicpocketGui?.homeDir ?? '') : ''
+  return homeDir ? `${homeDir}/.magicpocket/design-workspace` : ''
 }
 
 export function defaultDocumentTitle(): string {
@@ -97,7 +97,7 @@ async function loadArtifactDir(
   artifactDir: string,
   artifactId: string
 ): Promise<DesignArtifact | null> {
-  const api = window.kunGui
+  const api = window.magicpocketGui
   if (!api || typeof api.readWorkspaceFile !== 'function' || typeof api.listWorkspaceDirectory !== 'function') {
     return null
   }
@@ -111,9 +111,9 @@ async function loadArtifactDir(
   return null
 }
 
-/** Load every 画布 in a 设计稿 dir (`.kun-design/<docId>/<artifactId>/`). */
+/** Load every 画布 in a 设计稿 dir (`.magicpocket-design/<docId>/<artifactId>/`). */
 async function loadArtifactsForDoc(workspaceRoot: string, docId: string): Promise<DesignArtifact[]> {
-  const api = window.kunGui
+  const api = window.magicpocketGui
   if (!api || typeof api.listWorkspaceDirectory !== 'function') return []
   const sub = await api.listWorkspaceDirectory({ path: `${DESIGN_DIR}/${docId}`, workspaceRoot }).catch(() => null)
   if (!sub || !sub.ok) return []
@@ -138,8 +138,8 @@ function rewriteArtifactPaths(a: DesignArtifact, oldPrefix: string, newPrefix: s
 }
 
 /**
- * Physically move a legacy flat artifact (`.kun-design/<id>/…`) into the default
- * 设计稿's dir (`.kun-design/<docId>/<id>/…`) so the new model is uniform on disk.
+ * Physically move a legacy flat artifact (`.magicpocket-design/<id>/…`) into the default
+ * 设计稿's dir (`.magicpocket-design/<docId>/<id>/…`) so the new model is uniform on disk.
  * Best-effort: any IO failure leaves the artifact at its flat path (still adopted
  * into the 设计稿 — nothing is lost), since relativePath is per-artifact.
  */
@@ -149,7 +149,7 @@ async function moveArtifactIntoDoc(
   entries: { name: string; type: string }[],
   docId: string
 ): Promise<DesignArtifact> {
-  const api = window.kunGui
+  const api = window.magicpocketGui
   const oldPrefix = `${DESIGN_DIR}/${artifact.id}/`
   if (
     !api ||
@@ -182,7 +182,7 @@ async function moveArtifactIntoDoc(
 }
 
 /**
- * Legacy → nested upgrade. Wrap all flat `.kun-design/<id>/` artifact dirs into a
+ * Legacy → nested upgrade. Wrap all flat `.magicpocket-design/<id>/` artifact dirs into a
  * single default 设计稿 (preserving canvas positions), moving their files under
  * the 设计稿 dir. Returns the default 设计稿 or null when there's nothing legacy.
  */
@@ -190,7 +190,7 @@ async function migrateLegacyToDefaultDoc(
   workspaceRoot: string,
   topDirs: { name: string; type: string }[]
 ): Promise<DesignDocument | null> {
-  const api = window.kunGui
+  const api = window.magicpocketGui
   if (!api || typeof api.listWorkspaceDirectory !== 'function' || typeof api.readWorkspaceFile !== 'function') {
     return null
   }
@@ -285,7 +285,7 @@ export async function rehydrateDesignWorkspaceArtifacts({
   persistIndex
 }: RehydrateDesignWorkspaceArtifactsOptions): Promise<void> {
   const { workspaceRoot } = get()
-  const api = window.kunGui
+  const api = window.magicpocketGui
   if (
     !workspaceRoot ||
     !api ||

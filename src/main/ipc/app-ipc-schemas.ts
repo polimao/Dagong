@@ -33,7 +33,7 @@ import {
   KUN_DEBUG_LLM_ROUNDS_TEMPLATE,
   KUN_BACKGROUND_SHELLS_TEMPLATE,
   KUN_BACKGROUND_SHELL_TEMPLATE
-} from '../../shared/kun-endpoints'
+} from '../../shared/magicpocket-endpoints'
 import {
   IMAGE_GENERATION_QUALITIES,
   IMAGE_GENERATION_PROTOCOLS,
@@ -51,7 +51,7 @@ import {
   VIDEO_GENERATION_PROTOCOLS,
   WRITE_INLINE_COMPLETION_MODEL_IDS
 } from '../../shared/app-settings'
-import { DESKTOP_COMMANDS } from '../../shared/kun-gui-api'
+import { DESKTOP_COMMANDS } from '../../shared/magicpocket-gui-api'
 import { GUI_UPDATE_CHANNELS } from '../../shared/gui-update'
 import { WINDOW_CLOSE_ACTIONS, CHAT_CONTENT_MAX_WIDTH_MIN, CHAT_CONTENT_MAX_WIDTH_MAX, UI_FONT_SCALE_MIN, UI_FONT_SCALE_MAX } from '../../shared/app-settings'
 import { KEYBOARD_SHORTCUT_COMMANDS } from '../../shared/keyboard-shortcuts'
@@ -230,8 +230,8 @@ const hexColorSchema = z.string().trim().regex(/^#[0-9a-fA-F]{6}$/)
 const approvalPolicySchema = z.enum(['always', 'on-request', 'untrusted', 'never', 'auto', 'suggest'])
 const sandboxModeSchema = z.enum(['read-only', 'workspace-write', 'danger-full-access', 'external-sandbox'])
 const mcpSearchModeSchema = z.enum(['direct', 'search', 'auto'])
-const kunStorageBackendSchema = z.enum(['hybrid', 'file'])
-const kunCompactionSummaryModeSchema = z.enum(['heuristic', 'model'])
+const magicpocketStorageBackendSchema = z.enum(['hybrid', 'file'])
+const magicpocketCompactionSummaryModeSchema = z.enum(['heuristic', 'model'])
 const clawRunModeSchema = z.enum(['agent', 'plan'])
 const clawImProviderSchema = z.enum(['feishu', 'weixin', 'telegram'])
 const clawScheduleKindSchema = z.enum(['manual', 'interval', 'daily', 'at'])
@@ -378,7 +378,7 @@ const subagentsPatchSchema = z
   })
   .passthrough()
 
-const kunRuntimePatchSchema = z.object({
+const magicpocketRuntimePatchSchema = z.object({
   binaryPath: defaultPathSchema,
   port: z.number().int().min(MIN_KUN_LOCAL_PORT).max(65_535).optional(),
   autoStart: z.boolean().optional(),
@@ -420,13 +420,13 @@ const kunRuntimePatchSchema = z.object({
     minScore: z.number().nonnegative().optional()
   }).strict().optional(),
   storage: z.object({
-    backend: kunStorageBackendSchema.optional(),
+    backend: magicpocketStorageBackendSchema.optional(),
     sqlitePath: defaultPathSchema
   }).strict().optional(),
   contextCompaction: z.object({
     defaultSoftThreshold: z.number().int().positive().optional(),
     defaultHardThreshold: z.number().int().positive().optional(),
-    summaryMode: kunCompactionSummaryModeSchema.optional(),
+    summaryMode: magicpocketCompactionSummaryModeSchema.optional(),
     summaryTimeoutMs: z.number().int().positive().max(120_000).optional(),
     summaryMaxTokens: z.number().int().positive().max(16_000).optional(),
     summaryInputMaxBytes: z.number().int().positive().max(8 * 1024 * 1024).optional(),
@@ -522,7 +522,7 @@ const kunRuntimePatchSchema = z.object({
   instructions: z.object({
     enabled: z.boolean().optional()
   }).strict().optional(),
-  // Global small-model slot + per-role internal-LLM model overrides (agents.kun.*).
+  // Global small-model slot + per-role internal-LLM model overrides (agents.magicpocket.*).
   // Title & Summary default to smallModel, then the main conversation model.
   smallModel: optionalModelIdSchema,
   smallModelProviderId: z.string().trim().max(64).optional(),
@@ -1408,7 +1408,7 @@ const settingsPatchObjectSchema = z.object({
   cursorSpotlightColor: hexColorSchema.optional(),
   provider: modelProviderPatchSchema.optional(),
   agents: z.object({
-    kun: kunRuntimePatchSchema.optional()
+    magicpocket: magicpocketRuntimePatchSchema.optional()
   }).strict().optional(),
   workspaceRoot: defaultPathSchema,
   conversationWorkspaceRoot: defaultPathSchema,

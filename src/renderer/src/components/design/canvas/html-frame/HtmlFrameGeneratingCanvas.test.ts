@@ -40,11 +40,11 @@ describe('html frame generating sketch timeline', () => {
     const css = buildHtmlFrameGeneratingSketchCss()
 
     SKETCH_ELEMENTS.forEach((_, index) => {
-      expect(css).toContain(`@keyframes kun-hfgen-el-${index}{`)
-      expect(css).toContain(`.kun-hfgen-el-${index}{animation:kun-hfgen-el-${index}`)
+      expect(css).toContain(`@keyframes magicpocket-hfgen-el-${index}{`)
+      expect(css).toContain(`.magicpocket-hfgen-el-${index}{animation:magicpocket-hfgen-el-${index}`)
     })
-    expect(css).toContain('@keyframes kun-hfgen-brush{')
-    expect(css).toContain('@keyframes kun-hfgen-fade{')
+    expect(css).toContain('@keyframes magicpocket-hfgen-brush{')
+    expect(css).toContain('@keyframes magicpocket-hfgen-fade{')
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')
   })
 })

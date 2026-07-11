@@ -193,7 +193,7 @@ describe('MessageTimeline tool summaries', () => {
   })
 })
 
-describe('MessageTimeline Kun runtime metadata smoke', () => {
+describe('MessageTimeline MagicPocket runtime metadata smoke', () => {
   beforeEach(() => {
     useChatStore.setState({
       route: 'chat',
@@ -325,7 +325,7 @@ describe('MessageTimeline Kun runtime metadata smoke', () => {
         '[Claw IM agent instructions]',
         '',
         '[Agent name]',
-        'kun',
+        'magicpocket',
         '',
         '---',
         '[Current user request]',
@@ -358,8 +358,8 @@ describe('MessageTimeline Kun runtime metadata smoke', () => {
         },
         sources: [
           {
-            title: 'Kun docs',
-            url: 'https://example.com/kun'
+            title: 'MagicPocket docs',
+            url: 'https://example.com/magicpocket'
           }
         ]
       }
@@ -373,7 +373,7 @@ describe('MessageTimeline Kun runtime metadata smoke', () => {
     expect(html).toContain('Child agent')
     expect(html).toContain('research')
     expect(html).toContain('Sources 1')
-    expect(html).toContain('https://example.com/kun')
+    expect(html).toContain('https://example.com/magicpocket')
   })
 
   it('renders failed tool bubbles with the orange warning tone', () => {
@@ -406,8 +406,8 @@ describe('MessageTimeline Kun runtime metadata smoke', () => {
         },
         sources: [
           {
-            title: 'Kun docs',
-            url: 'https://example.com/kun'
+            title: 'MagicPocket docs',
+            url: 'https://example.com/magicpocket'
           }
         ]
       }

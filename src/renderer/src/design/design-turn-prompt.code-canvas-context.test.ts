@@ -44,7 +44,7 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'fix critique findings',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/ws'
       })
       expect(designPrompt).toContain('Design text contrast needs repair.')
@@ -55,7 +55,7 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'try again',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/workspace',
         previousOpErrors: [
           { code: 'SHAPE_NOT_FOUND', message: 'No shape with id "ghost"', suggestion: 'Available shapes: "Card" (s_1)' }
@@ -115,7 +115,7 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'Map the code architecture',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/ws'
       })
       expect(designPrompt).not.toContain('MAP CODE / ARCHITECTURE / FLOW')
@@ -126,7 +126,7 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'Create a landing page screen',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/ws'
       })
   
@@ -204,7 +204,7 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'Add settings page',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/workspace',
         canvasSnapshot
       })
@@ -234,7 +234,7 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'Generate an image here',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/workspace',
         canvasSnapshot
       })
@@ -284,7 +284,7 @@ describe("design turn prompt code canvas and context guidance", () => {
     it('carries app target sizing into code-to-design prompts', () => {
       const prompt = buildDesignFromCodePrompt({
         sourceRelativePath: 'src/App.tsx',
-        artifactRelativePath: '.kun-design/doc/reverse/v1.html',
+        artifactRelativePath: '.magicpocket-design/doc/reverse/v1.html',
         workspaceRoot: '/workspace',
         designContext: { designTarget: 'app' }
       })
@@ -296,7 +296,7 @@ describe("design turn prompt code canvas and context guidance", () => {
     it('carries default web target sizing into image-node prompts', () => {
       const prompt = buildDesignImageNodePrompt({
         text: 'Product preview',
-        outputRelativePath: '.kun-design/doc/preview.png',
+        outputRelativePath: '.magicpocket-design/doc/preview.png',
         workspaceRoot: '/workspace'
       })
   
@@ -309,19 +309,19 @@ describe("design turn prompt code canvas and context guidance", () => {
         target: 'canvas',
         mode: 'text',
         text: 'Tidy up the selected layers',
-        artifactRelativePath: '.kun-design/board/canvas.json',
+        artifactRelativePath: '.magicpocket-design/board/canvas.json',
         workspaceRoot: '/workspace',
         contextLocations: [
           {
             title: 'Design canvas',
             kind: 'canvas',
-            path: '.kun-design/board/canvas.json',
-            directory: '.kun-design/board'
+            path: '.magicpocket-design/board/canvas.json',
+            directory: '.magicpocket-design/board'
           }
         ]
       })
   
       expect(prompt).toContain('Selected on the canvas (the user is pointing at these)')
-      expect(prompt).toContain('Design canvas [canvas] → `.kun-design/board/canvas.json` (directory: `.kun-design/board`)')
+      expect(prompt).toContain('Design canvas [canvas] → `.magicpocket-design/board/canvas.json` (directory: `.magicpocket-design/board`)')
     })
 })
