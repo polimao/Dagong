@@ -389,8 +389,8 @@ export function WriteRichEditor({
         isEnabled: () => completionEnabledRef.current && !readOnlyRef.current,
         getFilePath: () => filePathRef.current,
         requestCompletion: async (context, mode) => {
-          if (typeof window.magicpocketGui?.requestWriteInlineCompletion !== 'function') return null
-          const result = await window.magicpocketGui.requestWriteInlineCompletion(
+          if (typeof window.dagongGui?.requestWriteInlineCompletion !== 'function') return null
+          const result = await window.dagongGui.requestWriteInlineCompletion(
             buildInlineCompletionPayload(context, {
               model: completionModelRef.current,
               workspaceRoot: workspaceRootRef.current,

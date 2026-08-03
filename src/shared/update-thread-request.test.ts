@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { UpdateThreadRequest } from '../../magicpocket/src/contracts/threads'
+import { UpdateThreadRequest } from '../../dagong/src/contracts/threads'
 
 describe('UpdateThreadRequest', () => {
   it('accepts workspace as a valid patch field', () => {

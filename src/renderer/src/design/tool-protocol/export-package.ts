@@ -100,7 +100,7 @@ export function buildDesignExportPackage(
   const resources: DesignExportResource[] = [
     { kind: 'project-design-md', path: STITCH_DESIGN_MD_PATH, title: options.title },
     { kind: 'design-system-md', path: options.designSystemMdPath, title: 'DESIGN_SYSTEM.md' },
-    { kind: 'graph-json', path: '.magicpocket-design/design-graph.json', title: 'Design Graph' },
+    { kind: 'graph-json', path: '.dagong-design/design-graph.json', title: 'Design Graph' },
     ...artifactResources(state)
   ]
 

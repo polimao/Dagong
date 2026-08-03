@@ -10,7 +10,7 @@ import {
 const createdAt = '2026-07-02T00:00:00.000Z'
 
 function artifact(id: string, patch: Partial<DesignArtifact> = {}): DesignArtifact {
-  const relativePath = `.magicpocket-design/doc/${id}/v1.html`
+  const relativePath = `.dagong-design/doc/${id}/v1.html`
   return {
     id,
     kind: 'html',

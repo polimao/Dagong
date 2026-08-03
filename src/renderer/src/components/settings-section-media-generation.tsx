@@ -75,21 +75,21 @@ export function MediaGenerationSettingsSection({ ctx }: { ctx: Record<string, an
   const {
     t,
     provider,
-    magicpocket,
+    dagong,
     selectControlClass,
-    updateMagicPocket
+    updateDagong
   } = ctx
   const textToSpeech = {
     ...DEFAULT_TEXT_TO_SPEECH,
-    ...(magicpocket.textToSpeech ?? {})
+    ...(dagong.textToSpeech ?? {})
   }
   const musicGeneration = {
     ...DEFAULT_MUSIC_GENERATION,
-    ...(magicpocket.musicGeneration ?? {})
+    ...(dagong.musicGeneration ?? {})
   }
   const videoGeneration = {
     ...DEFAULT_VIDEO_GENERATION,
-    ...(magicpocket.videoGeneration ?? {})
+    ...(dagong.videoGeneration ?? {})
   }
   const providers = (provider?.providers ?? []) as ProviderProfile[]
   const textToSpeechProviders = providers.filter((item) => Boolean(item.textToSpeech))
@@ -100,7 +100,7 @@ export function MediaGenerationSettingsSection({ ctx }: { ctx: Record<string, an
   const [showVideoApiKey, setShowVideoApiKey] = useState(false)
 
   const updateTextToSpeech = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       textToSpeech: {
         ...textToSpeech,
         ...patch
@@ -108,7 +108,7 @@ export function MediaGenerationSettingsSection({ ctx }: { ctx: Record<string, an
     })
   }
   const updateMusicGeneration = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       musicGeneration: {
         ...musicGeneration,
         ...patch
@@ -116,7 +116,7 @@ export function MediaGenerationSettingsSection({ ctx }: { ctx: Record<string, an
     })
   }
   const updateVideoGeneration = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       videoGeneration: {
         ...videoGeneration,
         ...patch

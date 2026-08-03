@@ -214,10 +214,10 @@ export function WriteSidebar({
   const pickWriteWorkspace = async (): Promise<void> => {
     try {
       setFileError(null)
-      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.dagongGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.magicpocketGui.pickWorkspaceDirectory(workspaceRoot || defaultWorkspaceRoot || undefined)
+      const picked = await window.dagongGui.pickWorkspaceDirectory(workspaceRoot || defaultWorkspaceRoot || undefined)
       if (!picked.canceled && picked.path) {
         await addWriteWorkspace(picked.path)
         if (runtimeConnection === 'ready') void ensureWriteThreadForWorkspace(picked.path)

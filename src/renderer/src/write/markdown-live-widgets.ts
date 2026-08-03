@@ -170,8 +170,8 @@ export class ImageWidget extends WidgetType {
     image.alt = this.alt
     image.loading = 'lazy'
     wrapper.appendChild(image)
-    if (this.localPath && typeof window.magicpocketGui?.readWorkspaceImage === 'function') {
-      void window.magicpocketGui.readWorkspaceImage({ path: this.localPath })
+    if (this.localPath && typeof window.dagongGui?.readWorkspaceImage === 'function') {
+      void window.dagongGui.readWorkspaceImage({ path: this.localPath })
         .then((result) => {
           if (result.ok) {
             image.src = result.dataUrl

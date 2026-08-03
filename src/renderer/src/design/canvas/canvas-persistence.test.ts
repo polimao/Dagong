@@ -11,8 +11,8 @@ import { createRunningAppFrameShape } from './running-app-frame'
 
 describe('canvas-persistence round-trip', () => {
   it('builds a stable document key from workspace and canvas path', () => {
-    expect(canvasDocumentKey('/workspace', 'code-thread-1', '.magicpocket-canvas')).toBe(
-      `/workspace\0${canvasDocPath('code-thread-1', '.magicpocket-canvas')}`
+    expect(canvasDocumentKey('/workspace', 'code-thread-1', '.dagong-canvas')).toBe(
+      `/workspace\0${canvasDocPath('code-thread-1', '.dagong-canvas')}`
     )
   })
 
@@ -227,13 +227,13 @@ describe('persistCanvasDocument debounce', () => {
   it('does not let one canvas save cancel another canvas save', () => {
     vi.useFakeTimers()
     const writeWorkspaceFile = vi.fn(async () => ({ ok: true as const }))
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile } })
 
     const designDoc = createEmptyDocument()
     const codeDoc = createEmptyDocument()
 
     persistCanvasDocument('/workspace', 'design-board', designDoc)
-    persistCanvasDocument('/workspace', 'code-thread-1', codeDoc, '.magicpocket-canvas')
+    persistCanvasDocument('/workspace', 'code-thread-1', codeDoc, '.dagong-canvas')
     vi.advanceTimersByTime(600)
 
     expect(writeWorkspaceFile).toHaveBeenCalledTimes(2)
@@ -243,7 +243,7 @@ describe('persistCanvasDocument debounce', () => {
       content: serializeCanvasDocument(designDoc)
     })
     expect(writeWorkspaceFile).toHaveBeenCalledWith({
-      path: canvasDocPath('code-thread-1', '.magicpocket-canvas'),
+      path: canvasDocPath('code-thread-1', '.dagong-canvas'),
       workspaceRoot: '/workspace',
       content: serializeCanvasDocument(codeDoc)
     })
@@ -252,7 +252,7 @@ describe('persistCanvasDocument debounce', () => {
   it('keeps debouncing repeated saves for the same canvas', () => {
     vi.useFakeTimers()
     const writeWorkspaceFile = vi.fn(async () => ({ ok: true as const }))
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile } })
 
     const firstDoc = createEmptyDocument()
     const latestDoc = createEmptyDocument()
@@ -262,13 +262,13 @@ describe('persistCanvasDocument debounce', () => {
     latestDoc.objects[rect.id] = { ...rect, parentId: latestDoc.rootId }
     latestDoc.objects[latestDoc.rootId] = { ...root, children: [rect.id] }
 
-    persistCanvasDocument('/workspace', 'code-thread-1', firstDoc, '.magicpocket-canvas')
-    persistCanvasDocument('/workspace', 'code-thread-1', latestDoc, '.magicpocket-canvas')
+    persistCanvasDocument('/workspace', 'code-thread-1', firstDoc, '.dagong-canvas')
+    persistCanvasDocument('/workspace', 'code-thread-1', latestDoc, '.dagong-canvas')
     vi.advanceTimersByTime(600)
 
     expect(writeWorkspaceFile).toHaveBeenCalledTimes(1)
     expect(writeWorkspaceFile).toHaveBeenCalledWith({
-      path: canvasDocPath('code-thread-1', '.magicpocket-canvas'),
+      path: canvasDocPath('code-thread-1', '.dagong-canvas'),
       workspaceRoot: '/workspace',
       content: serializeCanvasDocument(latestDoc)
     })

@@ -83,7 +83,7 @@ function buildHarness(overrides?: {
     applyI18nFromSettings,
     busy: false,
     clawChannels: [],
-    codeWorkspaceRoots: ['~/.magicpocket/default_workspace'],
+    codeWorkspaceRoots: ['~/.dagong/default_workspace'],
     composerPickList: [],
     createThread,
     currentTurnId: null,
@@ -102,13 +102,13 @@ function buildHarness(overrides?: {
       thread({
         id: 'thr_default',
         title: 'Only default thread',
-        workspace: '~/.magicpocket/default_workspace'
+        workspace: '~/.dagong/default_workspace'
       })
     ],
     unreadThreadIds: {},
     watchTurnCompletion: {},
     workspaceLabel: 'default_workspace',
-    workspaceRoot: '~/.magicpocket/default_workspace'
+    workspaceRoot: '~/.dagong/default_workspace'
   } as unknown as ChatState
 
   const set: ChatStoreSet = (partial) => {
@@ -157,7 +157,7 @@ describe('chat-store navigation workspace selection', () => {
       workspaceRoot: '/Users/zxy/new-project'
     }))
     vi.stubGlobal('window', {
-      magicpocketGui: {
+      dagongGui: {
         pickWorkspaceDirectory,
         setSettings
       }
@@ -166,18 +166,18 @@ describe('chat-store navigation workspace selection', () => {
 
     await expect(harness.actions.chooseWorkspace()).resolves.toBe('/Users/zxy/new-project')
 
-    expect(pickWorkspaceDirectory).toHaveBeenCalledWith('~/.magicpocket/default_workspace')
+    expect(pickWorkspaceDirectory).toHaveBeenCalledWith('~/.dagong/default_workspace')
     expect(setSettings).toHaveBeenCalledWith({ workspaceRoot: '/Users/zxy/new-project' })
     expect(provider.updateThreadWorkspace).not.toHaveBeenCalled()
     expect(harness.state.threads.find((item) => item.id === 'thr_default')?.workspace)
-      .toBe('~/.magicpocket/default_workspace')
+      .toBe('~/.dagong/default_workspace')
     expect(harness.createThread).toHaveBeenCalledWith({ workspaceRoot: '/Users/zxy/new-project' })
     expect(harness.selectThread).not.toHaveBeenCalled()
   })
 
   it('selectWorkspaceRoot persists the directory and lands on a clean new conversation', async () => {
     const setSettings = vi.fn(async () => ({ workspaceRoot: '/Users/zxy/new-project' }))
-    vi.stubGlobal('window', { magicpocketGui: { setSettings } })
+    vi.stubGlobal('window', { dagongGui: { setSettings } })
     const harness = buildHarness()
 
     await expect(harness.actions.selectWorkspaceRoot('/Users/zxy/new-project'))
@@ -198,7 +198,7 @@ describe('chat-store navigation workspace selection', () => {
 
   it('selectWorkspaceRoot ignores an empty path', async () => {
     const setSettings = vi.fn(async () => ({ workspaceRoot: '' }))
-    vi.stubGlobal('window', { magicpocketGui: { setSettings } })
+    vi.stubGlobal('window', { dagongGui: { setSettings } })
     const harness = buildHarness()
 
     await expect(harness.actions.selectWorkspaceRoot('   ')).resolves.toBeNull()
@@ -245,7 +245,7 @@ describe('chat-store navigation workspace selection', () => {
   it('openCode does not keep a legacy design assistant thread active in Code mode', async () => {
     const storage = new MemoryStorage()
     storage.setItem(
-      'magicpocket.design-assistant.threadRegistry.v1',
+      'dagong.design-assistant.threadRegistry.v1',
       JSON.stringify({ '/Users/zxy/project': 'thr_legacy_design' })
     )
     vi.stubGlobal('window', { localStorage: storage })
@@ -285,7 +285,7 @@ describe('chat-store navigation workspace selection', () => {
       thread({
         id: 'thr_design',
         title: 'Design Assistant',
-        workspace: '/Users/zxy/.magicpocket/design-workspace',
+        workspace: '/Users/zxy/.dagong/design-workspace',
         updatedAt: '2026-06-12T10:00:00.000Z'
       })
     ]
@@ -359,7 +359,7 @@ describe('onClawChannelActivity routes through subscribeThreadEventsLive (not se
     const selectThread = vi.fn(async () => undefined)
     const recoverActiveTurn = vi.fn(async () => true)
 
-    // Capture the callback registered via window.magicpocketGui.onClawChannelActivity
+    // Capture the callback registered via window.dagongGui.onClawChannelActivity
     let capturedClawActivityCallback: ((payload: { channelId: string; threadId: string }) => void) | null = null
     const onClawChannelActivity = vi.fn((cb: (payload: { channelId: string; threadId: string }) => void) => {
       capturedClawActivityCallback = cb
@@ -372,10 +372,10 @@ describe('onClawChannelActivity routes through subscribeThreadEventsLive (not se
       return () => {}
     })
     const getSettings = vi.fn(async () => ({
-      workspaceRoot: '~/.magicpocket/default_workspace',
+      workspaceRoot: '~/.dagong/default_workspace',
       write: {
-        defaultWorkspaceRoot: '~/.magicpocket/default_workspace',
-        activeWorkspaceRoot: '~/.magicpocket/default_workspace',
+        defaultWorkspaceRoot: '~/.dagong/default_workspace',
+        activeWorkspaceRoot: '~/.dagong/default_workspace',
         workspaces: []
       },
       claw: {
@@ -387,11 +387,11 @@ describe('onClawChannelActivity routes through subscribeThreadEventsLive (not se
       uiFontScale: 1,
     chatContentMaxWidthPx: 896,
       locale: 'en',
-      agents: { magicpocket: { apiKey: 'test-key', model: 'deepseek-v4-pro', baseUrl: '' } },
+      agents: { dagong: { apiKey: 'test-key', model: 'deepseek-v4-pro', baseUrl: '' } },
       disabledSkillIds: []
     }))
     vi.stubGlobal('window', {
-      magicpocketGui: {
+      dagongGui: {
         getSettings,
         onClawChannelActivity,
         onTrayAction,

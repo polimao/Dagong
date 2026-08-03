@@ -1,7 +1,7 @@
-import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
+import type { DagongRuntimeStatusPayload } from '@shared/dagong-gui-api'
 
 export function shouldSuppressRuntimeErrorBanner(
-  status: MagicPocketRuntimeStatusPayload | null | undefined
+  status: DagongRuntimeStatusPayload | null | undefined
 ): boolean {
   return status?.state === 'restarting' || status?.state === 'crashed'
 }

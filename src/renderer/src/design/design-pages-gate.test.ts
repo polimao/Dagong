@@ -12,10 +12,10 @@ function artifact(id: string, kind: DesignArtifact['kind']): DesignArtifact {
     id,
     kind,
     title: id,
-    relativePath: `.magicpocket-design/doc/${id}/${kind === 'html' ? 'v1.html' : 'canvas.json'}`,
+    relativePath: `.dagong-design/doc/${id}/${kind === 'html' ? 'v1.html' : 'canvas.json'}`,
     createdAt: now,
     updatedAt: now,
-    versions: [{ id: `${id}-v1`, relativePath: `.magicpocket-design/doc/${id}/v1.html`, createdAt: now, summary: '' }]
+    versions: [{ id: `${id}-v1`, relativePath: `.dagong-design/doc/${id}/v1.html`, createdAt: now, summary: '' }]
   }
 }
 

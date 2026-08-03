@@ -3,7 +3,7 @@ import {
   CUSTOM_SPEECH_TO_TEXT_PROVIDER_ID,
   DEFAULT_SPEECH_TO_TEXT_PROTOCOL,
   SPEECH_TO_TEXT_PROTOCOLS,
-  resolveMagicPocketSpeechToTextSettings
+  resolveDagongSpeechToTextSettings
 } from '@shared/app-settings'
 import {
   LOCAL_WHISPER_MODELS,
@@ -138,16 +138,16 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
     t,
     form,
     provider,
-    magicpocket,
+    dagong,
     selectControlClass,
-    updateMagicPocket
+    updateDagong
   } = ctx
   const speechToText = {
     ...DEFAULT_SPEECH_TO_TEXT,
-    ...(magicpocket.speechToText ?? {})
+    ...(dagong.speechToText ?? {})
   }
   const effectiveSpeechToText = form
-    ? resolveMagicPocketSpeechToTextSettings(form)
+    ? resolveDagongSpeechToTextSettings(form)
     : speechToText
   const speechProviders = (provider?.providers ?? []).filter((item: {
     speech?: unknown
@@ -178,7 +178,7 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   const [localWhisperSourceCheckBusy, setLocalWhisperSourceCheckBusy] = useState(false)
   const localWhisperStatus = localWhisperStatuses[selectedLocalWhisperModelId] ?? null
   const updateSpeechToText = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       speechToText: {
         ...speechToText,
         ...patch
@@ -194,15 +194,15 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   }
 
   const refreshLocalWhisperStatus = async (modelId: LocalWhisperModelId = selectedLocalWhisperModelId): Promise<void> => {
-    if (typeof window.magicpocketGui?.getLocalWhisperModelStatus !== 'function') return
-    const status = await window.magicpocketGui.getLocalWhisperModelStatus(modelId)
+    if (typeof window.dagongGui?.getLocalWhisperModelStatus !== 'function') return
+    const status = await window.dagongGui.getLocalWhisperModelStatus(modelId)
     setLocalWhisperModelStatus(status)
   }
 
   const refreshLocalWhisperModelStatuses = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.getLocalWhisperModelStatus !== 'function') return
+    if (typeof window.dagongGui?.getLocalWhisperModelStatus !== 'function') return
     const statuses = await Promise.all(
-      LOCAL_WHISPER_MODELS.map((model) => window.magicpocketGui.getLocalWhisperModelStatus(model.id))
+      LOCAL_WHISPER_MODELS.map((model) => window.dagongGui.getLocalWhisperModelStatus(model.id))
     )
     setLocalWhisperStatuses((current) => {
       const next = { ...current }
@@ -212,11 +212,11 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   }
 
   const refreshLocalWhisperSourceStatuses = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.checkLocalWhisperDownloadSources !== 'function') return
+    if (typeof window.dagongGui?.checkLocalWhisperDownloadSources !== 'function') return
     setLocalWhisperSourceStatuses(null)
     setLocalWhisperSourceCheckBusy(true)
     try {
-      const result = await window.magicpocketGui.checkLocalWhisperDownloadSources({ modelId: selectedLocalWhisperModelId })
+      const result = await window.dagongGui.checkLocalWhisperDownloadSources({ modelId: selectedLocalWhisperModelId })
       setLocalWhisperSourceStatuses(result.sources)
     } finally {
       setLocalWhisperSourceCheckBusy(false)
@@ -227,8 +227,8 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
     if (!usingLocalWhisper) return
     void refreshLocalWhisperModelStatuses().catch(() => undefined)
     void refreshLocalWhisperSourceStatuses().catch(() => undefined)
-    if (typeof window.magicpocketGui?.onLocalWhisperModelProgress !== 'function') return
-    return window.magicpocketGui.onLocalWhisperModelProgress((progress) => {
+    if (typeof window.dagongGui?.onLocalWhisperModelProgress !== 'function') return
+    return window.dagongGui.onLocalWhisperModelProgress((progress) => {
       const model = localWhisperModelById(progress.modelId)
       setLocalWhisperStatuses((current) => {
         const existing = current[progress.modelId]
@@ -264,11 +264,11 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   }, [usingLocalWhisper, selectedLocalWhisperModelId])
 
   const downloadLocalWhisper = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.downloadLocalWhisperModel !== 'function') return
+    if (typeof window.dagongGui?.downloadLocalWhisperModel !== 'function') return
     setLocalWhisperNotice(null)
     setLocalWhisperBusy('download')
     try {
-      const result = await window.magicpocketGui.downloadLocalWhisperModel({
+      const result = await window.dagongGui.downloadLocalWhisperModel({
         modelId: selectedLocalWhisperModelId,
         sourceId: speechToText.localWhisperDownloadSource
       })
@@ -282,11 +282,11 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   }
 
   const cancelLocalWhisper = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.cancelLocalWhisperModel !== 'function') return
+    if (typeof window.dagongGui?.cancelLocalWhisperModel !== 'function') return
     setLocalWhisperNotice(null)
     setLocalWhisperBusy('cancel')
     try {
-      const result = await window.magicpocketGui.cancelLocalWhisperModel(selectedLocalWhisperModelId)
+      const result = await window.dagongGui.cancelLocalWhisperModel(selectedLocalWhisperModelId)
       if (result.status) setLocalWhisperModelStatus(result.status)
       if (!result.ok) {
         setLocalWhisperNotice({ tone: 'error', message: t('speechToTextLocalCancelFailed', { message: result.message }) })
@@ -297,12 +297,12 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   }
 
   const deleteLocalWhisper = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.deleteLocalWhisperModel !== 'function') return
+    if (typeof window.dagongGui?.deleteLocalWhisperModel !== 'function') return
     if (!window.confirm(t('speechToTextLocalDeleteConfirm', { model: selectedLocalWhisperModel.shortName }))) return
     setLocalWhisperNotice(null)
     setLocalWhisperBusy('delete')
     try {
-      const result = await window.magicpocketGui.deleteLocalWhisperModel(selectedLocalWhisperModelId)
+      const result = await window.dagongGui.deleteLocalWhisperModel(selectedLocalWhisperModelId)
       if (result.status) setLocalWhisperModelStatus(result.status)
       if (!result.ok) {
         setLocalWhisperNotice({ tone: 'error', message: t('speechToTextLocalDeleteFailed', { message: result.message }) })
@@ -313,10 +313,10 @@ export function SpeechToTextSettingsSection({ ctx }: { ctx: Record<string, any> 
   }
 
   const runSpeechTest = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.transcribeSpeech !== 'function') return
+    if (typeof window.dagongGui?.transcribeSpeech !== 'function') return
     setTestState('busy')
     try {
-      const result = await window.magicpocketGui.transcribeSpeech({
+      const result = await window.dagongGui.transcribeSpeech({
         audioBase64: buildTestToneWavBase64(),
         mimeType: 'audio/wav',
         durationMs: 500,

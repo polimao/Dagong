@@ -168,7 +168,7 @@ export function useWorkbenchPlanController({
     const planStore = useGuiPlanStore.getState()
     planStore.setSaveStatus('saving')
     try {
-      const result = await window.magicpocketGui.writeWorkspaceFile({
+      const result = await window.dagongGui.writeWorkspaceFile({
         workspaceRoot: plan.workspaceRoot,
         path: plan.relativePath,
         content: contentToSave
@@ -195,7 +195,7 @@ export function useWorkbenchPlanController({
     targetWorkspaceRoot: string
   ): Promise<string[]> => {
     try {
-      const result = await window.magicpocketGui.listWorkspaceDirectory({
+      const result = await window.dagongGui.listWorkspaceDirectory({
         workspaceRoot: targetWorkspaceRoot,
         path: GUI_PLAN_RELATIVE_DIR
       })
@@ -261,7 +261,7 @@ export function useWorkbenchPlanController({
     meta: PlanResultMatch['meta'],
     shouldOpen: boolean
   ): Promise<void> => {
-    const result = await window.magicpocketGui.readWorkspaceFile({
+    const result = await window.dagongGui.readWorkspaceFile({
       workspaceRoot: meta.workspaceRoot,
       path: meta.relativePath
     })
@@ -344,7 +344,7 @@ export function useWorkbenchPlanController({
       return
     }
 
-    const requirement = await window.magicpocketGui.readWorkspaceFile({
+    const requirement = await window.dagongGui.readWorkspaceFile({
       workspaceRoot: plan.workspaceRoot,
       path: draftRelativePath
     })
@@ -390,7 +390,7 @@ export function useWorkbenchPlanController({
     if (sent) {
       const tracePath = sddDraftTraceRelativePath(draftRelativePath)
       if (tracePath) {
-        await window.magicpocketGui
+        await window.dagongGui
           .writeWorkspaceFile({
             workspaceRoot: plan.workspaceRoot,
             path: tracePath,

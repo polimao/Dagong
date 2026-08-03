@@ -1,20 +1,20 @@
 {
-  "name": "magicpocket-gui",
-  "productName": "MagicPocket",
+  "name": "dagong-gui",
+  "productName": "Dagong",
   "version": "0.1.0",
-  "description": "Electron workbench for the MagicPocket runtime (HTTP/SSE)",
+  "description": "Electron workbench for the Dagong runtime (HTTP/SSE)",
   "main": "./out/main/index.js",
   "type": "module",
   "scripts": {
-    "dev": "npm run build:magicpocket && electron-vite dev",
-    "build": "npm run build:magicpocket && electron-vite build",
-    "build:magicpocket": "node ./scripts/ensure-magicpocket-install.cjs && npm --prefix magicpocket run build",
+    "dev": "npm run build:dagong && electron-vite dev",
+    "build": "npm run build:dagong && electron-vite build",
+    "build:dagong": "node ./scripts/ensure-dagong-install.cjs && npm --prefix dagong run build",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "dist": "npm run build && npx --yes electron-builder@26.8.1 --config electron-builder.config.cjs --publish never",
-    "dist:mac": "rm -f dist/MagicPocket-*-mac-* dist/DeepSeek-GUI-*-mac-* dist/latest-mac.yml && npm run build && npm run dist:mac:x64:dmg && npm run dist:mac:x64:zip && npm run dist:mac:arm64:dmg && npm run dist:mac:arm64:zip && node ./scripts/generate-mac-latest.cjs dist",
-    "dist:mac:signed": "rm -f dist/MagicPocket-*-mac-* dist/DeepSeek-GUI-*-mac-* dist/latest-mac.yml && MAC_SIGN=1 npm run dist:mac:x64 && MAC_SIGN=1 npm run dist:mac:arm64 && node ./scripts/generate-mac-latest.cjs dist",
+    "dist:mac": "rm -f dist/Dagong-*-mac-* dist/DeepSeek-GUI-*-mac-* dist/latest-mac.yml && npm run build && npm run dist:mac:x64:dmg && npm run dist:mac:x64:zip && npm run dist:mac:arm64:dmg && npm run dist:mac:arm64:zip && node ./scripts/generate-mac-latest.cjs dist",
+    "dist:mac:signed": "rm -f dist/Dagong-*-mac-* dist/DeepSeek-GUI-*-mac-* dist/latest-mac.yml && MAC_SIGN=1 npm run dist:mac:x64 && MAC_SIGN=1 npm run dist:mac:arm64 && node ./scripts/generate-mac-latest.cjs dist",
     "dist:mac:arm64": "npm run build && npm run dist:mac:arm64:dmg && npm run dist:mac:arm64:zip",
     "dist:mac:x64": "npm run build && npm run dist:mac:x64:dmg && npm run dist:mac:x64:zip",
     "dist:mac:arm64:dmg": "npx --yes electron-builder@26.8.1 --config electron-builder.config.cjs --publish never --mac dmg --arm64",
@@ -108,11 +108,11 @@
     "vite": "^6.2.0",
     "vitest": "^4.1.7"
   },
-  "author": "MagicPocket Contributors",
+  "author": "Dagong Contributors",
   "license": "PolyForm-Noncommercial-1.0.0",
-  "homepage": "https://github.com/MagicPocketAgent/MagicPocket",
+  "homepage": "https://github.com/DagongAgent/Dagong",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MagicPocketAgent/MagicPocket.git"
+    "url": "https://github.com/DagongAgent/Dagong.git"
   }
 }

@@ -127,7 +127,7 @@ describe('ArchivedThreadsSettingsSection', () => {
     expect(html).toContain('flex h-full min-h-0 w-[248px]')
     expect(html).toContain('flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain')
     expect(html).toContain('ds-no-drag shrink-0 border-t border-ds-border p-3')
-    expect(html).toContain('MagicPocket')
+    expect(html).toContain('Dagong')
     expect(html).toContain('Settings')
   })
 })

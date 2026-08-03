@@ -124,7 +124,7 @@ function traySessionLabels(locale: AppSettingsV1['locale']): {
         recent: '最近会话',
         more: '更多',
         newChat: '新建会话',
-        openApp: '打开 MagicPocket',
+        openApp: '打开 Dagong',
         quit: '退出'
       }
     : {
@@ -132,7 +132,7 @@ function traySessionLabels(locale: AppSettingsV1['locale']): {
         recent: 'Recent',
         more: 'More',
         newChat: 'New Chat',
-        openApp: 'Open MagicPocket',
+        openApp: 'Open Dagong',
         quit: 'Exit'
       }
 }

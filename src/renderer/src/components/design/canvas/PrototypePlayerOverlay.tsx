@@ -74,8 +74,8 @@ export function buildPrototypeViewportModeScript(target: DesignTarget): string {
 (() => {
   try {
     const target = ${JSON.stringify(target)};
-    const styleId = '__magicpocketPrototypeViewportModeStyle';
-    document.documentElement.dataset.magicpocketPrototypeViewport = target;
+    const styleId = '__dagongPrototypeViewportModeStyle';
+    document.documentElement.dataset.dagongPrototypeViewport = target;
     let style = document.getElementById(styleId);
     if (!style) {
       style = document.createElement('style');
@@ -83,14 +83,14 @@ export function buildPrototypeViewportModeScript(target: DesignTarget): string {
       document.head.appendChild(style);
     }
     style.textContent = \`
-html[data-magicpocket-prototype-viewport="app"],
-html[data-magicpocket-prototype-viewport="app"] body {
+html[data-dagong-prototype-viewport="app"],
+html[data-dagong-prototype-viewport="app"] body {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
-html[data-magicpocket-prototype-viewport="app"]::-webkit-scrollbar,
-html[data-magicpocket-prototype-viewport="app"] body::-webkit-scrollbar,
-html[data-magicpocket-prototype-viewport="app"] *::-webkit-scrollbar {
+html[data-dagong-prototype-viewport="app"]::-webkit-scrollbar,
+html[data-dagong-prototype-viewport="app"] body::-webkit-scrollbar,
+html[data-dagong-prototype-viewport="app"] *::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
   background: transparent !important;
@@ -161,7 +161,7 @@ function PrototypePlayerOverlayInner({
     workspaceRoot,
     relativePath: currentArtifactPath,
     enabled: Boolean(open && workspaceRoot && currentArtifact),
-    partition: 'magicpocket-proto'
+    partition: 'dagong-proto'
   })
 
   useEffect(() => {

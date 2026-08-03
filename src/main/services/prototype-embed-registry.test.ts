@@ -13,8 +13,8 @@ let workspace: string
 describe('prototype embed registry', () => {
   beforeEach(() => {
     workspace = realpathSync(mkdtempSync(join(tmpdir(), 'proto-registry-')))
-    mkdirSync(join(workspace, '.magicpocketsdd', 'proto'), { recursive: true })
-    writeFileSync(join(workspace, '.magicpocketsdd', 'proto', 'page.html'), '<html></html>')
+    mkdirSync(join(workspace, '.dagongsdd', 'proto'), { recursive: true })
+    writeFileSync(join(workspace, '.dagongsdd', 'proto', 'page.html'), '<html></html>')
   })
 
   afterEach(() => {
@@ -24,7 +24,7 @@ describe('prototype embed registry', () => {
 
   it('authorizes a contained prototype and allow-lists its file url', async () => {
     const result = await authorizePrototypePath(
-      join(workspace, '.magicpocketsdd', 'proto', 'page.html'),
+      join(workspace, '.dagongsdd', 'proto', 'page.html'),
       workspace
     )
     expect(result.ok).toBe(true)
@@ -34,10 +34,10 @@ describe('prototype embed registry', () => {
   })
 
   it('rejects non-html files and files outside a proto directory', async () => {
-    writeFileSync(join(workspace, '.magicpocketsdd', 'proto', 'notes.txt'), 'x')
+    writeFileSync(join(workspace, '.dagongsdd', 'proto', 'notes.txt'), 'x')
     writeFileSync(join(workspace, 'loose.html'), '<html></html>')
 
-    const txt = await authorizePrototypePath(join(workspace, '.magicpocketsdd', 'proto', 'notes.txt'), workspace)
+    const txt = await authorizePrototypePath(join(workspace, '.dagongsdd', 'proto', 'notes.txt'), workspace)
     expect(txt.ok).toBe(false)
 
     const loose = await authorizePrototypePath(join(workspace, 'loose.html'), workspace)
@@ -45,11 +45,11 @@ describe('prototype embed registry', () => {
   })
 
   it('rejects paths escaping the workspace and missing files', async () => {
-    const escaped = await authorizePrototypePath('/tmp/.magicpocketsdd/proto/evil.html', workspace)
+    const escaped = await authorizePrototypePath('/tmp/.dagongsdd/proto/evil.html', workspace)
     expect(escaped.ok).toBe(false)
 
     const missing = await authorizePrototypePath(
-      join(workspace, '.magicpocketsdd', 'proto', 'gone.html'),
+      join(workspace, '.dagongsdd', 'proto', 'gone.html'),
       workspace
     )
     expect(missing).toMatchObject({ ok: false, message: expect.stringContaining('not found') })

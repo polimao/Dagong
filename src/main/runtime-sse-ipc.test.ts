@@ -23,7 +23,7 @@ describe('runtime-sse-ipc', () => {
     mockStore = {
       load: vi.fn().mockResolvedValue({
         agents: {
-          magicpocket: {
+          dagong: {
             baseUrl: 'http://localhost:18899',
             runtimeToken: 'test-token'
           }

@@ -53,8 +53,8 @@ export function WriteImagePreview({
     setDimensions(null)
   }, [src, filePath])
   const openImage = (): void => {
-    if (typeof window.magicpocketGui?.openEditorPath !== 'function') return
-    void window.magicpocketGui.openEditorPath({ path: filePath, workspaceRoot, editorId: 'system' }).catch(() => undefined)
+    if (typeof window.dagongGui?.openEditorPath !== 'function') return
+    void window.dagongGui.openEditorPath({ path: filePath, workspaceRoot, editorId: 'system' }).catch(() => undefined)
   }
 
   return (

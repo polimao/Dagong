@@ -32,7 +32,7 @@ import type {
   CoreReviewOutputJson,
   CoreReviewTargetJson,
   CoreUsageSnapshotJson
-} from './magicpocket-contract'
+} from './dagong-contract'
 
 export function buildQuery(options: Record<string, string | number | boolean | undefined>): string {
   const params = new URLSearchParams()
@@ -1175,7 +1175,7 @@ function runtimeStatusFromEvent(event: CoreRuntimeEventJson): RuntimeStatusEvent
  * reasoning deltas into a single sink.onDeltas call so one network chunk
  * costs one store update instead of one per token.
  */
-export async function dispatchMagicPocketRuntimeEvents(
+export async function dispatchDagongRuntimeEvents(
   events: CoreRuntimeEventJson[],
   sink: ThreadEventSink,
   handleApprovalRequest: (event: CoreRuntimeEventJson, sink: ThreadEventSink) => Promise<void>
@@ -1199,12 +1199,12 @@ export async function dispatchMagicPocketRuntimeEvents(
       continue
     }
     flushDeltas()
-    await dispatchMagicPocketRuntimeEvent(event, sink, handleApprovalRequest)
+    await dispatchDagongRuntimeEvent(event, sink, handleApprovalRequest)
   }
   flushDeltas()
 }
 
-export async function dispatchMagicPocketRuntimeEvent(
+export async function dispatchDagongRuntimeEvent(
   event: CoreRuntimeEventJson,
   sink: ThreadEventSink,
   handleApprovalRequest: (event: CoreRuntimeEventJson, sink: ThreadEventSink) => Promise<void>
@@ -1315,7 +1315,7 @@ export async function dispatchMagicPocketRuntimeEvent(
       sink.onTurnComplete()
       return
     case 'turn_failed': {
-      const payload = runtimeErrorFromEvent(event, 'MagicPocket turn failed')
+      const payload = runtimeErrorFromEvent(event, 'Dagong turn failed')
       sink.onRuntimeError?.(payload)
       sink.onError(errorForRuntimeEvent(payload), { terminal: true })
       return

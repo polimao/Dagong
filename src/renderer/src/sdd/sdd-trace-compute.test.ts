@@ -18,7 +18,7 @@ const PLAN = [
   ''
 ].join('\n')
 
-const PLAN_PATH = '.magicpocketsdd/plan/sdd-x.md'
+const PLAN_PATH = '.dagongsdd/plan/sdd-x.md'
 
 function todosWith(status: 'pending' | 'in_progress' | 'completed', rawText: string): ThreadTodoList {
   return {
@@ -81,7 +81,7 @@ describe('computeSddTrace', () => {
 
   it('ignores todos from other plan files', () => {
     const todos = todosWith('completed', '添加导出按钮 (covers: R-1)')
-    todos.items[0].source = { ...todos.items[0].source!, relativePath: '.magicpocketsdd/plan/other.md' }
+    todos.items[0].source = { ...todos.items[0].source!, relativePath: '.dagongsdd/plan/other.md' }
     const result = computeSddTrace({
       requirementMarkdown: REQUIREMENT,
       planMarkdown: PLAN,

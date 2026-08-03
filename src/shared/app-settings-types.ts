@@ -1,10 +1,10 @@
 import type { GuiUpdateChannel } from './gui-update'
 import type { KeyboardShortcutsConfigV1 } from './keyboard-shortcuts'
 import type { LocalWhisperDownloadSourceId } from './local-whisper'
-import type { ApprovalPolicy, SandboxMode } from '../../magicpocket/src/contracts/policy.js'
-import type { ComputerUseMode } from '../../magicpocket/src/contracts/capabilities.js'
-import type { ModelEndpointFormat } from '../../magicpocket/src/contracts/model-endpoint-format.js'
-import type { ToolOutputLimitsConfig } from '../../magicpocket/src/contracts/tool-output-limits.js'
+import type { ApprovalPolicy, SandboxMode } from '../../dagong/src/contracts/policy.js'
+import type { ComputerUseMode } from '../../dagong/src/contracts/capabilities.js'
+import type { ModelEndpointFormat } from '../../dagong/src/contracts/model-endpoint-format.js'
+import type { ToolOutputLimitsConfig } from '../../dagong/src/contracts/tool-output-limits.js'
 export {
   DEFAULT_MODEL_ENDPOINT_FORMAT,
   inferModelEndpointFormatFromUrl,
@@ -14,21 +14,21 @@ export {
   normalizeModelEndpointFormat,
   resolveModelEndpointFormat,
   usesChatCompletionsShape
-} from '../../magicpocket/src/contracts/model-endpoint-format.js'
+} from '../../dagong/src/contracts/model-endpoint-format.js'
 export { DEFAULT_GUI_UPDATE_CHANNEL, normalizeGuiUpdateChannel, type GuiUpdateChannel } from './gui-update'
 export {
   DEFAULT_APPROVAL_POLICY,
   DEFAULT_SANDBOX_MODE,
   type ApprovalPolicy,
   type SandboxMode
-} from '../../magicpocket/src/contracts/policy.js'
+} from '../../dagong/src/contracts/policy.js'
 export {
   DEFAULT_TOOL_OUTPUT_MAX_BYTES,
   DEFAULT_TOOL_OUTPUT_MAX_LINES,
   type ToolOutputLimitsConfig
-} from '../../magicpocket/src/contracts/tool-output-limits.js'
+} from '../../dagong/src/contracts/tool-output-limits.js'
 export const KUN_TOOL_PERMISSION_MODES = ['always-ask', 'read-only', 'sensitive-ask', 'workspace-write', 'bypass'] as const
-export type MagicPocketToolPermissionMode = (typeof KUN_TOOL_PERMISSION_MODES)[number]
+export type DagongToolPermissionMode = (typeof KUN_TOOL_PERMISSION_MODES)[number]
 /**
  * Overall UI text scale factor (applied as `zoom` on the app shell).
  * Previously a fixed enum ('small' | 'medium' | 'large'); now a free numeric
@@ -106,12 +106,12 @@ export const MIN_KUN_LOCAL_PORT = 10_000
 export const DEFAULT_SCHEDULE_INTERNAL_PORT = 18788
 // 这些默认目录与 legacy-data-migration.ts 的 HOME_DATA_MIGRATION_MAPPINGS
 // 一一对应:老安装的 ~/.deepseekgui/* 在启动期被搬到这里。
-export const DEFAULT_WRITE_WORKSPACE_ROOT = '~/.magicpocket/write_workspace'
-// 对话工作目录的默认值按平台不同:macOS/Windows 用 ~/Documents/MagicPocket,
-// Linux 用 ~/.local/share/MagicPocket/conversations。该默认值由 main 层
+export const DEFAULT_WRITE_WORKSPACE_ROOT = '~/.dagong/write_workspace'
+// 对话工作目录的默认值按平台不同:macOS/Windows 用 ~/Documents/Dagong,
+// Linux 用 ~/.local/share/Dagong/conversations。该默认值由 main 层
 // (DEFAULT_CONVERSATION_WORKSPACE_ROOT_ABSOLUTE)和 renderer 层
 // (defaultConversationWorkspaceRoot)各自按平台推导。
-export const DEFAULT_KUN_DATA_DIR = '~/.magicpocket/data'
+export const DEFAULT_KUN_DATA_DIR = '~/.dagong/data'
 export const DEFAULT_KUN_MODEL = 'deepseek-v4-pro'
 export const DEFAULT_WRITE_INLINE_COMPLETION_BASE_URL = 'https://api.deepseek.com/beta'
 export const DEFAULT_WRITE_INLINE_COMPLETION_MODEL = 'deepseek-v4-flash'
@@ -246,8 +246,8 @@ export type ModelProviderSettingsPatchV1 = Partial<
   providers?: ModelProviderProfilePatchV1[]
 }
 
-export type MagicPocketSubagentProfileV1 = {
-  /** Stable key; becomes the Record key in magicpocket SubagentsCapabilityConfig.profiles. */
+export type DagongSubagentProfileV1 = {
+  /** Stable key; becomes the Record key in dagong SubagentsCapabilityConfig.profiles. */
   id: string
   enabled: boolean
   name: string
@@ -276,16 +276,16 @@ export type MagicPocketSubagentProfileV1 = {
   reasoningEffort?: ModelReasoningEffort
 }
 
-export type MagicPocketSubagentsSettingsV1 = {
+export type DagongSubagentsSettingsV1 = {
   enabled: boolean
   maxParallel?: number
   maxChildRuns?: number
   defaultToolPolicy?: 'readOnly' | 'inherit'
   defaultProfile?: string
-  profiles: MagicPocketSubagentProfileV1[]
+  profiles: DagongSubagentProfileV1[]
 }
 
-export type MagicPocketRuntimeSettingsV1 = {
+export type DagongRuntimeSettingsV1 = {
   binaryPath: string
   port: number
   autoStart: boolean
@@ -304,42 +304,42 @@ export type MagicPocketRuntimeSettingsV1 = {
   sandboxMode: SandboxMode
   /** Compress safe tool context before each model call. */
   tokenEconomyMode: boolean
-  /** Detailed token-saving behavior used when building MagicPocket model requests. */
-  tokenEconomy: MagicPocketTokenEconomySettingsV1
+  /** Detailed token-saving behavior used when building Dagong model requests. */
+  tokenEconomy: DagongTokenEconomySettingsV1
   /** Model-visible output caps for builtin read/bash-style tools. */
-  toolOutputLimits: MagicPocketToolOutputLimitsSettingsV1
+  toolOutputLimits: DagongToolOutputLimitsSettingsV1
   /** When true, the runtime skips bearer-token auth. Local dev only. */
   insecure: boolean
-  /** GUI-managed MCP progressive discovery/search settings written into MagicPocket config.json. */
-  mcpSearch: MagicPocketMcpSearchSettingsV1
-  /** Persistent store backend used by MagicPocket. */
-  storage: MagicPocketStorageSettingsV1
-  /** Fallback compaction thresholds and summary behavior. Per-model thresholds live in MagicPocket config models.profiles. */
-  contextCompaction: MagicPocketContextCompactionSettingsV1
+  /** GUI-managed MCP progressive discovery/search settings written into Dagong config.json. */
+  mcpSearch: DagongMcpSearchSettingsV1
+  /** Persistent store backend used by Dagong. */
+  storage: DagongStorageSettingsV1
+  /** Fallback compaction thresholds and summary behavior. Per-model thresholds live in Dagong config models.profiles. */
+  contextCompaction: DagongContextCompactionSettingsV1
   /** Low-level loop guards and model argument repair tuning. */
-  runtimeTuning: MagicPocketRuntimeTuningSettingsV1
+  runtimeTuning: DagongRuntimeTuningSettingsV1
   /** OpenAI-compatible image generation provider shared by chat agents and Write image tools. */
-  imageGeneration: MagicPocketImageGenerationSettingsV1
+  imageGeneration: DagongImageGenerationSettingsV1
   /** Speech-to-text provider used for voice input in the composer. */
-  speechToText: MagicPocketSpeechToTextSettingsV1
+  speechToText: DagongSpeechToTextSettingsV1
   /** Text-to-speech provider exposed to agents as generate_speech. */
-  textToSpeech: MagicPocketTextToSpeechSettingsV1
+  textToSpeech: DagongTextToSpeechSettingsV1
   /** Music generation provider exposed to agents as generate_music. */
-  musicGeneration: MagicPocketMusicGenerationSettingsV1
+  musicGeneration: DagongMusicGenerationSettingsV1
   /** Video generation provider exposed to agents as generate_video. */
-  videoGeneration: MagicPocketVideoGenerationSettingsV1
-  /** GUI-owned model capability profiles written into MagicPocket `models.profiles`. */
+  videoGeneration: DagongVideoGenerationSettingsV1
+  /** GUI-owned model capability profiles written into Dagong `models.profiles`. */
   modelProfiles: Record<string, ModelProviderModelProfileV1>
-  /** Whether long-term memory is enabled in the MagicPocket runtime. */
+  /** Whether long-term memory is enabled in the Dagong runtime. */
   memoryEnabled: boolean
-  /** Native MagicPocket AGENTS.md instructions injected into every turn. */
-  instructions: MagicPocketInstructionSettingsV1
+  /** Native Dagong AGENTS.md instructions injected into every turn. */
+  instructions: DagongInstructionSettingsV1
   /** Host computer-use (screenshot + mouse/keyboard control) settings. */
-  computerUse: MagicPocketComputerUseSettingsV1
+  computerUse: DagongComputerUseSettingsV1
   /** First-party design-quality linter applied to frontend output. */
-  quality: MagicPocketDesignQualitySettingsV1
-  /** GUI-managed subagent profiles written into magicpocket SubagentsCapabilityConfig. */
-  subagents?: MagicPocketSubagentsSettingsV1
+  quality: DagongDesignQualitySettingsV1
+  /** GUI-managed subagent profiles written into dagong SubagentsCapabilityConfig. */
+  subagents?: DagongSubagentsSettingsV1
   /** Global small-model slot. Title & Summary default to this. Empty = follow main model. */
   smallModel?: string
   /** Provider id paired with smallModel for per-provider routing. */
@@ -364,13 +364,13 @@ export type MagicPocketRuntimeSettingsV1 = {
   codeReviewReasoningEffort?: ModelReasoningEffort
 }
 
-export type MagicPocketInstructionSettingsV1 = {
+export type DagongInstructionSettingsV1 = {
   enabled: boolean
 }
 
-export function magicpocketToolPermissionModeSettings(
-  mode: MagicPocketToolPermissionMode
-): Pick<MagicPocketRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'> {
+export function dagongToolPermissionModeSettings(
+  mode: DagongToolPermissionMode
+): Pick<DagongRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'> {
   switch (mode) {
     case 'always-ask':
       return { approvalPolicy: 'always', sandboxMode: 'danger-full-access' }
@@ -385,9 +385,9 @@ export function magicpocketToolPermissionModeSettings(
   }
 }
 
-export function magicpocketToolPermissionModeFromSettings(
-  settings: Pick<MagicPocketRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'>
-): MagicPocketToolPermissionMode {
+export function dagongToolPermissionModeFromSettings(
+  settings: Pick<DagongRuntimeSettingsV1, 'approvalPolicy' | 'sandboxMode'>
+): DagongToolPermissionMode {
   if (settings.approvalPolicy === 'always') return 'always-ask'
   if (settings.approvalPolicy === 'untrusted') return 'sensitive-ask'
   if (
@@ -401,12 +401,12 @@ export function magicpocketToolPermissionModeFromSettings(
 }
 
 /** Detection aggressiveness for the design-quality linter. */
-export type MagicPocketDesignQualityStrictness = 'relaxed' | 'standard' | 'strict'
+export type DagongDesignQualityStrictness = 'relaxed' | 'standard' | 'strict'
 
-export type MagicPocketDesignQualitySettingsV1 = {
+export type DagongDesignQualitySettingsV1 = {
   /** Master switch. Off means the builtin design-quality hook never fires. */
   enabled: boolean
-  strictness: MagicPocketDesignQualityStrictness
+  strictness: DagongDesignQualityStrictness
   /** Rule ids to suppress. */
   ignoreRules: string[]
   /** Relative-path glob patterns to skip. */
@@ -415,7 +415,7 @@ export type MagicPocketDesignQualitySettingsV1 = {
   maxFindings: number
 }
 
-export type MagicPocketComputerUseSettingsV1 = {
+export type DagongComputerUseSettingsV1 = {
   /** Master switch. Off means the computer_use tool is never registered. */
   enabled: boolean
   /**
@@ -430,7 +430,7 @@ export type MagicPocketComputerUseSettingsV1 = {
   maxActionsPerTurn: number
 }
 
-export type MagicPocketImageGenerationSettingsV1 = {
+export type DagongImageGenerationSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for image generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -448,7 +448,7 @@ export type MagicPocketImageGenerationSettingsV1 = {
   timeoutMs: number
 }
 
-export type MagicPocketSpeechToTextSettingsV1 = {
+export type DagongSpeechToTextSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for speech recognition. Empty or "custom" uses the fields below. */
   providerId: string
@@ -466,7 +466,7 @@ export type MagicPocketSpeechToTextSettingsV1 = {
   timeoutMs: number
 }
 
-export type MagicPocketTextToSpeechSettingsV1 = {
+export type DagongTextToSpeechSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for speech generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -484,7 +484,7 @@ export type MagicPocketTextToSpeechSettingsV1 = {
   timeoutMs: number
 }
 
-export type MagicPocketMusicGenerationSettingsV1 = {
+export type DagongMusicGenerationSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for music generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -497,7 +497,7 @@ export type MagicPocketMusicGenerationSettingsV1 = {
   timeoutMs: number
 }
 
-export type MagicPocketVideoGenerationSettingsV1 = {
+export type DagongVideoGenerationSettingsV1 = {
   enabled: boolean
   /** Existing provider profile to use for video generation. Empty or "custom" uses the fields below. */
   providerId: string
@@ -513,27 +513,27 @@ export type MagicPocketVideoGenerationSettingsV1 = {
   pollIntervalMs: number
 }
 
-export type MagicPocketMcpSearchMode = 'direct' | 'search' | 'auto'
+export type DagongMcpSearchMode = 'direct' | 'search' | 'auto'
 
-export type MagicPocketMcpSearchSettingsV1 = {
+export type DagongMcpSearchSettingsV1 = {
   enabled: boolean
-  mode: MagicPocketMcpSearchMode
+  mode: DagongMcpSearchMode
   autoThresholdToolCount: number
   topKDefault: number
   topKMax: number
   minScore: number
 }
 
-export type MagicPocketStorageBackend = 'hybrid' | 'file'
+export type DagongStorageBackend = 'hybrid' | 'file'
 
-export type MagicPocketStorageSettingsV1 = {
-  backend: MagicPocketStorageBackend
+export type DagongStorageSettingsV1 = {
+  backend: DagongStorageBackend
   sqlitePath: string
 }
 
-export type MagicPocketCompactionSummaryMode = 'heuristic' | 'model'
+export type DagongCompactionSummaryMode = 'heuristic' | 'model'
 
-export type MagicPocketHistoryHygieneSettingsV1 = {
+export type DagongHistoryHygieneSettingsV1 = {
   maxToolResultLines: number
   maxToolResultBytes: number
   maxToolResultTokens: number
@@ -542,20 +542,20 @@ export type MagicPocketHistoryHygieneSettingsV1 = {
   maxArrayItems: number
 }
 
-export type MagicPocketTokenEconomySettingsV1 = {
+export type DagongTokenEconomySettingsV1 = {
   enabled: boolean
   compressToolDescriptions: boolean
   compressToolResults: boolean
   conciseResponses: boolean
-  historyHygiene: MagicPocketHistoryHygieneSettingsV1
+  historyHygiene: DagongHistoryHygieneSettingsV1
 }
 
-export type MagicPocketToolOutputLimitsSettingsV1 = Required<ToolOutputLimitsConfig>
+export type DagongToolOutputLimitsSettingsV1 = Required<ToolOutputLimitsConfig>
 
-export type MagicPocketContextCompactionSettingsV1 = {
+export type DagongContextCompactionSettingsV1 = {
   defaultSoftThreshold: number
   defaultHardThreshold: number
-  summaryMode: MagicPocketCompactionSummaryMode
+  summaryMode: DagongCompactionSummaryMode
   summaryTimeoutMs: number
   summaryMaxTokens: number
   summaryInputMaxBytes: number
@@ -565,76 +565,76 @@ export type MagicPocketContextCompactionSettingsV1 = {
   summaryProviderId?: string
 }
 
-export type MagicPocketToolStormSettingsV1 = {
+export type DagongToolStormSettingsV1 = {
   enabled: boolean
   windowSize: number
   threshold: number
 }
 
-export type MagicPocketToolArgumentRepairSettingsV1 = {
+export type DagongToolArgumentRepairSettingsV1 = {
   maxStringBytes: number
 }
 
-export type MagicPocketRuntimeTuningSettingsV1 = {
+export type DagongRuntimeTuningSettingsV1 = {
   /**
    * Max idle gap (ms) between streaming chunks before a turn fails with
    * `stream_idle_timeout`. `0` disables the guard — useful for local LLM
    * servers that stay silent while prefilling a very large prompt.
    */
   streamIdleTimeoutMs: number
-  toolStorm: MagicPocketToolStormSettingsV1
-  toolArgumentRepair: MagicPocketToolArgumentRepairSettingsV1
+  toolStorm: DagongToolStormSettingsV1
+  toolArgumentRepair: DagongToolArgumentRepairSettingsV1
 }
 
 /**
  * Compatibility shell kept because persisted settings still use the
- * `agents.magicpocket` envelope. Prefer operating on the contained
- * `MagicPocketRuntimeSettingsV1` directly in new code.
+ * `agents.dagong` envelope. Prefer operating on the contained
+ * `DagongRuntimeSettingsV1` directly in new code.
  */
-export type MagicPocketSettingsEnvelopeV1 = {
-  magicpocket: MagicPocketRuntimeSettingsV1
+export type DagongSettingsEnvelopeV1 = {
+  dagong: DagongRuntimeSettingsV1
 }
 
-/** @deprecated Use `MagicPocketSettingsEnvelopeV1`. */
-export type AgentRuntimeSettingsMapV1 = MagicPocketSettingsEnvelopeV1
+/** @deprecated Use `DagongSettingsEnvelopeV1`. */
+export type AgentRuntimeSettingsMapV1 = DagongSettingsEnvelopeV1
 
-export type MagicPocketRuntimeTuningSettingsPatchV1 = {
+export type DagongRuntimeTuningSettingsPatchV1 = {
   streamIdleTimeoutMs?: number
-  toolStorm?: Partial<MagicPocketToolStormSettingsV1>
-  toolArgumentRepair?: Partial<MagicPocketToolArgumentRepairSettingsV1>
+  toolStorm?: Partial<DagongToolStormSettingsV1>
+  toolArgumentRepair?: Partial<DagongToolArgumentRepairSettingsV1>
 }
 
-export type MagicPocketTokenEconomySettingsPatchV1 = Partial<
-  Omit<MagicPocketTokenEconomySettingsV1, 'historyHygiene'>
+export type DagongTokenEconomySettingsPatchV1 = Partial<
+  Omit<DagongTokenEconomySettingsV1, 'historyHygiene'>
 > & {
-  historyHygiene?: Partial<MagicPocketHistoryHygieneSettingsV1>
+  historyHygiene?: Partial<DagongHistoryHygieneSettingsV1>
 }
 
-export type MagicPocketRuntimeSettingsPatchV1 = Partial<
+export type DagongRuntimeSettingsPatchV1 = Partial<
   Omit<
-    MagicPocketRuntimeSettingsV1,
+    DagongRuntimeSettingsV1,
     'mcpSearch' | 'storage' | 'contextCompaction' | 'runtimeTuning' | 'tokenEconomy' | 'toolOutputLimits' | 'imageGeneration' | 'speechToText' | 'textToSpeech' | 'musicGeneration' | 'videoGeneration' | 'instructions' | 'computerUse' | 'quality' | 'modelProfiles'
   >
 > & {
-  mcpSearch?: Partial<MagicPocketMcpSearchSettingsV1>
-  tokenEconomy?: MagicPocketTokenEconomySettingsPatchV1
-  toolOutputLimits?: Partial<MagicPocketToolOutputLimitsSettingsV1>
-  storage?: Partial<MagicPocketStorageSettingsV1>
-  contextCompaction?: Partial<MagicPocketContextCompactionSettingsV1>
-  runtimeTuning?: MagicPocketRuntimeTuningSettingsPatchV1
-  imageGeneration?: Partial<MagicPocketImageGenerationSettingsV1>
-  speechToText?: Partial<MagicPocketSpeechToTextSettingsV1>
-  textToSpeech?: Partial<MagicPocketTextToSpeechSettingsV1>
-  musicGeneration?: Partial<MagicPocketMusicGenerationSettingsV1>
-  videoGeneration?: Partial<MagicPocketVideoGenerationSettingsV1>
-  instructions?: Partial<MagicPocketInstructionSettingsV1>
-  computerUse?: Partial<MagicPocketComputerUseSettingsV1>
-  quality?: Partial<MagicPocketDesignQualitySettingsV1>
+  mcpSearch?: Partial<DagongMcpSearchSettingsV1>
+  tokenEconomy?: DagongTokenEconomySettingsPatchV1
+  toolOutputLimits?: Partial<DagongToolOutputLimitsSettingsV1>
+  storage?: Partial<DagongStorageSettingsV1>
+  contextCompaction?: Partial<DagongContextCompactionSettingsV1>
+  runtimeTuning?: DagongRuntimeTuningSettingsPatchV1
+  imageGeneration?: Partial<DagongImageGenerationSettingsV1>
+  speechToText?: Partial<DagongSpeechToTextSettingsV1>
+  textToSpeech?: Partial<DagongTextToSpeechSettingsV1>
+  musicGeneration?: Partial<DagongMusicGenerationSettingsV1>
+  videoGeneration?: Partial<DagongVideoGenerationSettingsV1>
+  instructions?: Partial<DagongInstructionSettingsV1>
+  computerUse?: Partial<DagongComputerUseSettingsV1>
+  quality?: Partial<DagongDesignQualitySettingsV1>
   modelProfiles?: Record<string, ModelProviderModelProfilePatchV1 | null>
 }
 
-export type MagicPocketSettingsEnvelopePatchV1 = {
-  magicpocket?: MagicPocketRuntimeSettingsPatchV1
+export type DagongSettingsEnvelopePatchV1 = {
+  dagong?: DagongRuntimeSettingsPatchV1
 }
 
 export type LogConfigV1 = {
@@ -648,7 +648,7 @@ export type CheckpointCleanupConfigV1 = {
   /**
    * Optional override for the Git checkpoint storage directory (issue #651).
    * Lets users point checkpoints at another drive with more free space instead
-   * of filling the system drive under the MagicPocket data dir. Absent = default
+   * of filling the system drive under the Dagong data dir. Absent = default
    * (`<dataDir>/git-checkpoints`).
    */
   directory?: string
@@ -741,7 +741,7 @@ export type ScheduleSettingsV1 = {
 //
 // A workflow is the multi-step generalization of a scheduled task: instead of a
 // single prompt it is a graph of nodes connected by edges. The "ai-agent" node
-// reuses the exact same MagicPocket-runtime execution path as a scheduled task.
+// reuses the exact same Dagong-runtime execution path as a scheduled task.
 // ---------------------------------------------------------------------------
 
 export type WorkflowNodeKind =
@@ -1264,7 +1264,7 @@ export type WorkflowNodeRunResultV1 = {
   inputJson?: string
   /** Retry attempts spent before this result (0/absent = first try). */
   retries?: number
-  /** For ai-agent nodes: the MagicPocket thread it created. */
+  /** For ai-agent nodes: the Dagong thread it created. */
   threadId: string
   error: string
 }
@@ -1308,7 +1308,7 @@ export type WorkflowV1 = {
   id: string
   name: string
   enabled: boolean
-  /** When true, the MagicPocket agent may invoke this workflow as a tool (list_workflows / run_workflow). */
+  /** When true, the Dagong agent may invoke this workflow as a tool (list_workflows / run_workflow). */
   callableByAgent: boolean
   /** Workflow-scoped variables, exposed to node expressions as {{$env.key}}. */
   env: WorkflowEnvVarV1[]
@@ -1342,7 +1342,7 @@ export type WorkflowNodePresetV1 = {
   config: WorkflowNodeV1['config']
 }
 
-/** The magicpocket agent hook phases a workflow can be bound to. Mirrors magicpocket's HOOK_PHASES. */
+/** The dagong agent hook phases a workflow can be bound to. Mirrors dagong's HOOK_PHASES. */
 export const WORKFLOW_HOOK_PHASES = [
   'PreToolUse',
   'PostToolUse',
@@ -1357,7 +1357,7 @@ export type WorkflowHookPhase = (typeof WORKFLOW_HOOK_PHASES)[number]
 export const WORKFLOW_HOOK_MODES = ['observe', 'block', 'rewrite'] as const
 export type WorkflowHookMode = (typeof WORKFLOW_HOOK_MODES)[number]
 
-/** Binds a Create Loop workflow to a magicpocket agent hook phase (reactive automation). */
+/** Binds a Create Loop workflow to a dagong agent hook phase (reactive automation). */
 export type WorkflowHookTriggerV1 = {
   id: string
   enabled: boolean
@@ -1371,28 +1371,28 @@ export type WorkflowHookTriggerV1 = {
    * rewrite = fold the workflow output into the tool result / injected context.
    */
   mode: WorkflowHookMode
-  /** Hook timeout in ms; 0 uses the magicpocket default. */
+  /** Hook timeout in ms; 0 uses the dagong default. */
   timeoutMs: number
 }
 
 export type WorkflowSettingsV1 = {
   enabled: boolean
   defaultWorkspaceRoot: string
-  /** Default model provider for new AI nodes. Empty inherits the MagicPocket runtime provider. */
+  /** Default model provider for new AI nodes. Empty inherits the Dagong runtime provider. */
   providerId?: string
   model: string
   mode: ScheduleRunMode
   keepAwake: boolean
   /** Local-only (127.0.0.1) port the webhook-trigger listener binds to. */
   webhookPort: number
-  /** Optional shared secret required on inbound webhook requests (x-magicpocket-secret / Bearer). */
+  /** Optional shared secret required on inbound webhook requests (x-dagong-secret / Bearer). */
   webhookSecret: string
   workflows: WorkflowV1[]
   /** Reusable palette items the user saved from configured nodes. */
   presets: WorkflowNodePresetV1[]
   /** User-defined script-backed modules. */
   modules: WorkflowCustomModuleV1[]
-  /** Workflows bound to magicpocket agent hook phases (reactive automation in code mode). */
+  /** Workflows bound to dagong agent hook phases (reactive automation in code mode). */
   hookTriggers: WorkflowHookTriggerV1[]
 }
 
@@ -1443,7 +1443,7 @@ export type ClawImSettingsV1 = {
   secret: string
   weixinBridgeUrl: string
   workspaceRoot: string
-  /** Default model provider for IM channels without their own provider. Empty inherits MagicPocket runtime provider. */
+  /** Default model provider for IM channels without their own provider. Empty inherits Dagong runtime provider. */
   providerId?: string
   model: string
   mode: ClawRunMode
@@ -1491,7 +1491,7 @@ export type ClawImTelegramPlatformCredentialV1 = {
    * Empty string means "allow all private chats" (group chats are always rejected).
    */
   allowedChatIds: string
-  /** Bot username resolved via getMe, e.g. "my_magicpocket_bot". Cosmetic only. */
+  /** Bot username resolved via getMe, e.g. "my_dagong_bot". Cosmetic only. */
   botUsername?: string
   createdAt: string
 }
@@ -1517,7 +1517,7 @@ export type ClawImConversationV1 = {
   latestMessageId: string
   senderId: string
   senderName: string
-  /** MagicPocket thread id this conversation maps to. */
+  /** Dagong thread id this conversation maps to. */
   localThreadId: string
   workspaceRoot: string
   createdAt: string
@@ -1534,7 +1534,7 @@ export type ClawImChannelV1 = {
   /** Model provider used by this IM channel. Empty inherits the IM/global provider. */
   providerId?: string
   model: string
-  /** MagicPocket thread id this channel maps to. */
+  /** Dagong thread id this channel maps to. */
   threadId: string
   workspaceRoot: string
   agentProfile: ClawImAgentProfileV1
@@ -1559,13 +1559,13 @@ export type WriteInlineCompletionSettingsV1 = {
   enabled: boolean
   retrievalEnabled: boolean
   longCompletionEnabled: boolean
-  /** When true, Write inherits MagicPocket's selected provider instead of using `providerId`. */
+  /** When true, Write inherits Dagong's selected provider instead of using `providerId`. */
   inheritProvider: boolean
   /** Selected provider for Write inline completion when `inheritProvider` is false. */
   providerId: string
   apiKey: string
   baseUrl: string
-  /** When true, Write inherits MagicPocket's runtime model instead of using `model` as an override. */
+  /** When true, Write inherits Dagong's runtime model instead of using `model` as an override. */
   inheritModel: boolean
   model: string
   debounceMs: number
@@ -1871,9 +1871,9 @@ export type AppSettingsV1 = {
   cursorSpotlight?: boolean
   cursorSpotlightColor?: string
   provider: ModelProviderSettingsV1
-  agents: MagicPocketSettingsEnvelopeV1
+  agents: DagongSettingsEnvelopeV1
   workspaceRoot: string
-  /** 对话会话的工作目录根(默认 ~/Documents/MagicPocket),不绑定项目文件夹。 */
+  /** 对话会话的工作目录根(默认 ~/Documents/Dagong),不绑定项目文件夹。 */
   conversationWorkspaceRoot: string
   log: LogConfigV1
   checkpointCleanup: CheckpointCleanupConfigV1
@@ -1898,7 +1898,7 @@ export type AppSettingsPatch = Partial<
   Omit<AppSettingsV1, 'provider' | 'agents' | 'log' | 'checkpointCleanup' | 'notifications' | 'appBehavior' | 'keyboardShortcuts' | 'write' | 'claw' | 'schedule' | 'design' | 'workflow' | 'guiUpdate' | 'terminal'>
 > & {
   provider?: ModelProviderSettingsPatchV1
-  agents?: MagicPocketSettingsEnvelopePatchV1
+  agents?: DagongSettingsEnvelopePatchV1
   log?: Partial<LogConfigV1>
   checkpointCleanup?: Partial<CheckpointCleanupConfigV1>
   notifications?: Partial<NotificationConfigV1>

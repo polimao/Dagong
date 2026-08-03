@@ -10,13 +10,13 @@ function artifact(id: string): DesignArtifact {
     id,
     kind: 'html',
     title: 'Home',
-    relativePath: `.magicpocket-design/doc/${id}/v2.html`,
-    designMdPath: `.magicpocket-design/doc/${id}/DESIGN.md`,
+    relativePath: `.dagong-design/doc/${id}/v2.html`,
+    designMdPath: `.dagong-design/doc/${id}/DESIGN.md`,
     createdAt: now,
     updatedAt: now,
     versions: [
-      { id: `${id}-v1`, relativePath: `.magicpocket-design/doc/${id}/v1.html`, createdAt: now, summary: 'Base screen' },
-      { id: `${id}-v2`, relativePath: `.magicpocket-design/doc/${id}/v2.html`, createdAt: now, summary: '' }
+      { id: `${id}-v1`, relativePath: `.dagong-design/doc/${id}/v1.html`, createdAt: now, summary: 'Base screen' },
+      { id: `${id}-v2`, relativePath: `.dagong-design/doc/${id}/v2.html`, createdAt: now, summary: '' }
     ]
   }
 }
@@ -24,10 +24,10 @@ function artifact(id: string): DesignArtifact {
 function resolvedTarget(patch: Partial<ResolvedDesignTurnTarget> = {}): ResolvedDesignTurnTarget {
   return {
     target: 'html',
-    artifactRelativePath: '.magicpocket-design/doc/home/v2.html',
-    basePath: '.magicpocket-design/doc/home/v1.html',
+    artifactRelativePath: '.dagong-design/doc/home/v2.html',
+    basePath: '.dagong-design/doc/home/v1.html',
     htmlArtifactId: 'home',
-    designNotesPath: '.magicpocket-design/doc/home/DESIGN.md',
+    designNotesPath: '.dagong-design/doc/home/DESIGN.md',
     visibleTargets: [],
     targetAutoRepairKey: 'artifact:home',
     ...patch
@@ -78,11 +78,11 @@ describe('prepareDesignTurnFiles', () => {
 
     expect(result).toEqual({ ok: true, previewSource: 'base', notesWritten: true })
     expect(api.writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.magicpocket-design/doc/home/v2.html',
+      path: '.dagong-design/doc/home/v2.html',
       content: '<!doctype html><html><body>Base</body></html>'
     }))
     expect(api.writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.magicpocket-design/doc/home/DESIGN.md',
+      path: '.dagong-design/doc/home/DESIGN.md',
       content: expect.stringContaining('Tighten hierarchy')
     }))
     expect(api.writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({

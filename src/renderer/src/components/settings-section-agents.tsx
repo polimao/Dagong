@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactElement, type ReactNode } from 'react'
 import type {
   AppSettingsV1,
-  MagicPocketToolPermissionMode,
+  DagongToolPermissionMode,
   ModelProviderProfileV1
 } from '@shared/app-settings'
 import {
@@ -16,9 +16,9 @@ import {
   MIN_KUN_LOCAL_PORT,
   WRITE_INLINE_COMPLETION_MODEL_IDS,
   defaultModelProviderSettings,
-  isMagicPocketRuntimeInsecure,
-  magicpocketToolPermissionModeFromSettings,
-  magicpocketToolPermissionModeSettings
+  isDagongRuntimeInsecure,
+  dagongToolPermissionModeFromSettings,
+  dagongToolPermissionModeSettings
 } from '@shared/app-settings'
 import type { GuiUpdateChannel } from '@shared/gui-update'
 import type {
@@ -26,7 +26,7 @@ import type {
   ComputerUsePermissions,
   ComputerUsePermissionState,
   SkillRootListItem
-} from '@shared/magicpocket-gui-api'
+} from '@shared/dagong-gui-api'
 import {
   Ban,
   Check,
@@ -61,7 +61,7 @@ import { parseUsageResponse } from '../hooks/usage-response'
 export { modelProvidersSettingsPatch } from './settings-section-providers'
 
 const TOOL_PERMISSION_OPTIONS: Array<{
-  value: MagicPocketToolPermissionMode
+  value: DagongToolPermissionMode
   labelKey: string
   descriptionKey: string
   Icon: typeof Hand
@@ -253,7 +253,7 @@ function modelContextProfileSummary(input: {
       contextWindowLabel: formatTokenNumber(DEEPSEEK_V4_CONTEXT_PROFILE.contextWindowTokens),
       softThresholdLabel: formatTokenNumber(DEEPSEEK_V4_CONTEXT_PROFILE.softThreshold),
       hardThresholdLabel: formatTokenNumber(DEEPSEEK_V4_CONTEXT_PROFILE.hardThreshold),
-      sourceLabelKey: 'magicpocketModelContextSourceBuiltIn'
+      sourceLabelKey: 'dagongModelContextSourceBuiltIn'
     }
   }
   const model = input.model?.trim() || 'auto'
@@ -262,7 +262,7 @@ function modelContextProfileSummary(input: {
     contextWindowLabel: 'models.profiles',
     softThresholdLabel: formatTokenNumber(input.fallbackSoftThreshold),
     hardThresholdLabel: formatTokenNumber(input.fallbackHardThreshold),
-    sourceLabelKey: 'magicpocketModelContextSourceFallback'
+    sourceLabelKey: 'dagongModelContextSourceFallback'
   }
 }
 
@@ -271,8 +271,8 @@ function usageNumber(value: unknown): number {
 }
 
 async function loadTokenEconomySavingsSummary(): Promise<TokenEconomySavingsSummary | null> {
-  if (typeof window === 'undefined' || typeof window.magicpocketGui?.runtimeRequest !== 'function') return null
-  const response = await window.magicpocketGui.runtimeRequest('/v1/usage?group_by=thread', 'GET')
+  if (typeof window === 'undefined' || typeof window.dagongGui?.runtimeRequest !== 'function') return null
+  const response = await window.dagongGui.runtimeRequest('/v1/usage?group_by=thread', 'GET')
   if (!response.ok || !response.body.trim()) return null
   const parsed = parseUsageResponse<{ totals?: Record<string, unknown> }>(response.body, 'token economy usage')
   const totals = parsed.totals ?? {}
@@ -286,9 +286,9 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     t,
     tCommon,
     form,
-    magicpocket,
+    dagong,
     update,
-    updateMagicPocket,
+    updateDagong,
     showRuntimeToken,
     setShowRuntimeToken,
     portError,
@@ -349,7 +349,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     memoryRecords,
     runtimeDiagnosticsBusy,
     runtimeDiagnosticsNotice,
-    refreshMagicPocketDiagnostics,
+    refreshDagongDiagnostics,
     disableMemoryRecord,
     restoreMemoryRecord,
     deleteMemoryRecord,
@@ -359,7 +359,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     splitSettingsList,
     listSettingsText
   } = ctx
-  const mcpSearch = magicpocket.mcpSearch ?? {
+  const mcpSearch = dagong.mcpSearch ?? {
     enabled: false,
     mode: 'auto',
     autoThresholdToolCount: 24,
@@ -383,11 +383,11 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
   }
   const tokenEconomy = {
     ...tokenEconomyDefaults,
-    ...(magicpocket.tokenEconomy ?? {}),
-    enabled: magicpocket.tokenEconomy?.enabled ?? magicpocket.tokenEconomyMode ?? false,
+    ...(dagong.tokenEconomy ?? {}),
+    enabled: dagong.tokenEconomy?.enabled ?? dagong.tokenEconomyMode ?? false,
     historyHygiene: {
       ...tokenEconomyDefaults.historyHygiene,
-      ...(magicpocket.tokenEconomy?.historyHygiene ?? {})
+      ...(dagong.tokenEconomy?.historyHygiene ?? {})
     }
   }
   const [tokenEconomySavingsState, setTokenEconomySavingsState] =
@@ -417,11 +417,11 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     }
   }, [tokenEconomy.enabled])
   const tokenEconomySavings = tokenEconomySavingsState.summary
-  const storage = magicpocket.storage ?? {
+  const storage = dagong.storage ?? {
     backend: 'hybrid',
     sqlitePath: ''
   }
-  const contextCompaction = magicpocket.contextCompaction ?? {
+  const contextCompaction = dagong.contextCompaction ?? {
     defaultSoftThreshold: 16000,
     defaultHardThreshold: 24000,
     summaryMode: 'model',
@@ -430,11 +430,11 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     summaryInputMaxBytes: 98304
   }
   const modelContext = modelContextProfileSummary({
-    model: magicpocket.model,
+    model: dagong.model,
     fallbackSoftThreshold: contextCompaction.defaultSoftThreshold,
     fallbackHardThreshold: contextCompaction.defaultHardThreshold
   })
-  const runtimeTuning = magicpocket.runtimeTuning ?? {
+  const runtimeTuning = dagong.runtimeTuning ?? {
     streamIdleTimeoutMs: 45000,
     toolStorm: {
       enabled: true,
@@ -445,12 +445,12 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
       maxStringBytes: 524288
     }
   }
-  const toolOutputLimits = magicpocket.toolOutputLimits ?? {
+  const toolOutputLimits = dagong.toolOutputLimits ?? {
     maxLines: DEFAULT_TOOL_OUTPUT_MAX_LINES,
     maxBytes: DEFAULT_TOOL_OUTPUT_MAX_BYTES
   }
   const updateMcpSearch = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       mcpSearch: {
         ...mcpSearch,
         ...patch
@@ -459,7 +459,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
   }
   const updateTokenEconomy = (patch: Record<string, unknown>): void => {
     const enabled = typeof patch.enabled === 'boolean' ? patch.enabled : tokenEconomy.enabled
-    updateMagicPocket({
+    updateDagong({
       tokenEconomyMode: enabled,
       tokenEconomy: {
         ...tokenEconomy,
@@ -477,7 +477,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     })
   }
   const updateStorage = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       storage: {
         ...storage,
         ...patch
@@ -485,7 +485,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     })
   }
   const updateContextCompaction = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       contextCompaction: {
         ...contextCompaction,
         ...patch
@@ -493,7 +493,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     })
   }
   const updateRuntimeTuning = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       runtimeTuning: {
         ...runtimeTuning,
         ...patch
@@ -501,7 +501,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     })
   }
   const updateToolOutputLimits = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       toolOutputLimits: {
         ...toolOutputLimits,
         ...patch
@@ -526,17 +526,17 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
   }
   const provider = form.provider ?? defaultModelProviderSettings()
   const modelProviders = provider.providers as ModelProviderProfileV1[]
-  const computerUse = magicpocket.computerUse ?? {
+  const computerUse = dagong.computerUse ?? {
     enabled: false,
     mode: 'auto' as const,
     maxImageDimension: 1280,
     maxActionsPerTurn: 40
   }
-  const instructions = magicpocket.instructions ?? {
+  const instructions = dagong.instructions ?? {
     enabled: true
   }
   const updateInstructions = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       instructions: {
         ...instructions,
         ...patch
@@ -544,14 +544,14 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     })
   }
   const updateComputerUse = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       computerUse: {
         ...computerUse,
         ...patch
       }
     })
   }
-  const quality = magicpocket.quality ?? {
+  const quality = dagong.quality ?? {
     enabled: true,
     strictness: 'standard' as const,
     ignoreRules: [],
@@ -559,24 +559,24 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
     maxFindings: 12
   }
   const updateQuality = (patch: Record<string, unknown>): void => {
-    updateMagicPocket({
+    updateDagong({
       quality: {
         ...quality,
         ...patch
       }
     })
   }
-  const activeProviderId = magicpocket.providerId?.trim() || DEFAULT_MODEL_PROVIDER_ID
+  const activeProviderId = dagong.providerId?.trim() || DEFAULT_MODEL_PROVIDER_ID
   const activeProvider = modelProviders.find((item) => item.id === activeProviderId) ?? modelProviders[0]
   const activeProviderModels = activeProvider?.models ?? []
-  const selectMagicPocketProvider = (providerId: string): void => {
+  const selectDagongProvider = (providerId: string): void => {
     const nextProvider = modelProviders.find((item) => item.id === providerId) ?? activeProvider
-    const nextModel = nextProvider?.models.includes(magicpocket.model)
-      ? magicpocket.model
-      : nextProvider?.models[0] ?? magicpocket.model
-    updateMagicPocket({ providerId, model: nextModel, apiKey: '', baseUrl: '' })
+    const nextModel = nextProvider?.models.includes(dagong.model)
+      ? dagong.model
+      : nextProvider?.models[0] ?? dagong.model
+    updateDagong({ providerId, model: nextModel, apiKey: '', baseUrl: '' })
   }
-  const toolPermissionMode = magicpocketToolPermissionModeFromSettings(magicpocket)
+  const toolPermissionMode = dagongToolPermissionModeFromSettings(dagong)
 
   return (
             <>
@@ -597,19 +597,19 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     description={t('autoStartDesc')}
                     control={
                       <Toggle
-                        checked={magicpocket.autoStart}
-                        onChange={(v) => updateMagicPocket({ autoStart: v })}
+                        checked={dagong.autoStart}
+                        onChange={(v) => updateDagong({ autoStart: v })}
                       />
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketProvider')}
-                    description={t('magicpocketProviderSelectDesc')}
+                    title={t('dagongProvider')}
+                    description={t('dagongProviderSelectDesc')}
                     control={
                       <select
                         className={selectControlClass}
                         value={activeProvider?.id ?? DEFAULT_MODEL_PROVIDER_ID}
-                        onChange={(e) => selectMagicPocketProvider(e.target.value)}
+                        onChange={(e) => selectDagongProvider(e.target.value)}
                       >
                         {modelProviders.map((item) => (
                           <option key={item.id} value={item.id}>{item.name}</option>
@@ -618,11 +618,11 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketModel')}
-                    description={t('magicpocketModelDesc')}
+                    title={t('dagongModel')}
+                    description={t('dagongModelDesc')}
                     control={
                       <ModelSelect
-                        value={magicpocket.model}
+                        value={dagong.model}
                         options={activeProviderModels}
                         optionLabel={(model) =>
                           model === activeProviderModels[0]
@@ -634,7 +634,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                         selectClassName={selectControlClass}
                         onChange={(model) => {
                           const next = model.trim()
-                          updateMagicPocket({ model: next || (activeProviderModels[0] ?? magicpocket.model) })
+                          updateDagong({ model: next || (activeProviderModels[0] ?? dagong.model) })
                         }}
                       />
                     }
@@ -654,8 +654,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                   />
                   <div className="px-3 py-4">
                     <AdvancedSettingsDisclosure
-                      title={t('magicpocketAssistantAdvanced')}
-                      description={t('magicpocketAssistantAdvancedDesc')}
+                      title={t('dagongAssistantAdvanced')}
+                      description={t('dagongAssistantAdvancedDesc')}
                     >
                       <div className="divide-y divide-ds-border-muted">
                   <SettingRow
@@ -672,8 +672,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                               ? 'border-red-400 focus:ring-red-300'
                               : 'border-ds-border focus:border-accent/40 focus:ring-accent/30'
                           }`}
-                          value={magicpocket.port}
-                          onChange={(e) => updateMagicPocket({ port: Number(e.target.value) })}
+                          value={dagong.port}
+                          onChange={(e) => updateDagong({ port: Number(e.target.value) })}
                         />
                         {portError ? (
                           <p className="mt-1 text-[12px] text-red-700 dark:text-red-300">{portError}</p>
@@ -682,26 +682,26 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketBinary')}
-                    description={t('magicpocketBinaryDesc')}
+                    title={t('dagongBinary')}
+                    description={t('dagongBinaryDesc')}
                     control={
                       <input
                         className="w-full min-w-0 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[14px] text-ds-ink shadow-sm focus:border-accent/40 focus:outline-none focus:ring-1 focus:ring-accent/30 md:max-w-md"
-                        placeholder={t('magicpocketBinaryPlaceholder')}
-                        value={compactHomePath(magicpocket.binaryPath)}
-                        onChange={(e) => updateMagicPocket({ binaryPath: expandHomePath(e.target.value) })}
+                        placeholder={t('dagongBinaryPlaceholder')}
+                        value={compactHomePath(dagong.binaryPath)}
+                        onChange={(e) => updateDagong({ binaryPath: expandHomePath(e.target.value) })}
                       />
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketDataDir')}
-                    description={t('magicpocketDataDirDesc')}
+                    title={t('dagongDataDir')}
+                    description={t('dagongDataDirDesc')}
                     control={
                       <input
                         className="w-full min-w-0 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[14px] text-ds-ink shadow-sm focus:border-accent/40 focus:outline-none focus:ring-1 focus:ring-accent/30 md:max-w-md"
                         placeholder={DEFAULT_KUN_DATA_DIR}
-                        value={compactHomePath(magicpocket.dataDir)}
-                        onChange={(e) => updateMagicPocket({ dataDir: expandHomePath(e.target.value) })}
+                        value={compactHomePath(dagong.dataDir)}
+                        onChange={(e) => updateDagong({ dataDir: expandHomePath(e.target.value) })}
                       />
                     }
                   />
@@ -710,8 +710,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     description={t('runtimeTokenDesc')}
                     control={
                       <SecretInput
-                        value={magicpocket.runtimeToken}
-                        onChange={(value) => updateMagicPocket({ runtimeToken: value })}
+                        value={dagong.runtimeToken}
+                        onChange={(value) => updateDagong({ runtimeToken: value })}
                         visible={showRuntimeToken}
                         onToggleVisibility={() => setShowRuntimeToken((value: boolean) => !value)}
                         showLabel={t('showSecret')}
@@ -721,12 +721,12 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketInsecure')}
-                    description={t('magicpocketInsecureDesc')}
+                    title={t('dagongInsecure')}
+                    description={t('dagongInsecureDesc')}
                     control={
                       <Toggle
-                        checked={isMagicPocketRuntimeInsecure(magicpocket)}
-                        onChange={(v) => updateMagicPocket({ insecure: v })}
+                        checked={isDagongRuntimeInsecure(dagong)}
+                        onChange={(v) => updateDagong({ insecure: v })}
                       />
                     }
                   />
@@ -734,8 +734,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     </AdvancedSettingsDisclosure>
                   </div>
                   <SettingRow
-                    title={t('magicpocketTokenEconomy')}
-                    description={t('magicpocketTokenEconomyDesc')}
+                    title={t('dagongTokenEconomy')}
+                    description={t('dagongTokenEconomyDesc')}
                     control={
                       <div className="flex min-w-0 flex-col items-start gap-2 sm:items-end">
                         <Toggle
@@ -746,14 +746,14 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           <div className="max-w-full rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-2.5 py-1.5 text-[12px] font-medium leading-5 text-emerald-700 dark:text-emerald-200">
                             {tokenEconomySavings ? (
                               <span>
-                                {t('magicpocketTokenEconomySavings', {
+                                {t('dagongTokenEconomySavings', {
                                   tokens: formatCompactNumber(tokenEconomySavings.tokens)
                                 })}
                               </span>
                             ) : tokenEconomySavingsState.loading ? (
-                              <span>{t('magicpocketTokenEconomySavingsLoading')}</span>
+                              <span>{t('dagongTokenEconomySavingsLoading')}</span>
                             ) : (
-                              <span>{t('magicpocketTokenEconomySavingsEmpty')}</span>
+                              <span>{t('dagongTokenEconomySavingsEmpty')}</span>
                             )}
                           </div>
                         ) : null}
@@ -761,8 +761,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketInstructions')}
-                    description={t('magicpocketInstructionsDesc')}
+                    title={t('dagongInstructions')}
+                    description={t('dagongInstructionsDesc')}
                     control={
                       <div className="flex min-w-0 flex-col items-start gap-2 sm:items-end">
                         <Toggle
@@ -770,7 +770,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           onChange={(enabled) => updateInstructions({ enabled })}
                         />
                         <div className="max-w-full rounded-lg border border-ds-border-muted bg-ds-main/40 px-2.5 py-1.5 text-[12px] leading-5 text-ds-muted">
-                          {t('magicpocketInstructionsDiagnostics', {
+                          {t('dagongInstructionsDiagnostics', {
                             count: toolDiagnostics?.instructions?.lastInjection?.sources?.length ?? runtimeInfo?.capabilities?.instructions?.lastSourceCount ?? 0
                           })}
                         </div>
@@ -804,7 +804,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                               type="button"
                               role="radio"
                               aria-checked={selected}
-                              onClick={() => updateMagicPocket(magicpocketToolPermissionModeSettings(option.value))}
+                              onClick={() => updateDagong(dagongToolPermissionModeSettings(option.value))}
                               className={`min-h-[72px] rounded-lg border px-3 py-2.5 text-left transition ${
                                 selected
                                   ? 'border-accent/55 bg-accent/10 text-ds-ink'
@@ -1283,21 +1283,21 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
 
 
               <div className="mt-6">
-                <SettingsCard title={t('magicpocketAdvanced')}>
+                <SettingsCard title={t('dagongAdvanced')}>
                   <div className="px-3 py-4">
                     <AdvancedSettingsDisclosure
-                      title={t('magicpocketAdvancedDetails')}
-                      description={t('magicpocketAdvancedDetailsDesc')}
+                      title={t('dagongAdvancedDetails')}
+                      description={t('dagongAdvancedDetailsDesc')}
                     >
                       <div className="divide-y divide-ds-border-muted">
                   <SettingRow
-                    title={t('magicpocketTokenEconomyOptions')}
-                    description={t('magicpocketTokenEconomyOptionsDesc')}
+                    title={t('dagongTokenEconomyOptions')}
+                    description={t('dagongTokenEconomyOptionsDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-3">
                         <label className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[13px] font-medium text-ds-muted">
-                          <span>{t('magicpocketCompressToolDescriptions')}</span>
+                          <span>{t('dagongCompressToolDescriptions')}</span>
                           <Toggle
                             checked={tokenEconomy.compressToolDescriptions}
                             disabled={!tokenEconomy.enabled}
@@ -1306,7 +1306,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[13px] font-medium text-ds-muted">
-                          <span>{t('magicpocketCompressToolResults')}</span>
+                          <span>{t('dagongCompressToolResults')}</span>
                           <Toggle
                             checked={tokenEconomy.compressToolResults}
                             disabled={!tokenEconomy.enabled}
@@ -1315,7 +1315,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[13px] font-medium text-ds-muted">
-                          <span>{t('magicpocketConciseResponses')}</span>
+                          <span>{t('dagongConciseResponses')}</span>
                           <Toggle
                             checked={tokenEconomy.conciseResponses}
                             disabled={!tokenEconomy.enabled}
@@ -1327,13 +1327,13 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketHistoryHygiene')}
-                    description={t('magicpocketHistoryHygieneDesc')}
+                    title={t('dagongHistoryHygiene')}
+                    description={t('dagongHistoryHygieneDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-3">
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketHistoryMaxResultLines')}
+                          {t('dagongHistoryMaxResultLines')}
                           <input
                             type="number"
                             min={1}
@@ -1344,7 +1344,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketHistoryMaxResultBytes')}
+                          {t('dagongHistoryMaxResultBytes')}
                           <input
                             type="number"
                             min={512}
@@ -1356,7 +1356,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketHistoryMaxResultTokens')}
+                          {t('dagongHistoryMaxResultTokens')}
                           <input
                             type="number"
                             min={128}
@@ -1368,7 +1368,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketHistoryMaxArgumentBytes')}
+                          {t('dagongHistoryMaxArgumentBytes')}
                           <input
                             type="number"
                             min={512}
@@ -1381,7 +1381,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketHistoryMaxArgumentTokens')}
+                          {t('dagongHistoryMaxArgumentTokens')}
                           <input
                             type="number"
                             min={128}
@@ -1394,7 +1394,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketHistoryMaxArrayItems')}
+                          {t('dagongHistoryMaxArrayItems')}
                           <input
                             type="number"
                             min={1}
@@ -1408,14 +1408,14 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketModelContextProfile')}
-                    description={t('magicpocketModelContextProfileDesc')}
+                    title={t('dagongModelContextProfile')}
+                    description={t('dagongModelContextProfileDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-4">
                         <div className="min-w-0 rounded-xl border border-ds-border-muted bg-ds-card px-3 py-2">
                           <div className="text-[11px] font-medium uppercase text-ds-faint">
-                            {t('magicpocketModelContextModel')}
+                            {t('dagongModelContextModel')}
                           </div>
                           <div className="mt-1 truncate text-[13px] font-semibold text-ds-ink">
                             {modelContext.modelLabel}
@@ -1426,7 +1426,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                         </div>
                         <div className="min-w-0 rounded-xl border border-ds-border-muted bg-ds-card px-3 py-2">
                           <div className="text-[11px] font-medium uppercase text-ds-faint">
-                            {t('magicpocketModelContextWindow')}
+                            {t('dagongModelContextWindow')}
                           </div>
                           <div className="mt-1 truncate text-[13px] font-semibold text-ds-ink">
                             {modelContext.contextWindowLabel}
@@ -1434,7 +1434,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                         </div>
                         <div className="min-w-0 rounded-xl border border-ds-border-muted bg-ds-card px-3 py-2">
                           <div className="text-[11px] font-medium uppercase text-ds-faint">
-                            {t('magicpocketModelContextSoft')}
+                            {t('dagongModelContextSoft')}
                           </div>
                           <div className="mt-1 truncate text-[13px] font-semibold text-ds-ink">
                             {modelContext.softThresholdLabel}
@@ -1442,7 +1442,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                         </div>
                         <div className="min-w-0 rounded-xl border border-ds-border-muted bg-ds-card px-3 py-2">
                           <div className="text-[11px] font-medium uppercase text-ds-faint">
-                            {t('magicpocketModelContextHard')}
+                            {t('dagongModelContextHard')}
                           </div>
                           <div className="mt-1 truncate text-[13px] font-semibold text-ds-ink">
                             {modelContext.hardThresholdLabel}
@@ -1452,40 +1452,40 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketStorageBackend')}
-                    description={t('magicpocketStorageBackendDesc')}
+                    title={t('dagongStorageBackend')}
+                    description={t('dagongStorageBackendDesc')}
                     control={
                       <select
                         className={selectControlClass}
                         value={storage.backend}
                         onChange={(e) => updateStorage({ backend: e.target.value })}
                       >
-                        <option value="hybrid">{t('magicpocketStorageHybrid')}</option>
-                        <option value="file">{t('magicpocketStorageFile')}</option>
+                        <option value="hybrid">{t('dagongStorageHybrid')}</option>
+                        <option value="file">{t('dagongStorageFile')}</option>
                       </select>
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketStorageSqlitePath')}
-                    description={t('magicpocketStorageSqlitePathDesc')}
+                    title={t('dagongStorageSqlitePath')}
+                    description={t('dagongStorageSqlitePathDesc')}
                     control={
                       <input
                         className="w-full min-w-0 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[14px] text-ds-ink shadow-sm focus:border-accent/40 focus:outline-none focus:ring-1 focus:ring-accent/30 md:max-w-md"
                         value={compactHomePath(storage.sqlitePath)}
                         disabled={storage.backend !== 'hybrid'}
-                        placeholder={t('magicpocketStorageSqlitePathPlaceholder')}
+                        placeholder={t('dagongStorageSqlitePathPlaceholder')}
                         onChange={(e) => updateStorage({ sqlitePath: expandHomePath(e.target.value) })}
                       />
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketCompactionThresholds')}
-                    description={t('magicpocketCompactionThresholdsDesc')}
+                    title={t('dagongCompactionThresholds')}
+                    description={t('dagongCompactionThresholdsDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-2">
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketCompactionSoftThreshold')}
+                          {t('dagongCompactionSoftThreshold')}
                           <input
                             type="number"
                             min={1024}
@@ -1496,7 +1496,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketCompactionHardThreshold')}
+                          {t('dagongCompactionHardThreshold')}
                           <input
                             type="number"
                             min={1024}
@@ -1510,13 +1510,13 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketCompactionSummary')}
-                    description={t('magicpocketCompactionSummaryDesc')}
+                    title={t('dagongCompactionSummary')}
+                    description={t('dagongCompactionSummaryDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-3">
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketCompactionSummaryTimeout')}
+                          {t('dagongCompactionSummaryTimeout')}
                           <input
                             type="number"
                             min={1000}
@@ -1528,7 +1528,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketCompactionSummaryMaxTokens')}
+                          {t('dagongCompactionSummaryMaxTokens')}
                           <input
                             type="number"
                             min={64}
@@ -1540,7 +1540,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketCompactionSummaryInputBytes')}
+                          {t('dagongCompactionSummaryInputBytes')}
                           <input
                             type="number"
                             min={1024}
@@ -1555,8 +1555,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketStreamIdleTimeout')}
-                    description={t('magicpocketStreamIdleTimeoutDesc')}
+                    title={t('dagongStreamIdleTimeout')}
+                    description={t('dagongStreamIdleTimeoutDesc')}
                     control={
                       <input
                         type="number"
@@ -1572,8 +1572,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketToolStorm')}
-                    description={t('magicpocketToolStormDesc')}
+                    title={t('dagongToolStorm')}
+                    description={t('dagongToolStormDesc')}
                     control={
                       <Toggle
                         checked={runtimeTuning.toolStorm.enabled}
@@ -1582,13 +1582,13 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketToolStormLimits')}
-                    description={t('magicpocketToolStormLimitsDesc')}
+                    title={t('dagongToolStormLimits')}
+                    description={t('dagongToolStormLimitsDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-2">
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketToolStormWindowSize')}
+                          {t('dagongToolStormWindowSize')}
                           <input
                             type="number"
                             min={1}
@@ -1600,7 +1600,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketToolStormThreshold')}
+                          {t('dagongToolStormThreshold')}
                           <input
                             type="number"
                             min={2}
@@ -1615,13 +1615,13 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketToolOutputLimits')}
-                    description={t('magicpocketToolOutputLimitsDesc')}
+                    title={t('dagongToolOutputLimits')}
+                    description={t('dagongToolOutputLimitsDesc')}
                     wideControl
                     control={
                       <div className="grid gap-3 sm:grid-cols-2">
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketToolOutputMaxLines')}
+                          {t('dagongToolOutputMaxLines')}
                           <input
                             type="number"
                             min={1}
@@ -1633,7 +1633,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                           />
                         </label>
                         <label className="flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-ds-muted">
-                          {t('magicpocketToolOutputMaxBytes')}
+                          {t('dagongToolOutputMaxBytes')}
                           <input
                             type="number"
                             min={1}
@@ -1648,8 +1648,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketToolArgumentRepair')}
-                    description={t('magicpocketToolArgumentRepairDesc')}
+                    title={t('dagongToolArgumentRepair')}
+                    description={t('dagongToolArgumentRepairDesc')}
                     control={
                       <input
                         type="number"
@@ -1669,16 +1669,16 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
               </div>
 
               <div className="mt-6">
-                <SettingsCard title={t('magicpocketDiagnostics')}>
+                <SettingsCard title={t('dagongDiagnostics')}>
                   <div className="px-3 py-4">
                     <AdvancedSettingsDisclosure
-                      title={t('magicpocketDiagnosticsAdvanced')}
-                      description={t('magicpocketDiagnosticsAdvancedDesc')}
+                      title={t('dagongDiagnosticsAdvanced')}
+                      description={t('dagongDiagnosticsAdvancedDesc')}
                     >
                       <div className="divide-y divide-ds-border-muted">
                   <SettingRow
-                    title={t('magicpocketRuntimeCapabilities')}
-                    description={t('magicpocketRuntimeCapabilitiesDesc')}
+                    title={t('dagongRuntimeCapabilities')}
+                    description={t('dagongRuntimeCapabilitiesDesc')}
                     wideControl
                     control={
                       <div className="flex w-full flex-col gap-3">
@@ -1703,10 +1703,10 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                         </div>
                         <div className="grid gap-2 text-[12.5px] text-ds-muted sm:grid-cols-2">
                           <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
-                            {t('magicpocketRuntimeModel')}: <span className="font-mono text-ds-ink">{runtimeInfo?.capabilities?.model?.id ?? 'unknown'}</span>
+                            {t('dagongRuntimeModel')}: <span className="font-mono text-ds-ink">{runtimeInfo?.capabilities?.model?.id ?? 'unknown'}</span>
                           </div>
                           <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
-                            {t('magicpocketRuntimePid')}: <span className="font-mono text-ds-ink">{runtimeInfo?.pid ?? 'unknown'}</span>
+                            {t('dagongRuntimePid')}: <span className="font-mono text-ds-ink">{runtimeInfo?.pid ?? 'unknown'}</span>
                           </div>
                           <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
                             MCP: <span className="font-mono text-ds-ink">{runtimeInfo?.capabilities?.mcp?.connectedServers ?? 0}/{runtimeInfo?.capabilities?.mcp?.configuredServers ?? 0}</span>
@@ -1730,12 +1730,12 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                         <div className="flex flex-wrap items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => void refreshMagicPocketDiagnostics()}
+                            onClick={() => void refreshDagongDiagnostics()}
                             disabled={runtimeDiagnosticsBusy}
                             className="inline-flex items-center gap-1.5 rounded-xl border border-ds-border bg-ds-card px-3 py-2 text-[13px] font-medium text-ds-ink shadow-sm transition hover:bg-ds-hover disabled:cursor-not-allowed disabled:opacity-55"
                           >
                             <RefreshCw className={`h-3.5 w-3.5 ${runtimeDiagnosticsBusy ? 'animate-spin' : ''}`} strokeWidth={1.75} />
-                            {t('magicpocketDiagnosticsRefresh')}
+                            {t('dagongDiagnosticsRefresh')}
                           </button>
                           {runtimeDiagnosticsNotice ? <InlineNoticeView notice={runtimeDiagnosticsNotice} /> : null}
                         </div>
@@ -1743,35 +1743,35 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketToolDiagnostics')}
-                    description={t('magicpocketToolDiagnosticsDesc')}
+                    title={t('dagongToolDiagnostics')}
+                    description={t('dagongToolDiagnosticsDesc')}
                     wideControl
                     control={
                       <div className="grid gap-2 text-[12.5px] text-ds-muted sm:grid-cols-2">
                         <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
-                          {t('magicpocketDiagnosticsProviders')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.providers?.length ?? 0}</span>
+                          {t('dagongDiagnosticsProviders')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.providers?.length ?? 0}</span>
                         </div>
                         <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
-                          {t('magicpocketDiagnosticsMcpServers')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.mcpServers?.length ?? 0}</span>
+                          {t('dagongDiagnosticsMcpServers')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.mcpServers?.length ?? 0}</span>
                         </div>
                         <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
-                          {t('magicpocketDiagnosticsSkills')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.skills?.skills?.length ?? 0}</span>
+                          {t('dagongDiagnosticsSkills')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.skills?.skills?.length ?? 0}</span>
                         </div>
                         <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-2">
-                          {t('magicpocketDiagnosticsAttachments')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.attachments?.count ?? 0}</span>
+                          {t('dagongDiagnosticsAttachments')}: <span className="font-mono text-ds-ink">{toolDiagnostics?.attachments?.count ?? 0}</span>
                         </div>
                       </div>
                     }
                   />
                   <SettingRow
-                    title={t('magicpocketMemoryRecords')}
-                    description={t('magicpocketMemoryRecordsDesc')}
+                    title={t('dagongMemoryRecords')}
+                    description={t('dagongMemoryRecordsDesc')}
                     wideControl
                     control={
                       <div className="flex flex-col gap-2">
                         {memoryRecords.length === 0 ? (
                           <div className="rounded-xl border border-ds-border-muted bg-ds-main/40 px-3 py-3 text-[13px] text-ds-faint">
-                            {t('magicpocketMemoryEmpty')}
+                            {t('dagongMemoryEmpty')}
                           </div>
                         ) : (
                           memoryRecords.slice(0, 8).map((memory: any) => (
@@ -1782,7 +1782,7 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                                   <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-ds-faint">
                                     <span className="font-mono">{memory.scope}</span>
                                     <span className="font-mono">{memory.id}</span>
-                                    {memory.disabledAt ? <span>{t('magicpocketMemoryDisabled')}</span> : null}
+                                    {memory.disabledAt ? <span>{t('dagongMemoryDisabled')}</span> : null}
                                     {memory.tags?.length ? <span>{compactList(memory.tags, '')}</span> : null}
                                   </div>
                                 </div>
@@ -1802,8 +1802,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                                       type="button"
                                       onClick={() => void disableMemoryRecord(memory.id)}
                                       className="rounded-lg p-1.5 text-ds-muted transition hover:bg-ds-hover hover:text-ds-ink"
-                                      aria-label={t('magicpocketMemoryDisable')}
-                                      title={t('magicpocketMemoryDisable')}
+                                      aria-label={t('dagongMemoryDisable')}
+                                      title={t('dagongMemoryDisable')}
                                     >
                                       <Ban className="h-3.5 w-3.5" strokeWidth={1.8} />
                                     </button>
@@ -1812,8 +1812,8 @@ export function AgentsSettingsSection({ ctx }: { ctx: Record<string, any> }): Re
                                     type="button"
                                     onClick={() => void deleteMemoryRecord(memory.id)}
                                     className="rounded-lg p-1.5 text-ds-muted transition hover:bg-red-500/10 hover:text-red-600"
-                                    aria-label={t('magicpocketMemoryDelete')}
-                                    title={t('magicpocketMemoryDelete')}
+                                    aria-label={t('dagongMemoryDelete')}
+                                    title={t('dagongMemoryDelete')}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" strokeWidth={1.8} />
                                   </button>
@@ -1848,7 +1848,7 @@ function ComputerUsePermissionRow({ t }: { t: (key: string) => string }): ReactE
   const [permissions, setPermissions] = useState<ComputerUsePermissions | null>(null)
 
   const refresh = (): void => {
-    void window.magicpocketGui?.getComputerUsePermissions?.().then(setPermissions).catch(() => undefined)
+    void window.dagongGui?.getComputerUsePermissions?.().then(setPermissions).catch(() => undefined)
   }
   useEffect(() => {
     refresh()
@@ -1858,7 +1858,7 @@ function ComputerUsePermissionRow({ t }: { t: (key: string) => string }): ReactE
   if (permissions && !permissions.needsPermission) return null
 
   const request = (kind: ComputerUsePermissionKind): void => {
-    void window.magicpocketGui
+    void window.dagongGui
       ?.requestComputerUsePermission?.(kind)
       .then(setPermissions)
       .catch(() => undefined)

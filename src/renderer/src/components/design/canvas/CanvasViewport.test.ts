@@ -134,10 +134,10 @@ describe('CanvasViewport surface behavior', () => {
   })
 
   it('allows code canvases to override the design-system persistence directory', () => {
-    expect(resolveCanvasDesignSystemBaseDir('.magicpocket-canvas', '.magicpocket-canvas/code-thread-1')).toBe(
-      '.magicpocket-canvas/code-thread-1'
+    expect(resolveCanvasDesignSystemBaseDir('.dagong-canvas', '.dagong-canvas/code-thread-1')).toBe(
+      '.dagong-canvas/code-thread-1'
     )
-    expect(resolveCanvasDesignSystemBaseDir('.magicpocket-design/doc-1', undefined)).toBe('.magicpocket-design/doc-1')
+    expect(resolveCanvasDesignSystemBaseDir('.dagong-design/doc-1', undefined)).toBe('.dagong-design/doc-1')
   })
 
   it('keeps design canvas keyboard shortcuts global', () => {

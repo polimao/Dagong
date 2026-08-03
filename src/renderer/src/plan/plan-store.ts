@@ -51,8 +51,8 @@ export type GuiPlanState = {
   clearActivePlan: () => void
 }
 
-const PLAN_REGISTRY_STORAGE_KEY = 'magicpocket.plan.registry.v1'
-const PLAN_PREVIEW_MODE_STORAGE_KEY = 'magicpocket.plan.previewMode'
+const PLAN_REGISTRY_STORAGE_KEY = 'dagong.plan.registry.v1'
+const PLAN_PREVIEW_MODE_STORAGE_KEY = 'dagong.plan.previewMode'
 
 function normalizeWorkspaceRoot(value: string | undefined | null): string {
   return (value ?? '').trim().replaceAll('\\', '/').replace(/\/+$/, '')

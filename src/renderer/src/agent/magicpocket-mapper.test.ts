@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { chatBlockFromItem, dispatchMagicPocketRuntimeEvent, mergeChatBlocks } from './magicpocket-mapper'
-import type { CoreRuntimeEventJson, CoreTurnItemJson } from './magicpocket-contract'
+import { chatBlockFromItem, dispatchDagongRuntimeEvent, mergeChatBlocks } from './dagong-mapper'
+import type { CoreRuntimeEventJson, CoreTurnItemJson } from './dagong-contract'
 import type { ThreadErrorOptions, ThreadEventSink } from './types'
 
 function makeSink(): ThreadEventSink {
@@ -30,7 +30,7 @@ describe('assistant stream mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'assistant_text_delta',
       seq: 1,
       item: {
@@ -44,7 +44,7 @@ describe('assistant stream mapping', () => {
         text: 'he'
       }
     }, sink, async () => undefined)
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'assistant_text_delta',
       seq: 2,
       item: {
@@ -58,7 +58,7 @@ describe('assistant stream mapping', () => {
         text: 'llo'
       }
     }, sink, async () => undefined)
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'item_created',
       seq: 3,
       item: {
@@ -90,7 +90,7 @@ describe('todo event mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'todos_updated',
       seq: 4,
       timestamp: '2026-06-04T00:00:00.000Z',
@@ -162,7 +162,7 @@ describe('review mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'item_updated',
       seq: 7,
       item: reviewItem
@@ -177,7 +177,7 @@ describe('review mapping', () => {
 })
 
 describe('create_plan tool mapping', () => {
-  it('surfaces turn failure messages from MagicPocket lifecycle events', async () => {
+  it('surfaces turn failure messages from Dagong lifecycle events', async () => {
     let capturedError: string | null = null
     let capturedErrorOptions: ThreadErrorOptions | null = null
     let capturedRuntimeError: unknown = null
@@ -192,7 +192,7 @@ describe('create_plan tool mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'turn_failed',
       seq: 8,
       timestamp: '2024-01-01T00:00:00.000Z',
@@ -226,7 +226,7 @@ describe('create_plan tool mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent({
+    await dispatchDagongRuntimeEvent({
       kind: 'item_created',
       seq: 9,
       timestamp: '2024-01-01T00:00:00.000Z',
@@ -493,7 +493,7 @@ describe('create_plan tool mapping', () => {
         }
       }
     }
-    void dispatchMagicPocketRuntimeEvent(event, sink, async () => undefined)
+    void dispatchDagongRuntimeEvent(event, sink, async () => undefined)
     const capturedTool = captured as { meta?: { plan?: { plan_id?: string; operation?: string } } } | null
     expect(capturedTool).not.toBeNull()
     expect(capturedTool?.meta?.plan?.plan_id).toBe('plan_x')
@@ -550,7 +550,7 @@ describe('user input mapping', () => {
         request = payload
       }
     }
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'user_input_requested',
         seq: 7,
@@ -591,7 +591,7 @@ describe('user input mapping', () => {
         called = true
       }
     }
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'item_created',
         seq: 8,
@@ -623,7 +623,7 @@ describe('approval mapping', () => {
         called = true
       }
     }
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'item_created',
         seq: 9,
@@ -697,7 +697,7 @@ describe('streaming runtime status events', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'tool_call_ready',
         seq: 20,
@@ -734,7 +734,7 @@ describe('streaming runtime status events', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'tool_result_upload_wait',
         seq: 21,
@@ -766,7 +766,7 @@ describe('streaming runtime status events', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'tool_catalog_changed',
         seq: 22,
@@ -799,7 +799,7 @@ describe('streaming runtime status events', () => {
 	      }
 	    }
 
-	    await dispatchMagicPocketRuntimeEvent(
+	    await dispatchDagongRuntimeEvent(
 	      {
 	        kind: 'tool_storm_suppressed',
 	        seq: 23,
@@ -827,7 +827,7 @@ describe('streaming runtime status events', () => {
 	  })
 	})
 
-describe('MagicPocket extension metadata mapping', () => {
+describe('Dagong extension metadata mapping', () => {
   it('maps turn disclosure metadata onto user messages', () => {
     const block = chatBlockFromItem({
       id: 'item_user_meta',
@@ -876,7 +876,7 @@ describe('MagicPocket extension metadata mapping', () => {
         captured = event
       }
     }
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'item_completed',
         seq: 12,
@@ -899,7 +899,7 @@ describe('MagicPocket extension metadata mapping', () => {
           toolName: 'web_search',
           callId: 'call_web',
           output: {
-            query: 'magicpocket mcp',
+            query: 'dagong mcp',
             sources: [
               {
                 sourceId: 'src_1',
@@ -933,7 +933,7 @@ describe('usage event mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'usage',
         seq: 12,
@@ -969,7 +969,7 @@ describe('usage event mapping', () => {
       }
     }
 
-    await dispatchMagicPocketRuntimeEvent(
+    await dispatchDagongRuntimeEvent(
       {
         kind: 'usage',
         seq: 13,
@@ -1001,7 +1001,7 @@ describe('usage event mapping', () => {
 })
 
 describe('tool presentation inference', () => {
-  it('prefers explicit toolKind from MagicPocket over local heuristics', () => {
+  it('prefers explicit toolKind from Dagong over local heuristics', () => {
     const block = chatBlockFromItem({
       id: 'item_explicit_kind',
       turnId: 'turn_1',

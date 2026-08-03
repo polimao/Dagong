@@ -67,12 +67,12 @@ describe('chat-store Claw actions helpers', () => {
   })
 
   it('uses the channel threadId when the latest conversation has none', () => {
-    const item = channel({ threadId: 'magicpocket-channel-thread' })
+    const item = channel({ threadId: 'dagong-channel-thread' })
     const conversation = { ...item.conversations[0], localThreadId: '' }
-    expect(clawThreadIdForProvider(item, conversation)).toBe('magicpocket-channel-thread')
+    expect(clawThreadIdForProvider(item, conversation)).toBe('dagong-channel-thread')
   })
 
-  it('recovers an unmapped Claw managed MagicPocket session before creating a new empty one', () => {
+  it('recovers an unmapped Claw managed Dagong session before creating a new empty one', () => {
     const item = channel()
     const recovered = findRecoverableClawThread(
       [
@@ -88,10 +88,10 @@ describe('chat-store Claw actions helpers', () => {
 
   it('writes recovered provider thread ids back to both channel and conversation', () => {
     const now = '2026-06-01T00:03:00.000Z'
-    const next = channelWithClawThreadMapping(channel(), 'magicpocket-thread', now, 'conversation-1')
+    const next = channelWithClawThreadMapping(channel(), 'dagong-thread', now, 'conversation-1')
 
-    expect(next.threadId).toBe('magicpocket-thread')
-    expect(next.conversations[0]?.localThreadId).toBe('magicpocket-thread')
+    expect(next.threadId).toBe('dagong-thread')
+    expect(next.conversations[0]?.localThreadId).toBe('dagong-thread')
   })
 
   it('drops stale configured thread ids and falls back to a recovered thread', () => {
@@ -130,7 +130,7 @@ describe('chat-store Claw actions helpers', () => {
         channels: [channel({ threadId: 'thr_missing', conversations: [] })]
       }
     }
-    const magicpocketGui = {
+    const dagongGui = {
       getSettings: vi.fn(async () => settings),
       setSettings: vi.fn(async (patch: { claw?: { channels?: ClawImChannelV1[] } }) => {
         settings = {
@@ -144,7 +144,7 @@ describe('chat-store Claw actions helpers', () => {
         return settings
       })
     }
-    vi.stubGlobal('window', { magicpocketGui })
+    vi.stubGlobal('window', { dagongGui })
 
     const provider = {
       createThread: vi.fn(),
@@ -208,7 +208,7 @@ describe('chat-store Claw actions helpers', () => {
     expect(state.activeClawChannelId).toBe('channel-1')
     expect(state.activeThreadId).toBeNull()
     expect(state.error).toBeNull()
-    expect(magicpocketGui.setSettings).toHaveBeenCalledWith({
+    expect(dagongGui.setSettings).toHaveBeenCalledWith({
       claw: {
         channels: [expect.objectContaining({ id: 'channel-1', threadId: '' })]
       }

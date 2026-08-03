@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultTerminalSettings,
@@ -22,10 +22,10 @@ function settings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      magicpocket: defaultMagicPocketRuntimeSettings()
+      dagong: defaultDagongRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -55,7 +55,7 @@ describe('runtimeSettingsApplyMode', () => {
     const prev = settings()
     const withModel = {
       ...prev,
-      agents: { magicpocket: { ...prev.agents.magicpocket, model: 'deepseek-reasoner' } }
+      agents: { dagong: { ...prev.agents.dagong, model: 'deepseek-reasoner' } }
     }
     const withProviderKey = {
       ...prev,
@@ -63,15 +63,15 @@ describe('runtimeSettingsApplyMode', () => {
     }
     const withApproval = {
       ...prev,
-      agents: { magicpocket: { ...prev.agents.magicpocket, approvalPolicy: 'never' as const, sandboxMode: 'read-only' as const } }
+      agents: { dagong: { ...prev.agents.dagong, approvalPolicy: 'never' as const, sandboxMode: 'read-only' as const } }
     }
     const withMedia = {
       ...prev,
       agents: {
-        magicpocket: {
-          ...prev.agents.magicpocket,
+        dagong: {
+          ...prev.agents.dagong,
           imageGeneration: {
-            ...prev.agents.magicpocket.imageGeneration,
+            ...prev.agents.dagong.imageGeneration,
             enabled: true,
             providerId: 'deepseek',
             model: 'image-model'
@@ -88,7 +88,7 @@ describe('runtimeSettingsApplyMode', () => {
     }
     const withMemory = {
       ...prev,
-      agents: { magicpocket: { ...prev.agents.magicpocket, memoryEnabled: true } }
+      agents: { dagong: { ...prev.agents.dagong, memoryEnabled: true } }
     }
 
     expect(runtimeSettingsApplyMode(prev, withModel)).toBe('hot')
@@ -104,22 +104,22 @@ describe('runtimeSettingsApplyMode', () => {
 
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
-      agents: { magicpocket: { ...prev.agents.magicpocket, port: prev.agents.magicpocket.port + 1 } }
+      agents: { dagong: { ...prev.agents.dagong, port: prev.agents.dagong.port + 1 } }
     })).toBe('restart')
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
-      agents: { magicpocket: { ...prev.agents.magicpocket, dataDir: '/tmp/magicpocket-next' } }
+      agents: { dagong: { ...prev.agents.dagong, dataDir: '/tmp/dagong-next' } }
     })).toBe('restart')
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
-      agents: { magicpocket: { ...prev.agents.magicpocket, runtimeToken: 'tok-next' } }
+      agents: { dagong: { ...prev.agents.dagong, runtimeToken: 'tok-next' } }
     })).toBe('restart')
     expect(runtimeSettingsApplyMode(prev, {
       ...prev,
       agents: {
-        magicpocket: {
-          ...prev.agents.magicpocket,
-          storage: { ...prev.agents.magicpocket.storage, backend: 'file' as const }
+        dagong: {
+          ...prev.agents.dagong,
+          storage: { ...prev.agents.dagong.storage, backend: 'file' as const }
         }
       }
     })).toBe('restart')

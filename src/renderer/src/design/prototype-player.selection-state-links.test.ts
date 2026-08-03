@@ -24,7 +24,7 @@ import type { DesignArtifact } from './design-types'
 const now = '2026-06-29T00:00:00.000Z'
 
 function artifact(id: string, title: string, extra: Partial<DesignArtifact> = {}): DesignArtifact {
-  const relativePath = `.magicpocket-design/doc/${id}/v1.html`
+  const relativePath = `.dagong-design/doc/${id}/v1.html`
   return {
     id,
     kind: 'html',
@@ -128,19 +128,19 @@ describe("prototype-player selection, state, and links", () => {
     })
     it('lists only HTML artifacts for the prototype screen map', () => {
       expect(resolvePrototypeScreens([
-        artifact('home', 'Home', { relativePath: '.magicpocket-design/doc/home/v1.html' }),
-        { ...artifact('board', 'Board', { relativePath: '.magicpocket-design/doc/board.json' }), kind: 'canvas' as const },
-        artifact('settings', 'Settings', { relativePath: '.magicpocket-design/doc/settings/v1.html' })
+        artifact('home', 'Home', { relativePath: '.dagong-design/doc/home/v1.html' }),
+        { ...artifact('board', 'Board', { relativePath: '.dagong-design/doc/board.json' }), kind: 'canvas' as const },
+        artifact('settings', 'Settings', { relativePath: '.dagong-design/doc/settings/v1.html' })
       ])).toEqual([
         {
           id: 'home',
           title: 'Home',
-          relativePath: '.magicpocket-design/doc/home/v1.html'
+          relativePath: '.dagong-design/doc/home/v1.html'
         },
         {
           id: 'settings',
           title: 'Settings',
-          relativePath: '.magicpocket-design/doc/settings/v1.html'
+          relativePath: '.dagong-design/doc/settings/v1.html'
         }
       ])
     })
@@ -148,7 +148,7 @@ describe("prototype-player selection, state, and links", () => {
       const artifacts = [
         artifact('home', 'Home'),
         artifact('settings', 'Settings'),
-        { ...artifact('board', 'Board', { relativePath: '.magicpocket-design/doc/board.json' }), kind: 'canvas' as const }
+        { ...artifact('board', 'Board', { relativePath: '.dagong-design/doc/board.json' }), kind: 'canvas' as const }
       ]
   
       expect(resolvePreferredPrototypeArtifactId(artifacts, 'settings', 'home')).toBe('settings')
@@ -214,13 +214,13 @@ describe("prototype-player selection, state, and links", () => {
       expect(prototypeMissingScreenPromptValues(artifact('home', 'Home'), ' ../checkout/v1.html ')).toEqual({
         current: 'Home',
         href: '../checkout/v1.html',
-        sourcePath: '.magicpocket-design/doc/home/v1.html',
+        sourcePath: '.dagong-design/doc/home/v1.html',
         suggestedTitle: 'Checkout'
       })
       expect(prototypeMissingScreenPromptValues(artifact('home', 'Home'), '   ')).toBeNull()
       expect(
         prototypeMissingScreenPromptValues(
-          { ...artifact('board', 'Board', { relativePath: '.magicpocket-design/doc/board.json' }), kind: 'canvas' },
+          { ...artifact('board', 'Board', { relativePath: '.dagong-design/doc/board.json' }), kind: 'canvas' },
           '../checkout/v1.html'
         )
       ).toBeNull()
@@ -230,7 +230,7 @@ describe("prototype-player selection, state, and links", () => {
       expect(suggestedPrototypeScreenTitleFromHref('/account-settings')).toBe('Account Settings')
       expect(suggestedPrototypeScreenTitleFromHref('#/billing-history')).toBe('Billing History')
       expect(suggestedPrototypeScreenTitleFromHref('Signup')).toBe('Signup')
-      expect(suggestedPrototypeScreenTitleFromHref('.magicpocket-design/doc/APIKeys/index.html')).toBe('API Keys')
+      expect(suggestedPrototypeScreenTitleFromHref('.dagong-design/doc/APIKeys/index.html')).toBe('API Keys')
       expect(suggestedPrototypeScreenTitleFromHref('   ')).toBe('New screen')
     })
     it('resolves prototype playback viewport from current target when no explicit frame exists', () => {
@@ -329,7 +329,7 @@ describe("prototype-player selection, state, and links", () => {
         artifact('home', 'Home', { prototypeLinks: [{ targetTitle: 'Home', targetArtifactId: 'home' }] })
       ])).toBe(true)
       expect(hasPrototypePlayback([
-        { ...artifact('board', 'Board', { relativePath: '.magicpocket-design/doc/board.json' }), kind: 'canvas' as const }
+        { ...artifact('board', 'Board', { relativePath: '.dagong-design/doc/board.json' }), kind: 'canvas' as const }
       ])).toBe(false)
     })
     it('resolves links by id or normalized title and drops duplicate/self/missing targets', () => {
@@ -421,32 +421,32 @@ describe("prototype-player selection, state, and links", () => {
       ])
     })
     it('synthesizes fallback links to sibling HTML pages when metadata is missing', () => {
-      const home = artifact('home', 'Home', { relativePath: '.magicpocket-design/doc/home/v1.html' })
-      const signup = artifact('signup', 'Signup', { relativePath: '.magicpocket-design/doc/signup/v1.html' })
-      const dashboard = artifact('dashboard', 'Dashboard', { relativePath: '.magicpocket-design/doc/dashboard/v1.html' })
+      const home = artifact('home', 'Home', { relativePath: '.dagong-design/doc/home/v1.html' })
+      const signup = artifact('signup', 'Signup', { relativePath: '.dagong-design/doc/signup/v1.html' })
+      const dashboard = artifact('dashboard', 'Dashboard', { relativePath: '.dagong-design/doc/dashboard/v1.html' })
   
       expect(resolvePrototypeLinks(home, [home, signup, dashboard])).toEqual([
         {
           targetArtifactId: 'signup',
           targetTitle: 'Signup',
-          targetRelativePath: '.magicpocket-design/doc/signup/v1.html',
+          targetRelativePath: '.dagong-design/doc/signup/v1.html',
           href: '../signup/v1.html',
           label: 'Signup'
         },
         {
           targetArtifactId: 'dashboard',
           targetTitle: 'Dashboard',
-          targetRelativePath: '.magicpocket-design/doc/dashboard/v1.html',
+          targetRelativePath: '.dagong-design/doc/dashboard/v1.html',
           href: '../dashboard/v1.html',
           label: 'Dashboard'
         }
       ])
     })
     it('uses current artifact versions for prototype links while resolving older version hrefs', () => {
-      const homeV1 = '.magicpocket-design/doc/home/v1.html'
-      const homeV2 = '.magicpocket-design/doc/home/v2.html'
-      const threadsV1 = '.magicpocket-design/doc/threads/v1.html'
-      const threadsV2 = '.magicpocket-design/doc/threads/v2.html'
+      const homeV1 = '.dagong-design/doc/home/v1.html'
+      const homeV2 = '.dagong-design/doc/home/v2.html'
+      const threadsV1 = '.dagong-design/doc/threads/v1.html'
+      const threadsV2 = '.dagong-design/doc/threads/v2.html'
       const home = artifact('home', 'Home', {
         relativePath: homeV2,
         versions: [
@@ -479,8 +479,8 @@ describe("prototype-player selection, state, and links", () => {
       ])
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v2.html#magicpocket-proto-nav=..%2Fthreads%2Fv1.html',
-          'file:///workspace/.magicpocket-design/doc/home/v2.html',
+          'file:///workspace/.dagong-design/doc/home/v2.html#dagong-proto-nav=..%2Fthreads%2Fv1.html',
+          'file:///workspace/.dagong-design/doc/home/v2.html',
           links
         )?.targetArtifactId
       ).toBe('threads')
@@ -516,18 +516,18 @@ describe("prototype-player selection, state, and links", () => {
         ]
       })
       const links = resolvePrototypeLinks(home, [home, artifact('signup', 'Signup')])
-      const currentFileUrl = 'file:///workspace/.magicpocket-design/doc/home/v1.html'
+      const currentFileUrl = 'file:///workspace/.dagong-design/doc/home/v1.html'
   
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#magicpocket-proto-nav=..%2Fsignup%2Fv1.html',
+          'file:///workspace/.dagong-design/doc/home/v1.html#dagong-proto-nav=..%2Fsignup%2Fv1.html',
           currentFileUrl,
           links
         )?.targetArtifactId
       ).toBe('signup')
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/signup/v1.html?rev=2',
+          'file:///workspace/.dagong-design/doc/signup/v1.html?rev=2',
           currentFileUrl,
           links
         )?.targetArtifactId
@@ -535,28 +535,28 @@ describe("prototype-player selection, state, and links", () => {
       expect(resolvePrototypeNavigationTarget('https://example.com', currentFileUrl, links)).toBeNull()
     })
     it('resolves captured workspace-relative paths through fallback sibling links', () => {
-      const home = artifact('home', 'Home', { relativePath: '.magicpocket-design/doc/home/v1.html' })
-      const signup = artifact('signup', 'Signup', { relativePath: '.magicpocket-design/doc/signup/v1.html' })
+      const home = artifact('home', 'Home', { relativePath: '.dagong-design/doc/home/v1.html' })
+      const signup = artifact('signup', 'Signup', { relativePath: '.dagong-design/doc/signup/v1.html' })
       const links = resolvePrototypeLinks(home, [home, signup])
-      const currentFileUrl = 'file:///workspace/.magicpocket-design/doc/home/v1.html'
+      const currentFileUrl = 'file:///workspace/.dagong-design/doc/home/v1.html'
   
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#magicpocket-proto-nav=.magicpocket-design%2Fdoc%2Fsignup%2Fv1.html',
+          'file:///workspace/.dagong-design/doc/home/v1.html#dagong-proto-nav=.dagong-design%2Fdoc%2Fsignup%2Fv1.html',
           currentFileUrl,
           links
         )?.targetArtifactId
       ).toBe('signup')
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#magicpocket-proto-nav=%2Fsignup%2Fv1.html%3Ffrom%3Dhome',
+          'file:///workspace/.dagong-design/doc/home/v1.html#dagong-proto-nav=%2Fsignup%2Fv1.html%3Ffrom%3Dhome',
           currentFileUrl,
           links
         )?.targetArtifactId
       ).toBe('signup')
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#magicpocket-proto-nav=signup%2Fv1.html',
+          'file:///workspace/.dagong-design/doc/home/v1.html#dagong-proto-nav=signup%2Fv1.html',
           currentFileUrl,
           links
         )?.targetArtifactId
@@ -566,18 +566,18 @@ describe("prototype-player selection, state, and links", () => {
       const home = artifact('home', 'Home')
       const signup = artifact('signup', 'Signup')
       const links = resolvePrototypeLinks(home, [home, signup])
-      const currentFileUrl = 'file:///workspace/.magicpocket-design/doc/home/v1.html'
+      const currentFileUrl = 'file:///workspace/.dagong-design/doc/home/v1.html'
   
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#magicpocket-proto-nav=Signup',
+          'file:///workspace/.dagong-design/doc/home/v1.html#dagong-proto-nav=Signup',
           currentFileUrl,
           links
         )?.targetArtifactId
       ).toBe('signup')
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#magicpocket-proto-nav=%20%20signup%20%20',
+          'file:///workspace/.dagong-design/doc/home/v1.html#dagong-proto-nav=%20%20signup%20%20',
           currentFileUrl,
           links
         )?.targetArtifactId
@@ -588,18 +588,18 @@ describe("prototype-player selection, state, and links", () => {
       const checkout = artifact('checkout', 'Checkout')
       const accountSettings = artifact('account-settings', 'Account Settings')
       const links = resolvePrototypeLinks(home, [home, checkout, accountSettings])
-      const currentFileUrl = 'file:///workspace/.magicpocket-design/doc/home/v1.html'
+      const currentFileUrl = 'file:///workspace/.dagong-design/doc/home/v1.html'
   
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#Checkout',
+          'file:///workspace/.dagong-design/doc/home/v1.html#Checkout',
           currentFileUrl,
           links
         )?.targetArtifactId
       ).toBe('checkout')
       expect(
         resolvePrototypeNavigationTarget(
-          'file:///workspace/.magicpocket-design/doc/home/v1.html#account-settings',
+          'file:///workspace/.dagong-design/doc/home/v1.html#account-settings',
           currentFileUrl,
           links
         )?.targetArtifactId

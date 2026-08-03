@@ -304,18 +304,18 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
     })
 
     // Stream PTY output → xterm.
-    const offData = window.magicpocketGui.onTerminalData((payload) => {
+    const offData = window.dagongGui.onTerminalData((payload) => {
       if (payload.sessionId !== sessionId) return
       term.write(payload.data)
     })
-    const offExit = window.magicpocketGui.onTerminalExit((payload) => {
+    const offExit = window.dagongGui.onTerminalExit((payload) => {
       if (payload.sessionId !== sessionId) return
       setExited(true)
     })
 
     // xterm input → PTY.
     const disposable = term.onData((data) => {
-      void window.magicpocketGui.writeToTerminal({
+      void window.dagongGui.writeToTerminal({
         sessionId,
         data
       })
@@ -337,7 +337,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
     const resizeObserver = new ResizeObserver(triggerFit)
     resizeObserver.observe(container)
     const onDimensionChange = (dim: { cols: number; rows: number }): void => {
-      void window.magicpocketGui.resizeTerminal({
+      void window.dagongGui.resizeTerminal({
         sessionId,
         cols: dim.cols,
         rows: dim.rows
@@ -348,7 +348,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
     // Create (or re-attach to) the PTY session. On re-attach the main process
     // replays the ring buffer before new output arrives.
     try {
-      const result = await window.magicpocketGui.createTerminal({
+      const result = await window.dagongGui.createTerminal({
         sessionId,
         cwd: workspaceRoot || undefined,
         cols,
@@ -363,7 +363,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
       // matches the visible grid.
       const dims = fit.proposeDimensions()
       if (dims) {
-        void window.magicpocketGui.resizeTerminal({
+        void window.dagongGui.resizeTerminal({
           sessionId,
           cols: dims.cols,
           rows: dims.rows
@@ -446,7 +446,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
   const handleCloseTab = useCallback((tabId: string) => {
     const closingIndex = tabs.findIndex((tab) => tab.id === tabId)
     if (closingIndex === -1) return
-    void window.magicpocketGui.disposeTerminal(sessionIdForTab(tabId))
+    void window.dagongGui.disposeTerminal(sessionIdForTab(tabId))
     setTabs((current) => {
       if (current.length <= 1) return current
       return current.filter((tab) => tab.id !== tabId)
@@ -514,7 +514,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
     const keptTab = tabs.find((tab) => tab.id === tabId)
     if (!keptTab) return
     for (const tab of tabs) {
-      if (tab.id !== tabId) void window.magicpocketGui.disposeTerminal(sessionIdForTab(tab.id))
+      if (tab.id !== tabId) void window.dagongGui.disposeTerminal(sessionIdForTab(tab.id))
     }
     setTabs([keptTab])
     setActiveTabId(tabId)
@@ -524,7 +524,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
 
   const handleCloseAllTabs = useCallback(() => {
     for (const tab of tabs) {
-      void window.magicpocketGui.disposeTerminal(sessionIdForTab(tab.id))
+      void window.dagongGui.disposeTerminal(sessionIdForTab(tab.id))
     }
     setContextMenu(null)
     cancelRenameTab()
@@ -538,7 +538,7 @@ export function TerminalPanel({ className = '', workspaceRoot, onCollapse, heigh
     if (!activeTab) return
     // Dispose the old shell then re-attach so a fresh one spawns.
     try {
-      await window.magicpocketGui.disposeTerminal(sessionIdForTab(activeTab.id))
+      await window.dagongGui.disposeTerminal(sessionIdForTab(activeTab.id))
     } catch {
       /* ignore */
     }

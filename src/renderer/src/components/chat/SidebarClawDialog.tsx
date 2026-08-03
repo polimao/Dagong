@@ -24,7 +24,7 @@ import type {
   ClawImProvider,
   ClawRunMode
 } from '@shared/app-settings'
-import type { ClawImInstallQrResult } from '@shared/magicpocket-gui-api'
+import type { ClawImInstallQrResult } from '@shared/dagong-gui-api'
 import { confirmDialog } from '../../lib/confirm-dialog'
 import { clawModelSelectOptions, mergeClawModelOptions } from '../../lib/claw-model-options'
 import {
@@ -225,9 +225,9 @@ export function ClawAddImDialog({
 
   useEffect(() => {
     let cancelled = false
-    if (typeof window.magicpocketGui?.getSettings !== 'function') return
+    if (typeof window.dagongGui?.getSettings !== 'function') return
     setLoadingConfig(true)
-    void window.magicpocketGui
+    void window.dagongGui
       .getSettings()
       .then((settings) => {
         if (cancelled) return
@@ -279,7 +279,7 @@ export function ClawAddImDialog({
   )
   const bindingPayload = useMemo(() => {
     const payload: Record<string, unknown> = {
-      kind: 'magicpocket.claw-im',
+      kind: 'dagong.claw-im',
       provider: effectiveProvider,
       endpoint,
       method: 'POST',
@@ -320,7 +320,7 @@ export function ClawAddImDialog({
 
   const startOfficialInstallQr = async (): Promise<void> => {
     if (!officialInstallProvider) return
-    if (typeof window.magicpocketGui?.startClawImInstallQr !== 'function') {
+    if (typeof window.dagongGui?.startClawImInstallQr !== 'function') {
       setInstallQr({
         status: 'error',
         url: '',
@@ -339,7 +339,7 @@ export function ClawAddImDialog({
     setInstallQr({ status: 'loading', url: '', deviceCode: '', userCode: '', timeLeft: 0, error: '' })
     let result: ClawImInstallQrResult
     try {
-      result = await window.magicpocketGui.startClawImInstallQr(officialInstallProvider, {
+      result = await window.dagongGui.startClawImInstallQr(officialInstallProvider, {
         isLark: officialInstallProvider === 'feishu' && officialInstallTarget === 'lark'
       })
     } catch (e) {
@@ -392,7 +392,7 @@ export function ClawAddImDialog({
     }, 1000)
     const waitForInstall = async (): Promise<void> => {
       try {
-        const poll = await window.magicpocketGui.pollClawImInstall(officialInstallProvider, result.deviceCode)
+        const poll = await window.dagongGui.pollClawImInstall(officialInstallProvider, result.deviceCode)
         if (installAttempt !== installAttemptRef.current) return
         if (poll.done) {
           clearInstallTimers()

@@ -46,7 +46,7 @@ function draft(overrides: Partial<SddDraftHistoryItem> & Pick<SddDraftHistoryIte
   return {
     id: overrides.id,
     workspaceRoot: overrides.workspaceRoot ?? '/tmp/app',
-    relativePath: overrides.relativePath ?? `.magicpocketsdd/draft/${folder}/requirement.md`,
+    relativePath: overrides.relativePath ?? `.dagongsdd/draft/${folder}/requirement.md`,
     createdAt: overrides.createdAt ?? '2026-01-01T00:00:00.000Z',
     updatedAt: overrides.updatedAt ?? '2026-01-02T00:00:00.000Z',
     title: overrides.title,
@@ -153,7 +153,7 @@ describe('SidebarProjectsSection groups', () => {
 
   it('maps remembered worktree roots to their source project without a registry entry', () => {
     const projectPath = '/Users/zxy/code/Kook-VoiceShop-Bot'
-    const worktreePath = '/Users/zxy/.magicpocket/worktrees/ab12/Kook-VoiceShop-Bot'
+    const worktreePath = '/Users/zxy/.dagong/worktrees/ab12/Kook-VoiceShop-Bot'
     const groups = buildSidebarWorkspaceGroups({
       threads: [thread({ id: 'thread-worktree', workspace: worktreePath })],
       searchQuery: '',
@@ -169,7 +169,7 @@ describe('SidebarProjectsSection groups', () => {
 
   it('shows worktree threads under their source project instead of a separate worktree project', () => {
     const projectPath = '/Users/zxy/code/Kook-VoiceShop-Bot'
-    const worktreePath = '/Users/zxy/.magicpocket/worktrees/0ff7/Kook-VoiceShop-Bot'
+    const worktreePath = '/Users/zxy/.dagong/worktrees/0ff7/Kook-VoiceShop-Bot'
     const threadWorktrees = {
       'thread-worktree': {
         projectPath,
@@ -229,12 +229,12 @@ describe('SidebarProjectsSection groups', () => {
     const groups = buildSidebarWorkspaceGroups({
       threads: [
         thread({ id: 'project-thread', workspace: '/Users/zxy/project-a' }),
-        thread({ id: 'conversation-thread', workspace: '/Users/zxy/Documents/MagicPocket/20260626-153012' })
+        thread({ id: 'conversation-thread', workspace: '/Users/zxy/Documents/Dagong/20260626-153012' })
       ],
       searchQuery: '',
       showArchived: false,
       workspaceRoot: '/Users/zxy/project-a',
-      conversationRoot: '/Users/zxy/Documents/MagicPocket',
+      conversationRoot: '/Users/zxy/Documents/Dagong',
       workspaceRoots: ['/Users/zxy/project-a']
     })
 
@@ -249,16 +249,16 @@ describe('SidebarProjectsSection groups', () => {
         thread({
           id: 'design-assistant',
           title: 'Design Assistant',
-          workspace: '/Users/zxy/.magicpocket/design-workspace'
+          workspace: '/Users/zxy/.dagong/design-workspace'
         })
       ],
       searchQuery: '',
       showArchived: false,
-      workspaceRoot: '/Users/zxy/.magicpocket/design-workspace',
+      workspaceRoot: '/Users/zxy/.dagong/design-workspace',
       conversationRoot: '',
       workspaceRoots: [
         '/Users/zxy/project-a',
-        '/Users/zxy/.magicpocket/design-workspace'
+        '/Users/zxy/.dagong/design-workspace'
       ]
     })
 
@@ -394,7 +394,7 @@ describe('SidebarActionDialog', () => {
       createElement(SidebarActionDialog, {
         state: {
           title: 'Remove AI training?',
-          description: 'This removes the project from MagicPocket.',
+          description: 'This removes the project from Dagong.',
           detail: 'Files on disk will not be deleted.',
           confirmLabel: 'Remove',
           danger: true,
@@ -445,7 +445,7 @@ describe('ThreadRow', () => {
         }),
         worktreeRecord: {
           projectPath: '/Users/zxy/project-a',
-          worktreePath: '/Users/zxy/.magicpocket/worktrees/abcd/project-a',
+          worktreePath: '/Users/zxy/.dagong/worktrees/abcd/project-a',
           branch: 'feature/layout-fix'
         },
         active: false,

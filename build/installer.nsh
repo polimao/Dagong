@@ -1,45 +1,45 @@
 !macro customCheckAppRunning
-  Var /GLOBAL MagicPocketInstallerCurrentPid
-  Var /GLOBAL MagicPocketInstallerStopAttempt
-  Var /GLOBAL MagicPocketInstallerStopResult
+  Var /GLOBAL DagongInstallerCurrentPid
+  Var /GLOBAL DagongInstallerStopAttempt
+  Var /GLOBAL DagongInstallerStopResult
 
   ${if} $INSTDIR == ""
     Return
   ${endif}
 
   System::Call 'kernel32::GetCurrentProcessId() i .r0'
-  StrCpy $MagicPocketInstallerCurrentPid $0
+  StrCpy $DagongInstallerCurrentPid $0
   System::Call 'kernel32::SetEnvironmentVariable(t, t)i ("KUN_INSTALLER_APP_ROOT", "$INSTDIR").r0'
-  System::Call 'kernel32::SetEnvironmentVariable(t, t)i ("KUN_INSTALLER_SELF_PID", "$MagicPocketInstallerCurrentPid").r0'
+  System::Call 'kernel32::SetEnvironmentVariable(t, t)i ("KUN_INSTALLER_SELF_PID", "$DagongInstallerCurrentPid").r0'
   System::Call 'kernel32::SetEnvironmentVariable(t, t)i ("KUN_INSTALLER_UNINSTALL_EXE", "${UNINSTALL_FILENAME}").r0'
 
-  StrCpy $MagicPocketInstallerStopAttempt 0
+  StrCpy $DagongInstallerStopAttempt 0
 
-  MagicPocketStopProcessesFromInstallDir:
-    IntOp $MagicPocketInstallerStopAttempt $MagicPocketInstallerStopAttempt + 1
+  DagongStopProcessesFromInstallDir:
+    IntOp $DagongInstallerStopAttempt $DagongInstallerStopAttempt + 1
     DetailPrint "Checking for running ${PRODUCT_NAME} processes under $INSTDIR."
     nsExec::Exec `"$PowerShellPath" -NoProfile -ExecutionPolicy Bypass -Command "$$ErrorActionPreference='SilentlyContinue';$$r=[IO.Path]::GetFullPath($$env:KUN_INSTALLER_APP_ROOT).TrimEnd('\')+'\';$$s=[int]$$env:KUN_INSTALLER_SELF_PID;$$u=$$env:KUN_INSTALLER_UNINSTALL_EXE;function p{@(gcim Win32_Process|?{if(!$$_.ExecutablePath){$$false}else{$$x=[IO.Path]::GetFullPath($$_.ExecutablePath);$$n=[IO.Path]::GetFileName($$x);$$_.ProcessId -ne $$s -and $$x.StartsWith($$r,'OrdinalIgnoreCase') -and !$$n.Equals($$u,'OrdinalIgnoreCase') -and !$$n.Equals('old-uninstaller.exe','OrdinalIgnoreCase')}})};$$a=p;if($$a.Count -eq 0){exit 1};$$a|%{& $$env:SystemRoot\System32\taskkill.exe /PID $$_.ProcessId /T /F|Out-Null};Start-Sleep -Milliseconds 500;if((p).Count -gt 0){exit 0}else{exit 1}"`
-    Pop $MagicPocketInstallerStopResult
+    Pop $DagongInstallerStopResult
 
-    ${if} $MagicPocketInstallerStopResult != 0
-      Goto MagicPocketInstallDirProcessesStopped
+    ${if} $DagongInstallerStopResult != 0
+      Goto DagongInstallDirProcessesStopped
     ${endif}
 
     Sleep 1200
-    ${if} $MagicPocketInstallerStopAttempt <= 5
-      Goto MagicPocketStopProcessesFromInstallDir
+    ${if} $DagongInstallerStopAttempt <= 5
+      Goto DagongStopProcessesFromInstallDir
     ${endif}
 
     !ifdef BUILD_UNINSTALLER
       ${ifNot} ${isUpdated}
-        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "$(appCannotBeClosed)" /SD IDCANCEL IDRETRY MagicPocketStopProcessesFromInstallDir
+        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "$(appCannotBeClosed)" /SD IDCANCEL IDRETRY DagongStopProcessesFromInstallDir
         Quit
       ${endif}
     !endif
 
     DetailPrint "${PRODUCT_NAME} processes may still be running; continuing with managed overwrite cleanup."
 
-  MagicPocketInstallDirProcessesStopped:
+  DagongInstallDirProcessesStopped:
   !ifndef BUILD_UNINSTALLER
     ${if} ${FileExists} "$INSTDIR\${UNINSTALL_FILENAME}"
       DetailPrint "Removing previous ${PRODUCT_NAME} install directory directly before overwrite install."
@@ -54,7 +54,7 @@
   !endif
 !macroend
 
-!macro magicpocketContinueAfterOldUninstallerFailure
+!macro dagongContinueAfterOldUninstallerFailure
   ${if} $R0 != 0
     DetailPrint "Old ${PRODUCT_NAME} uninstaller returned $R0; removing $INSTDIR directly before overwrite install."
     SetOutPath $TEMP
@@ -65,9 +65,9 @@
 !macroend
 
 !macro customUnInstallCheck
-  !insertmacro magicpocketContinueAfterOldUninstallerFailure
+  !insertmacro dagongContinueAfterOldUninstallerFailure
 !macroend
 
 !macro customUnInstallCheckCurrentUser
-  !insertmacro magicpocketContinueAfterOldUninstallerFailure
+  !insertmacro dagongContinueAfterOldUninstallerFailure
 !macroend

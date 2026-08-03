@@ -20,7 +20,7 @@ describe('InitialSetupDialog completion flow', () => {
       closeInitialSetup,
       getState: () => ({ runtimeConnection: 'ready', error: null }),
       setDialogError,
-      fallbackRuntimeError: 'Could not reach MagicPocket.'
+      fallbackRuntimeError: 'Could not reach Dagong.'
     })
 
     expect(completed).toBe(true)
@@ -44,7 +44,7 @@ describe('InitialSetupDialog completion flow', () => {
       closeInitialSetup,
       getState: () => ({ runtimeConnection: 'offline', error: 'Port is busy.' }),
       setDialogError,
-      fallbackRuntimeError: 'Could not reach MagicPocket.'
+      fallbackRuntimeError: 'Could not reach Dagong.'
     })
 
     expect(completed).toBe(false)
@@ -66,7 +66,7 @@ describe('InitialSetupDialog completion flow', () => {
       closeInitialSetup,
       getState: () => ({ runtimeConnection: 'offline', error: null }),
       setDialogError: vi.fn(),
-      fallbackRuntimeError: 'Could not reach MagicPocket.'
+      fallbackRuntimeError: 'Could not reach Dagong.'
     })
 
     expect(completed).toBe(true)

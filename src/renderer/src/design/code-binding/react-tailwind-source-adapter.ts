@@ -130,7 +130,7 @@ function findRequestTag(source: string, request: DesignCodeChangeRequest): TagRa
   }
   if (request.domId) {
     return (
-      findAttributeTag(source, 'data-magicpocket-source-id', request.domId) ??
+      findAttributeTag(source, 'data-dagong-source-id', request.domId) ??
       findAttributeTag(source, 'data-dom-id', request.domId) ??
       findAttributeTag(source, 'id', request.domId)
     )

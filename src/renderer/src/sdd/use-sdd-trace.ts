@@ -93,20 +93,20 @@ export function useSddTrace(input: {
     }
     let cancelled = false
     const load = async (): Promise<void> => {
-      if (typeof window.magicpocketGui?.readWorkspaceFile !== 'function') return
-      const requirement = await window.magicpocketGui
+      if (typeof window.dagongGui?.readWorkspaceFile !== 'function') return
+      const requirement = await window.dagongGui
         .readWorkspaceFile({ workspaceRoot, path: draftRelativePath })
         .catch(() => null)
       if (!cancelled) setDiskRequirement(requirement?.ok ? requirement.content : null)
       if (!planIsActive) {
-        const plan = await window.magicpocketGui
+        const plan = await window.dagongGui
           .readWorkspaceFile({ workspaceRoot, path: planRelativePath })
           .catch(() => null)
         if (!cancelled) setDiskPlan(plan?.ok ? plan.content : null)
       }
       const tracePath = sddDraftTraceRelativePath(draftRelativePath)
       if (tracePath) {
-        const trace = await window.magicpocketGui
+        const trace = await window.dagongGui
           .readWorkspaceFile({ workspaceRoot, path: tracePath })
           .catch(() => null)
         if (!cancelled) setSnapshot(trace?.ok ? parseTraceSnapshot(trace.content) : null)
@@ -163,8 +163,8 @@ export function useSddTrace(input: {
           await saveActiveSddDraftToDisk()
           return
         }
-        if (typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') return
-        const written = await window.magicpocketGui.writeWorkspaceFile({
+        if (typeof window.dagongGui?.writeWorkspaceFile !== 'function') return
+        const written = await window.dagongGui.writeWorkspaceFile({
           workspaceRoot,
           path: draftRelativePath,
           content: next

@@ -10,7 +10,7 @@ export function composeSddAssistantPrompt(options: {
 }): string {
   const frameworkGuidance = composeFrameworkGuidance(options.frameworkIds ?? [])
   return [
-    'You are helping clarify and improve an SDD requirement draft inside MagicPocket.',
+    'You are helping clarify and improve an SDD requirement draft inside Dagong.',
     `Workspace: ${options.workspaceRoot}`,
     `Draft file: ${options.draftRelativePath}`,
     '',

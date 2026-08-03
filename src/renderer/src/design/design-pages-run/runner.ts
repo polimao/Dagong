@@ -279,8 +279,8 @@ export async function runDesignPages(deps: RunDesignPagesDeps): Promise<void> {
       return {
         entry,
         id,
-        relativePath: `.magicpocket-design/${docId}/${id}/v1.html`,
-        designMdPath: `.magicpocket-design/${docId}/${id}/DESIGN.md`,
+        relativePath: `.dagong-design/${docId}/${id}/v1.html`,
+        designMdPath: `.dagong-design/${docId}/${id}/DESIGN.md`,
         createdAt: new Date().toISOString(),
         node: {
           ...defaultDesignArtifactNode(baseIndex + i),
@@ -338,7 +338,7 @@ export async function runDesignPages(deps: RunDesignPagesDeps): Promise<void> {
     // 4) Generate pages in parallel. The parent design agent only delegates:
     // every child gets one pre-created artifact path and may edit ONLY that
     // page's HTML + DESIGN.md. `delegate_task` calls from one assistant message
-    // run in a parallel batch in MagicPocket's AgentLoop.
+    // run in a parallel batch in Dagong's AgentLoop.
     const foundationLines = buildFoundationFollowLines({
       ...(designMdRef ? { designMdPath: designMdRef } : {}),
       ...(designSystemRef ? { designSystemMdPath: designSystemRef } : {})

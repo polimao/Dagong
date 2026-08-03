@@ -1,6 +1,6 @@
 import i18n from '../i18n'
 
-const DEFAULT_WORKSPACE_LABEL = 'MagicPocket'
+const DEFAULT_WORKSPACE_LABEL = 'Dagong'
 
 function normalizePathForMatch(path: string): string {
   return path.replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase()
@@ -11,8 +11,8 @@ function normalizePathForMatch(path: string): string {
 function isDefaultWorkspacePath(path: string): boolean {
   const normalized = normalizePathForMatch(path)
   return (
-    normalized === '~/.magicpocket/default_workspace'
-    || normalized.endsWith('/.magicpocket/default_workspace')
+    normalized === '~/.dagong/default_workspace'
+    || normalized.endsWith('/.dagong/default_workspace')
     || normalized === '~/.deepseekgui/default_workspace'
     || normalized.endsWith('/.deepseekgui/default_workspace')
   )

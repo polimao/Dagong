@@ -65,7 +65,7 @@ type CodeProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & {
 }
 
 export const writeMarkdownHardenOptions = {
-  defaultOrigin: 'https://magicpocket.local',
+  defaultOrigin: 'https://dagong.local',
   allowedLinkPrefixes: ['*'],
   allowedImagePrefixes: ['*']
 }
@@ -499,7 +499,7 @@ function WriteMarkdownPreviewContent({ content, isMarkdown, filePath, workspaceR
               onClick={(event) => {
                 if (!href) return
                 event.preventDefault()
-                void window.magicpocketGui?.openExternal?.(href)?.catch(() => undefined)
+                void window.dagongGui?.openExternal?.(href)?.catch(() => undefined)
               }}
             >
               {children}

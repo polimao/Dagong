@@ -5,9 +5,9 @@ import { loadDesignSystem } from './design-system-persistence'
 import { createEmptyDesignSystem, type DesignSystem } from './design-system-types'
 import { looksLikeStandaloneImageAssetPrompt } from '../design-image-intent'
 
-/** Workspace subdir for code-mode canvases. Kept out of `.magicpocket-design` so design
- * mode's artifact lister (which enumerates `.magicpocket-design/*`) never sees them. */
-export const CODE_CANVAS_DIR = '.magicpocket-canvas'
+/** Workspace subdir for code-mode canvases. Kept out of `.dagong-design` so design
+ * mode's artifact lister (which enumerates `.dagong-design/*`) never sees them. */
+export const CODE_CANVAS_DIR = '.dagong-canvas'
 
 export function codeCanvasArtifactId(threadId: string): string {
   return `code-${threadId}`

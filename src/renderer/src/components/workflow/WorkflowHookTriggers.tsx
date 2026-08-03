@@ -24,7 +24,7 @@ function newTriggerId(): string {
 }
 
 /**
- * Editor for binding Create Loop workflows to magicpocket agent hook phases — reactive
+ * Editor for binding Create Loop workflows to dagong agent hook phases — reactive
  * automation in code mode (e.g. PostToolUse on write/edit → run a review workflow).
  */
 export function WorkflowHookTriggers({

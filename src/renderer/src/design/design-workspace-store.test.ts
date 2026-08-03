@@ -15,7 +15,7 @@ type WriteWorkspaceFileRequest = {
 
 function artifact(id: string, kind: DesignArtifact['kind']): DesignArtifact {
   const relativePath =
-    kind === 'canvas' ? `.magicpocket-design/doc/${id}/canvas.json` : `.magicpocket-design/doc/${id}/v1.html`
+    kind === 'canvas' ? `.dagong-design/doc/${id}/canvas.json` : `.dagong-design/doc/${id}/v1.html`
   return {
     id,
     kind,
@@ -63,7 +63,7 @@ describe('design workspace store', () => {
 
   beforeEach(() => {
     writeWorkspaceFile.mockClear()
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile } })
     const canvas = artifact('canvas', 'canvas')
     const screen = artifact('screen', 'html')
     const doc: DesignDocument = {
@@ -100,26 +100,26 @@ describe('design workspace store', () => {
 
     expect(result).toEqual({
       artifactId: 'screen',
-      relativePath: '.magicpocket-design/doc/screen/v2.html',
-      basePath: '.magicpocket-design/doc/screen/v1.html',
-      designMdPath: '.magicpocket-design/doc/screen/DESIGN.md'
+      relativePath: '.dagong-design/doc/screen/v2.html',
+      basePath: '.dagong-design/doc/screen/v1.html',
+      designMdPath: '.dagong-design/doc/screen/DESIGN.md'
     })
 
     const state = useDesignWorkspaceStore.getState()
     const screen = state.artifacts.find((item) => item.id === 'screen')
     expect(state.activeArtifactId).toBe('canvas')
-    expect(screen?.relativePath).toBe('.magicpocket-design/doc/screen/v2.html')
-    expect(screen?.designMdPath).toBe('.magicpocket-design/doc/screen/DESIGN.md')
+    expect(screen?.relativePath).toBe('.dagong-design/doc/screen/v2.html')
+    expect(screen?.designMdPath).toBe('.dagong-design/doc/screen/DESIGN.md')
     expect(screen?.previewStatus).toBe('pending')
     expect(screen?.versions[0]).toMatchObject({
       id: 'screen-v2',
-      relativePath: '.magicpocket-design/doc/screen/v2.html',
+      relativePath: '.dagong-design/doc/screen/v2.html',
       summary: 'Make it a login screen'
     })
     expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.magicpocket-design/doc/screen/meta.json',
+      path: '.dagong-design/doc/screen/meta.json',
       workspaceRoot: '/workspace',
-      content: expect.stringContaining('.magicpocket-design/doc/screen/v2.html')
+      content: expect.stringContaining('.dagong-design/doc/screen/v2.html')
     }))
   })
 
@@ -130,7 +130,7 @@ describe('design workspace store', () => {
       versions: [
         {
           id: 'fresh-screen-v1',
-          relativePath: '.magicpocket-design/doc/fresh-screen/v1.html',
+          relativePath: '.dagong-design/doc/fresh-screen/v1.html',
           createdAt,
           summary: 'Initial brief'
         }
@@ -164,30 +164,30 @@ describe('design workspace store', () => {
 
     expect(result).toEqual({
       artifactId: fresh.id,
-      relativePath: '.magicpocket-design/doc/fresh-screen/v1.html',
-      designMdPath: '.magicpocket-design/doc/fresh-screen/DESIGN.md'
+      relativePath: '.dagong-design/doc/fresh-screen/v1.html',
+      designMdPath: '.dagong-design/doc/fresh-screen/DESIGN.md'
     })
     const updated = useDesignWorkspaceStore.getState().artifacts.find((item) => item.id === fresh.id)
     expect(useDesignWorkspaceStore.getState().activeArtifactId).toBe(canvas.id)
     expect(updated).toMatchObject({
-      relativePath: '.magicpocket-design/doc/fresh-screen/v1.html',
-      designMdPath: '.magicpocket-design/doc/fresh-screen/DESIGN.md',
+      relativePath: '.dagong-design/doc/fresh-screen/v1.html',
+      designMdPath: '.dagong-design/doc/fresh-screen/DESIGN.md',
       previewStatus: 'pending'
     })
     expect(updated?.versions).toHaveLength(1)
     expect(updated?.versions[0]).toMatchObject({
       id: 'fresh-screen-v1',
-      relativePath: '.magicpocket-design/doc/fresh-screen/v1.html',
+      relativePath: '.dagong-design/doc/fresh-screen/v1.html',
       summary: 'Build the real first screen'
     })
     expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.magicpocket-design/doc/fresh-screen/meta.json',
+      path: '.dagong-design/doc/fresh-screen/meta.json',
       workspaceRoot: '/workspace',
       content: expect.stringContaining('Build the real first screen')
     }))
     expect(
       writeWorkspaceFile.mock.calls.some(([request]) =>
-        (request as WriteWorkspaceFileRequest).content.includes('.magicpocket-design/doc/fresh-screen/v2.html')
+        (request as WriteWorkspaceFileRequest).content.includes('.dagong-design/doc/fresh-screen/v2.html')
       )
     ).toBe(false)
   })
@@ -211,7 +211,7 @@ describe('design workspace store', () => {
     const updated = useDesignWorkspaceStore.getState().artifacts.find((a) => a.id === 'screen')
     expect(updated?.previewStatus).toBe('ready')
     expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.magicpocket-design/doc/screen/meta.json',
+      path: '.dagong-design/doc/screen/meta.json',
       workspaceRoot: '/workspace',
       content: expect.stringContaining('"previewStatus": "ready"')
     }))
@@ -229,18 +229,18 @@ describe('design workspace store', () => {
     }
     const html = {
       ...artifact('screen', 'html'),
-      relativePath: '.magicpocket-design/doc/screen/v2.html',
+      relativePath: '.dagong-design/doc/screen/v2.html',
       updatedAt: '2026-06-20T01:00:00.000Z',
       versions: [
         {
           id: 'screen-v2',
-          relativePath: '.magicpocket-design/doc/screen/v2.html',
+          relativePath: '.dagong-design/doc/screen/v2.html',
           createdAt: '2026-06-20T01:00:00.000Z',
           summary: 'Broken draft'
         },
         {
           id: 'screen-v1',
-          relativePath: '.magicpocket-design/doc/screen/v1.html',
+          relativePath: '.dagong-design/doc/screen/v1.html',
           createdAt,
           summary: 'Stable draft'
         }
@@ -272,27 +272,27 @@ describe('design workspace store', () => {
 
       const updated = useDesignWorkspaceStore.getState().artifacts.find((a) => a.id === 'screen')
       expect(updated).toMatchObject({
-        relativePath: '.magicpocket-design/doc/screen/v1.html',
+        relativePath: '.dagong-design/doc/screen/v1.html',
         updatedAt: createdAt,
         previewStatus: 'pending',
         node
       })
       expect(updated?.versions.map((version) => version.id)).toEqual(['screen-v2', 'screen-v1'])
       expect(buildHtmlSiblingManifest(useDesignWorkspaceStore.getState().artifacts, null)[0]).toMatchObject({
-        htmlPath: '.magicpocket-design/doc/screen/v1.html',
+        htmlPath: '.dagong-design/doc/screen/v1.html',
         summary: 'Stable draft'
       })
       expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-        path: '.magicpocket-design/doc/screen/meta.json',
+        path: '.dagong-design/doc/screen/meta.json',
         workspaceRoot: '/workspace',
         content: expect.stringContaining('"previewStatus": "pending"')
       }))
       expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-        path: '.magicpocket-design/doc/screen/meta.json',
+        path: '.dagong-design/doc/screen/meta.json',
         content: expect.stringContaining('"height": 1720')
       }))
       expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-        path: '.magicpocket-design/documents.json',
+        path: '.dagong-design/documents.json',
         workspaceRoot: '/workspace',
         content: expect.stringContaining('"activeDocumentId": "doc"')
       }))
@@ -364,29 +364,29 @@ describe('design workspace store', () => {
     expect(updated?.title).toBe('Measured screen renamed')
     expect(updated?.node).toEqual(existing.node)
     expect(writeWorkspaceFile).toHaveBeenCalledWith(expect.objectContaining({
-      path: '.magicpocket-design/doc/screen/meta.json',
+      path: '.dagong-design/doc/screen/meta.json',
       content: expect.stringContaining('"height": 2100')
     }))
   })
 
   it('persists the design target from both quick toggle and context updates', () => {
     const { storage, localStorage } = stubLocalStorage()
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile }, localStorage })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile }, localStorage })
 
     useDesignWorkspaceStore.getState().setDesignTarget('app')
 
     expect(useDesignWorkspaceStore.getState().designContext.designTarget).toBe('app')
-    expect(storage.get('magicpocket.design.target.v1')).toBe('app')
+    expect(storage.get('dagong.design.target.v1')).toBe('app')
 
     useDesignWorkspaceStore.getState().updateDesignContext({ designTarget: 'web' })
 
     expect(useDesignWorkspaceStore.getState().designContext.designTarget).toBe('web')
-    expect(storage.get('magicpocket.design.target.v1')).toBe('web')
+    expect(storage.get('dagong.design.target.v1')).toBe('web')
 
     useDesignWorkspaceStore.getState().updateDesignContext({ designTarget: 'tablet' as never })
 
     expect(useDesignWorkspaceStore.getState().designContext.designTarget).toBe('web')
-    expect(storage.get('magicpocket.design.target.v1')).toBe('web')
+    expect(storage.get('dagong.design.target.v1')).toBe('web')
   })
 
   it('setVersionSummary no-ops on empty text or unknown ids', () => {
@@ -466,8 +466,8 @@ describe('design workspace store', () => {
       .map(([request]) => request as { path: string; content: string })
       .filter((request) => request.path.endsWith('/meta.json'))
     expect(metaWrites.map((request) => request.path).sort()).toEqual([
-      '.magicpocket-design/doc/details/meta.json',
-      '.magicpocket-design/doc/screen/meta.json'
+      '.dagong-design/doc/details/meta.json',
+      '.dagong-design/doc/screen/meta.json'
     ])
     expect(metaWrites.every((request) => request.content.includes('"status": "accepted"'))).toBe(true)
 
@@ -523,20 +523,20 @@ describe('design workspace store', () => {
       createdAt
     }))
     vi.stubGlobal('window', {
-      magicpocketGui: { writeWorkspaceFile, createWorkspaceDirectory }
+      dagongGui: { writeWorkspaceFile, createWorkspaceDirectory }
     })
 
     const id = useDesignWorkspaceStore.getState().createDocument('Second')
     await Promise.resolve()
     await Promise.resolve()
 
-    expect(createWorkspaceDirectory).toHaveBeenCalledWith({ path: '.magicpocket-design', workspaceRoot: '/workspace' })
-    expect(createWorkspaceDirectory).toHaveBeenCalledWith({ path: `.magicpocket-design/${id}`, workspaceRoot: '/workspace' })
+    expect(createWorkspaceDirectory).toHaveBeenCalledWith({ path: '.dagong-design', workspaceRoot: '/workspace' })
+    expect(createWorkspaceDirectory).toHaveBeenCalledWith({ path: `.dagong-design/${id}`, workspaceRoot: '/workspace' })
   })
 
   it('opens the canvas assistant by default unless the user collapsed it', async () => {
     const { storage, localStorage } = stubLocalStorage()
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile }, localStorage })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile }, localStorage })
 
     vi.resetModules()
     const { useDesignWorkspaceStore: freshStore } = await import('./design-workspace-store')
@@ -544,7 +544,7 @@ describe('design workspace store', () => {
     expect(freshStore.getState().canvasAssistantOpen).toBe(true)
 
     freshStore.getState().setCanvasAssistantOpen(false)
-    expect(storage.get('magicpocket.design.canvasAssistantOpen.v1')).toBe('0')
+    expect(storage.get('dagong.design.canvasAssistantOpen.v1')).toBe('0')
 
     vi.resetModules()
     const { useDesignWorkspaceStore: collapsedStore } = await import('./design-workspace-store')
@@ -554,28 +554,28 @@ describe('design workspace store', () => {
 
   it('toggles the canvas assistant open state and persists the collapsed mirror key', () => {
     const { storage, localStorage } = stubLocalStorage()
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile }, localStorage })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile }, localStorage })
     useDesignWorkspaceStore.setState({ canvasAssistantOpen: true, aiRailCollapsed: false })
 
     useDesignWorkspaceStore.getState().toggleCanvasAssistantOpen()
 
     expect(useDesignWorkspaceStore.getState().canvasAssistantOpen).toBe(false)
     expect(useDesignWorkspaceStore.getState().aiRailCollapsed).toBe(true)
-    expect(storage.get('magicpocket.design.canvasAssistantOpen.v1')).toBe('0')
-    expect(storage.get('magicpocket.design.aiRailCollapsed.v1')).toBe('1')
+    expect(storage.get('dagong.design.canvasAssistantOpen.v1')).toBe('0')
+    expect(storage.get('dagong.design.aiRailCollapsed.v1')).toBe('1')
 
     useDesignWorkspaceStore.getState().toggleCanvasAssistantOpen()
 
     expect(useDesignWorkspaceStore.getState().canvasAssistantOpen).toBe(true)
     expect(useDesignWorkspaceStore.getState().aiRailCollapsed).toBe(false)
-    expect(storage.get('magicpocket.design.canvasAssistantOpen.v1')).toBe('1')
-    expect(storage.get('magicpocket.design.aiRailCollapsed.v1')).toBe('0')
+    expect(storage.get('dagong.design.canvasAssistantOpen.v1')).toBe('1')
+    expect(storage.get('dagong.design.aiRailCollapsed.v1')).toBe('0')
   })
 
   it('new 画布 nest under the active 设计稿 directory', () => {
     const id = useDesignWorkspaceStore.getState().createDocument('Second')
     const { artifactId, relativePath } = useDesignWorkspaceStore.getState().prepareHtmlTurn('A landing page')
-    expect(relativePath).toBe(`.magicpocket-design/${id}/${artifactId}/v1.html`)
+    expect(relativePath).toBe(`.dagong-design/${id}/${artifactId}/v1.html`)
     expect(useDesignWorkspaceStore.getState().artifacts.map((a) => a.id)).toContain(artifactId)
   })
 
@@ -604,13 +604,13 @@ describe('design workspace store', () => {
       ]
     })
     const readWorkspaceFile = vi.fn((request: { path: string }) => {
-      if (request.path === '.magicpocket-design/documents.json') {
+      if (request.path === '.dagong-design/documents.json') {
         return Promise.resolve({ ok: true as const, content: documentsIndex })
       }
       return Promise.resolve({ ok: false as const, error: 'missing' })
     })
     const listWorkspaceDirectory = vi.fn(async (request: { path: string }) => {
-      if (request.path === '.magicpocket-design') {
+      if (request.path === '.dagong-design') {
         return {
           ok: true as const,
           entries: [{ name: 'doc', type: 'directory' as const }]
@@ -619,7 +619,7 @@ describe('design workspace store', () => {
       return { ok: true as const, entries: [] as Array<{ name: string; type: 'file' | 'directory' }> }
     })
     vi.stubGlobal('window', {
-      magicpocketGui: { writeWorkspaceFile, readWorkspaceFile, listWorkspaceDirectory }
+      dagongGui: { writeWorkspaceFile, readWorkspaceFile, listWorkspaceDirectory }
     })
 
     await useDesignWorkspaceStore.getState().rehydrateArtifacts()
@@ -656,7 +656,7 @@ describe('design workspace store', () => {
       ]
     })
     const readWorkspaceFile = vi.fn((request: { path: string }) => {
-      if (request.path === '.magicpocket-design/documents.json') return indexRead.promise
+      if (request.path === '.dagong-design/documents.json') return indexRead.promise
       return Promise.resolve({ ok: false as const, error: 'missing' })
     })
     const listWorkspaceDirectory = vi.fn(async () => ({
@@ -667,7 +667,7 @@ describe('design workspace store', () => {
       settingsWithDesign({ defaultWorkspaceRoot: '/workspace' })
     )
     vi.stubGlobal('window', {
-      magicpocketGui: { writeWorkspaceFile, readWorkspaceFile, listWorkspaceDirectory }
+      dagongGui: { writeWorkspaceFile, readWorkspaceFile, listWorkspaceDirectory }
     })
     useDesignWorkspaceStore.setState({
       workspaceRoot: '',

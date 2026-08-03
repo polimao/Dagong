@@ -11,12 +11,12 @@ export async function openWorkspacePathInEditor(
   target: WorkspacePathTarget,
   workspaceRoot?: string
 ): Promise<EditorOpenResult> {
-  if (typeof window === 'undefined' || typeof window.magicpocketGui?.openEditorPath !== 'function') {
+  if (typeof window === 'undefined' || typeof window.dagongGui?.openEditorPath !== 'function') {
     return { ok: false, message: 'Editor bridge is unavailable.' }
   }
 
   try {
-    return await window.magicpocketGui.openEditorPath({
+    return await window.dagongGui.openEditorPath({
       path: target.path,
       line: target.line,
       column: target.column,

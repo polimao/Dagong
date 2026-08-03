@@ -62,7 +62,7 @@ export function useWorkbenchFileTreeController({
   }
 
   async function pickComposerFileReferences(): Promise<void> {
-    const result = await window.magicpocketGui.pickLocalFiles(activeSkillWorkspace || undefined)
+    const result = await window.dagongGui.pickLocalFiles(activeSkillWorkspace || undefined)
     if (result.canceled) return
     for (const path of result.paths) {
       addComposerFileReference(composerFileReferenceFromPath(path, activeSkillWorkspace))

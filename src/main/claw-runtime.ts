@@ -29,7 +29,7 @@ import {
   DEFAULT_CLAW_MODEL,
   DEFAULT_MODEL_PROVIDER_ID,
   buildClawRuntimePrompt,
-  getMagicPocketRuntimeSettings,
+  getDagongRuntimeSettings,
   getModelProviderSettings,
   isComposerChatModelId,
   listNonTextModelIds,
@@ -75,7 +75,7 @@ import {
   type SseSubscriber,
   subscribeRuntimeThreadEvents
 } from './claw-runtime-helpers'
-import { getRuntimeBaseUrlForSettings, runtimeAuthHeaders } from './runtime/magicpocket-adapter'
+import { getRuntimeBaseUrlForSettings, runtimeAuthHeaders } from './runtime/dagong-adapter'
 import { FeishuStreamer } from './feishu-streamer'
 import type { TelegramInboundPayload } from './telegram-runtime'
 
@@ -184,7 +184,7 @@ function currentImModel(settings: AppSettingsV1, channel?: ClawImChannelV1): str
 function currentImProviderId(settings: AppSettingsV1, channel?: ClawImChannelV1): string {
   return channel?.providerId?.trim() ||
     settings.claw.im.providerId?.trim() ||
-    getMagicPocketRuntimeSettings(settings).providerId.trim() ||
+    getDagongRuntimeSettings(settings).providerId.trim() ||
     DEFAULT_MODEL_PROVIDER_ID
 }
 
@@ -259,8 +259,8 @@ function settingsWithImModelProvider(
     ...settings,
     agents: {
       ...settings.agents,
-      magicpocket: {
-        ...settings.agents.magicpocket,
+      dagong: {
+        ...settings.agents.dagong,
         providerId: trimmedProviderId,
         model: resolvedModel
       }
@@ -271,7 +271,7 @@ function settingsWithImModelProvider(
 function effectiveImRuntimeModel(settings: AppSettingsV1, requestedModel: string): string {
   const trimmed = requestedModel.trim()
   if (trimmed && trimmed.toLowerCase() !== DEFAULT_CLAW_MODEL) return trimmed
-  return getMagicPocketRuntimeSettings(settings).model.trim() || trimmed || DEFAULT_CLAW_MODEL
+  return getDagongRuntimeSettings(settings).model.trim() || trimmed || DEFAULT_CLAW_MODEL
 }
 
 function imCommandHelpText(settings: AppSettingsV1): string {
@@ -391,11 +391,11 @@ function imNewTopicText(settings: AppSettingsV1): string {
  */
 export function imWelcomeText(settings: AppSettingsV1, channel?: ClawImChannelV1): string {
   const profile = channel?.agentProfile
-  const name = profile?.name.trim() || channel?.label.trim() || 'MagicPocket'
+  const name = profile?.name.trim() || channel?.label.trim() || 'Dagong'
   const description = profile?.description.trim() ?? ''
   if (isChineseLocale(settings)) {
     return [
-      `你好，我是 ${name}，通过 MagicPocket 连接到这个对话的 AI 助手。`,
+      `你好，我是 ${name}，通过 Dagong 连接到这个对话的 AI 助手。`,
       ...(description ? [description] : []),
       '你可以直接发消息让我帮忙：回答问题、查资料、读写已连接电脑工作区里的文件、生成文档等，完成后我会在这里回复你。',
       imCommandHelpText(settings),
@@ -403,7 +403,7 @@ export function imWelcomeText(settings: AppSettingsV1, channel?: ClawImChannelV1
     ].join('\n\n')
   }
   return [
-    `Hi, I am ${name}, an AI assistant connected to this chat through MagicPocket.`,
+    `Hi, I am ${name}, an AI assistant connected to this chat through Dagong.`,
     ...(description ? [description] : []),
     'Send me a message and I will handle it on the connected computer: answering questions, research, reading and writing workspace files, generating documents — I reply here once done.',
     imCommandHelpText(settings),
@@ -565,14 +565,14 @@ export class ClawRuntime {
   private async runPrompt(settings: AppSettingsV1, options: RunPromptOptions): Promise<ClawRunResult> {
     const workspace = options.workspaceRoot.trim() || settings.workspaceRoot
     const existingThreadId = options.threadId?.trim()
-    const requestedModel = normalizeTaskModel(options.model) ?? (settings.agents.magicpocket.model.trim() || DEFAULT_CLAW_MODEL)
+    const requestedModel = normalizeTaskModel(options.model) ?? (settings.agents.dagong.model.trim() || DEFAULT_CLAW_MODEL)
     const runtimeSettings = settingsWithImModelProvider(settings, options.providerId, requestedModel)
     const model = effectiveImRuntimeModel(runtimeSettings, requestedModel)
     const createThread = async (): Promise<ThreadRecordJson | null> => {
       const body: Record<string, unknown> = { workspace, model, mode: options.mode }
       if (options.source === 'im') {
-        body.approvalPolicy = runtimeSettings.agents.magicpocket.approvalPolicy
-        body.sandboxMode = runtimeSettings.agents.magicpocket.sandboxMode
+        body.approvalPolicy = runtimeSettings.agents.dagong.approvalPolicy
+        body.sandboxMode = runtimeSettings.agents.dagong.sandboxMode
       }
       const create = await this.deps.runtimeRequest(runtimeSettings, '/v1/threads', {
         method: 'POST',
@@ -606,8 +606,8 @@ export class ClawRuntime {
     // IM turns follow the same policy the user picked for the GUI.
     if (options.source === 'im') {
       turnBody.disableUserInput = true
-      turnBody.approvalPolicy = runtimeSettings.agents.magicpocket.approvalPolicy
-      turnBody.sandboxMode = runtimeSettings.agents.magicpocket.sandboxMode
+      turnBody.approvalPolicy = runtimeSettings.agents.dagong.approvalPolicy
+      turnBody.sandboxMode = runtimeSettings.agents.dagong.sandboxMode
     }
     let turn = await this.startRuntimeTurn(runtimeSettings, thread.id, turnBody)
     if (!turn.ok && existingThreadId && isMissingThreadResult(turn)) {
@@ -1466,7 +1466,7 @@ export class ClawRuntime {
         { method: 'GET' }
       )
       if (!detailRes.ok) {
-        this.deps.logError('claw-feishu', 'Failed to read recent generated files from MagicPocket thread', {
+        this.deps.logError('claw-feishu', 'Failed to read recent generated files from Dagong thread', {
           ...context,
           threadId: targetThreadId,
           message: runtimeErrorMessage(detailRes, 'Failed to read thread result.')
@@ -1478,7 +1478,7 @@ export class ClawRuntime {
         maxFiles: 3
       })
     } catch (error) {
-      this.deps.logError('claw-feishu', 'Failed to inspect MagicPocket thread for recent generated files', {
+      this.deps.logError('claw-feishu', 'Failed to inspect Dagong thread for recent generated files', {
         ...context,
         threadId: targetThreadId,
         message: errorMessage(error)
@@ -1683,7 +1683,7 @@ export class ClawRuntime {
 
     // Build the prompt: a heading for image/attachment context, then the user text.
     // Image content is surfaced as a text note — full attachment upload into the
-    // MagicPocket runtime attachment store is a follow-up. The downloaded file path is
+    // Dagong runtime attachment store is a follow-up. The downloaded file path is
     // already on disk (in the OS temp dir) for future localFilePath wiring.
     const promptText = localFilePath && !text
       ? `${CLAW_TELEGRAM_INBOUND_IMAGE_HEADING}\nSender: ${payload.senderName}\n\n[image attachment]`
@@ -2224,7 +2224,7 @@ export class ClawRuntime {
           appSecret,
           domain: domain === 'lark' ? Domain.Lark : Domain.Feishu,
           loggerLevel: LoggerLevel.warn,
-          source: 'magicpocket',
+          source: 'dagong',
           transport: 'websocket',
           policy: {
             dmMode: 'open',
@@ -2354,13 +2354,13 @@ export class ClawRuntime {
       if (url.pathname === '/claw/internal/gui-plan/create' && req.method === 'POST') {
         // The legacy `gui_plan_create` MCP bridge is no longer the
         // active plan path. GUI plan creation now flows through the
-        // native MagicPocket `create_plan` tool. Reject legacy calls
+        // native Dagong `create_plan` tool. Reject legacy calls
         // loudly so older clients see a clear migration error.
         writeJson(res, 410, {
           ok: false,
           code: 'gui_plan_create_retired',
           message:
-            'The /claw/internal/gui-plan/create endpoint is no longer active. Use the MagicPocket create_plan tool.'
+            'The /claw/internal/gui-plan/create endpoint is no longer active. Use the Dagong create_plan tool.'
         })
         return
       }
@@ -2374,9 +2374,9 @@ export class ClawRuntime {
       }
       if (im.secret) {
         const auth = req.headers.authorization ?? ''
-        // 新名字 x-magicpocket-secret 优先;旧名字 x-deepseek-gui-secret 已配置
+        // 新名字 x-dagong-secret 优先;旧名字 x-deepseek-gui-secret 已配置
         // 在外部系统里,属于对外契约,必须长期兼容。
-        const rawHeaderSecret = req.headers['x-magicpocket-secret'] ?? req.headers['x-deepseek-gui-secret']
+        const rawHeaderSecret = req.headers['x-dagong-secret'] ?? req.headers['x-deepseek-gui-secret']
         const headerSecret = Array.isArray(rawHeaderSecret) ? rawHeaderSecret[0] : rawHeaderSecret
         if (auth !== `Bearer ${im.secret}` && headerSecret !== im.secret) {
           writeJson(res, 401, { ok: false, message: 'Unauthorized.' })

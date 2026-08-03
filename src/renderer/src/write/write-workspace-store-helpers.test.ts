@@ -42,7 +42,7 @@ afterEach(() => {
 })
 
 describe('write workspace assistant model helpers', () => {
-  it('normalizes empty and legacy auto assistant models to the default MagicPocket model', () => {
+  it('normalizes empty and legacy auto assistant models to the default Dagong model', () => {
     expect(normalizeWriteAssistantModel('')).toBe(DEFAULT_KUN_MODEL)
     expect(normalizeWriteAssistantModel('auto')).toBe(DEFAULT_KUN_MODEL)
     expect(normalizeWriteAssistantModel(' AUTO ')).toBe(DEFAULT_KUN_MODEL)

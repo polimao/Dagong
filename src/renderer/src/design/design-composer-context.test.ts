@@ -20,7 +20,7 @@ const createdAt = '2026-06-20T00:00:00.000Z'
 
 function artifact(id: string, kind: DesignArtifact['kind'] = 'html'): DesignArtifact {
   const relativePath =
-    kind === 'canvas' ? `.magicpocket-design/${id}/canvas.json` : `.magicpocket-design/${id}/v1.html`
+    kind === 'canvas' ? `.dagong-design/${id}/canvas.json` : `.dagong-design/${id}/v1.html`
   return {
     id,
     kind,
@@ -318,8 +318,8 @@ describe('designSelectedContextLocations', () => {
       {
         title: 'screen-a',
         kind: 'html',
-        path: '.magicpocket-design/screen-a/v1.html',
-        directory: '.magicpocket-design/screen-a'
+        path: '.dagong-design/screen-a/v1.html',
+        directory: '.dagong-design/screen-a'
       }
     ])
   })
@@ -339,8 +339,8 @@ describe('designSelectedContextLocations', () => {
       {
         title: 'board',
         kind: 'canvas',
-        path: '.magicpocket-design/board/canvas.json',
-        directory: '.magicpocket-design/board'
+        path: '.dagong-design/board/canvas.json',
+        directory: '.dagong-design/board'
       }
     ])
   })

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   getActiveAgentApiKey,
-  getMagicPocketRuntimeSettings,
+  getDagongRuntimeSettings,
   getModelProviderSettings,
   normalizeAppSettings,
   type AppSettingsV1
@@ -30,7 +30,7 @@ function settingsWithActiveXiaomiWithoutKey(): AppSettingsV1 {
         { id: 'xiaomi', name: 'Xiaomi', baseUrl: 'https://api.xiaomimimo.com/v1', models: ['mimo-v2.5'] }
       ]
     },
-    agents: { magicpocket: { providerId: 'xiaomi' } }
+    agents: { dagong: { providerId: 'xiaomi' } }
   })
 }
 
@@ -41,7 +41,7 @@ describe('initialSetupSelection', () => {
   })
 
   it('preselects the token plan mode for token plan profiles', () => {
-    const current = settings({ agents: { magicpocket: { providerId: 'minimax-token-plan' } } })
+    const current = settings({ agents: { dagong: { providerId: 'minimax-token-plan' } } })
     expect(initialSetupSelection(current)).toEqual({
       presetId: 'minimax',
       mode: 'token-plan',
@@ -51,15 +51,15 @@ describe('initialSetupSelection', () => {
 
   it('falls back to deepseek for unknown or empty active providers', () => {
     expect(initialSetupSelection(settings())).toEqual({ presetId: 'deepseek', mode: 'api', permissionMode: 'bypass' })
-    expect(initialSetupSelection(settings({ agents: { magicpocket: { providerId: 'custom-provider-2' } } })))
+    expect(initialSetupSelection(settings({ agents: { dagong: { providerId: 'custom-provider-2' } } })))
       .toEqual({ presetId: 'deepseek', mode: 'api', permissionMode: 'bypass' })
-    expect(initialSetupSelection(settings({ agents: { magicpocket: { providerId: 'litellm' } } })))
+    expect(initialSetupSelection(settings({ agents: { dagong: { providerId: 'litellm' } } })))
       .toEqual({ presetId: 'deepseek', mode: 'api', permissionMode: 'bypass' })
   })
 
   it('preselects the saved permission mode', () => {
     const current = settings({
-      agents: { magicpocket: { approvalPolicy: 'on-request', sandboxMode: 'workspace-write' } }
+      agents: { dagong: { approvalPolicy: 'on-request', sandboxMode: 'workspace-write' } }
     })
     expect(initialSetupSelection(current).permissionMode).toBe('workspace-write')
   })
@@ -95,7 +95,7 @@ describe('initialSetupDrafts', () => {
     expect(INITIAL_SETUP_PROVIDER_PRESETS.map((preset) => preset.id)).toEqual(['xiaomi', 'minimax'])
     for (const id of excludedIds) {
       expect(drafts[id]).toBeUndefined()
-      expect(initialSetupSelection(settings({ agents: { magicpocket: { providerId: id } } })))
+      expect(initialSetupSelection(settings({ agents: { dagong: { providerId: id } } })))
         .toEqual({ presetId: 'deepseek', mode: 'api', permissionMode: 'bypass' })
     }
   })
@@ -107,7 +107,7 @@ describe('buildInitialSetupSettings', () => {
     const drafts = initialSetupDrafts(current)
     const next = buildInitialSetupSettings(current, drafts, { presetId: 'deepseek', mode: 'api' })
 
-    expect(getMagicPocketRuntimeSettings(next).providerId).toBe('deepseek')
+    expect(getDagongRuntimeSettings(next).providerId).toBe('deepseek')
     expect(getActiveAgentApiKey(next)).toBe('sk-deepseek-key')
   })
 
@@ -120,7 +120,7 @@ describe('buildInitialSetupSettings', () => {
       permissionMode: 'workspace-write'
     })
 
-    const runtime = getMagicPocketRuntimeSettings(next)
+    const runtime = getDagongRuntimeSettings(next)
     expect(runtime.approvalPolicy).toBe('on-request')
     expect(runtime.sandboxMode).toBe('workspace-write')
   })
@@ -134,7 +134,7 @@ describe('buildInitialSetupSettings', () => {
     const current = settings({
       provider: { apiKey: 'sk-deepseek-key' },
       agents: {
-        magicpocket: { providerId: 'deepseek', approvalPolicy: 'never', sandboxMode: 'external-sandbox' }
+        dagong: { providerId: 'deepseek', approvalPolicy: 'never', sandboxMode: 'external-sandbox' }
       }
     })
     const seededMode = initialSetupSelection(current).permissionMode
@@ -146,7 +146,7 @@ describe('buildInitialSetupSettings', () => {
       permissionMode: seededMode
     })
 
-    const runtime = getMagicPocketRuntimeSettings(next)
+    const runtime = getDagongRuntimeSettings(next)
     expect(runtime.approvalPolicy).toBe('never')
     expect(runtime.sandboxMode).toBe('external-sandbox')
     expect(runtime.approvalPolicy).not.toBe('on-request')
@@ -159,7 +159,7 @@ describe('buildInitialSetupSettings', () => {
     const current = settings({
       provider: { apiKey: 'sk-deepseek-key' },
       agents: {
-        magicpocket: { providerId: 'deepseek', approvalPolicy: 'never', sandboxMode: 'external-sandbox' }
+        dagong: { providerId: 'deepseek', approvalPolicy: 'never', sandboxMode: 'external-sandbox' }
       }
     })
     const next = buildInitialSetupSettings(current, initialSetupDrafts(current), {
@@ -168,7 +168,7 @@ describe('buildInitialSetupSettings', () => {
       permissionMode: 'workspace-write'
     })
 
-    const runtime = getMagicPocketRuntimeSettings(next)
+    const runtime = getDagongRuntimeSettings(next)
     expect(runtime.approvalPolicy).toBe('on-request')
     expect(runtime.sandboxMode).toBe('workspace-write')
   })
@@ -179,7 +179,7 @@ describe('buildInitialSetupSettings', () => {
         apiKey: 'sk-old',
         baseUrl: 'https://old.example/v1'
       },
-      agents: { magicpocket: { providerId: 'deepseek' } }
+      agents: { dagong: { providerId: 'deepseek' } }
     })
     const drafts = initialSetupDrafts(current)
     drafts.deepseek = {
@@ -219,7 +219,7 @@ describe('buildInitialSetupSettings', () => {
       inputModalities: expect.arrayContaining(['image']),
       messageParts: expect.arrayContaining(['image_url'])
     }))
-    const runtime = getMagicPocketRuntimeSettings(next)
+    const runtime = getDagongRuntimeSettings(next)
     expect(runtime.providerId).toBe('xiaomi-token-plan')
     expect(runtime.model).toBe(profile?.models[0])
     expect(getActiveAgentApiKey(next)).toBe('tp-subscription-key')
@@ -232,7 +232,7 @@ describe('buildInitialSetupSettings', () => {
     drafts.minimax = { ...drafts.minimax, apiKey: 'mm-key' }
     const next = buildInitialSetupSettings(current, drafts, { presetId: 'xiaomi', mode: 'api' })
 
-    const runtime = getMagicPocketRuntimeSettings(next)
+    const runtime = getDagongRuntimeSettings(next)
     expect(runtime.speechToText.enabled).toBe(true)
     expect(runtime.speechToText.providerId).toBe('xiaomi')
     expect(runtime.imageGeneration.enabled).toBe(true)
@@ -266,7 +266,7 @@ describe('buildInitialSetupSettings', () => {
       models: ['image-01', 'image-01-live']
     })
 
-    const runtime = getMagicPocketRuntimeSettings(next)
+    const runtime = getDagongRuntimeSettings(next)
     expect(runtime.providerId).toBe('minimax-token-plan')
     expect(runtime.imageGeneration.enabled).toBe(true)
     expect(runtime.imageGeneration.providerId).toBe('minimax-token-plan')
@@ -274,17 +274,17 @@ describe('buildInitialSetupSettings', () => {
   })
 
   it('never overrides existing speech or image generation config while auto-wiring', () => {
-    const configured = settings({ agents: { magicpocket: { speechToText: { providerId: 'custom' } } } })
+    const configured = settings({ agents: { dagong: { speechToText: { providerId: 'custom' } } } })
     const drafts = initialSetupDrafts(configured)
     drafts.xiaomi = { ...drafts.xiaomi, apiKey: 'sk-mimo-key' }
     const next = buildInitialSetupSettings(configured, drafts, { presetId: 'xiaomi', mode: 'api' })
-    expect(getMagicPocketRuntimeSettings(next).speechToText.providerId).toBe('custom')
+    expect(getDagongRuntimeSettings(next).speechToText.providerId).toBe('custom')
 
-    const imageConfigured = settings({ agents: { magicpocket: { imageGeneration: { providerId: 'custom-image' } } } })
+    const imageConfigured = settings({ agents: { dagong: { imageGeneration: { providerId: 'custom-image' } } } })
     const imageDrafts = initialSetupDrafts(imageConfigured)
     imageDrafts['minimax-token-plan'] = { ...imageDrafts['minimax-token-plan'], apiKey: 'mm-tp-key' }
     const nextImage = buildInitialSetupSettings(imageConfigured, imageDrafts, { presetId: 'minimax', mode: 'token-plan' })
-    expect(getMagicPocketRuntimeSettings(nextImage).imageGeneration.providerId).toBe('custom-image')
+    expect(getDagongRuntimeSettings(nextImage).imageGeneration.providerId).toBe('custom-image')
   })
 
   it('prefers the pay-as-you-go profile for speech when both keys are filled', () => {
@@ -297,13 +297,13 @@ describe('buildInitialSetupSettings', () => {
   it('keeps the model override when the provider does not change', () => {
     const current = settings({
       provider: { apiKey: 'sk-deepseek-key' },
-      agents: { magicpocket: { providerId: 'deepseek', model: 'deepseek-v4-flash' } }
+      agents: { dagong: { providerId: 'deepseek', model: 'deepseek-v4-flash' } }
     })
     const next = buildInitialSetupSettings(current, initialSetupDrafts(current), {
       presetId: 'deepseek',
       mode: 'api'
     })
-    expect(getMagicPocketRuntimeSettings(next).model).toBe('deepseek-v4-flash')
+    expect(getDagongRuntimeSettings(next).model).toBe('deepseek-v4-flash')
   })
 
   it('preserves unrelated custom providers', () => {
@@ -329,7 +329,7 @@ describe('buildInitialSetupSettingsPatch', () => {
     const current = settings({
       instructions: { enabled: true },
       provider: { apiKey: '' },
-      agents: { magicpocket: { providerId: 'deepseek' } }
+      agents: { dagong: { providerId: 'deepseek' } }
     })
     const drafts = initialSetupDrafts(current)
     drafts.deepseek = {

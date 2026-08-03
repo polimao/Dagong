@@ -51,7 +51,7 @@ describe('design mode workflow', () => {
 
     expect(plan).toMatchObject({
       version: 1,
-      kind: 'magicpocket.design.mode-workflow',
+      kind: 'dagong.design.mode-workflow',
       recommendedStepId: 'extract-design-system'
     })
     expect(plan.steps.find((step) => step.id === 'extract-design-system')).toMatchObject({

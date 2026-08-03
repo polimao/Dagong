@@ -30,7 +30,7 @@ export function ensureBoardArtifact(): DesignArtifact & { kind: 'canvas' } {
   const docId = store.ensureActiveDocument()
   const createdAt = new Date().toISOString()
   const artifactId = createDesignArtifactId()
-  const relativePath = `.magicpocket-design/${docId}/${artifactId}/canvas.json`
+  const relativePath = `.dagong-design/${docId}/${artifactId}/canvas.json`
   const board: DesignArtifact & { kind: 'canvas' } = {
     id: artifactId,
     kind: 'canvas',

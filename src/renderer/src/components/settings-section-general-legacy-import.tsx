@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactElement } from 'react'
 import { ArchiveRestore, FolderOpen, Loader2 } from 'lucide-react'
-import type { LegacySessionDetectResult } from '@shared/magicpocket-gui-api'
+import type { LegacySessionDetectResult } from '@shared/dagong-gui-api'
 import { compactHomePathForSettingsDisplay } from '../lib/settings-home-paths'
 import { InlineNoticeView, SettingsCard, SettingRow, type InlineNotice } from './settings-controls'
 
@@ -27,13 +27,13 @@ export function LegacySessionImportCard({
   const [notice, setNotice] = useState<InlineNotice | null>(null)
 
   const refreshDetection = useCallback(async () => {
-    if (typeof window.magicpocketGui?.detectLegacySessions !== 'function') {
+    if (typeof window.dagongGui?.detectLegacySessions !== 'function') {
       setDetecting(false)
       return
     }
     setDetecting(true)
     try {
-      setDetection(await window.magicpocketGui.detectLegacySessions())
+      setDetection(await window.dagongGui.detectLegacySessions())
     } catch (error) {
       setNotice({ tone: 'error', message: error instanceof Error ? error.message : String(error) })
     } finally {
@@ -47,11 +47,11 @@ export function LegacySessionImportCard({
 
   const runImport = useCallback(
     async (sourceDir?: string) => {
-      if (typeof window.magicpocketGui?.importLegacySessions !== 'function') return
+      if (typeof window.dagongGui?.importLegacySessions !== 'function') return
       setBusy(true)
       setNotice(null)
       try {
-        const result = await window.magicpocketGui.importLegacySessions(sourceDir)
+        const result = await window.dagongGui.importLegacySessions(sourceDir)
         if (!result.ok) {
           setNotice({ tone: 'error', message: result.message })
           return
@@ -65,17 +65,17 @@ export function LegacySessionImportCard({
           message: t('legacyImportResult', { imported: result.imported, skipped: result.skipped })
         })
         await refreshDetection()
-        if (result.imported > 0 && typeof window.magicpocketGui?.confirmDialog === 'function') {
-          const restart = await window.magicpocketGui.confirmDialog({
+        if (result.imported > 0 && typeof window.dagongGui?.confirmDialog === 'function') {
+          const restart = await window.dagongGui.confirmDialog({
             message: t('legacyImportRestartTitle'),
             detail: t('legacyImportRestartDetail', { count: result.imported }),
             confirmLabel: t('legacyImportRestartConfirm'),
             cancelLabel: tCommon('cancel')
           })
-          if (restart && typeof window.magicpocketGui?.restartRuntime === 'function') {
+          if (restart && typeof window.dagongGui?.restartRuntime === 'function') {
             setRestarting(true)
             try {
-              await window.magicpocketGui.restartRuntime()
+              await window.dagongGui.restartRuntime()
             } finally {
               setRestarting(false)
             }
@@ -91,9 +91,9 @@ export function LegacySessionImportCard({
   )
 
   const pickAndImport = useCallback(async () => {
-    if (typeof window.magicpocketGui?.pickLegacySessionDir !== 'function') return
+    if (typeof window.dagongGui?.pickLegacySessionDir !== 'function') return
     try {
-      const picked = await window.magicpocketGui.pickLegacySessionDir()
+      const picked = await window.dagongGui.pickLegacySessionDir()
       if (picked.canceled || !picked.path) return
       await runImport(picked.path)
     } catch (error) {

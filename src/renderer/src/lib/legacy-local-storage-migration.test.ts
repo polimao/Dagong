@@ -20,26 +20,26 @@ function memoryStorage(seed: Record<string, string> = {}): Storage {
 }
 
 describe('legacy localStorage migration', () => {
-  it('copies legacy DeepSeek GUI keys to MagicPocket keys without deleting the old keys', () => {
+  it('copies legacy DeepSeek GUI keys to Dagong keys without deleting the old keys', () => {
     const storage = memoryStorage({
       'deepseekgui.plan.registry.v1': '{"plans":{}}',
       'deepseekgui.turnModelLabel': '{"thread|item":"deepseek-chat"}'
     })
 
     expect(migrateLegacyLocalStorageKeys(storage)).toBe(2)
-    expect(storage.getItem('magicpocket.plan.registry.v1')).toBe('{"plans":{}}')
-    expect(storage.getItem('magicpocket.turnModelLabel')).toBe('{"thread|item":"deepseek-chat"}')
+    expect(storage.getItem('dagong.plan.registry.v1')).toBe('{"plans":{}}')
+    expect(storage.getItem('dagong.turnModelLabel')).toBe('{"thread|item":"deepseek-chat"}')
     expect(storage.getItem('deepseekgui.plan.registry.v1')).toBe('{"plans":{}}')
   })
 
-  it('does not overwrite existing MagicPocket keys', () => {
+  it('does not overwrite existing Dagong keys', () => {
     const storage = memoryStorage({
       'deepseekgui.plan.registry.v1': 'legacy',
-      'magicpocket.plan.registry.v1': 'current'
+      'dagong.plan.registry.v1': 'current'
     })
 
     expect(migrateLegacyLocalStorageKeys(storage)).toBe(0)
-    expect(storage.getItem('magicpocket.plan.registry.v1')).toBe('current')
+    expect(storage.getItem('dagong.plan.registry.v1')).toBe('current')
     expect(storage.getItem('deepseekgui.plan.registry.v1')).toBe('legacy')
   })
 })

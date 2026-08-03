@@ -36,7 +36,7 @@ describe('DesignImageAnnotationOverlay', () => {
     expect(resolveImageAnnotationOverlayModel({
       route: 'chat',
       activeSddDraft: false,
-      canvasDocumentKey: `workspace\0.magicpocket-canvas/code-thread/canvas.json`,
+      canvasDocumentKey: `workspace\0.dagong-canvas/code-thread/canvas.json`,
       canvasDocument: imageDocument(),
       annotatingShapeId: 'image_1',
       activeCodeCanvasWorkspace: '/code',
@@ -51,7 +51,7 @@ describe('DesignImageAnnotationOverlay', () => {
     expect(resolveImageAnnotationOverlayModel({
       route: 'chat',
       activeSddDraft: false,
-      canvasDocumentKey: 'workspace/.magicpocket-design/doc/canvas.json',
+      canvasDocumentKey: 'workspace/.dagong-design/doc/canvas.json',
       canvasDocument: document,
       annotatingShapeId: 'image_1',
       activeCodeCanvasWorkspace: '/code'
@@ -60,7 +60,7 @@ describe('DesignImageAnnotationOverlay', () => {
     expect(resolveImageAnnotationOverlayModel({
       route: 'chat',
       activeSddDraft: true,
-      canvasDocumentKey: `workspace\0.magicpocket-canvas/code-thread/canvas.json`,
+      canvasDocumentKey: `workspace\0.dagong-canvas/code-thread/canvas.json`,
       canvasDocument: document,
       annotatingShapeId: 'image_1',
       activeCodeCanvasWorkspace: '/code'

@@ -4,11 +4,11 @@ import {
   DEFAULT_GUI_UPDATE_CHANNEL,
   DEFAULT_GIT_BRANCH_PREFIX,
   MIN_KUN_LOCAL_PORT,
-  defaultMagicPocketRuntimeSettings,
-  applyMagicPocketRuntimePatch,
-  getMagicPocketRuntimeSettings,
-  magicpocketSettingsEnvelope,
-  mergeMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
+  applyDagongRuntimePatch,
+  getDagongRuntimeSettings,
+  dagongSettingsEnvelope,
+  mergeDagongRuntimeSettings,
   mergeAppBehaviorSettings,
   mergeClawSettings,
   mergeDesignSettings,
@@ -41,7 +41,7 @@ type RendererSettingsShape = AppSettingsPatch
 type SettingsPatch = AppSettingsPatch
 const SETTINGS_DIFF_NO_CHANGE = Symbol('settings-diff-no-change')
 
-export const DEFAULT_WORKSPACE_ROOT = '~/.magicpocket/default_workspace'
+export const DEFAULT_WORKSPACE_ROOT = '~/.dagong/default_workspace'
 
 export function splitSettingsList(raw: string): string[] {
   return raw
@@ -55,7 +55,7 @@ export function listSettingsText(values: string[]): string {
 }
 
 export function hasValidPort(settings: AppSettingsV1): boolean {
-  const port = getMagicPocketRuntimeSettings(settings).port
+  const port = getDagongRuntimeSettings(settings).port
   return Number.isFinite(port) && port >= MIN_KUN_LOCAL_PORT && port <= 65535
 }
 
@@ -63,7 +63,7 @@ export function mergeSettings(current: AppSettingsV1, patch: SettingsPatch): App
   const safeCurrent = coerceRendererSettings(current)
   const { agents: agentsPatch, provider: providerPatch, ...restPatch } = patch
   return {
-    ...applyMagicPocketRuntimePatch(safeCurrent, agentsPatch?.magicpocket),
+    ...applyDagongRuntimePatch(safeCurrent, agentsPatch?.dagong),
     ...restPatch,
     provider: mergeModelProviderSettings(safeCurrent.provider, providerPatch),
     log: {
@@ -120,7 +120,7 @@ export function coerceRendererSettings(settings: AppSettingsV1): AppSettingsV1 {
     cursorSpotlight: raw.cursorSpotlight !== false,
     cursorSpotlightColor: normalizeCursorSpotlightColor(raw.cursorSpotlightColor),
     provider: normalizeModelProviderSettings(raw.provider),
-    agents: magicpocketSettingsEnvelope(mergeMagicPocketRuntimeSettings(defaultMagicPocketRuntimeSettings(), getMagicPocketRuntimeSettings(settings))),
+    agents: dagongSettingsEnvelope(mergeDagongRuntimeSettings(defaultDagongRuntimeSettings(), getDagongRuntimeSettings(settings))),
     workspaceRoot: typeof raw.workspaceRoot === 'string' ? raw.workspaceRoot : DEFAULT_WORKSPACE_ROOT,
     conversationWorkspaceRoot:
       typeof raw.conversationWorkspaceRoot === 'string' ? raw.conversationWorkspaceRoot : '',

@@ -12,7 +12,7 @@ const boardArtifact: DesignArtifact = {
   id: 'board',
   kind: 'canvas',
   title: 'Board',
-  relativePath: '.magicpocket-design/doc/board/canvas.json',
+  relativePath: '.dagong-design/doc/board/canvas.json',
   createdAt: '2026-07-02T00:00:00.000Z',
   updatedAt: '2026-07-02T00:00:00.000Z',
   versions: []
@@ -73,8 +73,8 @@ function baseOptions() {
 
 describe('image annotation dispatch', () => {
   it('detects code-canvas document keys', () => {
-    expect(isCodeCanvasDocumentKey(`workspace\0.magicpocket-canvas/code-thread/canvas.json`)).toBe(true)
-    expect(isCodeCanvasDocumentKey('workspace/.magicpocket-design/doc/canvas.json')).toBe(false)
+    expect(isCodeCanvasDocumentKey(`workspace\0.dagong-canvas/code-thread/canvas.json`)).toBe(true)
+    expect(isCodeCanvasDocumentKey('workspace/.dagong-design/doc/canvas.json')).toBe(false)
   })
 
   it('saves the annotated image and routes a design repair turn', async () => {
@@ -116,7 +116,7 @@ describe('image annotation dispatch', () => {
 
     const status = await applyImageAnnotationResult({
       ...options,
-      currentDocumentKey: `workspace\0.magicpocket-canvas/code-thread/canvas.json`,
+      currentDocumentKey: `workspace\0.dagong-canvas/code-thread/canvas.json`,
       getCanvasShapeState: () => canvasState,
       getDesignState: () => designState
     })

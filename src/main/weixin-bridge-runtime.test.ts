@@ -21,7 +21,7 @@ describe('weixin bridge runtime', () => {
 
     expect(baseInfo).toMatchObject({
       channel_version: pkg.version,
-      bot_agent: 'MagicPocket/0.2.0-test'
+      bot_agent: 'Dagong/0.2.0-test'
     })
   })
 

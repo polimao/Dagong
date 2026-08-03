@@ -70,18 +70,18 @@ describe("runtime design quality findings", () => {
       ])
     })
     it('caches runtime findings by normalized artifact path and merges by strongest severity', () => {
-      clearDesignRuntimeQualityFindings('.magicpocket-design/doc/page/v1.html')
-      setDesignRuntimeQualityFindings('.magicpocket-design\\doc\\page\\v1.html', [
+      clearDesignRuntimeQualityFindings('.dagong-design/doc/page/v1.html')
+      setDesignRuntimeQualityFindings('.dagong-design\\doc\\page\\v1.html', [
         { code: 'runtime-low-contrast-text', severity: 'warning', message: 'Low contrast', suggestion: 'Darken text' }
       ])
   
-      expect(getDesignRuntimeQualityFindings('.magicpocket-design/doc/page/v1.html')).toMatchObject([
+      expect(getDesignRuntimeQualityFindings('.dagong-design/doc/page/v1.html')).toMatchObject([
         { code: 'runtime-low-contrast-text', severity: 'warning' }
       ])
   
       const merged = mergeDesignHtmlQualityFindings(
         [{ code: 'runtime-low-contrast-text', severity: 'info', message: 'Less specific', suggestion: 'Review' }],
-        getDesignRuntimeQualityFindings('.magicpocket-design/doc/page/v1.html')
+        getDesignRuntimeQualityFindings('.dagong-design/doc/page/v1.html')
       )
       expect(merged).toMatchObject([
         { code: 'runtime-low-contrast-text', severity: 'warning', message: 'Low contrast' }

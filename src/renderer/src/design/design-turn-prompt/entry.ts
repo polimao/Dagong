@@ -25,7 +25,7 @@ import { formatDesignModeContextLines } from './design-mode-context'
 export function buildParallelDesignPagesPrompt(options: ParallelDesignPagesPromptOptions): string {
   const jobs = options.jobs.filter((job) => job.artifactId.trim() && job.relativePath.trim())
   const lines = [
-    'MagicPocket is asking you to fan out a multi-page design build to subagents.',
+    'Dagong is asking you to fan out a multi-page design build to subagents.',
     `Workspace: ${options.workspaceRoot}`,
     ...formatDesignTargetFrameLines(options.designContext),
     '',
@@ -100,8 +100,8 @@ export function buildDesignTurnPrompt(options: DesignTurnOptions): string {
     : `\`${options.artifactRelativePath}\``
   const lines = [
     options.basePath
-      ? 'MagicPocket is asking you to ITERATE on an existing single-file HTML design.'
-      : 'MagicPocket is asking you to design a single-file interactive HTML artifact.',
+      ? 'Dagong is asking you to ITERATE on an existing single-file HTML design.'
+      : 'Dagong is asking you to design a single-file interactive HTML artifact.',
     `Workspace: ${options.workspaceRoot}`,
     ...formatDesignTargetFrameLines(options.designContext),
     ...formatFrameContextLines(options.frameContext),

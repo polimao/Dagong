@@ -59,11 +59,11 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const load = useCallback(async (): Promise<void> => {
-    if (!root || typeof window.magicpocketGui?.getGitBranches !== 'function') return
+    if (!root || typeof window.dagongGui?.getGitBranches !== 'function') return
     setLoading(true)
     setError(null)
     try {
-      const next = await window.magicpocketGui.getGitBranches(root)
+      const next = await window.dagongGui.getGitBranches(root)
       setResult(next)
       if (!next.ok) setError(next.message)
     } catch (e) {
@@ -188,7 +188,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('switch')
     setError(null)
     try {
-      const next = await window.magicpocketGui.switchGitBranch(root, branch)
+      const next = await window.dagongGui.switchGitBranch(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -262,7 +262,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('switch')
     setError(null)
     try {
-      const next = await window.magicpocketGui.createAndSwitchGitBranch(root, branch)
+      const next = await window.dagongGui.createAndSwitchGitBranch(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -284,7 +284,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('worktree')
     setError(null)
     try {
-      const next = await window.magicpocketGui.checkoutGitBranchWorktree(root, branch)
+      const next = await window.dagongGui.checkoutGitBranchWorktree(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)
@@ -312,7 +312,7 @@ export function GitBranchPicker({ workspaceRoot }: Props): ReactElement | null {
     setActingKind('worktree')
     setError(null)
     try {
-      const next = await window.magicpocketGui.createGitBranchWorktree(root, branch)
+      const next = await window.dagongGui.createGitBranchWorktree(root, branch)
       setResult(next)
       if (!next.ok) {
         setError(next.message)

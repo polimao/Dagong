@@ -7,14 +7,14 @@ import {
   migrateLegacyHomeDataDirs,
   migrateLegacyUserDataDir,
   rewriteLegacyPathsInSettingsFile,
-  runLegacyMagicPocketDataMigration,
+  runLegacyDagongDataMigration,
   USER_DATA_MIGRATION_MARKER
 } from './legacy-data-migration'
 
 const tempRoots: string[] = []
 
 async function makeTempRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), 'magicpocket-migration-'))
+  const root = await mkdtemp(join(tmpdir(), 'dagong-migration-'))
   tempRoots.push(root)
   return root
 }
@@ -39,12 +39,12 @@ describe('migrateLegacyUserDataDir', () => {
     await mkdir(join(legacy, 'Local Storage'), { recursive: true })
     await writeFile(join(legacy, 'deepseek-gui-settings.json'), '{"version":1}', 'utf8')
 
-    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
+    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
 
-    expect(result).toEqual({ userDataPath: join(appData, 'MagicPocket'), migrated: true, usedLegacyFallback: false })
-    expect(await readFile(join(appData, 'MagicPocket', 'deepseek-gui-settings.json'), 'utf8')).toBe('{"version":1}')
-    expect(await isSymlinkTo(legacy, join(appData, 'MagicPocket'))).toBe(true)
-    const marker = JSON.parse(await readFile(join(appData, 'MagicPocket', USER_DATA_MIGRATION_MARKER), 'utf8'))
+    expect(result).toEqual({ userDataPath: join(appData, 'Dagong'), migrated: true, usedLegacyFallback: false })
+    expect(await readFile(join(appData, 'Dagong', 'deepseek-gui-settings.json'), 'utf8')).toBe('{"version":1}')
+    expect(await isSymlinkTo(legacy, join(appData, 'Dagong'))).toBe(true)
+    const marker = JSON.parse(await readFile(join(appData, 'Dagong', USER_DATA_MIGRATION_MARKER), 'utf8'))
     expect(marker.from).toBe(legacy)
   })
 
@@ -55,43 +55,43 @@ describe('migrateLegacyUserDataDir', () => {
     await mkdir(join(appData, 'deepseek-gui'), { recursive: true })
     await writeFile(join(appData, 'deepseek-gui', 'a.txt'), 'ancient', 'utf8')
 
-    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
+    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
 
     expect(result.migrated).toBe(true)
-    expect(await readFile(join(appData, 'MagicPocket', 'a.txt'), 'utf8')).toBe('recent')
+    expect(await readFile(join(appData, 'Dagong', 'a.txt'), 'utf8')).toBe('recent')
     expect((await lstat(join(appData, 'deepseek-gui'))).isDirectory()).toBe(true)
     expect((await lstat(join(appData, 'deepseek-gui'))).isSymbolicLink()).toBe(false)
   })
 
   it('keeps an existing non-empty new dir and does not touch legacy data', async () => {
     const appData = await makeTempRoot()
-    await mkdir(join(appData, 'MagicPocket'), { recursive: true })
-    await writeFile(join(appData, 'MagicPocket', 'magicpocket-settings.json'), '{}', 'utf8')
+    await mkdir(join(appData, 'Dagong'), { recursive: true })
+    await writeFile(join(appData, 'Dagong', 'dagong-settings.json'), '{}', 'utf8')
     await mkdir(join(appData, 'DeepSeek GUI'), { recursive: true })
 
-    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
+    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
 
-    expect(result).toEqual({ userDataPath: join(appData, 'MagicPocket'), migrated: false, usedLegacyFallback: false })
+    expect(result).toEqual({ userDataPath: join(appData, 'Dagong'), migrated: false, usedLegacyFallback: false })
     expect((await lstat(join(appData, 'DeepSeek GUI'))).isDirectory()).toBe(true)
   })
 
   it('replaces an empty new dir left behind by a previous run', async () => {
     const appData = await makeTempRoot()
-    await mkdir(join(appData, 'MagicPocket'), { recursive: true })
+    await mkdir(join(appData, 'Dagong'), { recursive: true })
     const legacy = join(appData, 'DeepSeek GUI')
     await mkdir(legacy, { recursive: true })
     await writeFile(join(legacy, 'a.txt'), 'data', 'utf8')
 
-    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
+    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
 
     expect(result.migrated).toBe(true)
-    expect(await readFile(join(appData, 'MagicPocket', 'a.txt'), 'utf8')).toBe('data')
+    expect(await readFile(join(appData, 'Dagong', 'a.txt'), 'utf8')).toBe('data')
   })
 
   it('is a no-op on fresh installs', async () => {
     const appData = await makeTempRoot()
-    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
-    expect(result).toEqual({ userDataPath: join(appData, 'MagicPocket'), migrated: false, usedLegacyFallback: false })
+    const result = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
+    expect(result).toEqual({ userDataPath: join(appData, 'Dagong'), migrated: false, usedLegacyFallback: false })
   })
 
   it('does not migrate twice once the legacy path is a link', async () => {
@@ -100,18 +100,18 @@ describe('migrateLegacyUserDataDir', () => {
     await mkdir(legacy, { recursive: true })
     await writeFile(join(legacy, 'a.txt'), 'data', 'utf8')
 
-    const first = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
+    const first = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
     expect(first.migrated).toBe(true)
-    const second = migrateLegacyUserDataDir({ userDataPath: join(appData, 'MagicPocket') })
+    const second = migrateLegacyUserDataDir({ userDataPath: join(appData, 'Dagong') })
     expect(second.migrated).toBe(false)
-    expect(second.userDataPath).toBe(join(appData, 'MagicPocket'))
+    expect(second.userDataPath).toBe(join(appData, 'Dagong'))
   })
 })
 
 describe('migrateLegacyHomeDataDirs', () => {
-  it('moves all known legacy dirs under ~/.magicpocket and links the old locations', async () => {
+  it('moves all known legacy dirs under ~/.dagong and links the old locations', async () => {
     const home = await makeTempRoot()
-    for (const child of ['magicpocket', 'default_workspace', 'claw', 'write_workspace']) {
+    for (const child of ['dagong', 'default_workspace', 'claw', 'write_workspace']) {
       await mkdir(join(home, '.deepseekgui', child), { recursive: true })
       await writeFile(join(home, '.deepseekgui', child, 'marker.txt'), child, 'utf8')
     }
@@ -119,59 +119,59 @@ describe('migrateLegacyHomeDataDirs', () => {
     const results = migrateLegacyHomeDataDirs({ homeDir: home })
 
     expect(results.map((r) => r.outcome)).toEqual(['migrated', 'migrated', 'migrated', 'migrated'])
-    expect(await readFile(join(home, '.magicpocket', 'data', 'marker.txt'), 'utf8')).toBe('magicpocket')
-    expect(await readFile(join(home, '.magicpocket', 'claw', 'marker.txt'), 'utf8')).toBe('claw')
-    expect(await isSymlinkTo(join(home, '.deepseekgui', 'magicpocket'), join(home, '.magicpocket', 'data'))).toBe(true)
-    expect(await isSymlinkTo(join(home, '.deepseekgui', 'claw'), join(home, '.magicpocket', 'claw'))).toBe(true)
+    expect(await readFile(join(home, '.dagong', 'data', 'marker.txt'), 'utf8')).toBe('dagong')
+    expect(await readFile(join(home, '.dagong', 'claw', 'marker.txt'), 'utf8')).toBe('claw')
+    expect(await isSymlinkTo(join(home, '.deepseekgui', 'dagong'), join(home, '.dagong', 'data'))).toBe(true)
+    expect(await isSymlinkTo(join(home, '.deepseekgui', 'claw'), join(home, '.dagong', 'claw'))).toBe(true)
     // 旧路径透过链接仍然可读(老版本回滚、sqlite 里的旧绝对路径都靠它)。
-    expect(await readFile(join(home, '.deepseekgui', 'magicpocket', 'marker.txt'), 'utf8')).toBe('magicpocket')
-    expect(await readFile(join(home, '.deepseekgui', 'MIGRATED.txt'), 'utf8')).toContain('.magicpocket')
+    expect(await readFile(join(home, '.deepseekgui', 'dagong', 'marker.txt'), 'utf8')).toBe('dagong')
+    expect(await readFile(join(home, '.deepseekgui', 'MIGRATED.txt'), 'utf8')).toContain('.dagong')
   })
 
-  it('merges into an existing ~/.magicpocket without touching its other children', async () => {
+  it('merges into an existing ~/.dagong without touching its other children', async () => {
     const home = await makeTempRoot()
-    await mkdir(join(home, '.magicpocket', 'skills'), { recursive: true })
-    await writeFile(join(home, '.magicpocket', 'config.toml'), 'x = 1', 'utf8')
-    await mkdir(join(home, '.deepseekgui', 'magicpocket'), { recursive: true })
-    await writeFile(join(home, '.deepseekgui', 'magicpocket', 'db.sqlite'), 'db', 'utf8')
+    await mkdir(join(home, '.dagong', 'skills'), { recursive: true })
+    await writeFile(join(home, '.dagong', 'config.toml'), 'x = 1', 'utf8')
+    await mkdir(join(home, '.deepseekgui', 'dagong'), { recursive: true })
+    await writeFile(join(home, '.deepseekgui', 'dagong', 'db.sqlite'), 'db', 'utf8')
 
     const results = migrateLegacyHomeDataDirs({ homeDir: home })
 
-    const magicpocketMapping = results.find((r) => r.nextPath === join(home, '.magicpocket', 'data'))
-    expect(magicpocketMapping?.outcome).toBe('migrated')
-    expect(await readFile(join(home, '.magicpocket', 'data', 'db.sqlite'), 'utf8')).toBe('db')
-    expect(await readFile(join(home, '.magicpocket', 'config.toml'), 'utf8')).toBe('x = 1')
+    const dagongMapping = results.find((r) => r.nextPath === join(home, '.dagong', 'data'))
+    expect(dagongMapping?.outcome).toBe('migrated')
+    expect(await readFile(join(home, '.dagong', 'data', 'db.sqlite'), 'utf8')).toBe('db')
+    expect(await readFile(join(home, '.dagong', 'config.toml'), 'utf8')).toBe('x = 1')
   })
 
   it('leaves both dirs alone when old and new both contain data', async () => {
     const home = await makeTempRoot()
     await mkdir(join(home, '.deepseekgui', 'claw'), { recursive: true })
     await writeFile(join(home, '.deepseekgui', 'claw', 'old.txt'), 'old', 'utf8')
-    await mkdir(join(home, '.magicpocket', 'claw'), { recursive: true })
-    await writeFile(join(home, '.magicpocket', 'claw', 'new.txt'), 'new', 'utf8')
+    await mkdir(join(home, '.dagong', 'claw'), { recursive: true })
+    await writeFile(join(home, '.dagong', 'claw', 'new.txt'), 'new', 'utf8')
 
     const results = migrateLegacyHomeDataDirs({ homeDir: home })
 
-    const clawMapping = results.find((r) => r.nextPath === join(home, '.magicpocket', 'claw'))
+    const clawMapping = results.find((r) => r.nextPath === join(home, '.dagong', 'claw'))
     expect(clawMapping?.outcome).toBe('next-exists')
     expect(clawMapping?.rewriteSafe).toBe(false)
     expect(await readFile(join(home, '.deepseekgui', 'claw', 'old.txt'), 'utf8')).toBe('old')
-    expect(await readFile(join(home, '.magicpocket', 'claw', 'new.txt'), 'utf8')).toBe('new')
+    expect(await readFile(join(home, '.dagong', 'claw', 'new.txt'), 'utf8')).toBe('new')
   })
 
   it('replaces an empty new home dir with migrated legacy data', async () => {
     const home = await makeTempRoot()
-    await mkdir(join(home, '.deepseekgui', 'magicpocket'), { recursive: true })
-    await writeFile(join(home, '.deepseekgui', 'magicpocket', 'db.sqlite'), 'db', 'utf8')
-    await mkdir(join(home, '.magicpocket', 'data'), { recursive: true })
+    await mkdir(join(home, '.deepseekgui', 'dagong'), { recursive: true })
+    await writeFile(join(home, '.deepseekgui', 'dagong', 'db.sqlite'), 'db', 'utf8')
+    await mkdir(join(home, '.dagong', 'data'), { recursive: true })
 
     const results = migrateLegacyHomeDataDirs({ homeDir: home })
 
-    const magicpocketMapping = results.find((r) => r.nextPath === join(home, '.magicpocket', 'data'))
-    expect(magicpocketMapping?.outcome).toBe('migrated')
-    expect(magicpocketMapping?.rewriteSafe).toBe(true)
-    expect(await readFile(join(home, '.magicpocket', 'data', 'db.sqlite'), 'utf8')).toBe('db')
-    expect(await isSymlinkTo(join(home, '.deepseekgui', 'magicpocket'), join(home, '.magicpocket', 'data'))).toBe(true)
+    const dagongMapping = results.find((r) => r.nextPath === join(home, '.dagong', 'data'))
+    expect(dagongMapping?.outcome).toBe('migrated')
+    expect(dagongMapping?.rewriteSafe).toBe(true)
+    expect(await readFile(join(home, '.dagong', 'data', 'db.sqlite'), 'utf8')).toBe('db')
+    expect(await isSymlinkTo(join(home, '.deepseekgui', 'dagong'), join(home, '.dagong', 'data'))).toBe(true)
   })
 
   it('reports missing legacy dirs as rewrite-safe no-ops', async () => {
@@ -188,7 +188,7 @@ describe('rewriteLegacyPathsInSettingsFile', () => {
     await mkdir(userData, { recursive: true })
     const settings = {
       workspaceRoot: join(home, '.deepseekgui', 'default_workspace'),
-      agents: { magicpocket: { dataDir: '~/.deepseekgui/magicpocket' } },
+      agents: { dagong: { dataDir: '~/.deepseekgui/dagong' } },
       write: {
         workspaces: [
           join(home, '.deepseekgui', 'write_workspace'),
@@ -200,7 +200,7 @@ describe('rewriteLegacyPathsInSettingsFile', () => {
           { workspaceRoot: join(home, '.deepseekgui', 'claw', 'feishu', 'app1') }
         ]
       },
-      codePromptPrefix: 'mentions /.deepseekgui/magicpocket casually',
+      codePromptPrefix: 'mentions /.deepseekgui/dagong casually',
       disabledSkillIds: [],
     }
     await writeFile(join(userData, 'deepseek-gui-settings.json'), JSON.stringify(settings), 'utf8')
@@ -215,21 +215,21 @@ describe('rewriteLegacyPathsInSettingsFile', () => {
 
     expect(rewritten).toBe(true)
     const updated = JSON.parse(await readFile(join(userData, 'deepseek-gui-settings.json'), 'utf8'))
-    expect(updated.workspaceRoot).toBe(join(home, '.magicpocket', 'default_workspace'))
-    expect(updated.agents.magicpocket.dataDir).toBe('~/.magicpocket/data')
-    expect(updated.claw.channels[0].workspaceRoot).toBe(join(home, '.magicpocket', 'claw', 'feishu', 'app1'))
+    expect(updated.workspaceRoot).toBe(join(home, '.dagong', 'default_workspace'))
+    expect(updated.agents.dagong.dataDir).toBe('~/.dagong/data')
+    expect(updated.claw.channels[0].workspaceRoot).toBe(join(home, '.dagong', 'claw', 'feishu', 'app1'))
     // write_workspace 映射没有传入 → 不重写;未知子目录永远不重写。
     expect(updated.write.workspaces[0]).toBe(join(home, '.deepseekgui', 'write_workspace'))
     expect(updated.write.workspaces[1]).toBe(join(home, '.deepseekgui', 'custom_dir'))
     // 非路径文本(前缀不是完整映射路径)不受影响。
-    expect(updated.codePromptPrefix).toBe('mentions /.deepseekgui/magicpocket casually')
+    expect(updated.codePromptPrefix).toBe('mentions /.deepseekgui/dagong casually')
   })
 
   it('leaves invalid JSON untouched', async () => {
     const home = await makeTempRoot()
     const userData = join(home, 'userData')
     await mkdir(userData, { recursive: true })
-    await writeFile(join(userData, 'magicpocket-settings.json'), '{not json', 'utf8')
+    await writeFile(join(userData, 'dagong-settings.json'), '{not json', 'utf8')
 
     const rewritten = rewriteLegacyPathsInSettingsFile({
       userDataPath: userData,
@@ -238,17 +238,17 @@ describe('rewriteLegacyPathsInSettingsFile', () => {
     })
 
     expect(rewritten).toBe(false)
-    expect(await readFile(join(userData, 'magicpocket-settings.json'), 'utf8')).toBe('{not json')
+    expect(await readFile(join(userData, 'dagong-settings.json'), 'utf8')).toBe('{not json')
   })
 
   it('rewrites absolute paths even when separators differ', async () => {
     const home = await makeTempRoot()
     const userData = join(home, 'userData')
     await mkdir(userData, { recursive: true })
-    const legacyWindowsish = join(home, '.deepseekgui', 'magicpocket').replace(/\//g, '\\')
+    const legacyWindowsish = join(home, '.deepseekgui', 'dagong').replace(/\//g, '\\')
     await writeFile(
-      join(userData, 'magicpocket-settings.json'),
-      JSON.stringify({ agents: { magicpocket: { dataDir: `${legacyWindowsish}\\sessions` } } }),
+      join(userData, 'dagong-settings.json'),
+      JSON.stringify({ agents: { dagong: { dataDir: `${legacyWindowsish}\\sessions` } } }),
       'utf8'
     )
 
@@ -259,46 +259,46 @@ describe('rewriteLegacyPathsInSettingsFile', () => {
     })
 
     expect(rewritten).toBe(true)
-    const updated = JSON.parse(await readFile(join(userData, 'magicpocket-settings.json'), 'utf8'))
-    expect(updated.agents.magicpocket.dataDir).toBe(`${join(home, '.magicpocket', 'data').replace(/\//g, '\\')}\\sessions`)
+    const updated = JSON.parse(await readFile(join(userData, 'dagong-settings.json'), 'utf8'))
+    expect(updated.agents.dagong.dataDir).toBe(`${join(home, '.dagong', 'data').replace(/\//g, '\\')}\\sessions`)
   })
 })
 
-describe('runLegacyMagicPocketDataMigration', () => {
+describe('runLegacyDagongDataMigration', () => {
   it('migrates userData, home dirs, and rewrites settings in one pass', async () => {
     const root = await makeTempRoot()
     const home = join(root, 'home')
     const appData = join(root, 'appData')
     const legacyUserData = join(appData, 'DeepSeek GUI')
     await mkdir(legacyUserData, { recursive: true })
-    await mkdir(join(home, '.deepseekgui', 'magicpocket'), { recursive: true })
-    await writeFile(join(home, '.deepseekgui', 'magicpocket', 'db.sqlite'), 'db', 'utf8')
+    await mkdir(join(home, '.deepseekgui', 'dagong'), { recursive: true })
+    await writeFile(join(home, '.deepseekgui', 'dagong', 'db.sqlite'), 'db', 'utf8')
     await writeFile(
       join(legacyUserData, 'deepseek-gui-settings.json'),
       JSON.stringify({
         version: 1,
         workspaceRoot: join(home, '.deepseekgui', 'default_workspace'),
-        agents: { magicpocket: { dataDir: '~/.deepseekgui/magicpocket' } }
+        agents: { dagong: { dataDir: '~/.deepseekgui/dagong' } }
       }),
       'utf8'
     )
 
-    const result = runLegacyMagicPocketDataMigration({ userDataPath: join(appData, 'MagicPocket'), homeDir: home })
+    const result = runLegacyDagongDataMigration({ userDataPath: join(appData, 'Dagong'), homeDir: home })
 
     expect(result.userData.migrated).toBe(true)
     expect(result.userData.usedLegacyFallback).toBe(false)
     expect(result.settingsRewritten).toBe(true)
     const settings = JSON.parse(
-      await readFile(join(appData, 'MagicPocket', 'deepseek-gui-settings.json'), 'utf8')
+      await readFile(join(appData, 'Dagong', 'deepseek-gui-settings.json'), 'utf8')
     )
-    expect(settings.agents.magicpocket.dataDir).toBe('~/.magicpocket/data')
-    expect(settings.workspaceRoot).toBe(join(home, '.magicpocket', 'default_workspace'))
-    expect(await readFile(join(home, '.magicpocket', 'data', 'db.sqlite'), 'utf8')).toBe('db')
+    expect(settings.agents.dagong.dataDir).toBe('~/.dagong/data')
+    expect(settings.workspaceRoot).toBe(join(home, '.dagong', 'default_workspace'))
+    expect(await readFile(join(home, '.dagong', 'data', 'db.sqlite'), 'utf8')).toBe('db')
   })
 
   it('never throws even when nothing exists', () => {
     expect(() =>
-      runLegacyMagicPocketDataMigration({ userDataPath: join('/nonexistent-root', 'MagicPocket'), homeDir: '/nonexistent-home' })
+      runLegacyDagongDataMigration({ userDataPath: join('/nonexistent-root', 'Dagong'), homeDir: '/nonexistent-home' })
     ).not.toThrow()
   })
 })

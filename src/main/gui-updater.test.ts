@@ -94,7 +94,7 @@ function platformManifestName(): string {
 }
 
 describe('checkGuiUpdate feed URL', () => {
-  it('prefers the magicpocket-agent update feed when metadata is reachable', async () => {
+  it('prefers the dagong-agent update feed when metadata is reachable', async () => {
     process.env.DEEPSEEK_GUI_ALLOW_UNSIGNED_UPDATES = '1'
     const fetchMock = vi.fn().mockResolvedValue({ ok: true })
     vi.stubGlobal('fetch', fetchMock)
@@ -112,16 +112,16 @@ describe('checkGuiUpdate feed URL', () => {
       hasUpdate: true
     })
     expect(fetchMock).toHaveBeenCalledWith(
-      `https://www.magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
+      `https://www.dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
       expect.objectContaining({ method: 'HEAD' })
     )
     expect(updater.setFeedURL).toHaveBeenLastCalledWith({
       provider: 'generic',
-      url: 'https://www.magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/'
+      url: 'https://www.dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/'
     })
   })
 
-  it('falls back to the bare magicpocket-agent feed before the legacy feed', async () => {
+  it('falls back to the bare dagong-agent feed before the legacy feed', async () => {
     process.env.DEEPSEEK_GUI_ALLOW_UNSIGNED_UPDATES = '1'
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({ ok: false, status: 404 })
@@ -142,21 +142,21 @@ describe('checkGuiUpdate feed URL', () => {
     })
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
-      `https://www.magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
+      `https://www.dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
       expect.objectContaining({ method: 'HEAD' })
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      `https://magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
+      `https://dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
       expect.objectContaining({ method: 'HEAD' })
     )
     expect(updater.setFeedURL).toHaveBeenLastCalledWith({
       provider: 'generic',
-      url: 'https://magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/'
+      url: 'https://dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/'
     })
   })
 
-  it('falls back to the legacy deepseek-gui feed when both magicpocket-agent feeds are unavailable', async () => {
+  it('falls back to the legacy deepseek-gui feed when both dagong-agent feeds are unavailable', async () => {
     process.env.DEEPSEEK_GUI_ALLOW_UNSIGNED_UPDATES = '1'
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({ ok: false, status: 404 })
@@ -178,12 +178,12 @@ describe('checkGuiUpdate feed URL', () => {
     })
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
-      `https://www.magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
+      `https://www.dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
       expect.objectContaining({ method: 'HEAD' })
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      `https://magicpocket-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
+      `https://dagong-agent.com/api/r2/deepseek-gui/channels/stable/latest/${platformManifestName()}`,
       expect.objectContaining({ method: 'HEAD' })
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -287,14 +287,14 @@ describe('showPostUpdateReleaseNotes', () => {
     expect(showMessageBox).toHaveBeenCalledTimes(1)
     expect(showMessageBox).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: 'MagicPocket 已更新',
-        message: '已更新到 MagicPocket 0.2.0',
+        title: 'Dagong 已更新',
+        message: '已更新到 Dagong 0.2.0',
         detail: '修复更新流程并改进启动体验。',
         buttons: ['查看更新日志', '稍后']
       })
     )
     expect(openExternal).toHaveBeenCalledWith(
-      'https://github.com/MagicPocketAgent/MagicPocket/blob/master/release/release-v0.2.0.md'
+      'https://github.com/DagongAgent/Dagong/blob/master/release/release-v0.2.0.md'
     )
     expect(JSON.parse(mockedFiles.get(versionStatePath) ?? '{}')).toEqual({
       lastSeenVersion: '0.2.0'

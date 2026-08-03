@@ -141,7 +141,7 @@
 
 ### 优化
 
-#### S-O1 ｜ 后端 `magicpocket:config:write` 缺 HTTPS / 供应链深度校验
+#### S-O1 ｜ 后端 `dagong:config:write` 缺 HTTPS / 供应链深度校验
 - 文件：`src/main/ipc/register-app-ipc-handlers.ts:335-348`、`1007-1026`
 - 渲染层有 `validateMcpServersHttps`/`auditMcpConfigSupplyChain`，但后端 `validateMcpConfigContent` 仅校验"是 JSON 对象"。任何绕过渲染层的直接 IPC 调用都能写 `http://` MCP url。
 - 修复：后端复用 HTTPS 校验逻辑（提到 shared），形成纵深防御。
@@ -164,10 +164,10 @@
 - **S-S4** ｜ OAuth 关闭按钮用字符 `x` 而非 `X` 图标（`PluginMarketplaceView.tsx:1925`）。
 - **S-S5** ｜ `appendMcpConfig` 并发写竞态（`PluginMarketplaceView.tsx:1230-1243`）：OAuth 安装与自定义安装可并发，第二次写覆盖第一次。用 ref 维护最新 configText。
 - **S-S6** ｜ OAuth 预览 `item.mcpConfig('')` 传空 workspaceRoot（`1965`），实际安装传 `workspaceRoot`（`1249`），调用不一致。
-- **S-S7** ｜ `SkillGithubImportResult.paths` 后端返回但前端未用（`magicpocket-gui-api.ts:155`）。
+- **S-S7** ｜ `SkillGithubImportResult.paths` 后端返回但前端未用（`dagong-gui-api.ts:155`）。
 - **S-S8** ｜ Settings `toggleSkillRoot` 只写 `claw.skills.disabledDirs`，后端同时合并 `schedule.skills.disabledDirs`（`skill-service.ts:220-232`），存在不一致隐患。
 - **S-S9** ｜ localStorage installed 标记与磁盘脱节：手动删 skill 文件后 localStorage 仍记已安装，`isInstalled` fallback 到 localStorage 返回 true，按钮 disabled 无法重装。
-- **S-S10** ｜ `DeepseekConfigFileResult`/`DeepseekConfigSaveResult` 类型名遗留（`magicpocket-gui-api.ts:192-193`），应改 `MagicPocketConfig*`。
+- **S-S10** ｜ `DeepseekConfigFileResult`/`DeepseekConfigSaveResult` 类型名遗留（`dagong-gui-api.ts:192-193`），应改 `DagongConfig*`。
 
 ---
 
@@ -178,7 +178,7 @@
 #### C-B1 ｜ SettingsView 与 PluginMarketplaceView 的 mcpConfigText 不同步
 - 文件：`SettingsView.tsx:175-181,479-553`；`PluginMarketplaceView.tsx:986-987,1023-1036`
 - 两个视图各自维护 `mcpConfigText` + `mcpLoaded` 标志，无跨组件通知。在 Settings 保存后切到面板，后者 `mcpLoaded` 已为 true 不重载，显示**旧内容**；反之亦然。
-- 修复：引入全局事件（IPC 广播 `magicpocket:config:written`，或 zustand/context 共享状态），写入后使另一处 `mcpLoaded` 失效。
+- 修复：引入全局事件（IPC 广播 `dagong:config:written`，或 zustand/context 共享状态），写入后使另一处 `mcpLoaded` 失效。
 
 #### C-B2 ｜ gui_schedule 系统服务器在 SettingsView 可被误编辑/删除
 - 文件：`src/main/claw-schedule-mcp-config.ts:98-142`；`mcp/McpServersEditor.tsx:149-179`
@@ -186,7 +186,7 @@
 - 修复：McpServersEditor 对 `gui_schedule`（或 `systemManaged` server）加只读/隐藏标记。
 
 #### C-B3 ｜ readJsonObjectIfExists 静默吞掉 mcp.json 的 JSON 解析错误
-- 文件：`src/main/magicpocket-process.ts:1268-1278`
+- 文件：`src/main/dagong-process.ts:1268-1278`
 - mcp.json 损坏（SyntaxError）时返回 `null`，runtime 当作"无任何 server"静默启动，用户无反馈——所有连接器消失但无错误提示。对比 `claw-schedule-mcp-config.ts:192-207` 会抛带路径的错误，行为不一致。
 - 修复：不静默返回 null，向上抛出或记录日志并反馈 GUI。
 
@@ -242,10 +242,10 @@
 - 多次挂载/多实例时持续递增不重置，设计不健壮。
 - 修复：用 `crypto.randomUUID()` 或组件内 `useRef` 计数。
 
-#### C-O8 ｜ IPC handler 命名混乱：resolveMagicPocketConfigPath 实指 mcp.json
+#### C-O8 ｜ IPC handler 命名混乱：resolveDagongConfigPath 实指 mcp.json
 - 文件：`register-app-ipc-handlers.ts:994-1026,430-431`；`index.ts:1861`
-- 参数/调用名 `resolveMagicPocketConfigPath`，实际注入的是 `resolveMagicPocketMcpJsonPath`（返回 mcp.json）；而 `claw-schedule-mcp-config.ts:26-28` 同名函数返回 config.toml。维护者易混淆。
-- 修复：统一改 `resolveMagicPocketMcpJsonPath`。
+- 参数/调用名 `resolveDagongConfigPath`，实际注入的是 `resolveDagongMcpJsonPath`（返回 mcp.json）；而 `claw-schedule-mcp-config.ts:26-28` 同名函数返回 config.toml。维护者易混淆。
+- 修复：统一改 `resolveDagongMcpJsonPath`。
 
 ### 小问题
 

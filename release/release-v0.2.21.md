@@ -1,6 +1,6 @@
-# MagicPocket v0.2.21
+# Dagong v0.2.21
 
-这一版是 v0.2.20 之后的一次 Agent 工具链与运行时治理增强。主线是让 MagicPocket 更会“看项目、管上下文、接外部工具”：新增预算受控的代码地图、超大工具输出 artifact、文档附件文本注入、远程 MCP OAuth、任务图和更严格的子代理执行契约；同时修复 Git 检查点、分支导航、SSE 断线恢复、附件安全和多语言流式渲染等问题。
+这一版是 v0.2.20 之后的一次 Agent 工具链与运行时治理增强。主线是让 Dagong 更会“看项目、管上下文、接外部工具”：新增预算受控的代码地图、超大工具输出 artifact、文档附件文本注入、远程 MCP OAuth、任务图和更严格的子代理执行契约；同时修复 Git 检查点、分支导航、SSE 断线恢复、附件安全和多语言流式渲染等问题。
 
 需要特别说明的是：此前进入 `develop` 的 SSH Remote / 远程运行位置 / 端口转发功能已在本版发布前撤回。这个方向后续会重新设计，不会作为 v0.2.21 的正式功能发布。
 
@@ -9,11 +9,11 @@
 - 新增 `repo_map` 代码地图工具，可以在预算内扫描本地项目结构，帮助 Agent 更快建立代码上下文。
 - 超大工具输出会被转存为 artifact，避免把长输出直接塞满对话上下文；同时新增读取 artifact 的能力，后续可以按需查看完整内容或指定行范围。
 - MCP 工具检索进一步收敛：模型可以优先通过专门的 MCP inspection/search 流程定位工具，而不是每轮携带完整工具目录。
-- Headless `magicpocket exec` 支持 JSONL 流式输出，方便脚本、CI 或外部集成实时消费运行状态。
+- Headless `dagong exec` 支持 JSONL 流式输出，方便脚本、CI 或外部集成实时消费运行状态。
 
 ### MCP、Marketplace 与安全
 
-- 远程 HTTP/SSE MCP server 支持 OAuth 授权，MagicPocket 会把 token 存在运行时数据目录，而不是写回 MCP 配置文件。
+- 远程 HTTP/SSE MCP server 支持 OAuth 授权，Dagong 会把 token 存在运行时数据目录，而不是写回 MCP 配置文件。
 - 新增 MCP OAuth 状态查看与清除接口，便于排查和撤销远程 MCP 授权。
 - Marketplace 安装会校验并固定 MCP package，减少远程包被替换或配置漂移带来的风险。
 - MCP stdio 环境、命名与传输层做了进一步拆分和加固，降低外部工具配置对运行时稳定性的影响。
@@ -59,11 +59,11 @@
 ### 升级说明
 
 - 从 `v0.2.20` 升级可直接通过 GUI 更新。
-- 如果你使用远程 HTTP/SSE MCP server，可以在 MCP 配置中启用 OAuth；授权 token 会保存在 MagicPocket runtime data 目录。
+- 如果你使用远程 HTTP/SSE MCP server，可以在 MCP 配置中启用 OAuth；授权 token 会保存在 Dagong runtime data 目录。
 - Marketplace 现在会更严格地校验 MCP package 和配置，旧的非固定或不安全配置可能需要重新确认后再安装。
-- 文档附件会把提取出的文本注入上下文；对于很大的文档，MagicPocket 会做截断和安全包装。
+- 文档附件会把提取出的文本注入上下文；对于很大的文档，Dagong 会做截断和安全包装。
 - SSH Remote 不在本版中发布，如果你在开发版里试用过该入口，升级到 v0.2.21 后将看不到相关运行位置和端口转发功能。
 
 ### 总结
 
-v0.2.21 不是一个追求“堆大功能”的版本，而是把 MagicPocket 的 Agent 底座继续做厚：更会读项目、更会管理长输出和文档、更安全地连接 MCP、更严格地约束子代理和记忆。同时，它也把尚未成熟的 SSH Remote 从发版线上撤下，给后续重新设计留出空间。
+v0.2.21 不是一个追求“堆大功能”的版本，而是把 Dagong 的 Agent 底座继续做厚：更会读项目、更会管理长输出和文档、更安全地连接 MCP、更严格地约束子代理和记忆。同时，它也把尚未成熟的 SSH Remote 从发版线上撤下，给后续重新设计留出空间。

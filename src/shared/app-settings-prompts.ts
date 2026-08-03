@@ -7,10 +7,10 @@ import {
   type ClawImRemoteSessionV1
 } from './app-settings-types'
 import {
-  resolveMagicPocketImageGenerationSettings,
-  resolveMagicPocketMusicGenerationSettings,
-  resolveMagicPocketTextToSpeechSettings,
-  resolveMagicPocketVideoGenerationSettings
+  resolveDagongImageGenerationSettings,
+  resolveDagongMusicGenerationSettings,
+  resolveDagongTextToSpeechSettings,
+  resolveDagongVideoGenerationSettings
 } from './app-settings-provider'
 
 export const CLAW_CURRENT_USER_REQUEST_HEADING = '[Current user request]'
@@ -114,14 +114,14 @@ export function normalizeClawImRemoteSession(input: unknown): ClawImRemoteSessio
 }
 
 /**
- * Read the MagicPocket thread id from a legacy `agentThreadIds` record.
+ * Read the Dagong thread id from a legacy `agentThreadIds` record.
  * Returns the empty string when no candidate is present.
  */
 export function readLegacyAgentThreadId(input: unknown): string {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return ''
   const raw = input as Record<string, unknown>
   const candidates = [
-    typeof raw.magicpocket === 'string' ? raw.magicpocket.trim() : '',
+    typeof raw.dagong === 'string' ? raw.dagong.trim() : '',
     typeof raw.codewhale === 'string' ? raw.codewhale.trim() : '',
     typeof raw.reasonix === 'string' ? raw.reasonix.trim() : ''
   ]
@@ -202,32 +202,32 @@ export function buildClawRuntimePrompt(
   const channelInstructions = buildClawImAgentInstructions(options.channel)
   if (channelInstructions) instructions.push(channelInstructions)
   const imageGeneration = settings.provider && settings.agents
-    ? resolveMagicPocketImageGenerationSettings(settings as AppSettingsV1)
-    : settings.agents?.magicpocket?.imageGeneration
+    ? resolveDagongImageGenerationSettings(settings as AppSettingsV1)
+    : settings.agents?.dagong?.imageGeneration
   if (imageGeneration?.enabled && imageGeneration.baseUrl.trim() && imageGeneration.apiKey.trim() && imageGeneration.model.trim()) {
     instructions.push(
       'Image generation is enabled for this Claw agent. When the user asks you to create, draw, generate, or edit an image, call the `generate_image` tool. After the tool succeeds the image file is delivered to the user automatically (IM chats receive it as a picture message), so simply confirm the image is ready — never paste base64 data, local file paths, or fabricated links into your reply.'
     )
   }
   const textToSpeech = settings.provider && settings.agents
-    ? resolveMagicPocketTextToSpeechSettings(settings as AppSettingsV1)
-    : settings.agents?.magicpocket?.textToSpeech
+    ? resolveDagongTextToSpeechSettings(settings as AppSettingsV1)
+    : settings.agents?.dagong?.textToSpeech
   if (textToSpeech?.enabled && textToSpeech.baseUrl.trim() && textToSpeech.apiKey.trim() && textToSpeech.model.trim()) {
     instructions.push(
       'Text-to-speech generation is enabled for this Claw agent. When the user asks for spoken narration, voiceover, dubbing, or audio speech, call the `generate_speech` tool. After the tool succeeds the audio file is delivered to the user automatically, so simply confirm the speech audio is ready and never paste base64 data, local file paths, or fabricated links into your reply.'
     )
   }
   const musicGeneration = settings.provider && settings.agents
-    ? resolveMagicPocketMusicGenerationSettings(settings as AppSettingsV1)
-    : settings.agents?.magicpocket?.musicGeneration
+    ? resolveDagongMusicGenerationSettings(settings as AppSettingsV1)
+    : settings.agents?.dagong?.musicGeneration
   if (musicGeneration?.enabled && musicGeneration.baseUrl.trim() && musicGeneration.apiKey.trim() && musicGeneration.model.trim()) {
     instructions.push(
       'Music generation is enabled for this Claw agent. When the user asks for a song, instrumental track, soundtrack, jingle, or music cover, call the `generate_music` tool. After the tool succeeds the audio file is delivered to the user automatically, so simply confirm the music is ready and never paste base64 data, local file paths, or fabricated links into your reply.'
     )
   }
   const videoGeneration = settings.provider && settings.agents
-    ? resolveMagicPocketVideoGenerationSettings(settings as AppSettingsV1)
-    : settings.agents?.magicpocket?.videoGeneration
+    ? resolveDagongVideoGenerationSettings(settings as AppSettingsV1)
+    : settings.agents?.dagong?.videoGeneration
   if (videoGeneration?.enabled && videoGeneration.baseUrl.trim() && videoGeneration.apiKey.trim() && videoGeneration.model.trim()) {
     instructions.push(
       'Video generation is enabled for this Claw agent. When the user asks for text-to-video or image-to-video generation, call the `generate_video` tool. After the tool succeeds the video file is delivered to the user automatically, so simply confirm the video is ready and never paste base64 data, local file paths, or fabricated links into your reply.'

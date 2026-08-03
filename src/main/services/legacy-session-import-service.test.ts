@@ -11,7 +11,7 @@ import {
 const tempRoots: string[] = []
 
 async function makeTempRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), 'magicpocket-session-import-'))
+  const root = await mkdtemp(join(tmpdir(), 'dagong-session-import-'))
   tempRoots.push(root)
   return root
 }
@@ -39,55 +39,55 @@ afterEach(async () => {
 })
 
 describe('defaultLegacySourceCandidates', () => {
-  it('points at the legacy DeepSeek GUI magicpocket and coreagent threads dirs', () => {
+  it('points at the legacy DeepSeek GUI dagong and coreagent threads dirs', () => {
     const candidates = defaultLegacySourceCandidates('/home/zoe')
     expect(candidates.map((c) => c.path)).toEqual([
-      join('/home/zoe', '.deepseekgui', 'magicpocket', 'threads'),
+      join('/home/zoe', '.deepseekgui', 'dagong', 'threads'),
       join('/home/zoe', '.deepseekgui', 'coreagent', 'threads')
     ])
-    expect(candidates.map((c) => c.kind)).toEqual(['magicpocket', 'coreagent'])
+    expect(candidates.map((c) => c.kind)).toEqual(['dagong', 'coreagent'])
   })
 })
 
 describe('detectLegacySessions', () => {
   it('reports thread counts and how many are new vs the destination', async () => {
     const root = await makeTempRoot()
-    const magicpocketThreads = join(root, '.deepseekgui', 'magicpocket', 'threads')
-    await writeThread(magicpocketThreads, 'thr_a')
-    await writeThread(magicpocketThreads, 'thr_b')
+    const dagongThreads = join(root, '.deepseekgui', 'dagong', 'threads')
+    await writeThread(dagongThreads, 'thr_a')
+    await writeThread(dagongThreads, 'thr_b')
     const coreagentThreads = join(root, '.deepseekgui', 'coreagent', 'threads')
     await writeThread(coreagentThreads, 'thr_c')
-    // One of the magicpocket threads already exists in the destination.
-    const dataDir = join(root, '.magicpocket', 'data')
+    // One of the dagong threads already exists in the destination.
+    const dataDir = join(root, '.dagong', 'data')
     await writeThread(join(dataDir, 'threads'), 'thr_a')
 
     const detection = await detectLegacySessions({ homeDir: root, destDataDir: dataDir })
 
     expect(detection.destDir).toBe(join(dataDir, 'threads'))
-    const magicpocket = detection.sources.find((s) => s.kind === 'magicpocket')
-    expect(magicpocket).toMatchObject({ threadCount: 2, newCount: 1 })
+    const dagong = detection.sources.find((s) => s.kind === 'dagong')
+    expect(dagong).toMatchObject({ threadCount: 2, newCount: 1 })
     const coreagent = detection.sources.find((s) => s.kind === 'coreagent')
     expect(coreagent).toMatchObject({ threadCount: 1, newCount: 1 })
   })
 
   it('omits sources that do not exist', async () => {
     const root = await makeTempRoot()
-    await writeThread(join(root, '.deepseekgui', 'magicpocket', 'threads'), 'thr_a')
+    await writeThread(join(root, '.deepseekgui', 'dagong', 'threads'), 'thr_a')
     const detection = await detectLegacySessions({
       homeDir: root,
-      destDataDir: join(root, '.magicpocket', 'data')
+      destDataDir: join(root, '.dagong', 'data')
     })
-    expect(detection.sources.map((s) => s.kind)).toEqual(['magicpocket'])
+    expect(detection.sources.map((s) => s.kind)).toEqual(['dagong'])
   })
 })
 
 describe('importLegacySessions', () => {
   it('copies all auto-detected legacy threads into the destination', async () => {
     const root = await makeTempRoot()
-    await writeThread(join(root, '.deepseekgui', 'magicpocket', 'threads'), 'thr_a')
-    await writeThread(join(root, '.deepseekgui', 'magicpocket', 'threads'), 'thr_b')
+    await writeThread(join(root, '.deepseekgui', 'dagong', 'threads'), 'thr_a')
+    await writeThread(join(root, '.deepseekgui', 'dagong', 'threads'), 'thr_b')
     await writeThread(join(root, '.deepseekgui', 'coreagent', 'threads'), 'thr_c')
-    const dataDir = join(root, '.magicpocket', 'data')
+    const dataDir = join(root, '.dagong', 'data')
 
     const summary = await importLegacySessions({ homeDir: root, destDataDir: dataDir })
 
@@ -101,8 +101,8 @@ describe('importLegacySessions', () => {
 
   it('never overwrites a thread that already exists in the destination', async () => {
     const root = await makeTempRoot()
-    await writeThread(join(root, '.deepseekgui', 'magicpocket', 'threads'), 'thr_a', 'legacy title')
-    const dataDir = join(root, '.magicpocket', 'data')
+    await writeThread(join(root, '.deepseekgui', 'dagong', 'threads'), 'thr_a', 'legacy title')
+    const dataDir = join(root, '.dagong', 'data')
     await writeThread(join(dataDir, 'threads'), 'thr_a', 'current title')
 
     const summary = await importLegacySessions({ homeDir: root, destDataDir: dataDir })
@@ -115,10 +115,10 @@ describe('importLegacySessions', () => {
 
   it('imports from an explicitly chosen folder, descending into a threads subdir', async () => {
     const root = await makeTempRoot()
-    // User picks the parent (…/backup/magicpocket), not the threads dir itself.
-    const pickedParent = join(root, 'backup', 'magicpocket')
+    // User picks the parent (…/backup/dagong), not the threads dir itself.
+    const pickedParent = join(root, 'backup', 'dagong')
     await writeThread(join(pickedParent, 'threads'), 'thr_x')
-    const dataDir = join(root, '.magicpocket', 'data')
+    const dataDir = join(root, '.dagong', 'data')
 
     const summary = await importLegacySessions({
       homeDir: root,
@@ -142,7 +142,7 @@ describe('importLegacySessions', () => {
     const oddDir = join(source, 'session-1')
     await mkdir(oddDir, { recursive: true })
     await writeFile(join(oddDir, 'thread.json'), '{"id":"session-1","title":"x","turns":[]}', 'utf8')
-    const dataDir = join(root, '.magicpocket', 'data')
+    const dataDir = join(root, '.dagong', 'data')
 
     const summary = await importLegacySessions({
       homeDir: root,
@@ -158,7 +158,7 @@ describe('importLegacySessions', () => {
     const root = await makeTempRoot()
     const summary = await importLegacySessions({
       homeDir: root,
-      destDataDir: join(root, '.magicpocket', 'data')
+      destDataDir: join(root, '.dagong', 'data')
     })
     expect(summary).toMatchObject({ total: 0, imported: 0, skipped: 0 })
   })

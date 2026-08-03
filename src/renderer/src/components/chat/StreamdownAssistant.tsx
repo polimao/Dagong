@@ -163,9 +163,9 @@ function StreamdownLink({
       return
     }
 
-    if (isExternal && href && typeof window.magicpocketGui?.openExternal === 'function') {
+    if (isExternal && href && typeof window.dagongGui?.openExternal === 'function') {
       event.preventDefault()
-      void window.magicpocketGui.openExternal(href).catch(() => undefined)
+      void window.dagongGui.openExternal(href).catch(() => undefined)
     }
   }
 
@@ -174,7 +174,7 @@ function StreamdownLink({
     event.preventDefault()
     void openWorkspacePathInEditor(resolvedFileTarget, workspaceRoot).then((result) => {
       if (!result.ok) {
-        void window.magicpocketGui?.logError?.('editor-open', 'Failed to open file reference', {
+        void window.dagongGui?.logError?.('editor-open', 'Failed to open file reference', {
           message: result.message,
           target: resolvedFileTarget
         })?.catch(() => undefined)

@@ -29,7 +29,7 @@ describe('parseMcpConfigText', () => {
     expect(model.preserved).toEqual({})
   })
 
-  it('parses a magicpocket-format stdio server', () => {
+  it('parses a dagong-format stdio server', () => {
     const model = expectOk(
       parseMcpConfigText(
         JSON.stringify({

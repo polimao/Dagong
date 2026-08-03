@@ -5,8 +5,8 @@
 # invented. Anything not in this block is editorial, not authoritative.
 
 schema_version: 1
-project: MagicPocket
-single_runtime: magicpocket
+project: Dagong
+single_runtime: dagong
 themes: [light, dark, system]
 
 # ---------- 1. Palette (raw hex from --ds-* tokens) ----------
@@ -224,8 +224,8 @@ window:
   app_region: drag           # html/body/-webkit-app-region
   no_drag_class: ds-no-drag  # add to anything clickable in the title bar
   macos_top_inset_px: 42     # safe area for traffic-light controls
-  app_icon: src/asset/img/magicpocket.png
-  secondary_logos: [magicpocket_mac.png, magicpocket_tray.png]
+  app_icon: src/asset/img/dagong.png
+  secondary_logos: [dagong_mac.png, dagong_tray.png]
 
 # ---------- 9. Iconography ----------
 icons:
@@ -286,8 +286,8 @@ i18n:
 
 # ---------- 13. Brand & voice ----------
 brand:
-  product_name: "MagicPocket"
-  tagline: "把 MagicPocket 的本地智能体能力带进桌面窗口"
+  product_name: "Dagong"
+  tagline: "把 Dagong 的本地智能体能力带进桌面窗口"
   hero_kw: [Code, Design, Write, Connect phone]
   pillars:
     - "本地优先 (Local-first): settings, sessions, logs all on disk; model calls use your own DeepSeek API key."
@@ -311,19 +311,19 @@ a11y:
 
 # ---------- 15. Don't (anti-patterns enforced by the codebase) ----------
 dont:
-  - "Use a second live agent runtime — MagicPocket is the only one."
+  - "Use a second live agent runtime — Dagong is the only one."
   - "Add AgentSwitcher / ConnectionStatusBar / RuntimeDiagnosticsDialog."
   - "Add CodeWhale/Reasonix adapters, process managers, RPC bridges, updaters, importers."
   - "Add a design/drawing starter card in the core workbench."
   - "Add /usage or /runtime slash command that opens a runtime control panel."
-  - "Save settings under agents.codewhale or agents.reasonix; only agents.magicpocket."
+  - "Save settings under agents.codewhale or agents.reasonix; only agents.dagong."
   - "Use emoji in production copy or as functional UI affordance."
   - "Apply a tint or hue that isn't in the palette above."
   - "Use a font outside the three declared families."
   - "Use a border radius smaller than 4px on a clickable surface."
 ---
 
-# MagicPocket — DESIGN.md
+# Dagong — DESIGN.md
 
 > 单一权威设计文档。所有屏幕、所有组件、所有视觉决策,都从这里出。
 
@@ -353,8 +353,8 @@ the frontmatter wins, and the markdown needs an update.
 
 ## 1. Project at a glance
 
-MagicPocket (formerly DeepSeek GUI) is a local desktop workbench built
-around its namesake **MagicPocket** runtime. The desktop shell is Electron; the runtime is a TypeScript
+Dagong (formerly DeepSeek GUI) is a local desktop workbench built
+around its namesake **Dagong** runtime. The desktop shell is Electron; the runtime is a TypeScript
 package that speaks HTTP/SSE; the renderer is React 19 + Zustand 5;
 the visual system is TailwindCSS 3 with a hand-built token layer on
 top.
@@ -372,7 +372,7 @@ human staying in the loop on every mutating call.
 | **Write** | A long-form writing space: Markdown files, FIM completion, selection-scoped inline agent. |
 | **Connect phone** | Background automation: Feishu / Lark channels, webhook / relay, scheduled tasks. Internal route and storage names still use `claw` for compatibility. |
 
-All product surfaces share the same MagicPocket HTTP/SSE boundary, the same
+All product surfaces share the same Dagong HTTP/SSE boundary, the same
 settings (API key, base URL, model), and the same visual system.
 
 ---
@@ -383,7 +383,7 @@ These six rules are not aspirations — they are how the product is
 already built. New screens must follow them, not re-interpret them.
 
 1. **One runtime, one boundary.** Code, Design, Write, and Connect phone all call
-   `magicpocket serve` over `127.0.0.1:port`. The renderer never
+   `dagong serve` over `127.0.0.1:port`. The renderer never
    embeds an agent loop and never speaks a second protocol. This
    keeps upgrades and debugging boring.
 2. **Local-first, observable, controllable.** Settings, sessions,
@@ -397,7 +397,7 @@ already built. New screens must follow them, not re-interpret them.
    important, it goes in Settings, not in the main canvas.
 4. **The renderer maps HTTP, it does not implement agent logic.**
    Approvals, steering, compaction, fork, resume, usage — all
-   come from MagicPocket endpoints, never re-implemented in React.
+   come from Dagong endpoints, never re-implemented in React.
 5. **Stable visual identity, not visual novelty.** A new screen
    should look like a sibling of an existing one, not a fresh
    experiment. New components earn their place by replacing
@@ -589,7 +589,7 @@ containing many cells. Do not animate the composer.
 
 ### 3.9 Layout grammar
 
-Every screen in MagicPocket follows the same macro-grammar:
+Every screen in Dagong follows the same macro-grammar:
 
 - **Topbar**: a translucent strip with the back button, session
   title, mode switcher, and right-side action cluster. The topbar
@@ -620,8 +620,8 @@ first.
   Write, and Connect phone"), second person for the user. No emoji. No
   marketing language. Error messages are full sentences ending in
   punctuation; never a raw stack trace.
-- The product name is "MagicPocket" (formerly "DeepSeek GUI"). The bundled
-  runtime shares the name; say "MagicPocket runtime" when the distinction matters.
+- The product name is "Dagong" (formerly "DeepSeek GUI"). The bundled
+  runtime shares the name; say "Dagong runtime" when the distinction matters.
   The main workbenches are "Code" and "Write"; the phone/IM surface is
   "Connect phone" in English and "连接手机" in zh copy. Internal code may
   still say `claw`, but production copy should not expose it as the product name.
@@ -667,19 +667,19 @@ If any box is unchecked, fix it before merging.
 │ Renderer (React 19 + Zustand 5)                             │
 │  AppShell  →  Workbench  →  (Code | Design | Write | Connect phone) UI│
 │       │                                                      │
-│       │ window.magicpocketGui.runtimeRequest / startSse             │
+│       │ window.dagongGui.runtimeRequest / startSse             │
 │       ▼                                                      │
 │ Preload (contextBridge, contextIsolated)                    │
-│  magicpocketGui.* IPC surface                                        │
+│  dagongGui.* IPC surface                                        │
 │       │                                                      │
 │       ▼                                                      │
 │ Main process (Node)                                          │
-│  RuntimeHost  →  magicpocketRuntimeAdapter                    │
+│  RuntimeHost  →  dagongRuntimeAdapter                    │
 │  Settings / Connect phone runtime / Terminal / Updater / Logger│
 │       │                                                      │
 │       │ spawn child process + HTTP/SSE                       │
 │       ▼                                                      │
-│ MagicPocket (TypeScript package)                              │
+│ Dagong (TypeScript package)                              │
 │  serve --host 127.0.0.1 --port 18899                          │
 │  /health · /v1/* · SSE /v1/threads/{id}/events              │
 │  cache-first AgentLoop · ports & adapters · append-only log  │
@@ -693,7 +693,7 @@ If any box is unchecked, fix it before merging.
 Three lessons baked into this shape:
 
 1. The renderer **does not know** which runtime it talks to
-   beyond "magicpocket". Switching providers is not a product
+   beyond "dagong". Switching providers is not a product
    surface; it's a main-process concern.
 2. The main process **does not implement agent logic**. It
    spawns the child, forwards HTTP, and forwards SSE. It also
@@ -701,22 +701,22 @@ Three lessons baked into this shape:
    workspace
    files, external editors, and Write export/completion) that the
    renderer can ask for.
-3. MagicPocket **is** the agent. Loop, tool host, stores, model
+3. Dagong **is** the agent. Loop, tool host, stores, model
    client, server — all in one process, behind one HTTP/SSE
    boundary.
 
 ---
 
-## 5. Core runtime: MagicPocket
+## 5. Core runtime: Dagong
 
-The MagicPocket package (`magicpocket/`) is the single active agent
+The Dagong package (`dagong/`) is the single active agent
 runtime. It is a TypeScript ESM package that ships its own HTTP
 server and is built before the Electron app.
 
 ### 5.1 Module layout
 
 ```text
-magicpocket/src/
+dagong/src/
   cli/             # Command-line entrypoints (serve)
   contracts/       # Zod schemas and inferred types for HTTP/SSE
   domain/          # Thread, Turn, Item, Event, Approval, Usage entities
@@ -731,17 +731,17 @@ magicpocket/src/
   telemetry/       # Usage counter, cache telemetry
   server/          # HTTP server, router, auth, SSE, response helpers,
                    # runtime-factory, route handlers
-  prompt/          # System prompt for the MagicPocket identity
+  prompt/          # System prompt for the Dagong identity
   shared/          # Shared types with the GUI
 ```
 
 ### 5.2 Hexagonal shape
 
-MagicPocket is structured as **ports & adapters**:
+Dagong is structured as **ports & adapters**:
 
 - `contracts/` — the boundary. Zod schemas describe every HTTP/SSE
   DTO. This is what the GUI imports indirectly through its mapper
-  (`src/renderer/src/agent/magicpocket-contract.ts`).
+  (`src/renderer/src/agent/dagong-contract.ts`).
 - `domain/` — entities. Thread, Turn, Item, Event, Approval, Usage.
   No I/O.
 - `ports/` — interfaces. The agent loop only knows about
@@ -790,7 +790,7 @@ telemetry. The principles:
   pinned constraints from the immutable prefix. Soft threshold
   16k tokens, hard threshold 24k tokens.
 - **Tool pair healing.** Before sending history to the model,
-  MagicPocket drops orphan `tool_result`s and tool calls with
+  Dagong drops orphan `tool_result`s and tool calls with
   missing results, to avoid 400/retry storms.
 
 Cache hit rate is reported as `hit / (hit + miss)` using
@@ -892,12 +892,12 @@ next replay skips them).
 
 ### 6.1 Process roles
 
-- **Main** (`src/main/`) — Node process. Owns the MagicPocket
+- **Main** (`src/main/`) — Node process. Owns the Dagong
   child process, settings store, updater, Connect phone runtime,
   file/git/editor helpers, Write services, IPC handlers, logger,
   GUI updater, macOS/Windows code-signing glue.
 - **Preload** (`src/preload/`) — `contextBridge` surface.
-  Exposes a typed `window.magicpocketGui` API to the renderer. No Node
+  Exposes a typed `window.dagongGui` API to the renderer. No Node
   access leaks into the renderer.
 - **Renderer** (`src/renderer/`) — Chromium process. React 19
   SPA. Runs Code / Design / Write / Connect phone UIs.
@@ -916,16 +916,16 @@ src/
     claw-schedule-mcp-*             # schedule MCP config + standalone server
     gui-updater.ts                  # electron-updater integration
     logger.ts                       # structured logger
-    resolve-magicpocket-binary.ts     # CLI / dev-script / packaged binary resolver
+    resolve-dagong-binary.ts     # CLI / dev-script / packaged binary resolver
   preload/
-    index.ts                        # contextBridge surface (window.magicpocketGui)
+    index.ts                        # contextBridge surface (window.dagongGui)
     index.d.ts                      # API type definitions
   shared/                           # types + constants shared by main and renderer
   renderer/
     src/
       App.tsx                       # Suspense shell
       AppShell.tsx                  # routes Workbench / Settings / InitialSetup
-      agent/                        # AgentProvider interface + MagicPocket impl
+      agent/                        # AgentProvider interface + Dagong impl
       components/                   # Workbench, Settings, ChangeInspector, …
       design/                       # Design-mode canvas, artifacts, prompts, graph, persistence
       hooks/
@@ -936,13 +936,13 @@ src/
       write/                        # Write-mode workspace, inline edit, RAG
 ```
 
-### 6.3 The magicpocketGui API surface
+### 6.3 The dagongGui API surface
 
-`window.magicpocketGui` is the only thing the renderer is allowed to call
+`window.dagongGui` is the only thing the renderer is allowed to call
 on the system. It includes:
 
 - `runtimeRequest(path, method, body)` — generic JSON request to
-  MagicPocket.
+  Dagong.
 - `startSse(threadId, sinceSeq, streamId)` / `stopSse` /
   `onSseEvent` — SSE subscription for a thread.
 - `getSettings` / `setSettings` — typed settings I/O.
@@ -966,24 +966,24 @@ on the system. It includes:
   `checkGuiUpdate`, `downloadGuiUpdate`, `installGuiUpdate`,
   `onGuiUpdateState`, `logError`, `getLogPath`, `openLogDir`).
 
-Every method on this surface is typed in `src/shared/magicpocket-gui-api.ts`
+Every method on this surface is typed in `src/shared/dagong-gui-api.ts`
 and validated at the IPC boundary by Zod schemas in
 `src/main/ipc/app-ipc-schemas.ts`.
 
 ### 6.4 The runtime adapter
 
-The main process owns the MagicPocket child process through a
+The main process owns the Dagong child process through a
 `LocalHttpRuntimeAdapter`:
 
-- `magicpocketRuntimeAdapter.resolveExecutable(settings)` —
+- `dagongRuntimeAdapter.resolveExecutable(settings)` —
   finds the right binary or falls back to the dev script.
-- `magicpocketRuntimeAdapter.ensureRunning(settings)` — starts
+- `dagongRuntimeAdapter.ensureRunning(settings)` — starts
   the child if it isn't already.
-- `magicpocketRuntimeAdapter.stopAndWait()` — graceful shutdown
+- `dagongRuntimeAdapter.stopAndWait()` — graceful shutdown
   for app exit.
-- `magicpocketRuntimeAdapter.getBaseUrl(settings)` — base URL
+- `dagongRuntimeAdapter.getBaseUrl(settings)` — base URL
   for the current settings.
-- `magicpocketRuntimeAdapter.reclaimPort(port)` — recover a
+- `dagongRuntimeAdapter.reclaimPort(port)` — recover a
   stuck port.
 
 `runtimeRequestViaHost` is the single chokepoint: it ensures the
@@ -1046,19 +1046,19 @@ Persistence is layered:
   fork registry).
 - `electron-store` (main) — settings, Connect phone config (internal Claw key), write
   workspace config.
-- `~/.deepseekgui/magicpocket` (MagicPocket) — threads,
+- `~/.deepseekgui/dagong` (Dagong) — threads,
   events, sessions, usage.
 
 ### 7.3 The AgentProvider interface
 
 The renderer talks to the runtime through one interface,
 `AgentProvider` (`src/renderer/src/agent/types.ts`). Today the
-only implementation is `MagicPocketRuntimeProvider`
-(`src/renderer/src/agent/magicpocket-runtime.ts`), which is a thin
+only implementation is `DagongRuntimeProvider`
+(`src/renderer/src/agent/dagong-runtime.ts`), which is a thin
 HTTP/SSE client. Its DTOs live in
-`src/renderer/src/agent/magicpocket-contract.ts` and the
+`src/renderer/src/agent/dagong-contract.ts` and the
 DTO-to-ChatBlock mapping lives in
-`src/renderer/src/agent/magicpocket-mapper.ts`.
+`src/renderer/src/agent/dagong-mapper.ts`.
 
 `getProvider()` (in `registry.ts`) returns a single cached
 instance. `resetProviderCacheForTests()` exists for unit tests
@@ -1099,17 +1099,17 @@ the runtime contract, only which renderer and local workflow state the store pul
 - **Code** — default mode, full agent flow, workspace roots,
   todo panel, changes inspector, plan panel, file preview, and dev browser.
 - **Design** — design-thread registry isolates design sessions from Code, Write,
-  and Connect phone sessions. Artifacts persist under `.magicpocket-design/`, the canvas
+  and Connect phone sessions. Artifacts persist under `.dagong-design/`, the canvas
   previews interactive HTML prototypes and graph outputs, and approved designs can
   publish `DESIGN_SYSTEM.md` before opening a fresh Code thread.
 - **Write** — write-thread registry isolates Write sessions
-  from Code / Design / Connect phone sessions. Uses the same MagicPocket but a
+  from Code / Design / Connect phone sessions. Uses the same Dagong but a
   separate `WRITE_ASSISTANT_THREAD_TITLE` namespace. Inline
   completion and selected-text agent go through dedicated
   main-process services.
 - **Connect phone** — internal `claw` channel registry. Each IM channel has its
   own thread id, model, and workspace root. Runs through
-  `ClawRuntime` (main process), which calls MagicPocket over
+  `ClawRuntime` (main process), which calls Dagong over
   HTTP just like the renderer does.
 
 ---
@@ -1121,12 +1121,12 @@ the runtime contract, only which renderer and local workflow state the store pul
 | Settings | OS app-data dir | JSON | `JsonSettingsStore` (main) |
 | Session list / workbench layout | `localStorage` | JSON | Renderer |
 | Design thread registry | `localStorage` | JSON | Renderer |
-| Design artifacts | workspace `.magicpocket-design/` | HTML / PNG / JSON / Markdown | Renderer + MagicPocket |
+| Design artifacts | workspace `.dagong-design/` | HTML / PNG / JSON / Markdown | Renderer + Dagong |
 | Write thread registry | `localStorage` | JSON | Renderer |
 | Connect phone channels | OS app-data dir | JSON | `JsonSettingsStore` |
-| Threads / turns / events | `~/.deepseekgui/magicpocket` | JSON + JSONL | MagicPocket |
-| Usage counters | MagicPocket data dir | JSON | MagicPocket |
-| Skill / MCP files | MagicPocket data dir + workspace | Markdown / JSON | MagicPocket + renderer |
+| Threads / turns / events | `~/.deepseekgui/dagong` | JSON + JSONL | Dagong |
+| Usage counters | Dagong data dir | JSON | Dagong |
+| Skill / MCP files | Dagong data dir + workspace | Markdown / JSON | Dagong + renderer |
 | GUI logs | OS app-data dir / `log/` | NDJSON | `logger.ts` |
 | Inline completion debug | OS app-data dir | NDJSON | `write-inline-completion-service.ts` |
 
@@ -1146,7 +1146,7 @@ the README and respected by the install script.
 
 ### 9.1 Tool execution & approval
 
-- `LocalToolHost` (`magicpocket/src/adapters/tool/local-tool-host.ts`)
+- `LocalToolHost` (`dagong/src/adapters/tool/local-tool-host.ts`)
   holds the registered tools and their policies. Policies:
   `auto`, `on-request`, `suggest`, `never`, `untrusted`.
 - A tool with `shouldAdvertise(ctx)` is gated at the listing
@@ -1197,13 +1197,13 @@ compaction block inline with a "show replaced" detail.
 
 ### 9.5 Connect phone automation
 
-- `ClawRuntime` (main process) creates and reuses MagicPocket
+- `ClawRuntime` (main process) creates and reuses Dagong
   threads for each IM channel and each scheduled task.
 - Feishu / Lark integration uses `@larksuiteoapi/node-sdk`.
   Install is device-flow QR code; the renderer polls
   `claw:im-install:poll` until authorized.
 - Webhook / relay is a small HTTP server in `ClawRuntime` that
-  POSTs inbound webhooks into a MagicPocket thread.
+  POSTs inbound webhooks into a Dagong thread.
 - Scheduled tasks are detected from natural-language Connect phone
   prompts (`claw-scheduled-task-detector.ts`) and stored under
   `claw.scheduledTasks` in settings.
@@ -1243,14 +1243,14 @@ postmortem timing.
   workspace inspector and the file/tool adapters.
 - **Renderer isolation** — `contextIsolation: true`, no
   `nodeIntegration`, no `webviewTag` exposure. The renderer
-  only sees the `window.magicpocketGui` API surface.
+  only sees the `window.dagongGui` API surface.
 - **External links** — `openExternal` is the only way to leave
   the app; URLs are validated against an allow-list.
 - **Markdown rendering** — `rehype-harden` strips unsafe
   nodes. Code blocks go through `shiki` with a fixed theme.
 - **Settings file** — written atomically, debounced, never
   read on the renderer side. Legacy `codewhale` / `reasonix`
-  keys are migrated to `magicpocket` once and discarded.
+  keys are migrated to `dagong` once and discarded.
 
 ---
 
@@ -1259,18 +1259,18 @@ postmortem timing.
 These are enforced by `docs/AGENTS.md` and reflect real product
 decisions. New work must respect them.
 
-- **One live agent runtime: MagicPocket.** No second live
+- **One live agent runtime: Dagong.** No second live
   provider, no provider switcher, no runtime diagnostics
   panel, no legacy CodeWhale / Reasonix process path.
 - **No UI surface for runtime internals.** No AgentSwitcher,
   no ConnectionStatusBar, no RuntimeDiagnosticsDialog, no
   RuntimeInsightsPanel, no `/usage` or `/runtime` slash
   command.
-- **Saved settings only contain `agents.magicpocket`.** Old keys
+- **Saved settings only contain `agents.dagong`.** Old keys
   may only appear in migration.
 - **Renderer does not implement agent logic.** Approvals,
   steering, compaction, fork, resume, usage — all come from
-  MagicPocket endpoints, never re-implemented in React.
+  Dagong endpoints, never re-implemented in React.
 - **No new drawing / design starter card** in the core
   workbench.
 - **No emoji in production copy or as functional UI
@@ -1287,19 +1287,19 @@ When you need to add a new capability, follow this path. It's
 intentionally boring.
 
 1. **Add the protocol field.** New Zod schema in
-   `magicpocket/src/contracts/`. Run `npm --prefix magicpocket run
+   `dagong/src/contracts/`. Run `npm --prefix dagong run
    build`.
-2. **Add the agent behavior.** In `magicpocket/src/loop/`,
-   `magicpocket/src/services/`, or a new port + adapter pair
-   under `magicpocket/src/ports/` and `magicpocket/src/adapters/`.
+2. **Add the agent behavior.** In `dagong/src/loop/`,
+   `dagong/src/services/`, or a new port + adapter pair
+   under `dagong/src/ports/` and `dagong/src/adapters/`.
 3. **Add the HTTP route.** New file under
-   `magicpocket/src/server/routes/`, registered in
+   `dagong/src/server/routes/`, registered in
    `routes/index.ts`.
 4. **Map the endpoint / event in the GUI.** Add to
-   `src/renderer/src/agent/magicpocket-contract.ts` and the
-   mapper `magicpocket-mapper.ts`; expose the call in
-   `magicpocket-runtime.ts`.
-5. **Add settings only under `agents.magicpocket`.** Anything
+   `src/renderer/src/agent/dagong-contract.ts` and the
+   mapper `dagong-mapper.ts`; expose the call in
+   `dagong-runtime.ts`.
+5. **Add settings only under `agents.dagong`.** Anything
    else gets migrated to it.
 6. **Add i18n strings to both `zh` and `en` locale files.**
 7. **If the surface needs a new visual element, add it to
@@ -1326,9 +1326,9 @@ Manual smoke (full list in `docs/AGENTS.md`):
 - Code: create thread, stream reply, approve / deny, interrupt.
 - Write: open workspace, request inline completion, run
   selected-text agent.
-- Connect phone: save settings, run a manual task through a MagicPocket
+- Connect phone: save settings, run a manual task through a Dagong
   thread.
-- Settings → Agents: shows only MagicPocket.
+- Settings → Agents: shows only Dagong.
 - Cache telemetry on a hot thread should stay ≥ 90% hit.
 
 If any check fails, the change is not ready.
@@ -1340,14 +1340,14 @@ If any check fails, the change is not ready.
 | Concern | File |
 | --- | --- |
 | App lifecycle | `src/main/index.ts` |
-| Runtime adapter | `src/main/runtime/magicpocket-adapter.ts` |
+| Runtime adapter | `src/main/runtime/dagong-adapter.ts` |
 | HTTP forwarding | `src/main/runtime/runtime-host.ts` |
-| Child process | `src/main/magicpocket-process.ts` |
+| Child process | `src/main/dagong-process.ts` |
 | Settings | `src/main/settings-store.ts`, `src/shared/app-settings.ts` |
 | IPC | `src/main/ipc/register-app-ipc-handlers.ts`, `src/main/ipc/app-ipc-schemas.ts` |
-| magicpocketGui API | `src/preload/index.ts`, `src/shared/magicpocket-gui-api.ts` |
-| Agent provider | `src/renderer/src/agent/magicpocket-runtime.ts` |
-| DTO mapping | `src/renderer/src/agent/magicpocket-mapper.ts` |
+| dagongGui API | `src/preload/index.ts`, `src/shared/dagong-gui-api.ts` |
+| Agent provider | `src/renderer/src/agent/dagong-runtime.ts` |
+| DTO mapping | `src/renderer/src/agent/dagong-mapper.ts` |
 | App shell | `src/renderer/src/AppShell.tsx` |
 | Workbench | `src/renderer/src/components/Workbench.tsx` |
 | Chat store | `src/renderer/src/store/chat-store.ts` |
@@ -1355,26 +1355,26 @@ If any check fails, the change is not ready.
 | Write services | `src/main/services/write-*-service.ts` |
 | Workspace/editor services | `src/main/services/workspace-*.ts`, `src/main/services/workspace-editors.ts` |
 | Tokens / styles | `src/renderer/src/styles/*.css`, `src/renderer/src/index.css` |
-| Agent loop | `magicpocket/src/loop/agent-loop.ts` |
-| Immutable prefix | `magicpocket/src/cache/immutable-prefix.ts` |
-| HTTP routes | `magicpocket/src/server/routes/` |
-| Tool host | `magicpocket/src/adapters/tool/local-tool-host.ts` |
-| Model client | `magicpocket/src/adapters/model/compat-model-client.ts` |
-| Cache doc | `docs/magicpocket-cache-optimization.md` |
-| Architecture doc | `docs/magicpocket-architecture.md` |
-| Contribution doc | `docs/magicpocket-contributing.md` |
+| Agent loop | `dagong/src/loop/agent-loop.ts` |
+| Immutable prefix | `dagong/src/cache/immutable-prefix.ts` |
+| HTTP routes | `dagong/src/server/routes/` |
+| Tool host | `dagong/src/adapters/tool/local-tool-host.ts` |
+| Model client | `dagong/src/adapters/model/compat-model-client.ts` |
+| Cache doc | `docs/dagong-cache-optimization.md` |
+| Architecture doc | `docs/dagong-architecture.md` |
+| Contribution doc | `docs/dagong-contributing.md` |
 
 ---
 
 ## 15. References
 
-- `docs/magicpocket-architecture.md` — single-runtime plan and
+- `docs/dagong-architecture.md` — single-runtime plan and
   GUI拆改范围.
-- `docs/magicpocket-cache-optimization.md` — cache hit rate
+- `docs/dagong-cache-optimization.md` — cache hit rate
   measurement, stable prefix rules, tool pair healing.
-- `docs/magicpocket-contributing.md` — port & adapter / FCIS
+- `docs/dagong-contributing.md` — port & adapter / FCIS
   patterns, four PR archetypes.
-- `magicpocket/README.md` — CLI flags, env vars, data dir layout,
+- `dagong/README.md` — CLI flags, env vars, data dir layout,
   HTTP API.
 - `docs/AGENTS.md` — agent runtime notes (constraints enforced
   on contributors).

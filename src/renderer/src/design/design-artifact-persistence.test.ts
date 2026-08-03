@@ -13,7 +13,7 @@ describe('design artifact persistence', () => {
         id: 'draft',
         kind: 'html',
         title: 'Draft',
-        relativePath: '.magicpocket-design/draft/v1.html',
+        relativePath: '.dagong-design/draft/v1.html',
         createdAt: '2026-06-20T00:00:00.000Z',
         updatedAt: '2026-06-20T00:00:00.000Z',
         versions: []
@@ -22,7 +22,7 @@ describe('design artifact persistence', () => {
     )
 
     expect(artifact?.id).toBe('draft')
-    expect(artifact?.designMdPath).toBe('.magicpocket-design/draft/DESIGN.md')
+    expect(artifact?.designMdPath).toBe('.dagong-design/draft/DESIGN.md')
     expect(artifact?.node).toBeUndefined()
   })
 
@@ -32,11 +32,11 @@ describe('design artifact persistence', () => {
       id: 'draft',
       kind: 'html',
       title: 'Draft',
-      relativePath: '.magicpocket-design/draft/v1.html',
+      relativePath: '.dagong-design/draft/v1.html',
       createdAt,
       updatedAt: createdAt,
-      versions: [{ id: 'draft-v1', relativePath: '.magicpocket-design/draft/v1.html', createdAt, summary: '' }],
-      designMdPath: '.magicpocket-design/draft/DESIGN.md',
+      versions: [{ id: 'draft-v1', relativePath: '.dagong-design/draft/v1.html', createdAt, summary: '' }],
+      designMdPath: '.dagong-design/draft/DESIGN.md',
       previewStatus: 'ready',
       node: {
         x: 120,
@@ -69,7 +69,7 @@ describe('design artifact persistence', () => {
     expect(parsed?.node).toEqual(artifact.node)
     expect(parsed?.prototypeLinks).toEqual(artifact.prototypeLinks)
     expect(parsed?.direction).toEqual(artifact.direction)
-    expect(parsed?.designMdPath).toBe('.magicpocket-design/draft/DESIGN.md')
+    expect(parsed?.designMdPath).toBe('.dagong-design/draft/DESIGN.md')
     expect(parsed?.previewStatus).toBe('ready')
   })
 
@@ -80,19 +80,19 @@ describe('design artifact persistence', () => {
         id: 'draft',
         kind: 'html',
         title: 'Draft',
-        relativePath: '.magicpocket-design/draft/v1.html',
+        relativePath: '.dagong-design/draft/v1.html',
         createdAt,
         updatedAt: createdAt,
         versions: [
           {
             id: 'draft-v2',
-            relativePath: '.magicpocket-design/draft/v2.html',
+            relativePath: '.dagong-design/draft/v2.html',
             createdAt: '2026-06-20T01:00:00.000Z',
             summary: 'Newer experiment'
           },
           {
             id: 'draft-v1',
-            relativePath: '.magicpocket-design/draft/v1.html',
+            relativePath: '.dagong-design/draft/v1.html',
             createdAt,
             summary: 'Selected stable version'
           }
@@ -112,13 +112,13 @@ describe('design artifact persistence', () => {
         id: 'draft',
         kind: 'html',
         title: 'Draft',
-        relativePath: '.magicpocket-design/draft/v3.html',
+        relativePath: '.dagong-design/draft/v3.html',
         createdAt,
         updatedAt: createdAt,
         versions: [
           {
             id: 'draft-v2',
-            relativePath: '.magicpocket-design/draft/v2.html',
+            relativePath: '.dagong-design/draft/v2.html',
             createdAt,
             summary: 'Old version'
           }
@@ -129,7 +129,7 @@ describe('design artifact persistence', () => {
 
     expect(parsed?.versions[0]).toMatchObject({
       id: 'draft-v3',
-      relativePath: '.magicpocket-design/draft/v3.html',
+      relativePath: '.dagong-design/draft/v3.html',
       summary: ''
     })
     expect(parsed?.versions[1]?.id).toBe('draft-v2')
@@ -137,11 +137,11 @@ describe('design artifact persistence', () => {
 
   it('adds a default node when reconstructing legacy artifact folders', () => {
     const artifact = reconstructArtifact('legacy', [
-      { name: 'v1.html', path: '.magicpocket-design/legacy/v1.html', type: 'file', ext: '.html' },
-      { name: 'meta.json', path: '.magicpocket-design/legacy/meta.json', type: 'file', ext: '.json' }
+      { name: 'v1.html', path: '.dagong-design/legacy/v1.html', type: 'file', ext: '.html' },
+      { name: 'meta.json', path: '.dagong-design/legacy/meta.json', type: 'file', ext: '.json' }
     ])
 
     expect(artifact?.node).toEqual(defaultDesignArtifactNode(0))
-    expect(artifact?.designMdPath).toBe('.magicpocket-design/legacy/DESIGN.md')
+    expect(artifact?.designMdPath).toBe('.dagong-design/legacy/DESIGN.md')
   })
 })

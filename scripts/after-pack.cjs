@@ -3,12 +3,12 @@ const { chmodSync, existsSync, readdirSync, rmSync } = require('node:fs')
 const { join } = require('node:path')
 
 const KUN_RUNTIME_REQUIRED_PATHS = [
-  'magicpocket/dist/cli/serve-entry.js',
-  'magicpocket/package.json',
-  'magicpocket/package-lock.json',
-  'magicpocket/node_modules/zod/package.json',
-  'magicpocket/node_modules/diff/package.json',
-  'magicpocket/node_modules/@modelcontextprotocol/sdk/package.json'
+  'dagong/dist/cli/serve-entry.js',
+  'dagong/package.json',
+  'dagong/package-lock.json',
+  'dagong/node_modules/zod/package.json',
+  'dagong/node_modules/diff/package.json',
+  'dagong/node_modules/@modelcontextprotocol/sdk/package.json'
 ]
 
 function normalizePlatform(platform) {
@@ -46,17 +46,17 @@ function npmCommand(args, platform = process.platform) {
   return { command: 'npm', args }
 }
 
-function prunePackedMagicPocketDependencies(context) {
+function prunePackedDagongDependencies(context) {
   const root = unpackedAppRoot(context)
-  const magicpocketDir = join(root, 'magicpocket')
-  if (!existsSync(magicpocketDir)) return
+  const dagongDir = join(root, 'dagong')
+  if (!existsSync(dagongDir)) return
 
-  assertExists(join(magicpocketDir, 'package.json'), 'MagicPocket package manifest')
-  assertExists(join(magicpocketDir, 'node_modules'), 'MagicPocket node_modules')
+  assertExists(join(dagongDir, 'package.json'), 'Dagong package manifest')
+  assertExists(join(dagongDir, 'node_modules'), 'Dagong node_modules')
 
   const prune = npmCommand(['prune', '--omit=dev', '--ignore-scripts'])
   execFileSync(prune.command, prune.args, {
-    cwd: magicpocketDir,
+    cwd: dagongDir,
     env: {
       ...process.env,
       npm_config_audit: 'false',
@@ -71,10 +71,10 @@ function prunePackedMagicPocketDependencies(context) {
     join(root, 'node_modules', 'better-sqlite3', 'package.json'),
     'root better-sqlite3 dependency'
   )
-  rmSync(join(magicpocketDir, 'node_modules', 'better-sqlite3'), { recursive: true, force: true })
+  rmSync(join(dagongDir, 'node_modules', 'better-sqlite3'), { recursive: true, force: true })
 }
 
-function validateBundledMagicPocketRuntime(context) {
+function validateBundledDagongRuntime(context) {
   const root = unpackedAppRoot(context)
   for (const relativePath of KUN_RUNTIME_REQUIRED_PATHS) {
     assertExists(join(root, relativePath), relativePath)
@@ -150,8 +150,8 @@ function prunePackedWhisperResources(context) {
 }
 
 async function afterPack(context) {
-  prunePackedMagicPocketDependencies(context)
-  validateBundledMagicPocketRuntime(context)
+  prunePackedDagongDependencies(context)
+  validateBundledDagongRuntime(context)
   prunePackedWhisperResources(context)
   ensureNodePtyHelpersExecutable(context)
   maybeAdhocSignMacApp(context)
@@ -163,8 +163,8 @@ exports._internals = {
   packedResourcesDir,
   unpackedAppRoot,
   npmCommand,
-  prunePackedMagicPocketDependencies,
-  validateBundledMagicPocketRuntime,
+  prunePackedDagongDependencies,
+  validateBundledDagongRuntime,
   normalizeArch,
   prunePackedWhisperResources,
   ensureNodePtyHelpersExecutable

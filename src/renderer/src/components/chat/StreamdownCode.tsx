@@ -177,7 +177,7 @@ function InlineFileReferenceCode({
   const handleOpenEditor = (): void => {
     void openWorkspacePathInEditor(resolvedTarget, workspaceRoot).then((result) => {
       if (!result.ok) {
-        void window.magicpocketGui?.logError?.('editor-open', 'Failed to open inline file reference', {
+        void window.dagongGui?.logError?.('editor-open', 'Failed to open inline file reference', {
           message: result.message,
           target: resolvedTarget
         })?.catch(() => undefined)

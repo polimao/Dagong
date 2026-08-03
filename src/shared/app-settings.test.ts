@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
-  applyMagicPocketRuntimePatch,
-  magicpocketSettingsEnvelope,
-  magicpocketSettingsPatch,
+  applyDagongRuntimePatch,
+  dagongSettingsEnvelope,
+  dagongSettingsPatch,
   DEFAULT_KUN_DATA_DIR,
   DEFAULT_KUN_MODEL,
   DEFAULT_LOG_RETENTION_DAYS,
@@ -17,9 +17,9 @@ import {
   buildClawRuntimePrompt,
   defaultClawSettings,
   defaultModelProviderSettings,
-  mergeMagicPocketRuntimeSettings,
+  mergeDagongRuntimeSettings,
   mergeScheduleSettings,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
   defaultTerminalSettings,
@@ -33,7 +33,7 @@ import {
   mergeWriteSettings,
   normalizeWriteSettings,
   normalizeWriteAgentPresets,
-  isMagicPocketRuntimeInsecure,
+  isDagongRuntimeInsecure,
   migrateLegacyAppSettings,
   normalizeAppSettings,
   normalizeChatContentMaxWidth,
@@ -41,10 +41,10 @@ import {
   applyGitBranchPrefix,
   parseClawUserPromptForDisplay,
   inferModelEndpointFormatFromUrl,
-  magicpocketToolPermissionModeFromSettings,
-  magicpocketToolPermissionModeSettings,
+  dagongToolPermissionModeFromSettings,
+  dagongToolPermissionModeSettings,
   normalizeScheduleSettings,
-  resolveMagicPocketRuntimeSettings,
+  resolveDagongRuntimeSettings,
   resolveWriteInlineCompletionApiKey,
   resolveWriteInlineCompletionBaseUrl,
   resolveWriteInlineCompletionModel,
@@ -62,10 +62,10 @@ function settings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      magicpocket: defaultMagicPocketRuntimeSettings()
+      dagong: defaultDagongRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -145,64 +145,64 @@ function clawChannel(provider: ClawImProvider, label: string, name = label): Cla
   }
 }
 
-describe('magicpocket defaults', () => {
+describe('dagong defaults', () => {
   it('keeps a single shared default data directory source', () => {
-    expect(defaultMagicPocketRuntimeSettings().dataDir).toBe(DEFAULT_KUN_DATA_DIR)
+    expect(defaultDagongRuntimeSettings().dataDir).toBe(DEFAULT_KUN_DATA_DIR)
   })
 
   it('defaults the assistant model to v4 pro', () => {
-    expect(defaultMagicPocketRuntimeSettings().model).toBe(DEFAULT_KUN_MODEL)
+    expect(defaultDagongRuntimeSettings().model).toBe(DEFAULT_KUN_MODEL)
   })
 
   it('defaults approval policy to auto', () => {
-    expect(defaultMagicPocketRuntimeSettings().approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
-    expect(defaultMagicPocketRuntimeSettings().approvalPolicy).toBe('auto')
+    expect(defaultDagongRuntimeSettings().approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
+    expect(defaultDagongRuntimeSettings().approvalPolicy).toBe('auto')
   })
 
   it('defaults sandbox mode to full access', () => {
-    expect(defaultMagicPocketRuntimeSettings().sandboxMode).toBe(DEFAULT_SANDBOX_MODE)
-    expect(defaultMagicPocketRuntimeSettings().sandboxMode).toBe('danger-full-access')
+    expect(defaultDagongRuntimeSettings().sandboxMode).toBe(DEFAULT_SANDBOX_MODE)
+    expect(defaultDagongRuntimeSettings().sandboxMode).toBe('danger-full-access')
   })
 
   it('maps unified tool permission modes to approval and sandbox settings', () => {
-    expect(magicpocketToolPermissionModeSettings('always-ask')).toEqual({
+    expect(dagongToolPermissionModeSettings('always-ask')).toEqual({
       approvalPolicy: 'always',
       sandboxMode: 'danger-full-access'
     })
-    expect(magicpocketToolPermissionModeSettings('read-only')).toEqual({
+    expect(dagongToolPermissionModeSettings('read-only')).toEqual({
       approvalPolicy: 'on-request',
       sandboxMode: 'danger-full-access'
     })
-    expect(magicpocketToolPermissionModeSettings('sensitive-ask')).toEqual({
+    expect(dagongToolPermissionModeSettings('sensitive-ask')).toEqual({
       approvalPolicy: 'untrusted',
       sandboxMode: 'danger-full-access'
     })
-    expect(magicpocketToolPermissionModeSettings('workspace-write')).toEqual({
+    expect(dagongToolPermissionModeSettings('workspace-write')).toEqual({
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     })
-    expect(magicpocketToolPermissionModeSettings('bypass')).toEqual({
+    expect(dagongToolPermissionModeSettings('bypass')).toEqual({
       approvalPolicy: 'auto',
       sandboxMode: 'danger-full-access'
     })
-    expect(magicpocketToolPermissionModeFromSettings(defaultMagicPocketRuntimeSettings())).toBe('bypass')
-    expect(magicpocketToolPermissionModeFromSettings({
+    expect(dagongToolPermissionModeFromSettings(defaultDagongRuntimeSettings())).toBe('bypass')
+    expect(dagongToolPermissionModeFromSettings({
       approvalPolicy: 'always',
       sandboxMode: 'danger-full-access'
     })).toBe('always-ask')
-    expect(magicpocketToolPermissionModeFromSettings({
+    expect(dagongToolPermissionModeFromSettings({
       approvalPolicy: 'untrusted',
       sandboxMode: 'danger-full-access'
     })).toBe('sensitive-ask')
-    expect(magicpocketToolPermissionModeFromSettings({
+    expect(dagongToolPermissionModeFromSettings({
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     })).toBe('workspace-write')
   })
 
   it('defaults token economy mode to off', () => {
-    expect(defaultMagicPocketRuntimeSettings().tokenEconomyMode).toBe(false)
-    expect(defaultMagicPocketRuntimeSettings().tokenEconomy).toMatchObject({
+    expect(defaultDagongRuntimeSettings().tokenEconomyMode).toBe(false)
+    expect(defaultDagongRuntimeSettings().tokenEconomy).toMatchObject({
       enabled: false,
       compressToolDescriptions: true,
       compressToolResults: true,
@@ -219,16 +219,16 @@ describe('magicpocket defaults', () => {
   })
 
   it('defaults tool output limits to 500kb and 20000 lines', () => {
-    expect(defaultMagicPocketRuntimeSettings().toolOutputLimits).toEqual({
+    expect(defaultDagongRuntimeSettings().toolOutputLimits).toEqual({
       maxLines: DEFAULT_TOOL_OUTPUT_MAX_LINES,
       maxBytes: DEFAULT_TOOL_OUTPUT_MAX_BYTES
     })
-    expect(defaultMagicPocketRuntimeSettings().toolOutputLimits.maxLines).toBe(20_000)
-    expect(defaultMagicPocketRuntimeSettings().toolOutputLimits.maxBytes).toBe(500 * 1024)
+    expect(defaultDagongRuntimeSettings().toolOutputLimits.maxLines).toBe(20_000)
+    expect(defaultDagongRuntimeSettings().toolOutputLimits.maxBytes).toBe(500 * 1024)
   })
 
   it('defaults MCP search discovery to off', () => {
-    expect(defaultMagicPocketRuntimeSettings().mcpSearch).toMatchObject({
+    expect(defaultDagongRuntimeSettings().mcpSearch).toMatchObject({
       enabled: false,
       mode: 'auto',
       autoThresholdToolCount: 24,
@@ -238,7 +238,7 @@ describe('magicpocket defaults', () => {
   })
 
   it('defaults image generation to off with empty provider fields', () => {
-    expect(defaultMagicPocketRuntimeSettings().imageGeneration).toEqual({
+    expect(defaultDagongRuntimeSettings().imageGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'openai-images',
@@ -252,7 +252,7 @@ describe('magicpocket defaults', () => {
   })
 
   it('defaults media generation to off with empty provider fields', () => {
-    expect(defaultMagicPocketRuntimeSettings().textToSpeech).toEqual({
+    expect(defaultDagongRuntimeSettings().textToSpeech).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'openai-speech',
@@ -263,7 +263,7 @@ describe('magicpocket defaults', () => {
       format: 'mp3',
       timeoutMs: 120000
     })
-    expect(defaultMagicPocketRuntimeSettings().musicGeneration).toEqual({
+    expect(defaultDagongRuntimeSettings().musicGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'minimax-music',
@@ -273,7 +273,7 @@ describe('magicpocket defaults', () => {
       format: 'mp3',
       timeoutMs: 300000
     })
-    expect(defaultMagicPocketRuntimeSettings().videoGeneration).toEqual({
+    expect(defaultDagongRuntimeSettings().videoGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'minimax-video',
@@ -287,8 +287,8 @@ describe('magicpocket defaults', () => {
     })
   })
 
-  it('defaults advanced MagicPocket runtime tuning to conservative values', () => {
-    expect(defaultMagicPocketRuntimeSettings()).toMatchObject({
+  it('defaults advanced Dagong runtime tuning to conservative values', () => {
+    expect(defaultDagongRuntimeSettings()).toMatchObject({
       storage: {
         backend: 'hybrid',
         sqlitePath: ''
@@ -519,11 +519,11 @@ describe('claw settings', () => {
   })
 })
 
-describe('isMagicPocketRuntimeInsecure', () => {
+describe('isDagongRuntimeInsecure', () => {
   it('keeps auth enabled even when the runtime token is empty', () => {
     expect(
-      isMagicPocketRuntimeInsecure({
-        ...defaultMagicPocketRuntimeSettings(),
+      isDagongRuntimeInsecure({
+        ...defaultDagongRuntimeSettings(),
         insecure: false,
         runtimeToken: ''
       })
@@ -532,8 +532,8 @@ describe('isMagicPocketRuntimeInsecure', () => {
 
   it('keeps auth enabled when a token exists and insecure is false', () => {
     expect(
-      isMagicPocketRuntimeInsecure({
-        ...defaultMagicPocketRuntimeSettings(),
+      isDagongRuntimeInsecure({
+        ...defaultDagongRuntimeSettings(),
         insecure: false,
         runtimeToken: 'tok-1'
       })
@@ -542,8 +542,8 @@ describe('isMagicPocketRuntimeInsecure', () => {
 
   it('honors explicit insecure mode', () => {
     expect(
-      isMagicPocketRuntimeInsecure({
-        ...defaultMagicPocketRuntimeSettings(),
+      isDagongRuntimeInsecure({
+        ...defaultDagongRuntimeSettings(),
         insecure: true,
         runtimeToken: 'tok-1'
       })
@@ -551,10 +551,10 @@ describe('isMagicPocketRuntimeInsecure', () => {
   })
 })
 
-describe('mergeMagicPocketRuntimeSettings', () => {
-  it('merges a direct magicpocket patch without the envelope wrapper', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+describe('mergeDagongRuntimeSettings', () => {
+  it('merges a direct dagong patch without the envelope wrapper', () => {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       model: 'deepseek-reasoner',
       port: 19000,
       tokenEconomyMode: true
@@ -567,8 +567,8 @@ describe('mergeMagicPocketRuntimeSettings', () => {
   })
 
   it('deep-merges token economy settings and keeps the legacy switch synced', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       tokenEconomy: {
         enabled: true,
         compressToolResults: false,
@@ -587,14 +587,14 @@ describe('mergeMagicPocketRuntimeSettings', () => {
       current.tokenEconomy.historyHygiene.maxToolResultBytes
     )
 
-    const legacySwitch = mergeMagicPocketRuntimeSettings(next, { tokenEconomyMode: false })
+    const legacySwitch = mergeDagongRuntimeSettings(next, { tokenEconomyMode: false })
     expect(legacySwitch.tokenEconomyMode).toBe(false)
     expect(legacySwitch.tokenEconomy.enabled).toBe(false)
   })
 
   it('deep-merges tool output limits and normalizes out-of-range values', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       toolOutputLimits: {
         maxBytes: 2 * 1024 * 1024
       }
@@ -603,7 +603,7 @@ describe('mergeMagicPocketRuntimeSettings', () => {
     expect(next.toolOutputLimits.maxLines).toBe(current.toolOutputLimits.maxLines)
     expect(next.toolOutputLimits.maxBytes).toBe(2 * 1024 * 1024)
 
-    const clamped = mergeMagicPocketRuntimeSettings(next, {
+    const clamped = mergeDagongRuntimeSettings(next, {
       toolOutputLimits: {
         maxLines: 9_999_999,
         maxBytes: 999 * 1024 * 1024
@@ -614,8 +614,8 @@ describe('mergeMagicPocketRuntimeSettings', () => {
   })
 
   it('deep-merges MCP search settings', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       mcpSearch: {
         enabled: true,
         mode: 'search',
@@ -630,42 +630,42 @@ describe('mergeMagicPocketRuntimeSettings', () => {
   })
 
   it('preserves workspace-write when normalizing unified tool permission settings', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     })
 
     expect(next.approvalPolicy).toBe('on-request')
     expect(next.sandboxMode).toBe('workspace-write')
-    expect(magicpocketToolPermissionModeFromSettings(next)).toBe('workspace-write')
+    expect(dagongToolPermissionModeFromSettings(next)).toBe('workspace-write')
   })
 
   it('preserves non-UI approval/sandbox combinations instead of canonicalizing them', () => {
     // The unified 5-mode selector cannot represent every approvalPolicy/sandboxMode
-    // combination. mergeMagicPocketRuntimeSettings must NOT snap these to a canonical mode,
+    // combination. mergeDagongRuntimeSettings must NOT snap these to a canonical mode,
     // otherwise it would silently weaken a user's saved security posture.
-    const current = defaultMagicPocketRuntimeSettings()
+    const current = defaultDagongRuntimeSettings()
 
-    const neverReadOnly = mergeMagicPocketRuntimeSettings(current, {
+    const neverReadOnly = mergeDagongRuntimeSettings(current, {
       approvalPolicy: 'never',
       sandboxMode: 'read-only'
     })
     expect(neverReadOnly.approvalPolicy).toBe('never')
     expect(neverReadOnly.sandboxMode).toBe('read-only')
 
-    const suggest = mergeMagicPocketRuntimeSettings(current, { approvalPolicy: 'suggest' })
+    const suggest = mergeDagongRuntimeSettings(current, { approvalPolicy: 'suggest' })
     expect(suggest.approvalPolicy).toBe('suggest')
 
-    const externalSandbox = mergeMagicPocketRuntimeSettings(current, { sandboxMode: 'external-sandbox' })
+    const externalSandbox = mergeDagongRuntimeSettings(current, { sandboxMode: 'external-sandbox' })
     expect(externalSandbox.sandboxMode).toBe('external-sandbox')
   })
 
-  it('deep-merges advanced MagicPocket settings', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+  it('deep-merges advanced Dagong settings', () => {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       storage: {
-        sqlitePath: ' /tmp/magicpocket.sqlite3 '
+        sqlitePath: ' /tmp/dagong.sqlite3 '
       },
       contextCompaction: {
         defaultSoftThreshold: 64000
@@ -678,7 +678,7 @@ describe('mergeMagicPocketRuntimeSettings', () => {
     })
 
     expect(next.storage.backend).toBe('hybrid')
-    expect(next.storage.sqlitePath).toBe('/tmp/magicpocket.sqlite3')
+    expect(next.storage.sqlitePath).toBe('/tmp/dagong.sqlite3')
     expect(next.contextCompaction.defaultSoftThreshold).toBe(64000)
     expect(next.contextCompaction.defaultHardThreshold).toBe(64000)
     expect(next.contextCompaction.summaryMode).toBe('model')
@@ -690,10 +690,10 @@ describe('mergeMagicPocketRuntimeSettings', () => {
   })
 
   it('normalizes the stream idle timeout (0 disables, out-of-range clamps)', () => {
-    const current = defaultMagicPocketRuntimeSettings()
+    const current = defaultDagongRuntimeSettings()
     expect(current.runtimeTuning.streamIdleTimeoutMs).toBe(450000)
 
-    const set = mergeMagicPocketRuntimeSettings(current, {
+    const set = mergeDagongRuntimeSettings(current, {
       runtimeTuning: { streamIdleTimeoutMs: 300000 }
     })
     expect(set.runtimeTuning.streamIdleTimeoutMs).toBe(300000)
@@ -702,24 +702,24 @@ describe('mergeMagicPocketRuntimeSettings', () => {
 
     // 0 means "disabled" and is preserved rather than coerced to the default.
     expect(
-      mergeMagicPocketRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 0 } })
+      mergeDagongRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 0 } })
         .runtimeTuning.streamIdleTimeoutMs
     ).toBe(0)
 
     // Negative falls back to the default; absurdly large clamps to the cap.
     expect(
-      mergeMagicPocketRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: -5 } })
+      mergeDagongRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: -5 } })
         .runtimeTuning.streamIdleTimeoutMs
     ).toBe(450000)
     expect(
-      mergeMagicPocketRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 999_999_999 } })
+      mergeDagongRuntimeSettings(current, { runtimeTuning: { streamIdleTimeoutMs: 999_999_999 } })
         .runtimeTuning.streamIdleTimeoutMs
     ).toBe(3_600_000)
   })
 
   it('deep-merges image generation settings and normalizes invalid values', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       imageGeneration: {
         enabled: true,
         baseUrl: ' https://api.siliconflow.cn/v1 ',
@@ -740,7 +740,7 @@ describe('mergeMagicPocketRuntimeSettings', () => {
       timeoutMs: 180000
     })
 
-    const sized = mergeMagicPocketRuntimeSettings(next, {
+    const sized = mergeDagongRuntimeSettings(next, {
       imageGeneration: { defaultSize: '1536x1024', quality: 'high', timeoutMs: 240000 }
     })
     expect(sized.imageGeneration.defaultSize).toBe('1536x1024')
@@ -748,7 +748,7 @@ describe('mergeMagicPocketRuntimeSettings', () => {
     expect(sized.imageGeneration.timeoutMs).toBe(240000)
     expect(sized.imageGeneration.apiKey).toBe('sk-image')
 
-    const invalidSize = mergeMagicPocketRuntimeSettings(sized, {
+    const invalidSize = mergeDagongRuntimeSettings(sized, {
       imageGeneration: { defaultSize: 'huge', quality: 'maximum' as never, timeoutMs: -5 }
     })
     expect(invalidSize.imageGeneration.defaultSize).toBe('')
@@ -757,8 +757,8 @@ describe('mergeMagicPocketRuntimeSettings', () => {
   })
 
   it('deep-merges media generation settings and normalizes invalid values', () => {
-    const current = defaultMagicPocketRuntimeSettings()
-    const next = mergeMagicPocketRuntimeSettings(current, {
+    const current = defaultDagongRuntimeSettings()
+    const next = mergeDagongRuntimeSettings(current, {
       textToSpeech: {
         enabled: true,
         protocol: 'minimax-t2a',
@@ -812,7 +812,7 @@ describe('mergeMagicPocketRuntimeSettings', () => {
       pollIntervalMs: 20000
     })
 
-    const invalid = mergeMagicPocketRuntimeSettings(next, {
+    const invalid = mergeDagongRuntimeSettings(next, {
       textToSpeech: { format: 'aac', timeoutMs: -1 },
       videoGeneration: { defaultDuration: -1, pollIntervalMs: -1 }
     })
@@ -830,8 +830,8 @@ describe('mergeMagicPocketRuntimeSettings', () => {
       textToSpeech: _textToSpeech,
       musicGeneration: _musicGeneration,
       videoGeneration: _videoGeneration,
-      ...legacyMagicPocket
-    } = defaultMagicPocketRuntimeSettings()
+      ...legacyDagong
+    } = defaultDagongRuntimeSettings()
     void _textToSpeech
     void _musicGeneration
     void _videoGeneration
@@ -844,23 +844,23 @@ describe('mergeMagicPocketRuntimeSettings', () => {
           minimaxProfile
         ]
       },
-      agents: { magicpocket: legacyMagicPocket as AppSettingsV1['agents']['magicpocket'] }
+      agents: { dagong: legacyDagong as AppSettingsV1['agents']['dagong'] }
     })
-    const resolved = resolveMagicPocketRuntimeSettings(normalized)
+    const resolved = resolveDagongRuntimeSettings(normalized)
 
-    expect(normalized.agents.magicpocket.textToSpeech).toEqual(expect.objectContaining({
+    expect(normalized.agents.dagong.textToSpeech).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-t2a',
       model: 'speech-2.8-hd'
     }))
-    expect(normalized.agents.magicpocket.musicGeneration).toEqual(expect.objectContaining({
+    expect(normalized.agents.dagong.musicGeneration).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-music',
       model: 'music-2.6'
     }))
-    expect(normalized.agents.magicpocket.videoGeneration).toEqual(expect.objectContaining({
+    expect(normalized.agents.dagong.videoGeneration).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-video',
@@ -872,25 +872,25 @@ describe('mergeMagicPocketRuntimeSettings', () => {
   })
 })
 
-describe('magicpocket envelope helpers', () => {
+describe('dagong envelope helpers', () => {
   it('wraps runtime settings and patches into the compatibility shell', () => {
-    const runtime = defaultMagicPocketRuntimeSettings()
-    expect(magicpocketSettingsEnvelope(runtime)).toEqual({ magicpocket: runtime })
-    expect(magicpocketSettingsPatch({ model: 'deepseek-reasoner' })).toEqual({
-      magicpocket: { model: 'deepseek-reasoner' }
+    const runtime = defaultDagongRuntimeSettings()
+    expect(dagongSettingsEnvelope(runtime)).toEqual({ dagong: runtime })
+    expect(dagongSettingsPatch({ model: 'deepseek-reasoner' })).toEqual({
+      dagong: { model: 'deepseek-reasoner' }
     })
   })
 
-  it('applies a magicpocket patch onto full app settings', () => {
+  it('applies a dagong patch onto full app settings', () => {
     const current = settings()
-    const next = applyMagicPocketRuntimePatch(current, { model: 'deepseek-reasoner' })
-    expect(next.agents.magicpocket.model).toBe('deepseek-reasoner')
+    const next = applyDagongRuntimePatch(current, { model: 'deepseek-reasoner' })
+    expect(next.agents.dagong.model).toBe('deepseek-reasoner')
     expect(next.write).toEqual(current.write)
   })
 })
 
-describe('legacy MagicPocket defaults migration', () => {
-  it('normalizes old master settings without an agents.magicpocket envelope', () => {
+describe('legacy Dagong defaults migration', () => {
+  it('normalizes old master settings without an agents.dagong envelope', () => {
     const normalized = normalizeAppSettings({
       version: 1,
       locale: 'zh',
@@ -915,7 +915,7 @@ describe('legacy MagicPocket defaults migration', () => {
       claw: defaultClawSettings()
     } as unknown as AppSettingsV1)
 
-    expect(normalized.agents.magicpocket).toEqual(expect.objectContaining({
+    expect(normalized.agents.dagong).toEqual(expect.objectContaining({
       binaryPath: '',
       port: 18787,
       autoStart: false,
@@ -931,7 +931,7 @@ describe('legacy MagicPocket defaults migration', () => {
     expect('deepseek' in normalized).toBe(false)
   })
 
-  it('keeps legacy workspace-write permissions during MagicPocket migration', () => {
+  it('keeps legacy workspace-write permissions during Dagong migration', () => {
     const normalized = normalizeAppSettings({
       version: 1,
       locale: 'zh',
@@ -956,29 +956,29 @@ describe('legacy MagicPocket defaults migration', () => {
       claw: defaultClawSettings()
     } as unknown as AppSettingsV1)
 
-    expect(normalized.agents.magicpocket).toEqual(expect.objectContaining({
+    expect(normalized.agents.dagong).toEqual(expect.objectContaining({
       approvalPolicy: 'on-request',
       sandboxMode: 'workspace-write'
     }))
   })
 
-  it('moves the legacy local HTTP default port to the MagicPocket default port', () => {
+  it('moves the legacy local HTTP default port to the Dagong default port', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agentProvider: 'deepseek-runtime',
       deepseek: {
-        // 这里必须保留旧版真实写入值, 用于升级到当前 MagicPocket 默认端口。
+        // 这里必须保留旧版真实写入值, 用于升级到当前 Dagong 默认端口。
         port: 7878
       }
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket?.port).toBe(18899)
+    expect(migrated.agents?.dagong?.port).toBe(18899)
   })
 
-  it('moves previous MagicPocket local default ports out of the low range', () => {
+  it('moves previous Dagong local default ports out of the low range', () => {
     const normalized = normalizeAppSettings({
       ...settings(),
-      agents: { magicpocket: { ...defaultMagicPocketRuntimeSettings(), port: 8899 } },
+      agents: { dagong: { ...defaultDagongRuntimeSettings(), port: 8899 } },
       claw: {
         ...defaultClawSettings(),
         im: { ...defaultClawSettings().im, port: 8787 }
@@ -993,7 +993,7 @@ describe('legacy MagicPocket defaults migration', () => {
       }
     })
 
-    expect(normalized.agents.magicpocket.port).toBe(18899)
+    expect(normalized.agents.dagong.port).toBe(18899)
     expect(normalized.claw.im.port).toBe(18787)
     expect(normalized.schedule.internal.port).toBe(18788)
     expect(normalized.workflow.webhookPort).toBe(18799)
@@ -1006,7 +1006,7 @@ describe('legacy MagicPocket defaults migration', () => {
       deepseek: {}
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket?.imageGeneration).toEqual({
+    expect(migrated.agents?.dagong?.imageGeneration).toEqual({
       enabled: false,
       providerId: '',
       protocol: 'openai-images',
@@ -1023,10 +1023,10 @@ describe('legacy MagicPocket defaults migration', () => {
     const normalized = normalizeAppSettings({
       ...settings(),
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           imageGeneration: {
-            ...defaultMagicPocketRuntimeSettings().imageGeneration,
+            ...defaultDagongRuntimeSettings().imageGeneration,
             enabled: true,
             providerId: 'custom',
             protocol: 'codex-responses-image',
@@ -1038,7 +1038,7 @@ describe('legacy MagicPocket defaults migration', () => {
       }
     })
 
-    expect(normalized.agents.magicpocket.imageGeneration).toMatchObject({
+    expect(normalized.agents.dagong.imageGeneration).toMatchObject({
       protocol: 'codex-responses-image',
       baseUrl: 'https://chatgpt.com/backend-api/codex',
       apiKey: 'codex-access',
@@ -1053,39 +1053,39 @@ describe('legacy MagicPocket defaults migration', () => {
       deepseek: {}
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket?.approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
+    expect(migrated.agents?.dagong?.approvalPolicy).toBe(DEFAULT_APPROVAL_POLICY)
   })
 
-  it('upgrades old persisted MagicPocket defaults to the current defaults', () => {
+  it('upgrades old persisted Dagong defaults to the current defaults', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agents: {
-        magicpocket: {
+        dagong: {
           dataDir: '~/.deepseekgui/coreagent',
           model: 'deepseek-chat'
         }
       }
     } as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket).toEqual(expect.objectContaining({
+    expect(migrated.agents?.dagong).toEqual(expect.objectContaining({
       dataDir: DEFAULT_KUN_DATA_DIR,
       model: DEFAULT_KUN_MODEL
     }))
   })
 
-  it('preserves a non-legacy MagicPocket model override', () => {
+  it('preserves a non-legacy Dagong model override', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agents: {
-        magicpocket: {
-          dataDir: '/tmp/custom-magicpocket',
+        dagong: {
+          dataDir: '/tmp/custom-dagong',
           model: 'deepseek-v4-flash'
         }
       }
     } as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket).toEqual(expect.objectContaining({
-      dataDir: '/tmp/custom-magicpocket',
+    expect(migrated.agents?.dagong).toEqual(expect.objectContaining({
+      dataDir: '/tmp/custom-dagong',
       model: 'deepseek-v4-flash'
     }))
   })
@@ -1114,8 +1114,8 @@ describe('legacy MagicPocket defaults migration', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           providerId: 'custom-provider-2',
           model: 'custom-model'
         }
@@ -1134,12 +1134,12 @@ describe('legacy MagicPocket defaults migration', () => {
         })
       ])
     )
-    expect(migrated.agents.magicpocket.providerId).toBe('custom-provider-2')
+    expect(migrated.agents.dagong.providerId).toBe('custom-provider-2')
     expect(migrated.provider.proxy).toEqual({
       enabled: true,
       url: 'http://127.0.0.1:7890'
     })
-    expect(resolveMagicPocketRuntimeSettings(migrated)).toEqual(
+    expect(resolveDagongRuntimeSettings(migrated)).toEqual(
       expect.objectContaining({
         apiKey: 'sk-custom',
         baseUrl: 'https://custom.example/v1',
@@ -1220,14 +1220,14 @@ describe('claw runtime prompts', () => {
     state.claw.channels = [{
       id: 'channel-1',
       provider: 'feishu',
-      label: 'magicpocket',
+      label: 'dagong',
       enabled: true,
       model: 'auto',
       threadId: '',
       workspaceRoot: '',
       conversations: [],
       agentProfile: {
-        name: 'magicpocket',
+        name: 'dagong',
         description: '',
         identity: '',
         personality: '',
@@ -1241,14 +1241,14 @@ describe('claw runtime prompts', () => {
     const prompt = buildClawRuntimePrompt(state, 'hi', { channel: state.claw.channels[0] })
 
     expect(prompt).toContain('[Claw managed instructions]')
-    expect(prompt).toContain('[Agent name]\nmagicpocket')
+    expect(prompt).toContain('[Agent name]\ndagong')
     expect(prompt).not.toContain('gui_schedule')
     expect(prompt).not.toContain('scheduled-task tools')
   })
 
   it('tells Claw agents to use the image tool when image generation is configured', () => {
     const state = settings()
-    state.agents.magicpocket.imageGeneration = {
+    state.agents.dagong.imageGeneration = {
       enabled: true,
       providerId: '',
       protocol: 'openai-images',
@@ -1268,7 +1268,7 @@ describe('claw runtime prompts', () => {
 
   it('tells Claw agents to use media tools when media generation is configured', () => {
     const state = settings()
-    state.agents.magicpocket.textToSpeech = {
+    state.agents.dagong.textToSpeech = {
       enabled: true,
       providerId: '',
       protocol: 'minimax-t2a',
@@ -1279,7 +1279,7 @@ describe('claw runtime prompts', () => {
       format: 'mp3',
       timeoutMs: 120000
     }
-    state.agents.magicpocket.musicGeneration = {
+    state.agents.dagong.musicGeneration = {
       enabled: true,
       providerId: '',
       protocol: 'minimax-music',
@@ -1289,7 +1289,7 @@ describe('claw runtime prompts', () => {
       format: 'mp3',
       timeoutMs: 300000
     }
-    state.agents.magicpocket.videoGeneration = {
+    state.agents.dagong.videoGeneration = {
       enabled: true,
       providerId: '',
       protocol: 'minimax-video',
@@ -1319,7 +1319,7 @@ describe('claw runtime prompts', () => {
       '[Claw IM agent instructions]',
       '',
       '[Agent name]',
-      'magicpocket',
+      'dagong',
       '',
       '---',
       '[Current user request]',
@@ -1354,15 +1354,15 @@ describe('write inline completion runtime config', () => {
     expect(resolveWriteInlineCompletionBaseUrl(state)).toBe('https://write-only.example/v1')
   })
 
-  it('falls back to the magicpocket model when write keeps the default inline model', () => {
+  it('falls back to the dagong model when write keeps the default inline model', () => {
     const state = settings()
-    state.agents.magicpocket.model = 'deepseek-chat'
+    state.agents.dagong.model = 'deepseek-chat'
     expect(resolveWriteInlineCompletionModel(state)).toBe('deepseek-chat')
   })
 
   it('keeps an explicit flash override when write disables inheritance', () => {
     const state = settings()
-    state.agents.magicpocket.model = 'deepseek-chat'
+    state.agents.dagong.model = 'deepseek-chat'
     state.write.inlineCompletion.inheritModel = false
     state.write.inlineCompletion.model = 'deepseek-v4-flash'
 
@@ -1371,7 +1371,7 @@ describe('write inline completion runtime config', () => {
 
   it('preserves an explicit request model before any fallback', () => {
     const state = settings()
-    state.agents.magicpocket.model = 'deepseek-chat'
+    state.agents.dagong.model = 'deepseek-chat'
     expect(resolveWriteInlineCompletionModel(state, 'deepseek-v4-pro')).toBe('deepseek-v4-pro')
   })
 
@@ -1379,7 +1379,7 @@ describe('write inline completion runtime config', () => {
     const state = settings()
     state.provider.apiKey = 'general-key'
     state.provider.baseUrl = 'https://general.example/v1'
-    state.agents.magicpocket.model = 'deepseek-chat'
+    state.agents.dagong.model = 'deepseek-chat'
     const legacyInlineCompletion = { ...state.write.inlineCompletion } as Partial<AppSettingsV1['write']['inlineCompletion']>
     delete legacyInlineCompletion.apiKey
     delete legacyInlineCompletion.baseUrl
@@ -1394,7 +1394,7 @@ describe('write inline completion runtime config', () => {
 
   it('treats legacy flash defaults without an inherit flag as inherited', () => {
     const state = settings()
-    state.agents.magicpocket.model = 'deepseek-chat'
+    state.agents.dagong.model = 'deepseek-chat'
     const legacyInlineCompletion = {
       ...state.write.inlineCompletion,
       model: 'deepseek-v4-flash'

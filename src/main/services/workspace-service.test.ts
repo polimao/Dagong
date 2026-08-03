@@ -51,7 +51,7 @@ describe('workspace-service boundary checks', () => {
     await mkdir(workspaceRoot, { recursive: true })
     await writeFile(join(workspaceRoot, 'inside.txt'), 'inside', 'utf8')
     await writeFile(outsideFile, 'outside', 'utf8')
-    await rm(join(tmpdir(), 'magicpocket'), { recursive: true, force: true })
+    await rm(join(tmpdir(), 'dagong'), { recursive: true, force: true })
   })
 
   it('allows files inside the selected workspace', async () => {
@@ -197,7 +197,7 @@ describe('workspace-service boundary checks', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.name).toMatch(/^pasted-image-.+\.png$/)
-    expect(dirname(result.localFilePath)).toBe(join(tmpdir(), 'magicpocket'))
+    expect(dirname(result.localFilePath)).toBe(join(tmpdir(), 'dagong'))
     expect(basename(result.localFilePath)).toMatch(/^\d+\.png$/)
     expect(result.mimeType).toBe('image/png')
     expect(result.dataBase64).toBe(Buffer.from('clipboard-png-bytes').toString('base64'))
@@ -207,9 +207,9 @@ describe('workspace-service boundary checks', () => {
     await expect(readFile(result.localFilePath)).resolves.toEqual(Buffer.from('clipboard-png-bytes'))
   })
 
-  it('saves SDD pasted clipboard images into .magicpocketsdd/img with draft-relative markdown', async () => {
-    const currentFilePath = join(workspaceRoot, '.magicpocketsdd', 'draft', 'draft-1', 'requirement.md')
-    await mkdir(join(workspaceRoot, '.magicpocketsdd', 'draft', 'draft-1'), { recursive: true })
+  it('saves SDD pasted clipboard images into .dagongsdd/img with draft-relative markdown', async () => {
+    const currentFilePath = join(workspaceRoot, '.dagongsdd', 'draft', 'draft-1', 'requirement.md')
+    await mkdir(join(workspaceRoot, '.dagongsdd', 'draft', 'draft-1'), { recursive: true })
     await writeFile(currentFilePath, '# requirement', 'utf8')
 
     vi.mocked(clipboard.readImage).mockReturnValue({
@@ -220,13 +220,13 @@ describe('workspace-service boundary checks', () => {
     const result = await saveWorkspaceClipboardImage({
       workspaceRoot,
       currentFilePath,
-      imageDirectory: '.magicpocketsdd/img'
+      imageDirectory: '.dagongsdd/img'
     })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    expect(await realpath(dirname(result.path))).toBe(await realpath(join(workspaceRoot, '.magicpocketsdd', 'img')))
+    expect(await realpath(dirname(result.path))).toBe(await realpath(join(workspaceRoot, '.dagongsdd', 'img')))
     expect(result.markdownPath.startsWith('../../img/pasted-image-')).toBe(true)
     await expect(readFile(result.path)).resolves.toEqual(Buffer.from('sdd-png-bytes'))
   })
@@ -251,7 +251,7 @@ describe('workspace-service boundary checks', () => {
 
   it('picks workspace images with both html-relative and workspace-relative paths', async () => {
     const sourceImage = join(rootDir, 'source.png')
-    const currentFilePath = join(workspaceRoot, '.magicpocket-design', 'screen-a', 'v1.html')
+    const currentFilePath = join(workspaceRoot, '.dagong-design', 'screen-a', 'v1.html')
     await mkdir(dirname(currentFilePath), { recursive: true })
     await writeFile(currentFilePath, '<!doctype html>', 'utf8')
     await writeFile(

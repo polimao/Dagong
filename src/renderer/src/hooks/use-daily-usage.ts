@@ -190,9 +190,9 @@ export function normalizeDailyUsageResponse(raw: RawDailyUsageResponse): DailyUs
 }
 
 export async function loadDailyUsage(range: DailyUsageRange): Promise<DailyUsageSummary | null> {
-  if (typeof window.magicpocketGui?.runtimeRequest !== 'function') return null
+  if (typeof window.dagongGui?.runtimeRequest !== 'function') return null
   const response = await withUsageRequestTimeout(
-    window.magicpocketGui.runtimeRequest(buildDailyUsagePath(range), 'GET'),
+    window.dagongGui.runtimeRequest(buildDailyUsagePath(range), 'GET'),
     'daily usage'
   )
   if (!response.ok || !response.body.trim()) {

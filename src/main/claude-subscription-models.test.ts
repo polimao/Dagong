@@ -54,23 +54,23 @@ describe('fetchSdkModels', () => {
     return c
   }
 
-  // A magicpocket root that actually has the SDK package dir, so resolveMagicPocketDir picks it.
-  function magicpocketRootWithSdk(): { root: string; cleanup: () => void } {
-    const root = join(tmpdir(), `magicpocket-models-test-${process.pid}`)
+  // A dagong root that actually has the SDK package dir, so resolveDagongDir picks it.
+  function dagongRootWithSdk(): { root: string; cleanup: () => void } {
+    const root = join(tmpdir(), `dagong-models-test-${process.pid}`)
     mkdirSync(join(root, 'node_modules', '@anthropic-ai', 'claude-agent-sdk'), { recursive: true })
     return { root, cleanup: () => rmSync(root, { recursive: true, force: true }) }
   }
 
-  test('returns [] immediately when no magicpocket root has the SDK', async () => {
-    expect(await fetchSdkModels({ magicpocketRoots: [join(tmpdir(), 'nope')] })).toEqual([])
+  test('returns [] immediately when no dagong root has the SDK', async () => {
+    expect(await fetchSdkModels({ dagongRoots: [join(tmpdir(), 'nope')] })).toEqual([])
   })
 
   test('parses the model ids the subprocess prints', async () => {
-    const { root, cleanup } = magicpocketRootWithSdk()
+    const { root, cleanup } = dagongRootWithSdk()
     try {
       const child = fakeChild()
       const promise = fetchSdkModels({
-        magicpocketRoots: [root],
+        dagongRoots: [root],
         token: 'sk-ant-oat01-x',
         spawnFn: (() => child) as never
       })
@@ -83,10 +83,10 @@ describe('fetchSdkModels', () => {
   })
 
   test('resolves [] on subprocess error', async () => {
-    const { root, cleanup } = magicpocketRootWithSdk()
+    const { root, cleanup } = dagongRootWithSdk()
     try {
       const child = fakeChild()
-      const promise = fetchSdkModels({ magicpocketRoots: [root], spawnFn: (() => child) as never })
+      const promise = fetchSdkModels({ dagongRoots: [root], spawnFn: (() => child) as never })
       child.emit('error', new Error('boom'))
       expect(await promise).toEqual([])
     } finally {

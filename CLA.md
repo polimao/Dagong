@@ -3,7 +3,7 @@
 Version 1.0
 
 This Contributor License Agreement ("Agreement") applies to any contribution
-submitted to MagicPocket, including code, documentation, design assets, tests, examples,
+submitted to Dagong, including code, documentation, design assets, tests, examples,
 configuration, issue text, pull request text, and any other material submitted
 for inclusion in the project ("Contribution").
 
@@ -24,7 +24,7 @@ publicly display, publicly perform, distribute, sublicense, and otherwise
 exploit your Contribution, in whole or in part, under any license terms.
 
 This license includes the right for the project owner to license, sublicense,
-or relicense your Contribution as part of MagicPocket or related works under
+or relicense your Contribution as part of Dagong or related works under
 noncommercial, commercial, proprietary, source-available, open-source, or other
 license terms, without needing additional permission from you.
 
@@ -60,7 +60,7 @@ The project owner may make the project available under the license stated in
 the repository, currently the PolyForm Noncommercial License 1.0.0, and may
 also offer separate commercial licenses or other license terms.
 
-You understand that commercial licensing decisions for MagicPocket are controlled by
+You understand that commercial licensing decisions for Dagong are controlled by
 the project owner and do not require additional approval from contributors who
 submitted Contributions under this Agreement.
 
@@ -81,5 +81,5 @@ mark it as "Not a Contribution" in writing before or at the time you submit it.
 
 ## 10. Agreement Scope
 
-This Agreement applies to all Contributions you submit to MagicPocket unless the
+This Agreement applies to all Contributions you submit to Dagong unless the
 project owner agrees in writing to different terms.

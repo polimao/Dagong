@@ -9,11 +9,11 @@ function normalizedHomeDir(homeDir: string | undefined): string {
 }
 
 function currentPlatform(): string {
-  return typeof window !== 'undefined' ? window.magicpocketGui?.platform ?? '' : ''
+  return typeof window !== 'undefined' ? window.dagongGui?.platform ?? '' : ''
 }
 
 function currentHomeDir(): string {
-  return typeof window !== 'undefined' ? window.magicpocketGui?.homeDir ?? '' : ''
+  return typeof window !== 'undefined' ? window.dagongGui?.homeDir ?? '' : ''
 }
 
 export function compactHomePathForSettingsDisplay(
@@ -95,20 +95,20 @@ export function expandSettingsHomePathsForUse(
 ): AppSettingsV1 {
   const expand = (value: string): string => expandHomePathForSettingsUse(value, homeDir, platform)
   const expandList = (values: readonly string[]): string[] => expandHomePathListForSettingsUse(values, homeDir, platform)
-  const magicpocket = settings.agents.magicpocket
+  const dagong = settings.agents.dagong
   return {
     ...settings,
     workspaceRoot: expand(settings.workspaceRoot),
     conversationWorkspaceRoot: expand(settings.conversationWorkspaceRoot),
     agents: {
       ...settings.agents,
-      magicpocket: {
-        ...magicpocket,
-        binaryPath: expand(magicpocket.binaryPath),
-        dataDir: expand(magicpocket.dataDir),
+      dagong: {
+        ...dagong,
+        binaryPath: expand(dagong.binaryPath),
+        dataDir: expand(dagong.dataDir),
         storage: {
-          ...magicpocket.storage,
-          sqlitePath: expand(magicpocket.storage.sqlitePath)
+          ...dagong.storage,
+          sqlitePath: expand(dagong.storage.sqlitePath)
         }
       }
     },

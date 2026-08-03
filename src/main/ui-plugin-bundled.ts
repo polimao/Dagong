@@ -2,33 +2,33 @@ import { readFile, stat, writeFile } from 'node:fs/promises'
 import { mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import imagicpocketFigureRef from '../asset/img/imagicpocket.png?url'
-import imagicpocketRunFigureRef from '../asset/img/imagicpocket_run.png?url'
-import imagicpocketBobaFigureRef from '../asset/img/imagicpocket_boba.png?url'
-import imagicpocketWaveFigureRef from '../asset/img/imagicpocket_wave.png?url'
-import imagicpocketSleepFigureRef from '../asset/img/imagicpocket_sleep.png?url'
-import imagicpocketStandFigureRef from '../asset/img/imagicpocket_stand.png?url'
+import idagongFigureRef from '../asset/img/idagong.png?url'
+import idagongRunFigureRef from '../asset/img/idagong_run.png?url'
+import idagongBobaFigureRef from '../asset/img/idagong_boba.png?url'
+import idagongWaveFigureRef from '../asset/img/idagong_wave.png?url'
+import idagongSleepFigureRef from '../asset/img/idagong_sleep.png?url'
+import idagongStandFigureRef from '../asset/img/idagong_stand.png?url'
 import { UI_PLUGIN_BUNDLED_IKUN_ID } from '../shared/ui-plugin'
 import { seedUiPlugin, uiPluginsRootDir } from './services/ui-plugin-service'
 
 /**
- * 预装 UI 插件:iMagicPocket 模式就是形象工坊的官方示例插件,
- * 首次启动时自动安装进 ~/.magicpocket/ui-plugins/imagicpocket/。
+ * 预装 UI 插件:iDagong 模式就是形象工坊的官方示例插件,
+ * 首次启动时自动安装进 ~/.dagong/ui-plugins/idagong/。
  * 安装只做一次(种子标记),用户删掉后不会被强行复活。
  */
 
 const BUNDLED_SEED_MARKER = '.bundled-seed-v1'
 
 /**
- * iMagicPocket 的 manifest。注意:激活 id 为 'imagicpocket' 的插件时,渲染层会额外点亮
- * data-imagicpocket-mode 的手工 CSS 机制(运球/快攻/喝奶茶变体、橙色氛围),
+ * iDagong 的 manifest。注意:激活 id 为 'idagong' 的插件时,渲染层会额外点亮
+ * data-idagong-mode 的手工 CSS 机制(运球/快攻/喝奶茶变体、橙色氛围),
  * 所以这里的 figures 主要服务于工坊预览与通用槽位兜底。
  */
 const BUNDLED_IKUN_MANIFEST = {
   id: UI_PLUGIN_BUNDLED_IKUN_ID,
-  name: 'iMagicPocket 模式',
+  name: 'iDagong 模式',
   version: '1.0.0',
-  author: 'MagicPocket Team',
+  author: 'Dagong Team',
   description: '预装示例插件:坤鸡全家福,附手工运球/快攻/喝奶茶动画与出没彩蛋。',
   figures: {
     swim: 'img/dribble.png',
@@ -44,12 +44,12 @@ const BUNDLED_IKUN_MANIFEST = {
 }
 
 const BUNDLED_IKUN_FIGURE_REFS: Record<string, string> = {
-  swim: imagicpocketFigureRef,
-  run: imagicpocketRunFigureRef,
-  greet: imagicpocketWaveFigureRef,
-  sleep: imagicpocketSleepFigureRef,
-  sit: imagicpocketBobaFigureRef,
-  toggleIcon: imagicpocketStandFigureRef
+  swim: idagongFigureRef,
+  run: idagongRunFigureRef,
+  greet: idagongWaveFigureRef,
+  sleep: idagongSleepFigureRef,
+  sit: idagongBobaFigureRef,
+  toggleIcon: idagongStandFigureRef
 }
 
 /** bundle 所在目录,用于把 ?url 的 /chunks/xxx.png 还原为真实文件路径 */
@@ -70,9 +70,9 @@ async function bytesFromAssetRef(ref: string): Promise<Buffer> {
 
 let seedPromise: Promise<void> | null = null
 
-export function ensureBundledUiPlugins(magicpocketHomeDir: string): Promise<void> {
+export function ensureBundledUiPlugins(dagongHomeDir: string): Promise<void> {
   seedPromise ??= (async () => {
-    const rootDir = uiPluginsRootDir(magicpocketHomeDir)
+    const rootDir = uiPluginsRootDir(dagongHomeDir)
     const markerPath = join(rootDir, BUNDLED_SEED_MARKER)
     try {
       await stat(markerPath)
@@ -86,11 +86,11 @@ export function ensureBundledUiPlugins(magicpocketHomeDir: string): Promise<void
       for (const [slot, ref] of Object.entries(BUNDLED_IKUN_FIGURE_REFS)) {
         figureBytes[slot] = await bytesFromAssetRef(ref)
       }
-      const result = await seedUiPlugin(magicpocketHomeDir, BUNDLED_IKUN_MANIFEST, figureBytes)
+      const result = await seedUiPlugin(dagongHomeDir, BUNDLED_IKUN_MANIFEST, figureBytes)
       if (result.ok) {
         seeded = true
       } else {
-        console.error('[ui-plugin] failed to seed bundled imagicpocket plugin:', result.errors.join('; '))
+        console.error('[ui-plugin] failed to seed bundled idagong plugin:', result.errors.join('; '))
       }
     } catch (error) {
       console.error('[ui-plugin] bundled seed error:', error)
@@ -99,7 +99,7 @@ export function ensureBundledUiPlugins(magicpocketHomeDir: string): Promise<void
     if (seeded) {
       try {
         await mkdir(rootDir, { recursive: true })
-        await writeFile(markerPath, 'imagicpocket\n', 'utf8')
+        await writeFile(markerPath, 'idagong\n', 'utf8')
       } catch {
         // 标记写入失败可接受,下次会重试播种
       }

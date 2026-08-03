@@ -30,7 +30,7 @@ describe('app-ipc-schemas', () => {
     expect(payload.path).toBe('/v1/threads?limit=1')
   })
 
-  it('accepts the MagicPocket runtime info endpoint', () => {
+  it('accepts the Dagong runtime info endpoint', () => {
     const payload = runtimeRequestPayloadSchema.parse({
       path: '/v1/runtime/info',
       method: 'GET'
@@ -39,7 +39,7 @@ describe('app-ipc-schemas', () => {
     expect(payload.path).toBe('/v1/runtime/info')
   })
 
-  it('accepts the MagicPocket runtime tool diagnostics endpoint', () => {
+  it('accepts the Dagong runtime tool diagnostics endpoint', () => {
     const payload = runtimeRequestPayloadSchema.parse({
       path: '/v1/runtime/tools',
       method: 'GET'
@@ -48,7 +48,7 @@ describe('app-ipc-schemas', () => {
     expect(payload.path).toBe('/v1/runtime/tools')
   })
 
-  it('accepts MagicPocket supply-chain audit endpoints', () => {
+  it('accepts Dagong supply-chain audit endpoints', () => {
     expect(runtimeRequestPayloadSchema.parse({
       path: '/v1/supply-chain/audit',
       method: 'POST',
@@ -61,7 +61,7 @@ describe('app-ipc-schemas', () => {
     }).path).toBe('/v1/supply-chain/update-check')
   })
 
-  it('accepts MagicPocket MCP OAuth status and token reset endpoints', () => {
+  it('accepts Dagong MCP OAuth status and token reset endpoints', () => {
     expect(runtimeRequestPayloadSchema.parse({
       path: '/v1/mcp/oauth',
       method: 'GET'
@@ -72,7 +72,7 @@ describe('app-ipc-schemas', () => {
     }).path).toBe('/v1/mcp/oauth/google_drive')
   })
 
-  it('accepts the MagicPocket skills endpoint', () => {
+  it('accepts the Dagong skills endpoint', () => {
     const payload = runtimeRequestPayloadSchema.parse({
       path: '/v1/skills',
       method: 'GET'
@@ -81,7 +81,7 @@ describe('app-ipc-schemas', () => {
     expect(payload.path).toBe('/v1/skills')
   })
 
-  it('accepts MagicPocket attachment and memory endpoints', () => {
+  it('accepts Dagong attachment and memory endpoints', () => {
     expect(runtimeRequestPayloadSchema.parse({
       path: '/v1/attachments',
       method: 'POST',
@@ -138,7 +138,7 @@ describe('app-ipc-schemas', () => {
     expect(skillListPayloadSchema.parse({})).toEqual({})
   })
 
-  it('accepts MagicPocket thread goal endpoints', () => {
+  it('accepts Dagong thread goal endpoints', () => {
     expect(runtimeRequestPayloadSchema.parse({
       path: '/v1/threads/thr_1/goal',
       method: 'GET'
@@ -154,7 +154,7 @@ describe('app-ipc-schemas', () => {
     }).path).toBe('/v1/threads/thr_1/goal')
   })
 
-  it('accepts the MagicPocket thread review endpoint', () => {
+  it('accepts the Dagong thread review endpoint', () => {
     expect(runtimeRequestPayloadSchema.parse({
       path: '/v1/threads/thr_1/review',
       method: 'POST',
@@ -169,7 +169,7 @@ describe('app-ipc-schemas', () => {
     }).path).toBe('/v1/debug/llm-rounds')
   })
 
-  it('rejects runtime request paths outside the modeled MagicPocket API surface', () => {
+  it('rejects runtime request paths outside the modeled Dagong API surface', () => {
     expect(() =>
       runtimeRequestPayloadSchema.parse({
         path: '/v1/runtime/secrets',
@@ -187,11 +187,11 @@ describe('app-ipc-schemas', () => {
     ).toThrow(/runtime request path is not allowed/)
   })
 
-  it('accepts a valid settings patch for magicpocket and write settings', () => {
+  it('accepts a valid settings patch for dagong and write settings', () => {
     const payload = settingsPatchSchema.parse({
       theme: 'dark',
       agents: {
-        magicpocket: {
+        dagong: {
           port: 19000,
           model: 'deepseek-chat',
           modelProfiles: {
@@ -239,13 +239,13 @@ describe('app-ipc-schemas', () => {
       disabledSkillIds: ['test-skill-08']
     })
 
-    expect(payload.agents?.magicpocket?.port).toBe(19000)
-    expect(payload.agents?.magicpocket?.modelProfiles?.['custom-vision-model']?.inputModalities).toEqual(['text', 'image'])
-    expect(payload.agents?.magicpocket?.modelProfiles?.['custom-vision-model']?.maxOutputTokens).toBe(32000)
-    expect(payload.agents?.magicpocket?.tokenEconomy?.enabled).toBe(true)
-    expect(payload.agents?.magicpocket?.tokenEconomy?.historyHygiene?.maxToolResultTokens).toBe(4000)
-    expect(payload.agents?.magicpocket?.toolOutputLimits?.maxLines).toBe(30000)
-    expect(payload.agents?.magicpocket?.toolOutputLimits?.maxBytes).toBe(1048576)
+    expect(payload.agents?.dagong?.port).toBe(19000)
+    expect(payload.agents?.dagong?.modelProfiles?.['custom-vision-model']?.inputModalities).toEqual(['text', 'image'])
+    expect(payload.agents?.dagong?.modelProfiles?.['custom-vision-model']?.maxOutputTokens).toBe(32000)
+    expect(payload.agents?.dagong?.tokenEconomy?.enabled).toBe(true)
+    expect(payload.agents?.dagong?.tokenEconomy?.historyHygiene?.maxToolResultTokens).toBe(4000)
+    expect(payload.agents?.dagong?.toolOutputLimits?.maxLines).toBe(30000)
+    expect(payload.agents?.dagong?.toolOutputLimits?.maxBytes).toBe(1048576)
     expect(payload.write?.inlineCompletion?.model).toBe('deepseek-v4-pro')
     expect(payload.write?.selectionAssist?.infographicPrompt).toBe('手绘风格信息图。')
     expect(payload.write?.selectionAssist?.quickActions).toHaveLength(2)
@@ -256,7 +256,7 @@ describe('app-ipc-schemas', () => {
 
   it('rejects low local service ports', () => {
     expect(() => settingsPatchSchema.parse({
-      agents: { magicpocket: { port: 9999 } }
+      agents: { dagong: { port: 9999 } }
     })).toThrow()
     expect(() => settingsPatchSchema.parse({
       claw: { im: { port: 9999 } }
@@ -303,7 +303,7 @@ describe('app-ipc-schemas', () => {
         }]
       },
       agents: {
-        magicpocket: {
+        dagong: {
           textToSpeech: {
             enabled: true,
             providerId: 'minimax',
@@ -336,9 +336,9 @@ describe('app-ipc-schemas', () => {
     })
 
     expect(payload.provider?.providers?.[0]?.textToSpeech?.models).toEqual(['speech-2.8-hd'])
-    expect(payload.agents?.magicpocket?.textToSpeech?.enabled).toBe(true)
-    expect(payload.agents?.magicpocket?.musicGeneration?.model).toBe('music-2.6')
-    expect(payload.agents?.magicpocket?.videoGeneration?.defaultResolution).toBe('1080P')
+    expect(payload.agents?.dagong?.textToSpeech?.enabled).toBe(true)
+    expect(payload.agents?.dagong?.musicGeneration?.model).toBe('music-2.6')
+    expect(payload.agents?.dagong?.videoGeneration?.defaultResolution).toBe('1080P')
   })
 
   it('accepts long provider model ids imported from upstream catalogs', () => {
@@ -368,7 +368,7 @@ describe('app-ipc-schemas', () => {
         }]
       },
       agents: {
-        magicpocket: {
+        dagong: {
           model: longModelId,
           modelProfiles: {
             [longModelId]: {
@@ -391,8 +391,8 @@ describe('app-ipc-schemas', () => {
     })
 
     expect(payload.provider?.providers?.[0]?.models).toEqual([longModelId])
-    expect(payload.agents?.magicpocket?.model).toBe(longModelId)
-    expect(payload.agents?.magicpocket?.imageGeneration?.quality).toBe('high')
+    expect(payload.agents?.dagong?.model).toBe(longModelId)
+    expect(payload.agents?.dagong?.imageGeneration?.quality).toBe('high')
     expect(payload.schedule?.model).toBe(longModelId)
     expect(payload.workflow?.model).toBe(longModelId)
   })
@@ -488,7 +488,7 @@ describe('app-ipc-schemas', () => {
         }]
       },
       agents: {
-        magicpocket: {
+        dagong: {
           port: 19001,
           imageRecognition: { enabled: true }
         },
@@ -503,8 +503,8 @@ describe('app-ipc-schemas', () => {
 
     expect(payload.locale).toBe('zh')
     expect(payload.provider?.providers?.[0]?.imageRecognition).toEqual({ enabled: true })
-    expect(payload.agents?.magicpocket?.port).toBe(19001)
-    expect(payload.agents?.magicpocket?.imageRecognition).toEqual({ enabled: true })
+    expect(payload.agents?.dagong?.port).toBe(19001)
+    expect(payload.agents?.dagong?.imageRecognition).toEqual({ enabled: true })
     expect(payload.disabledSkillIds).toEqual(['legacy-skill'])
     expect('reasonix' in payload).toBe(false)
     expect('quickChat' in payload).toBe(false)
@@ -593,7 +593,7 @@ describe('app-ipc-schemas', () => {
   it('accepts a configurable stream idle timeout in runtime tuning patches', () => {
     const payload = settingsPatchSchema.parse({
       agents: {
-        magicpocket: {
+        dagong: {
           runtimeTuning: {
             streamIdleTimeoutMs: 300000
           }
@@ -601,13 +601,13 @@ describe('app-ipc-schemas', () => {
       }
     })
 
-    expect(payload.agents?.magicpocket?.runtimeTuning?.streamIdleTimeoutMs).toBe(300000)
+    expect(payload.agents?.dagong?.runtimeTuning?.streamIdleTimeoutMs).toBe(300000)
   })
 
   it('rejects an out-of-range stream idle timeout', () => {
     expect(() =>
       settingsPatchSchema.parse({
-        agents: { magicpocket: { runtimeTuning: { streamIdleTimeoutMs: -1 } } }
+        agents: { dagong: { runtimeTuning: { streamIdleTimeoutMs: -1 } } }
       })
     ).toThrow()
   })
@@ -615,7 +615,7 @@ describe('app-ipc-schemas', () => {
   it('rejects out-of-range tool output limits', () => {
     expect(() =>
       settingsPatchSchema.parse({
-        agents: { magicpocket: { toolOutputLimits: { maxBytes: 128 * 1024 * 1024 } } }
+        agents: { dagong: { toolOutputLimits: { maxBytes: 128 * 1024 * 1024 } } }
       })
     ).toThrow()
   })
@@ -624,7 +624,7 @@ describe('app-ipc-schemas', () => {
     expect(() =>
       settingsPatchSchema.parse({
         agents: {
-          magicpocket: {
+          dagong: {
             mysteryFlag: true
           }
         }
@@ -803,13 +803,13 @@ describe('app-ipc-schemas', () => {
 
   it('accepts content-only export payloads', () => {
     const payload = writeExportPayloadSchema.parse({
-      title: 'MagicPocket answer',
+      title: 'Dagong answer',
       workspaceRoot: '/tmp/workspace',
       format: 'png',
       content: '# Answer'
     })
 
-    expect(payload.title).toBe('MagicPocket answer')
+    expect(payload.title).toBe('Dagong answer')
     expect(payload.format).toBe('png')
   })
 
@@ -827,11 +827,11 @@ describe('app-ipc-schemas', () => {
   it('accepts workspace image pick payloads and rejects extra fields', () => {
     const payload = workspaceImagePickPayloadSchema.parse({
       workspaceRoot: '/tmp/workspace',
-      currentFilePath: '/tmp/workspace/.magicpocket-design/abc/v1.html',
+      currentFilePath: '/tmp/workspace/.dagong-design/abc/v1.html',
       imageDirectory: 'img'
     })
     expect(payload.workspaceRoot).toBe('/tmp/workspace')
-    expect(payload.currentFilePath).toBe('/tmp/workspace/.magicpocket-design/abc/v1.html')
+    expect(payload.currentFilePath).toBe('/tmp/workspace/.dagong-design/abc/v1.html')
     expect(payload.imageDirectory).toBe('img')
     expect(
       workspaceImagePickPayloadSchema.parse({

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import type { ChatBlock, RuntimeConnectionStatus } from '../../agent/types'
 import { FloatingComposer } from '../chat/FloatingComposer'
 import { SubagentReturnBar } from '../chat/message-timeline-empty'
-import { ImagicpocketCameoLayer, MagicPocketCelebrationLayer } from '../chat/AnimatedWorkLogo'
+import { IdagongCameoLayer, DagongCelebrationLayer } from '../chat/AnimatedWorkLogo'
 import { DevPreviewLaunchCard } from '../DevPreviewLaunchCard'
 import { SessionHeader } from '../SessionHeader'
 import { PanelRightClose, PanelRightOpen } from 'lucide-react'
@@ -165,8 +165,8 @@ export function WorkbenchChatStage({
               }
             />
           </Suspense>
-          {uiModeCameosEnabled && !focusModeEnabled ? <ImagicpocketCameoLayer /> : null}
-          {!focusModeEnabled ? <MagicPocketCelebrationLayer active={busy} suppressed={Boolean(runtimeError)} /> : null}
+          {uiModeCameosEnabled && !focusModeEnabled ? <IdagongCameoLayer /> : null}
+          {!focusModeEnabled ? <DagongCelebrationLayer active={busy} suppressed={Boolean(runtimeError)} /> : null}
         </div>
         <div className="ds-no-drag relative flex shrink-0 justify-center px-2 pb-3 pt-0 sm:px-4 md:px-6 lg:px-8">
           {showReturnBar ? (

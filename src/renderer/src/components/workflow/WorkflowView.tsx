@@ -56,9 +56,9 @@ export function WorkflowView({ leftSidebarCollapsed, onToggleLeftSidebar }: Prop
   const [runInputTarget, setRunInputTarget] = useState<WorkflowV1 | null>(null)
 
   const refreshStatus = useCallback(async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.getWorkflowStatus !== 'function') return
+    if (typeof window.dagongGui?.getWorkflowStatus !== 'function') return
     try {
-      setStatus(await window.magicpocketGui.getWorkflowStatus())
+      setStatus(await window.dagongGui.getWorkflowStatus())
     } catch {
       /* ignore transient status errors */
     }
@@ -68,8 +68,8 @@ export function WorkflowView({ leftSidebarCollapsed, onToggleLeftSidebar }: Prop
     try {
       const [nextSettings, nextStatus] = await Promise.all([
         rendererRuntimeClient.getSettings({ forceRefresh: true }),
-        typeof window.magicpocketGui?.getWorkflowStatus === 'function'
-          ? window.magicpocketGui.getWorkflowStatus()
+        typeof window.dagongGui?.getWorkflowStatus === 'function'
+          ? window.dagongGui.getWorkflowStatus()
           : Promise.resolve(null)
       ])
       setSettings(nextSettings)
@@ -258,8 +258,8 @@ export function WorkflowView({ leftSidebarCollapsed, onToggleLeftSidebar }: Prop
 
   const handleRun = useCallback(
     async (id: string, input?: Record<string, unknown>): Promise<void> => {
-      if (typeof window.magicpocketGui?.runWorkflow !== 'function') return
-      const result = await window.magicpocketGui.runWorkflow(id, input)
+      if (typeof window.dagongGui?.runWorkflow !== 'function') return
+      const result = await window.dagongGui.runWorkflow(id, input)
       if (!result.ok) {
         setError(result.message)
         return
@@ -283,8 +283,8 @@ export function WorkflowView({ leftSidebarCollapsed, onToggleLeftSidebar }: Prop
 
   const handleStop = useCallback(
     async (id: string): Promise<void> => {
-      if (typeof window.magicpocketGui?.stopWorkflow !== 'function') return
-      await window.magicpocketGui.stopWorkflow(id)
+      if (typeof window.dagongGui?.stopWorkflow !== 'function') return
+      await window.dagongGui.stopWorkflow(id)
       void refreshStatus()
     },
     [refreshStatus]
@@ -292,8 +292,8 @@ export function WorkflowView({ leftSidebarCollapsed, onToggleLeftSidebar }: Prop
 
   const handleRunNode = useCallback(
     async (workflowId: string, nodeId: string): Promise<void> => {
-      if (typeof window.magicpocketGui?.runWorkflowNode !== 'function') return
-      const result = await window.magicpocketGui.runWorkflowNode(workflowId, nodeId)
+      if (typeof window.dagongGui?.runWorkflowNode !== 'function') return
+      const result = await window.dagongGui.runWorkflowNode(workflowId, nodeId)
       if (!result.ok) {
         setError(result.message)
         return

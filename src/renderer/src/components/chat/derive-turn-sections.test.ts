@@ -240,17 +240,17 @@ describe('deriveTurnSections', () => {
 
   it('merges repeated file changes for the same displayed path', () => {
     const firstPatch = [
-      'diff --git a/.magicpocketsdd/draft/plan/requirement.md b/.magicpocketsdd/draft/plan/requirement.md',
-      '--- a/.magicpocketsdd/draft/plan/requirement.md',
-      '+++ b/.magicpocketsdd/draft/plan/requirement.md',
+      'diff --git a/.dagongsdd/draft/plan/requirement.md b/.dagongsdd/draft/plan/requirement.md',
+      '--- a/.dagongsdd/draft/plan/requirement.md',
+      '+++ b/.dagongsdd/draft/plan/requirement.md',
       '@@ -1,1 +1,1 @@',
       '-old title',
       '+new title'
     ].join('\n')
     const secondPatch = [
-      'diff --git a/.magicpocketsdd/draft/plan/requirement.md b/.magicpocketsdd/draft/plan/requirement.md',
-      '--- a/.magicpocketsdd/draft/plan/requirement.md',
-      '+++ b/.magicpocketsdd/draft/plan/requirement.md',
+      'diff --git a/.dagongsdd/draft/plan/requirement.md b/.dagongsdd/draft/plan/requirement.md',
+      '--- a/.dagongsdd/draft/plan/requirement.md',
+      '+++ b/.dagongsdd/draft/plan/requirement.md',
       '@@ -4,1 +4,2 @@',
       ' context',
       '+new detail'
@@ -262,7 +262,7 @@ describe('deriveTurnSections', () => {
         summary: 'Edit requirement',
         status: 'success',
         toolKind: 'file_change',
-        filePath: '/tmp/.magicpocketsdd/draft/plan/requirement.md',
+        filePath: '/tmp/.dagongsdd/draft/plan/requirement.md',
         detail: firstPatch
       },
       {
@@ -271,7 +271,7 @@ describe('deriveTurnSections', () => {
         summary: 'Edit requirement again',
         status: 'success',
         toolKind: 'file_change',
-        filePath: '/tmp/.magicpocketsdd/draft/plan/requirement.md',
+        filePath: '/tmp/.dagongsdd/draft/plan/requirement.md',
         detail: secondPatch
       }
     ])
@@ -279,7 +279,7 @@ describe('deriveTurnSections', () => {
     expect(result.turnFileChanges).toHaveLength(1)
     expect(result.turnFileChanges[0]).toMatchObject({
       id: 'tool_first_edit',
-      filePath: '.magicpocketsdd/draft/plan/requirement.md'
+      filePath: '.dagongsdd/draft/plan/requirement.md'
     })
     expect(result.turnFileChanges[0]?.detail).toContain('+new title')
     expect(result.turnFileChanges[0]?.detail).toContain('+new detail')

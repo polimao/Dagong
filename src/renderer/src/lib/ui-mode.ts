@@ -1,14 +1,14 @@
 import { readBrowserStorageItem, writeBrowserStorageItem } from './browser-storage'
-import { IKUN_MODE_STORAGE_KEY } from './imagicpocket-mode'
+import { IKUN_MODE_STORAGE_KEY } from './idagong-mode'
 
 /**
- * 形象模式偏好:'default' | 'imagicpocket' | 'retroma' | <UI 插件 id>。
- * 取代旧的布尔型 magicpocket.imagicpocketMode(读取时自动迁移)。
+ * 形象模式偏好:'default' | 'idagong' | 'retroma' | <UI 插件 id>。
+ * 取代旧的布尔型 dagong.idagongMode(读取时自动迁移)。
  */
-export const UI_MODE_STORAGE_KEY = 'magicpocket.uiMode'
+export const UI_MODE_STORAGE_KEY = 'dagong.uiMode'
 
 export const UI_MODE_DEFAULT = 'default'
-export const UI_MODE_IKUN = 'imagicpocket'
+export const UI_MODE_IKUN = 'idagong'
 /** Retroma 羊皮纸浅色配色模式:纯配色(无吉祥物),仅浅色生效 */
 export const UI_MODE_RETROMA = 'retroma'
 
@@ -19,7 +19,7 @@ export function readUiModePreference(): string {
   if (stored && (stored === UI_MODE_DEFAULT || UI_MODE_PATTERN.test(stored))) {
     return stored
   }
-  // 迁移:旧的 iMagicPocket 开关
+  // 迁移:旧的 iDagong 开关
   const legacy = readBrowserStorageItem(IKUN_MODE_STORAGE_KEY)?.trim().toLowerCase()
   if (legacy === '1' || legacy === 'true' || legacy === 'on') {
     return UI_MODE_IKUN

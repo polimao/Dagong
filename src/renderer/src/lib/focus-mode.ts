@@ -1,6 +1,6 @@
 import { readBrowserStorageItem, writeBrowserStorageItem } from './browser-storage'
 
-export const FOCUS_MODE_STORAGE_KEY = 'magicpocket.focusMode'
+export const FOCUS_MODE_STORAGE_KEY = 'dagong.focusMode'
 
 export function readFocusModePreference(): boolean {
   const raw = readBrowserStorageItem(FOCUS_MODE_STORAGE_KEY)

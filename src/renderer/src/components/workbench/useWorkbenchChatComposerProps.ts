@@ -1,5 +1,5 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react'
-import type { CoreRuntimeInfoJson } from '../../agent/magicpocket-contract'
+import type { CoreRuntimeInfoJson } from '../../agent/dagong-contract'
 import type { ComposerChangeSummary } from '../../lib/composer-change-summary'
 import type { WorkbenchChatStageProps } from './WorkbenchChatStage'
 

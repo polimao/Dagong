@@ -4,7 +4,7 @@ import type {
   SseEndPayload,
   SseErrorPayload,
   SseEventPayload
-} from '@shared/magicpocket-gui-api'
+} from '@shared/dagong-gui-api'
 
 class RendererRuntimeClient {
   private cachedSettings: AppSettingsV1 | null = null
@@ -16,7 +16,7 @@ class RendererRuntimeClient {
     }
     if (this.cachedSettings) return this.cachedSettings
     if (this.settingsPromise) return this.settingsPromise
-    const task = window.magicpocketGui.getSettings().then((settings) => {
+    const task = window.dagongGui.getSettings().then((settings) => {
       this.cachedSettings = settings
       return settings
     })
@@ -27,7 +27,7 @@ class RendererRuntimeClient {
   }
 
   async setSettings(partial: AppSettingsPatch): Promise<AppSettingsV1> {
-    const settings = await window.magicpocketGui.setSettings(partial)
+    const settings = await window.dagongGui.setSettings(partial)
     this.cachedSettings = settings
     this.settingsPromise = null
     return settings
@@ -40,34 +40,34 @@ class RendererRuntimeClient {
 
   runtimeRequest(path: string, method?: string, body?: string): Promise<RuntimeRequestResult> {
     if (body === undefined) {
-      if (method === undefined) return window.magicpocketGui.runtimeRequest(path)
-      return window.magicpocketGui.runtimeRequest(path, method)
+      if (method === undefined) return window.dagongGui.runtimeRequest(path)
+      return window.dagongGui.runtimeRequest(path, method)
     }
-    return window.magicpocketGui.runtimeRequest(path, method, body)
+    return window.dagongGui.runtimeRequest(path, method, body)
   }
 
   restartRuntime(): Promise<void> {
-    return window.magicpocketGui.restartRuntime()
+    return window.dagongGui.restartRuntime()
   }
 
   startSse(threadId: string, sinceSeq: number, streamId?: string): Promise<{ streamId: string }> {
-    return window.magicpocketGui.startSse(threadId, sinceSeq, streamId)
+    return window.dagongGui.startSse(threadId, sinceSeq, streamId)
   }
 
   stopSse(streamId: string): Promise<boolean> {
-    return window.magicpocketGui.stopSse(streamId)
+    return window.dagongGui.stopSse(streamId)
   }
 
   onSseEvent(handler: (payload: SseEventPayload) => void): () => void {
-    return window.magicpocketGui.onSseEvent(handler)
+    return window.dagongGui.onSseEvent(handler)
   }
 
   onSseEnd(handler: (payload: SseEndPayload) => void): () => void {
-    return window.magicpocketGui.onSseEnd(handler)
+    return window.dagongGui.onSseEnd(handler)
   }
 
   onSseError(handler: (payload: SseErrorPayload) => void): () => void {
-    return window.magicpocketGui.onSseError(handler)
+    return window.dagongGui.onSseError(handler)
   }
 }
 

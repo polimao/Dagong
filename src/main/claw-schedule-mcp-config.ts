@@ -23,16 +23,16 @@ type ClawScheduleMcpConfigPaths = {
   mcpJsonPath?: string
 }
 
-export function resolveMagicPocketConfigPath(): string {
-  return join(homedir(), '.magicpocket', 'config.toml')
+export function resolveDagongConfigPath(): string {
+  return join(homedir(), '.dagong', 'config.toml')
 }
 
 export function resolveDeepseekConfigPath(): string {
-  return resolveMagicPocketConfigPath()
+  return resolveDagongConfigPath()
 }
 
-export function resolveMagicPocketMcpJsonPath(): string {
-  return join(homedir(), '.magicpocket', 'mcp.json')
+export function resolveDagongMcpJsonPath(): string {
+  return join(homedir(), '.dagong', 'mcp.json')
 }
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -202,7 +202,7 @@ async function readJsonFile(path: string): Promise<unknown | null> {
     return JSON.parse(raw) as unknown
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to parse MagicPocket MCP config at ${path}: ${message}`, { cause: error })
+    throw new Error(`Failed to parse Dagong MCP config at ${path}: ${message}`, { cause: error })
   }
 }
 
@@ -234,8 +234,8 @@ export async function syncClawScheduleMcpConfig(
   launch: ClawScheduleMcpLaunchConfig,
   paths: ClawScheduleMcpConfigPaths = {}
 ): Promise<void> {
-  const configTomlPath = paths.configTomlPath ?? resolveMagicPocketConfigPath()
-  const mcpJsonPath = paths.mcpJsonPath ?? resolveMagicPocketMcpJsonPath()
+  const configTomlPath = paths.configTomlPath ?? resolveDagongConfigPath()
+  const mcpJsonPath = paths.mcpJsonPath ?? resolveDagongMcpJsonPath()
 
   await cleanupLegacyTomlConfig(configTomlPath)
 

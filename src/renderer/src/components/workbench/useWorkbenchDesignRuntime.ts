@@ -1,5 +1,5 @@
 import { useCallback, useMemo, type Dispatch, type SetStateAction } from 'react'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import {
   buildComposerAssistantPickList,
   resolveComposerAssistantProviderId

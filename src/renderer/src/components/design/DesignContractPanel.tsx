@@ -80,7 +80,7 @@ export function DesignContractPanel({ workspaceRoot, document, onSeedPrompt }: P
 
   const exportContract = async (): Promise<void> => {
     if (!model.canExport || exportState.status === 'exporting') return
-    if (typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') {
+    if (typeof window.dagongGui?.writeWorkspaceFile !== 'function') {
       setExportState({ status: 'error', message: t('designContractUnavailable') })
       return
     }
@@ -100,7 +100,7 @@ export function DesignContractPanel({ workspaceRoot, document, onSeedPrompt }: P
         designContext: workspaceState.designContext,
         artifacts: latestDocument.artifacts
       })
-      await window.magicpocketGui.writeWorkspaceFile({
+      await window.dagongGui.writeWorkspaceFile({
         path: model.path,
         workspaceRoot,
         content

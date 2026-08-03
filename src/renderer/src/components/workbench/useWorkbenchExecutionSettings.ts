@@ -22,8 +22,8 @@ export function useWorkbenchExecutionSettings({
       .then((settings) => {
         if (cancelled) return
         setComposerExecutionSettings({
-          approvalPolicy: settings.agents.magicpocket.approvalPolicy,
-          sandboxMode: settings.agents.magicpocket.sandboxMode
+          approvalPolicy: settings.agents.dagong.approvalPolicy,
+          sandboxMode: settings.agents.dagong.sandboxMode
         })
       })
       .catch(() => undefined)
@@ -40,15 +40,15 @@ export function useWorkbenchExecutionSettings({
     setComposerExecutionApplying(true)
     void rendererRuntimeClient.setSettings({
       agents: {
-        magicpocket: {
+        dagong: {
           ...(patch.approvalPolicy ? { approvalPolicy: patch.approvalPolicy as ApprovalPolicy } : {}),
           ...(patch.sandboxMode ? { sandboxMode: patch.sandboxMode as SandboxMode } : {})
         }
       }
     }).then((settings) => {
       setComposerExecutionSettings({
-        approvalPolicy: settings.agents.magicpocket.approvalPolicy,
-        sandboxMode: settings.agents.magicpocket.sandboxMode
+        approvalPolicy: settings.agents.dagong.approvalPolicy,
+        sandboxMode: settings.agents.dagong.sandboxMode
       })
       onSettingsUpdated()
     }).catch((error: unknown) => {

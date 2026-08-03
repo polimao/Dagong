@@ -9,8 +9,8 @@ import {
   resolveClawScheduleMcpCommand,
   resolveClawScheduleMcpNodeEntryPath,
   resolveDeepseekConfigPath,
-  resolveMagicPocketConfigPath,
-  resolveMagicPocketMcpJsonPath,
+  resolveDagongConfigPath,
+  resolveDagongMcpJsonPath,
   syncClawScheduleMcpConfig,
   type ClawScheduleMcpLaunchConfig
 } from './claw-schedule-mcp-config'
@@ -18,7 +18,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -38,10 +38,10 @@ function createSettings(patch: Partial<AppSettingsV1['schedule']['internal']> = 
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      magicpocket: defaultMagicPocketRuntimeSettings()
+      dagong: defaultDagongRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: {
       enabled: true,
       retentionDays: 2
@@ -82,19 +82,19 @@ function createSettings(patch: Partial<AppSettingsV1['schedule']['internal']> = 
 }
 
 const launch: ClawScheduleMcpLaunchConfig = {
-  appPath: '/Applications/MagicPocket.app',
-  execPath: '/Applications/MagicPocket.app/Contents/MacOS/MagicPocket',
+  appPath: '/Applications/Dagong.app',
+  execPath: '/Applications/Dagong.app/Contents/MacOS/Dagong',
   isPackaged: false
 }
 
 describe('claw schedule MCP config', () => {
-  it('uses MagicPocket config files by default', () => {
-    expect(resolveMagicPocketConfigPath()).toBe(join(homedir(), '.magicpocket', 'config.toml'))
-    expect(resolveMagicPocketMcpJsonPath()).toBe(join(homedir(), '.magicpocket', 'mcp.json'))
-    expect(resolveDeepseekConfigPath()).toBe(resolveMagicPocketConfigPath())
+  it('uses Dagong config files by default', () => {
+    expect(resolveDagongConfigPath()).toBe(join(homedir(), '.dagong', 'config.toml'))
+    expect(resolveDagongMcpJsonPath()).toBe(join(homedir(), '.dagong', 'mcp.json'))
+    expect(resolveDeepseekConfigPath()).toBe(resolveDagongConfigPath())
   })
 
-  it('writes the gui_schedule server to the MagicPocket MCP JSON config shape', () => {
+  it('writes the gui_schedule server to the Dagong MCP JSON config shape', () => {
     const settings = createSettings({ port: 19787, secret: 'top-secret' })
     const synced = buildSyncedClawScheduleMcpJson(
       {
@@ -140,7 +140,7 @@ describe('claw schedule MCP config', () => {
 
   it('uses the macOS Electron helper for real app bundle paths', () => {
     expect(resolveClawScheduleMcpCommand(launch, 'darwin')).toBe(
-      '/Applications/MagicPocket.app/Contents/Frameworks/MagicPocket Helper.app/Contents/MacOS/MagicPocket Helper'
+      '/Applications/Dagong.app/Contents/Frameworks/Dagong Helper.app/Contents/MacOS/Dagong Helper'
     )
     expect(resolveClawScheduleMcpCommand({
       appPath: '/tmp/deepseek-gui-test-app',
@@ -193,10 +193,10 @@ describe('claw schedule MCP config', () => {
 
   it('syncs mcp.json and cleans the old config.toml entry on disk', async () => {
     const root = await mkdtemp(join(tmpdir(), 'ds-gui-mcp-'))
-    const magicpocketDir = join(root, '.magicpocket')
-    const configTomlPath = join(magicpocketDir, 'config.toml')
-    const mcpJsonPath = join(magicpocketDir, 'mcp.json')
-    await mkdir(magicpocketDir, { recursive: true })
+    const dagongDir = join(root, '.dagong')
+    const configTomlPath = join(dagongDir, 'config.toml')
+    const mcpJsonPath = join(dagongDir, 'mcp.json')
+    await mkdir(dagongDir, { recursive: true })
     await writeFile(
       configTomlPath,
       [

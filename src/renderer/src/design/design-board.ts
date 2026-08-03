@@ -542,7 +542,7 @@ export async function ensureDesignBoardArtifact(
   const docId = store.ensureActiveDocument()
   const createdAt = new Date().toISOString()
   const artifactId = createDesignArtifactId()
-  const relativePath = `.magicpocket-design/${docId}/${artifactId}/canvas.json`
+  const relativePath = `.dagong-design/${docId}/${artifactId}/canvas.json`
   const artifact: DesignArtifact & { kind: 'canvas' } = {
     id: artifactId,
     kind: 'canvas',
@@ -553,8 +553,8 @@ export async function ensureDesignBoardArtifact(
     versions: [{ id: `${artifactId}-v1`, relativePath, createdAt, summary: '' }]
   }
 
-  if (typeof window.magicpocketGui?.writeWorkspaceFile === 'function') {
-    const write = await window.magicpocketGui
+  if (typeof window.dagongGui?.writeWorkspaceFile === 'function') {
+    const write = await window.dagongGui
       .writeWorkspaceFile({
         path: relativePath,
         workspaceRoot: trimmedRoot,

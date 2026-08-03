@@ -24,8 +24,8 @@ async function readImageDataUrl(
   workspaceRoot: string,
   path: string
 ): Promise<string | null> {
-  if (typeof window.magicpocketGui?.readWorkspaceImage !== 'function') return null
-  const result = await window.magicpocketGui.readWorkspaceImage({
+  if (typeof window.dagongGui?.readWorkspaceImage !== 'function') return null
+  const result = await window.dagongGui.readWorkspaceImage({
     path,
     ...(workspaceRoot ? { workspaceRoot } : {})
   })
@@ -40,7 +40,7 @@ async function resolveWorkspaceImage(
   const hit = cache.get(key)
   if (hit) return hit
   const trimmedPath = path.trim()
-  if (!trimmedPath || typeof window.magicpocketGui?.readWorkspaceImage !== 'function') return null
+  if (!trimmedPath || typeof window.dagongGui?.readWorkspaceImage !== 'function') return null
   try {
     const dataUrl = isAbsoluteLocalImagePath(trimmedPath)
       ? await readImageDataUrl('', trimmedPath)

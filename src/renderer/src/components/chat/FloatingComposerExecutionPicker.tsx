@@ -10,10 +10,10 @@ import {
   ShieldQuestion
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { ApprovalPolicy, MagicPocketToolPermissionMode, SandboxMode } from '@shared/app-settings'
+import type { ApprovalPolicy, DagongToolPermissionMode, SandboxMode } from '@shared/app-settings'
 import {
-  magicpocketToolPermissionModeFromSettings,
-  magicpocketToolPermissionModeSettings
+  dagongToolPermissionModeFromSettings,
+  dagongToolPermissionModeSettings
 } from '@shared/app-settings'
 
 export type ComposerExecutionSettings = {
@@ -29,7 +29,7 @@ type Props = {
 }
 
 type ApprovalOption = {
-  value: MagicPocketToolPermissionMode
+  value: DagongToolPermissionMode
   labelKey: string
   descriptionKey: string
   Icon: typeof Hand
@@ -87,15 +87,15 @@ const APPROVAL_OPTIONS: ApprovalOption[] = [
   }
 ]
 
-function permissionOption(mode: MagicPocketToolPermissionMode): ApprovalOption {
+function permissionOption(mode: DagongToolPermissionMode): ApprovalOption {
   return APPROVAL_OPTIONS.find((option) => option.value === mode) ?? APPROVAL_OPTIONS[1]
 }
 
-function permissionLabelKey(mode: MagicPocketToolPermissionMode): string {
+function permissionLabelKey(mode: DagongToolPermissionMode): string {
   return permissionOption(mode).labelKey
 }
 
-function permissionDescriptionKey(mode: MagicPocketToolPermissionMode): string {
+function permissionDescriptionKey(mode: DagongToolPermissionMode): string {
   return permissionOption(mode).descriptionKey
 }
 
@@ -111,7 +111,7 @@ export function FloatingComposerExecutionPicker({
   const rootRef = useRef<HTMLDivElement | null>(null)
   const approvalButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
-  const permissionMode = magicpocketToolPermissionModeFromSettings(value)
+  const permissionMode = dagongToolPermissionModeFromSettings(value)
   const currentPermissionOption = permissionOption(permissionMode)
   const bypass = permissionMode === 'bypass'
   const PermissionIcon = currentPermissionOption.Icon
@@ -182,7 +182,7 @@ export function FloatingComposerExecutionPicker({
             description={t(option.descriptionKey)}
             Icon={option.Icon}
             iconClass={option.iconClass}
-            onClick={() => update(magicpocketToolPermissionModeSettings(option.value))}
+            onClick={() => update(dagongToolPermissionModeSettings(option.value))}
           />
         ))}
       </div>

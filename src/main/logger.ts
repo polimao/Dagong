@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { DEFAULT_LOG_RETENTION_DAYS } from '../shared/app-settings'
 
 export type LogLevel = 'error' | 'warn' | 'info'
-export type ManagedLogFilePrefix = 'deepseek-gui' | 'magicpocket'
+export type ManagedLogFilePrefix = 'deepseek-gui' | 'dagong'
 
 type LoggerConfig = {
   /** Directory where log files are stored. */
@@ -15,7 +15,7 @@ type LoggerConfig = {
 }
 
 let cfg: LoggerConfig = { dir: '', enabled: true, retentionDays: DEFAULT_LOG_RETENTION_DAYS }
-const MANAGED_LOG_FILE_PREFIXES: ManagedLogFilePrefix[] = ['deepseek-gui', 'magicpocket']
+const MANAGED_LOG_FILE_PREFIXES: ManagedLogFilePrefix[] = ['deepseek-gui', 'dagong']
 
 export function configureLogger(config: Partial<LoggerConfig>): void {
   cfg = { ...cfg, ...config }
@@ -77,7 +77,7 @@ export async function appendManagedLogLine(
 async function writeLogLine(level: LogLevel, category: string, message: string): Promise<void> {
   const stamp = new Date().toISOString()
   const line = `[${stamp}] [${level.toUpperCase()}] [${category}] ${message}\n`
-  await appendManagedLogLine('magicpocket', line)
+  await appendManagedLogLine('dagong', line)
 }
 
 export function logError(category: string, message: string, detail?: unknown): void {

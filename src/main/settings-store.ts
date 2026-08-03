@@ -1,10 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
-import { atomicWriteFile } from '../../magicpocket/src/adapters/file/atomic-write.js'
+import { atomicWriteFile } from '../../dagong/src/adapters/file/atomic-write.js'
 import {
-  applyMagicPocketRuntimePatch,
-  magicpocketSettingsEnvelope,
+  applyDagongRuntimePatch,
+  dagongSettingsEnvelope,
   DEFAULT_GUI_UPDATE_CHANNEL,
   DEFAULT_CHECKPOINT_CLEANUP_ENABLED,
   DEFAULT_CHECKPOINT_CLEANUP_INTERVAL_DAYS,
@@ -13,13 +13,13 @@ import {
   DEFAULT_LOG_RETENTION_DAYS,
   DEFAULT_WRITE_WORKSPACE_ROOT,
   defaultClawSettings,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultDesignSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
-  getMagicPocketRuntimeSettings,
-  mergeMagicPocketRuntimeSettings,
+  getDagongRuntimeSettings,
+  mergeDagongRuntimeSettings,
   mergeModelProviderSettings,
   defaultWriteSettings,
   mergeClawSettings,
@@ -46,19 +46,19 @@ import {
 
 export type { AppSettingsV1 }
 
-// 数据默认根目录从 ~/.deepseekgui 升级为 ~/.magicpocket。老安装的既有目录由
+// 数据默认根目录从 ~/.deepseekgui 升级为 ~/.dagong。老安装的既有目录由
 // legacy-data-migration.ts 在启动期搬迁并留兼容链接;settings 里存的旧
 // 绝对路径也在那里按迁移结果重写,这里只负责“新值”。
-const DEFAULT_WORKSPACE_ROOT = join(homedir(), '.magicpocket', 'default_workspace')
+const DEFAULT_WORKSPACE_ROOT = join(homedir(), '.dagong', 'default_workspace')
 // 对话会话不绑定项目文件夹,每个新会话在此目录下自动创建时间戳子目录作为工作目录。
 // macOS/Windows 用系统 Documents 文件夹;Linux 没有 Documents 约定,改用 XDG 风格目录。
 const DEFAULT_CONVERSATION_WORKSPACE_ROOT_ABSOLUTE =
   process.platform === 'linux'
-    ? join(homedir(), '.local', 'share', 'MagicPocket', 'conversations')
-    : join(homedir(), 'Documents', 'MagicPocket')
-const DEFAULT_CLAW_CHANNELS_ROOT = join(homedir(), '.magicpocket', 'claw')
+    ? join(homedir(), '.local', 'share', 'Dagong', 'conversations')
+    : join(homedir(), 'Documents', 'Dagong')
+const DEFAULT_CLAW_CHANNELS_ROOT = join(homedir(), '.dagong', 'claw')
 const DEFAULT_WRITE_WORKSPACE_ROOT_ABSOLUTE = expandHomePath(DEFAULT_WRITE_WORKSPACE_ROOT)
-const SETTINGS_FILE_NAME = 'magicpocket-settings.json'
+const SETTINGS_FILE_NAME = 'dagong-settings.json'
 // 旧版设置文件名。userData 整目录迁移后旧文件会原样留在新目录里,
 // 首次加载从它兜底读取,load() 随后把规范化结果另存为新文件名;旧
 // 文件保留不动,用户回滚老版本时还能读到可用配置。
@@ -233,7 +233,7 @@ const defaultSettings = (): AppSettingsV1 => ({
   cursorSpotlightColor: DEFAULT_CURSOR_SPOTLIGHT_COLOR,
   provider: defaultModelProviderSettings(),
   agents: {
-    magicpocket: defaultMagicPocketRuntimeSettings()
+    dagong: defaultDagongRuntimeSettings()
   },
   workspaceRoot: DEFAULT_WORKSPACE_ROOT,
   conversationWorkspaceRoot: DEFAULT_CONVERSATION_WORKSPACE_ROOT_ABSOLUTE,
@@ -271,8 +271,8 @@ function buildMergedSettings(parsed: Partial<AppSettingsV1>): AppSettingsV1 {
     ...defaults,
     ...migrated,
     provider: mergeModelProviderSettings(defaults.provider, migrated.provider),
-    agents: magicpocketSettingsEnvelope(
-      mergeMagicPocketRuntimeSettings(getMagicPocketRuntimeSettings(defaults), migrated.agents?.magicpocket)
+    agents: dagongSettingsEnvelope(
+      mergeDagongRuntimeSettings(getDagongRuntimeSettings(defaults), migrated.agents?.dagong)
     ),
     log: { ...defaults.log, ...migrated.log },
     checkpointCleanup: normalizeCheckpointCleanupSettings({
@@ -345,11 +345,11 @@ async function replaceInvalidSettingsWithDefaults(
   await store.save(defaults)
   if (backupPath) {
     console.warn(
-      `[magicpocket-gui] Invalid settings were replaced with defaults (${reason}). Backup: ${backupPath}`
+      `[dagong-gui] Invalid settings were replaced with defaults (${reason}). Backup: ${backupPath}`
     )
   } else {
     console.warn(
-      `[magicpocket-gui] Invalid settings were replaced with defaults (${reason}). Backup could not be written for ${sourcePath}.`
+      `[dagong-gui] Invalid settings were replaced with defaults (${reason}). Backup could not be written for ${sourcePath}.`
     )
   }
   return defaults
@@ -465,7 +465,7 @@ export class JsonSettingsStore {
     const cur = await this.load()
     const { agents: agentsPatch, provider: providerPatch, ...restPatch } = partial
     const next = normalizeStoredSettings({
-      ...applyMagicPocketRuntimePatch(cur, agentsPatch?.magicpocket),
+      ...applyDagongRuntimePatch(cur, agentsPatch?.dagong),
       ...restPatch,
       provider: mergeModelProviderSettings(cur.provider, providerPatch),
       log: { ...cur.log, ...(partial.log ?? {}) },

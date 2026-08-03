@@ -12,8 +12,8 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
   return `
 (() => {
   try {
-  const key = '__magicpocketPrototypeNavCaptureInstalled';
-  const titleKey = '__magicpocketPrototypeNavCaptureTitles';
+  const key = '__dagongPrototypeNavCaptureInstalled';
+  const titleKey = '__dagongPrototypeNavCaptureTitles';
   const hrefs = ${JSON.stringify(hrefs)};
   const targetTitles = ${JSON.stringify(targetTitles)};
   const normalize = (value) => {
@@ -197,15 +197,15 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
     signalBack(steps);
     return true;
   };
-  if (!window.__magicpocketPrototypeNavListenerInstalled) {
-    window.__magicpocketPrototypeNavListenerInstalled = true;
-    window.__magicpocketPrototypeOriginalOpen = window.__magicpocketPrototypeOriginalOpen || window.open;
-    if (!window.__magicpocketPrototypeWindowOpenPatched && typeof window.__magicpocketPrototypeOriginalOpen === 'function') {
-      window.__magicpocketPrototypeWindowOpenPatched = true;
+  if (!window.__dagongPrototypeNavListenerInstalled) {
+    window.__dagongPrototypeNavListenerInstalled = true;
+    window.__dagongPrototypeOriginalOpen = window.__dagongPrototypeOriginalOpen || window.open;
+    if (!window.__dagongPrototypeWindowOpenPatched && typeof window.__dagongPrototypeOriginalOpen === 'function') {
+      window.__dagongPrototypeWindowOpenPatched = true;
       window.open = function(url, target, features) {
         const raw = String(url || '').trim();
         if (raw && navigate(raw, { preventDefault() {}, stopPropagation() {} })) return null;
-        return window.__magicpocketPrototypeOriginalOpen.call(window, url, target, features);
+        return window.__dagongPrototypeOriginalOpen.call(window, url, target, features);
       };
     }
     const patchHistoryMethod = (methodName, originalKey, patchedKey) => {
@@ -218,12 +218,12 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
         return window[originalKey].apply(window.history, arguments);
       };
     };
-    patchHistoryMethod('pushState', '__magicpocketPrototypeOriginalPushState', '__magicpocketPrototypePushStatePatched');
-    patchHistoryMethod('replaceState', '__magicpocketPrototypeOriginalReplaceState', '__magicpocketPrototypeReplaceStatePatched');
-    if (window.history && !window.__magicpocketPrototypeBackPatched) {
-      window.__magicpocketPrototypeBackPatched = true;
-      window.__magicpocketPrototypeOriginalBack = window.__magicpocketPrototypeOriginalBack || window.history.back;
-      window.__magicpocketPrototypeOriginalGo = window.__magicpocketPrototypeOriginalGo || window.history.go;
+    patchHistoryMethod('pushState', '__dagongPrototypeOriginalPushState', '__dagongPrototypePushStatePatched');
+    patchHistoryMethod('replaceState', '__dagongPrototypeOriginalReplaceState', '__dagongPrototypeReplaceStatePatched');
+    if (window.history && !window.__dagongPrototypeBackPatched) {
+      window.__dagongPrototypeBackPatched = true;
+      window.__dagongPrototypeOriginalBack = window.__dagongPrototypeOriginalBack || window.history.back;
+      window.__dagongPrototypeOriginalGo = window.__dagongPrototypeOriginalGo || window.history.go;
       if (typeof window.history.back === 'function') {
         window.history.back = function() {
           return signalBack(1);
@@ -233,7 +233,7 @@ export function buildPrototypeNavigationCaptureScript(links: readonly PrototypeP
         window.history.go = function(delta) {
           const steps = Number(delta);
           if (Number.isFinite(steps) && steps < 0) return signalBack(Math.abs(steps));
-          return window.__magicpocketPrototypeOriginalGo.apply(window.history, arguments);
+          return window.__dagongPrototypeOriginalGo.apply(window.history, arguments);
         };
       }
     }

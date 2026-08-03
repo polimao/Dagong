@@ -578,12 +578,12 @@ export const useDesignWorkspaceStore = create<DesignWorkspaceState>((set, get) =
 
     refreshDesignSystemHash: async () => {
       const { workspaceRoot } = get()
-      if (!workspaceRoot || typeof window.magicpocketGui?.readWorkspaceFile !== 'function') {
+      if (!workspaceRoot || typeof window.dagongGui?.readWorkspaceFile !== 'function') {
         set({ designSystemHash: '' })
         return
       }
-      const res = await window.magicpocketGui
-        .readWorkspaceFile({ path: '.magicpocket-design/DESIGN_SYSTEM.md', workspaceRoot })
+      const res = await window.dagongGui
+        .readWorkspaceFile({ path: '.dagong-design/DESIGN_SYSTEM.md', workspaceRoot })
         .catch(() => null)
       set({ designSystemHash: res && res.ok ? hashDesignSystem(res.content) : '' })
     },

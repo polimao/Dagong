@@ -12,7 +12,7 @@ import type {
 import { resolvePrototypeViewportFrame } from './prototype-player'
 
 /** Project-level Stitch/code-agent compatible design brief export. */
-export const STITCH_DESIGN_MD_PATH = '.magicpocket-design/DESIGN.md'
+export const STITCH_DESIGN_MD_PATH = '.dagong-design/DESIGN.md'
 
 export type BuildStitchDesignMarkdownOptions = {
   title?: string
@@ -136,7 +136,7 @@ function formatScreens(
 }
 
 export function buildStitchDesignMarkdown(options: BuildStitchDesignMarkdownOptions): string {
-  const title = clean(options.title) || 'MagicPocket design project'
+  const title = clean(options.title) || 'Dagong design project'
   const updatedAt = options.updatedAt ?? new Date().toISOString()
   const contextLines = formatDesignContextLines(options.designContext).filter((line) => line.trim())
   const preset = options.designContext?.designSystemPreset
@@ -145,14 +145,14 @@ export function buildStitchDesignMarkdown(options: BuildStitchDesignMarkdownOpti
   return [
     `# DESIGN.md: ${title}`,
     '',
-    'Portable project design guide for MagicPocket, Stitch-style workflows, and code agents.',
+    'Portable project design guide for Dagong, Stitch-style workflows, and code agents.',
     '',
     '## Source',
     '',
     `- Updated: ${updatedAt}`,
     `- Project brief: ${code(options.projectBriefPath)}`,
     `- Shared token file: ${code(options.designSystemMdPath)}`,
-    '- Origin: MagicPocket design mode',
+    '- Origin: Dagong design mode',
     '',
     '## Product Brief',
     '',

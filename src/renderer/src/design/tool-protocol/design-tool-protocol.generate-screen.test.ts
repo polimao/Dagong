@@ -116,7 +116,7 @@ describe('design.generate_screen tool executor', () => {
       path: request.path,
       savedAt: '2026-07-02T00:00:00.000Z'
     }))
-    vi.stubGlobal('window', { magicpocketGui: { writeWorkspaceFile } })
+    vi.stubGlobal('window', { dagongGui: { writeWorkspaceFile } })
     useDesignWorkspaceStore.setState({ workspaceRoot: '/workspace' })
 
     const result = executeDesignToolInvocation({
@@ -139,8 +139,8 @@ describe('design.generate_screen tool executor', () => {
 
     expect(output.draftWrite).toMatchObject({
       status: 'queued',
-      htmlPath: expect.stringMatching(/^\.magicpocket-design\/.+\/.+\/v1\.html$/),
-      designMdPath: expect.stringMatching(/^\.magicpocket-design\/.+\/.+\/DESIGN\.md$/)
+      htmlPath: expect.stringMatching(/^\.dagong-design\/.+\/.+\/v1\.html$/),
+      designMdPath: expect.stringMatching(/^\.dagong-design\/.+\/.+\/DESIGN\.md$/)
     })
     expect(htmlWrite).toMatchObject({
       workspaceRoot: '/workspace',

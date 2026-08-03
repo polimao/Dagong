@@ -2,10 +2,10 @@ import type { IpcMain, WebContents } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { URL } from 'node:url'
 import type { AppSettingsV1 } from '../shared/app-settings'
-import { magicpocketThreadEventsPath } from '../shared/magicpocket-endpoints'
+import { dagongThreadEventsPath } from '../shared/dagong-endpoints'
 import { sseStartPayloadSchema, streamIdSchema } from './ipc/app-ipc-schemas'
 import type { JsonSettingsStore } from './settings-store'
-import { getRuntimeBaseUrlForSettings, runtimeAuthHeaders } from './runtime/magicpocket-adapter'
+import { getRuntimeBaseUrlForSettings, runtimeAuthHeaders } from './runtime/dagong-adapter'
 
 type SseControllerState = {
   controller: AbortController
@@ -179,7 +179,7 @@ export function registerRuntimeSseIpc(options: {
       let reconnectDelayMs = SSE_RECONNECT_BASE_MS
       try {
         while (!state.stoppedByClient && !ac.signal.aborted) {
-          const url = new URL(`${base}${magicpocketThreadEventsPath(request.threadId)}`)
+          const url = new URL(`${base}${dagongThreadEventsPath(request.threadId)}`)
           url.searchParams.set('since_seq', String(nextSinceSeq))
           const requestHeaders = { ...headers }
           if (nextSinceSeq > 0) {

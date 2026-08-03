@@ -1,8 +1,8 @@
 /**
  * Fetch the Claude models available to a subscription, via the Agent SDK's
- * `query().supportedModels()`. The SDK lives in magicpocket's
+ * `query().supportedModels()`. The SDK lives in dagong's
  * node_modules (not the app's), so we run a short ESM eval in a Node subprocess
- * with cwd = the magicpocket dir, scoping the OAuth token into its env. Defensive: any
+ * with cwd = the dagong dir, scoping the OAuth token into its env. Defensive: any
  * failure (no SDK, timeout, not-logged-in) resolves to `[]` so the caller keeps
  * its existing/preset model list.
  */
@@ -14,8 +14,8 @@ const SDK_PKG = '@anthropic-ai/claude-agent-sdk'
 // Frame the JSON payload so we can extract it from any other stdout noise.
 const MARK = '<<<KUN_MODELS>>>'
 
-function resolveMagicPocketDir(magicpocketRoots: readonly string[]): string | undefined {
-  return magicpocketRoots.find((root) => existsSync(join(root, 'node_modules', '@anthropic-ai', 'claude-agent-sdk')))
+function resolveDagongDir(dagongRoots: readonly string[]): string | undefined {
+  return dagongRoots.find((root) => existsSync(join(root, 'node_modules', '@anthropic-ai', 'claude-agent-sdk')))
 }
 
 /** Env with API-key overrides stripped so the OAuth token is what authenticates. */
@@ -29,16 +29,16 @@ function scopedEnv(token?: string): NodeJS.ProcessEnv {
 
 export function fetchSdkModels(options: {
   token?: string
-  magicpocketRoots: readonly string[]
-  /** Explicit Claude Code binary path (when not bundled in magicpocket/node_modules). */
+  dagongRoots: readonly string[]
+  /** Explicit Claude Code binary path (when not bundled in dagong/node_modules). */
   binaryPath?: string
   /** Node/Electron executable to run the eval with (defaults to the current one). */
   nodePath?: string
   spawnFn?: typeof spawn
   timeoutMs?: number
 }): Promise<string[]> {
-  const magicpocketDir = resolveMagicPocketDir(options.magicpocketRoots)
-  if (!magicpocketDir) return Promise.resolve([])
+  const dagongDir = resolveDagongDir(options.dagongRoots)
+  if (!dagongDir) return Promise.resolve([])
   const spawnFn = options.spawnFn ?? spawn
   const timeoutMs = options.timeoutMs ?? 30_000
   const nodePath = options.nodePath ?? process.execPath
@@ -75,7 +75,7 @@ export function fetchSdkModels(options: {
 
     try {
       child = spawnFn(nodePath, ['--input-type=module', '-e', script], {
-        cwd: magicpocketDir,
+        cwd: dagongDir,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: scopedEnv(options.token)
       })

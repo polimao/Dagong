@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import {
   buildComposerAssistantPickList,
   resolveComposerAssistantProviderId

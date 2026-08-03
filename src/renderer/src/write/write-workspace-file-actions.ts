@@ -101,9 +101,9 @@ export function createWriteFileActions({
       const requestedRoot = normalizePath(path || workspaceRoot)
       const targetKey = path ? requestedRoot : '__root__'
       set((state) => ({ loadingDirs: { ...state.loadingDirs, [targetKey]: true } }))
-      let result: Awaited<ReturnType<typeof window.magicpocketGui.listWorkspaceDirectory>>
+      let result: Awaited<ReturnType<typeof window.dagongGui.listWorkspaceDirectory>>
       try {
-        result = await window.magicpocketGui.listWorkspaceDirectory({ workspaceRoot, path })
+        result = await window.dagongGui.listWorkspaceDirectory({ workspaceRoot, path })
       } catch (error) {
         set((state) => ({
           loadingDirs: withoutLoadingDirs(state.loadingDirs, [targetKey, requestedRoot]),
@@ -183,7 +183,7 @@ export function createWriteFileActions({
       set({ fileLoading: true, fileError: null })
       try {
         if (isWriteImageFilePath(path)) {
-          const result = await window.magicpocketGui.readWorkspaceImage({ path, workspaceRoot })
+          const result = await window.dagongGui.readWorkspaceImage({ path, workspaceRoot })
           if (!result.ok) {
             set({ fileLoading: false, fileError: result.message })
             return
@@ -211,7 +211,7 @@ export function createWriteFileActions({
         }
 
         if (isWritePdfFilePath(path)) {
-          const result = await window.magicpocketGui.readWorkspacePdf({ path, workspaceRoot })
+          const result = await window.dagongGui.readWorkspacePdf({ path, workspaceRoot })
           if (!result.ok) {
             set({ fileLoading: false, fileError: result.message })
             return
@@ -238,7 +238,7 @@ export function createWriteFileActions({
           return
         }
 
-        const result = await window.magicpocketGui.readWorkspaceFile({ path, workspaceRoot })
+        const result = await window.dagongGui.readWorkspaceFile({ path, workspaceRoot })
         if (!result.ok) {
           set({ fileLoading: false, fileError: result.message })
           return
@@ -295,9 +295,9 @@ export function createWriteFileActions({
     },
 
     createFile: async (workspaceRoot, path, content = '') => {
-      let result: Awaited<ReturnType<typeof window.magicpocketGui.createWorkspaceFile>>
+      let result: Awaited<ReturnType<typeof window.dagongGui.createWorkspaceFile>>
       try {
-        result = await window.magicpocketGui.createWorkspaceFile({ workspaceRoot, path, content })
+        result = await window.dagongGui.createWorkspaceFile({ workspaceRoot, path, content })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return null
@@ -312,9 +312,9 @@ export function createWriteFileActions({
     },
 
     createDirectory: async (workspaceRoot, path) => {
-      let result: Awaited<ReturnType<typeof window.magicpocketGui.createWorkspaceDirectory>>
+      let result: Awaited<ReturnType<typeof window.dagongGui.createWorkspaceDirectory>>
       try {
-        result = await window.magicpocketGui.createWorkspaceDirectory({ workspaceRoot, path })
+        result = await window.dagongGui.createWorkspaceDirectory({ workspaceRoot, path })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return null
@@ -335,9 +335,9 @@ export function createWriteFileActions({
     renameEntry: async (workspaceRoot, path, newName) => {
       cancelExternalSyncAnimation()
       const nextName = ensureMarkdownRenameExtension(path, newName.trim())
-      let result: Awaited<ReturnType<typeof window.magicpocketGui.renameWorkspaceEntry>>
+      let result: Awaited<ReturnType<typeof window.dagongGui.renameWorkspaceEntry>>
       try {
-        result = await window.magicpocketGui.renameWorkspaceEntry({ workspaceRoot, path, newName: nextName })
+        result = await window.dagongGui.renameWorkspaceEntry({ workspaceRoot, path, newName: nextName })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return null
@@ -397,9 +397,9 @@ export function createWriteFileActions({
 
     deleteEntry: async (workspaceRoot, path) => {
       cancelExternalSyncAnimation()
-      let result: Awaited<ReturnType<typeof window.magicpocketGui.deleteWorkspaceEntry>>
+      let result: Awaited<ReturnType<typeof window.dagongGui.deleteWorkspaceEntry>>
       try {
-        result = await window.magicpocketGui.deleteWorkspaceEntry({ workspaceRoot, path })
+        result = await window.dagongGui.deleteWorkspaceEntry({ workspaceRoot, path })
       } catch (error) {
         set({ fileError: formatActionError(error) })
         return false

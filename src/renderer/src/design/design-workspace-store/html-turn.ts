@@ -166,13 +166,13 @@ export async function duplicateHtmlArtifact(
     !source ||
     source.kind !== 'html' ||
     !workspaceRoot ||
-    typeof window.magicpocketGui?.readWorkspaceFile !== 'function' ||
-    typeof window.magicpocketGui?.writeWorkspaceFile !== 'function'
+    typeof window.dagongGui?.readWorkspaceFile !== 'function' ||
+    typeof window.dagongGui?.writeWorkspaceFile !== 'function'
   ) {
     return
   }
 
-  const read = await window.magicpocketGui
+  const read = await window.dagongGui
     .readWorkspaceFile({ path: source.relativePath, workspaceRoot })
     .catch(() => null)
   if (!read || !read.ok) return
@@ -182,17 +182,17 @@ export async function duplicateHtmlArtifact(
   const copyId = createDesignArtifactId()
   const relativePath = `${artifactDirPath(docId, copyId)}/v1.html`
   const designMdPath = artifactDesignMdPath(docId, copyId)
-  const write = await window.magicpocketGui
+  const write = await window.dagongGui
     .writeWorkspaceFile({ path: relativePath, workspaceRoot, content: read.content })
     .catch(() => null)
   if (!write || !write.ok) return
 
   const sourceDesignMdPath = source.designMdPath ?? artifactDesignMdPathOf(source.relativePath)
-  const designNotes = await window.magicpocketGui
+  const designNotes = await window.dagongGui
     .readWorkspaceFile({ path: sourceDesignMdPath, workspaceRoot })
     .catch(() => null)
   if (designNotes?.ok) {
-    await window.magicpocketGui
+    await window.dagongGui
       .writeWorkspaceFile({ path: designMdPath, workspaceRoot, content: designNotes.content })
       .catch(() => null)
   }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { SkillListItem } from '@shared/magicpocket-gui-api'
-import type { CoreRuntimeInfoJson, CoreRuntimeSkillJson } from '../../agent/magicpocket-contract'
+import type { SkillListItem } from '@shared/dagong-gui-api'
+import type { CoreRuntimeInfoJson, CoreRuntimeSkillJson } from '../../agent/dagong-contract'
 import { getProvider } from '../../agent/registry'
 
 function mergeSkillCommands(
@@ -45,8 +45,8 @@ export function useWorkbenchRuntimeMetadata(input: {
     const runtimeReady = input.runtimeConnection === 'ready'
     if (!runtimeReady) setRuntimeInfo(null)
     const provider = getProvider()
-    const localSkillsTask = typeof window !== 'undefined' && typeof window.magicpocketGui?.listSkills === 'function'
-      ? window.magicpocketGui.listSkills(input.activeSkillWorkspace || undefined)
+    const localSkillsTask = typeof window !== 'undefined' && typeof window.dagongGui?.listSkills === 'function'
+      ? window.dagongGui.listSkills(input.activeSkillWorkspace || undefined)
       : Promise.resolve({ ok: true as const, skills: [], validationErrors: [] })
     void Promise.allSettled([
       runtimeReady && provider.getRuntimeInfo ? provider.getRuntimeInfo() : Promise.resolve(null),

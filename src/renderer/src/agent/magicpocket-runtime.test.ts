@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -11,7 +11,7 @@ import {
   defaultTerminalSettings,
   type AppSettingsV1
 } from '@shared/app-settings'
-import { MagicPocketRuntimeProvider } from './magicpocket-runtime'
+import { DagongRuntimeProvider } from './dagong-runtime'
 import { getProvider, resetProviderCacheForTests } from './registry'
 import { rendererRuntimeClient } from './runtime-client'
 import type { ThreadEventSink } from './types'
@@ -25,10 +25,10 @@ function settings(): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      magicpocket: defaultMagicPocketRuntimeSettings()
+      dagong: defaultDagongRuntimeSettings()
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -46,9 +46,9 @@ function settings(): AppSettingsV1 {
   }
 }
 
-function installDsGui(overrides: Partial<Window['magicpocketGui']>): void {
+function installDsGui(overrides: Partial<Window['dagongGui']>): void {
   vi.stubGlobal('window', {
-    magicpocketGui: {
+    dagongGui: {
       getSettings: vi.fn(async () => settings()),
       runtimeRequest: vi.fn(async () => ({ ok: true, status: 200, body: '{}' })),
       startSse: vi.fn(async (_threadId: string, _sinceSeq: number, streamId?: string) => ({
@@ -68,15 +68,15 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('MagicPocketRuntimeProvider', () => {
-  it('reports the magicpocket id and MagicPocket display name', () => {
-    const provider = new MagicPocketRuntimeProvider()
-    expect(provider.id).toBe('magicpocket')
-    expect(provider.displayName).toBe('MagicPocket')
+describe('DagongRuntimeProvider', () => {
+  it('reports the dagong id and Dagong display name', () => {
+    const provider = new DagongRuntimeProvider()
+    expect(provider.id).toBe('dagong')
+    expect(provider.displayName).toBe('Dagong')
   })
 
   it('exposes the local HTTP/SSE capabilities', () => {
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     const caps = provider.getCapabilities()
     expect(caps.stream).toBe(true)
     expect(caps.interrupt).toBe(true)
@@ -91,7 +91,7 @@ describe('MagicPocketRuntimeProvider', () => {
         body: '{not-json'
       }))
     })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await expect(provider.listThreads()).rejects.toThrow(
       'runtime returned an invalid thread list response'
@@ -106,13 +106,13 @@ describe('MagicPocketRuntimeProvider', () => {
     }))
     installDsGui({ runtimeRequest })
 
-    const result = await new MagicPocketRuntimeProvider().authorizeMcpOAuthCredentials('google_drive')
+    const result = await new DagongRuntimeProvider().authorizeMcpOAuthCredentials('google_drive')
 
     expect(runtimeRequest).toHaveBeenCalledWith('/v1/mcp/oauth/google_drive', 'POST')
     expect(result).toEqual({ serverId: 'google_drive', status: 'authorized', authorized: true })
   })
 
-  it('maps MagicPocket thread items into chat blocks', async () => {
+  it('maps Dagong thread items into chat blocks', async () => {
     installDsGui({
       runtimeRequest: vi.fn(async () => ({
         ok: true,
@@ -161,7 +161,7 @@ describe('MagicPocketRuntimeProvider', () => {
         })
       }))
     })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     const detail = await provider.getThreadDetail('thr_1')
     expect(detail.blocks.map((block) => block.kind)).toEqual(['user', 'assistant'])
     expect(detail.latestSeq).toBe(9)
@@ -210,7 +210,7 @@ describe('MagicPocketRuntimeProvider', () => {
     installDsGui({
       runtimeRequest: vi.fn(async () => ({ ok: true, status: 200, body: threadBody(['in_live']) }))
     })
-    const liveDetail = await new MagicPocketRuntimeProvider().getThreadDetail('thr_1')
+    const liveDetail = await new DagongRuntimeProvider().getThreadDetail('thr_1')
     const liveBlock = liveDetail.blocks.find((block) => block.kind === 'user_input')
     expect(liveBlock).toMatchObject({ requestId: 'in_live', status: 'pending', live: true })
 
@@ -219,7 +219,7 @@ describe('MagicPocketRuntimeProvider', () => {
     installDsGui({
       runtimeRequest: vi.fn(async () => ({ ok: true, status: 200, body: threadBody([]) }))
     })
-    const staleDetail = await new MagicPocketRuntimeProvider().getThreadDetail('thr_1')
+    const staleDetail = await new DagongRuntimeProvider().getThreadDetail('thr_1')
     const staleBlock = staleDetail.blocks.find((block) => block.kind === 'user_input')
     expect(staleBlock?.kind === 'user_input' && staleBlock.live).toBeFalsy()
   })
@@ -277,7 +277,7 @@ describe('MagicPocketRuntimeProvider', () => {
         })
       }))
     })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     const detail = await provider.getThreadDetail('thr_1')
     expect(detail.blocks).toHaveLength(1)
     expect(detail.blocks[0]).toMatchObject({
@@ -287,14 +287,14 @@ describe('MagicPocketRuntimeProvider', () => {
     })
   })
 
-  it('posts MagicPocket turn requests and returns the deterministic user item id', async () => {
+  it('posts Dagong turn requests and returns the deterministic user item id', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_abc', userMessageItemId: 'item_user_real' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     const result = await provider.sendUserMessage('thr_1', 'hello')
     expect(runtimeRequest).toHaveBeenCalledWith(
       '/v1/threads/thr_1/turns',
@@ -308,14 +308,14 @@ describe('MagicPocketRuntimeProvider', () => {
     expect(result.userMessageItemId).toBe('item_user_real')
   })
 
-  it('posts per-turn provider ids with MagicPocket turn requests when provided', async () => {
+  it('posts per-turn provider ids with Dagong turn requests when provided', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_abc', userMessageItemId: 'item_user_real' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.sendUserMessage('thr_1', 'hello', {
       model: 'mimo-v2.5',
       providerId: 'xiaomi-token-plan'
@@ -333,14 +333,14 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('posts workspace checkpoint ids with MagicPocket turn requests when provided', async () => {
+  it('posts workspace checkpoint ids with Dagong turn requests when provided', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_abc', userMessageItemId: 'item_user_real' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.sendUserMessage('thr_1', 'hello', { workspaceCheckpointId: 'gcp_1' })
     expect(runtimeRequest).toHaveBeenCalledWith(
       '/v1/threads/thr_1/turns',
@@ -361,7 +361,7 @@ describe('MagicPocketRuntimeProvider', () => {
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_canvas', userMessageItemId: 'item_user_canvas' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.sendUserMessage('thr_1', 'design a screen', { guiDesignCanvas: true })
     expect(runtimeRequest).toHaveBeenCalledWith(
       '/v1/threads/thr_1/turns',
@@ -378,7 +378,7 @@ describe('MagicPocketRuntimeProvider', () => {
   it('posts rewind requests to the runtime', async () => {
     const runtimeRequest = vi.fn(async () => ({ ok: true, status: 200, body: '{}' }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.rewindThread('thr_1', 'turn_1')
     expect(runtimeRequest).toHaveBeenCalledWith(
       '/v1/threads/thr_1/rewind',
@@ -387,14 +387,14 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('posts attachment ids with MagicPocket turn requests when provided', async () => {
+  it('posts attachment ids with Dagong turn requests when provided', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_img', userMessageItemId: 'item_user_img' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await provider.sendUserMessage('thr_1', 'describe this', { attachmentIds: ['att_1'] })
 
@@ -410,14 +410,14 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('posts file references with MagicPocket turn requests when provided', async () => {
+  it('posts file references with Dagong turn requests when provided', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_files', userMessageItemId: 'item_user_files' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await provider.sendUserMessage('thr_1', 'explain these files', {
       fileReferences: [
@@ -461,14 +461,14 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('posts explicit reasoning effort with MagicPocket turn requests', async () => {
+  it('posts explicit reasoning effort with Dagong turn requests', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_reason', userMessageItemId: 'item_user_reason' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await provider.sendUserMessage('thr_1', 'think harder', {
       model: 'auto',
@@ -488,14 +488,14 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('posts GUI plan context with MagicPocket plan turn requests', async () => {
+  it('posts GUI plan context with Dagong plan turn requests', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 202,
       body: JSON.stringify({ threadId: 'thr_1', turnId: 'turn_plan', userMessageItemId: 'item_user_plan' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await provider.sendUserMessage('thr_1', 'refine the plan', {
       mode: 'plan',
@@ -503,8 +503,8 @@ describe('MagicPocketRuntimeProvider', () => {
       guiPlan: {
         operation: 'refine',
         workspaceRoot: '/workspace/deepseek-gui',
-        relativePath: '.magicpocketsdd/plan/auth.md',
-        planId: '/workspace/deepseek-gui:.magicpocketsdd/plan/auth.md',
+        relativePath: '.dagongsdd/plan/auth.md',
+        planId: '/workspace/deepseek-gui:.dagongsdd/plan/auth.md',
         sourceRequest: 'Add auth',
         title: 'auth'
       }
@@ -522,8 +522,8 @@ describe('MagicPocketRuntimeProvider', () => {
         guiPlan: {
           operation: 'refine',
           workspaceRoot: '/workspace/deepseek-gui',
-          relativePath: '.magicpocketsdd/plan/auth.md',
-          planId: '/workspace/deepseek-gui:.magicpocketsdd/plan/auth.md',
+          relativePath: '.dagongsdd/plan/auth.md',
+          planId: '/workspace/deepseek-gui:.dagongsdd/plan/auth.md',
           sourceRequest: 'Add auth',
           title: 'auth'
         }
@@ -538,7 +538,7 @@ describe('MagicPocketRuntimeProvider', () => {
       body: '{}'
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await provider.interruptTurn('thr_1', 'turn_1', { discard: true })
 
@@ -549,7 +549,7 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('loads runtime diagnostics and uploads image attachments through MagicPocket endpoints', async () => {
+  it('loads runtime diagnostics and uploads image attachments through Dagong endpoints', async () => {
     const runtimeRequest = vi.fn(async (path: string) => {
       if (path === '/v1/runtime/info') {
         return {
@@ -558,7 +558,7 @@ describe('MagicPocketRuntimeProvider', () => {
           body: JSON.stringify({
             host: '127.0.0.1',
             port: 17878,
-            dataDir: '/tmp/magicpocket',
+            dataDir: '/tmp/dagong',
             startedAt: '2024-01-01T00:00:00.000Z',
             capabilities: {
               contractVersion: 1,
@@ -657,7 +657,7 @@ describe('MagicPocketRuntimeProvider', () => {
       return { ok: true, status: 200, body: '{}' }
     })
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await expect(provider.getRuntimeInfo()).resolves.toMatchObject({
       capabilities: { attachments: { available: true } }
@@ -734,7 +734,7 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('lists, disables, and deletes memory records through MagicPocket endpoints', async () => {
+  it('lists, disables, and deletes memory records through Dagong endpoints', async () => {
     const runtimeRequest = vi.fn(async (path: string, method?: string, body?: string) => {
       if (path === '/v1/memory?workspace=%2Ftmp%2Fworkspace&include_deleted=false') {
         return {
@@ -790,7 +790,7 @@ describe('MagicPocketRuntimeProvider', () => {
       return { ok: true, status: 200, body: '{}' }
     })
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     await expect(provider.listMemories({ workspace: '/tmp/workspace', includeDeleted: false })).resolves.toHaveLength(1)
     await expect(provider.updateMemory('mem_1', { disabled: true }, { workspace: '/tmp/workspace' })).resolves.toMatchObject({
@@ -803,7 +803,7 @@ describe('MagicPocketRuntimeProvider', () => {
     })
   })
 
-  it('calls MagicPocket fork and user-input compatibility endpoints', async () => {
+  it('calls Dagong fork and user-input compatibility endpoints', async () => {
     const runtimeRequest = vi.fn(async (path: string) => ({
       ok: true,
       status: 200,
@@ -822,7 +822,7 @@ describe('MagicPocketRuntimeProvider', () => {
         : '{}'
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     const forked = await provider.forkThread('thr_parent')
     await provider.forkThread('thr_parent', { turnId: 'turn_1' })
@@ -848,14 +848,14 @@ describe('MagicPocketRuntimeProvider', () => {
     )
   })
 
-  it('resumes a session through the MagicPocket HTTP runtime', async () => {
+  it('resumes a session through the Dagong HTTP runtime', async () => {
     const runtimeRequest = vi.fn(async () => ({
       ok: true,
       status: 201,
       body: JSON.stringify({ thread_id: 'thr_resumed', session_id: 'sess_1' })
     }))
     installDsGui({ runtimeRequest })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
 
     const result = await provider.resumeSession('sess_1', { mode: 'plan' })
 
@@ -865,13 +865,13 @@ describe('MagicPocketRuntimeProvider', () => {
       'POST',
       JSON.stringify({
         workspace: '/tmp/workspace',
-        model: defaultMagicPocketRuntimeSettings().model,
+        model: defaultDagongRuntimeSettings().model,
         mode: 'plan'
       })
     )
   })
 
-  it('maps MagicPocket SSE deltas into the thread event sink', async () => {
+  it('maps Dagong SSE deltas into the thread event sink', async () => {
     let onData: ((payload: { streamId: string; events: unknown[] }) => void) | null = null
     const ac = new AbortController()
     const sink: ThreadEventSink = {
@@ -918,7 +918,7 @@ describe('MagicPocketRuntimeProvider', () => {
         return { streamId: streamId ?? 'stream-1' }
       })
     })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.subscribeThreadEvents('thr_1', 2, sink, ac.signal)
     expect(sink.onSeq).toHaveBeenCalledWith(3)
     expect(sink.onDeltas).toHaveBeenCalledWith([{ text: 'he', kind: 'agent_message', seq: 3 }])
@@ -944,7 +944,7 @@ describe('MagicPocketRuntimeProvider', () => {
     }
     const autoSettings: AppSettingsV1 = {
       ...settings(),
-      agents: { magicpocket: { ...defaultMagicPocketRuntimeSettings(), approvalPolicy: 'auto' } }
+      agents: { dagong: { ...defaultDagongRuntimeSettings(), approvalPolicy: 'auto' } }
     }
     installDsGui({
       getSettings: vi.fn(async () => autoSettings),
@@ -966,7 +966,7 @@ describe('MagicPocketRuntimeProvider', () => {
         return { streamId: streamId ?? 'stream-1' }
       })
     })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.subscribeThreadEvents('thr_1', 0, sink, ac.signal)
     expect(runtimeRequest).toHaveBeenCalledWith(
       '/v1/approvals/appr_auto',
@@ -981,7 +981,7 @@ describe('MagicPocketRuntimeProvider', () => {
     const runtimeRequest = vi.fn(async () => ({ ok: true, status: 200, body: '{}' }))
     const getSettings = vi.fn(async (): Promise<AppSettingsV1> => ({
       ...settings(),
-      agents: { magicpocket: { ...defaultMagicPocketRuntimeSettings(), approvalPolicy: 'on-request' } }
+      agents: { dagong: { ...defaultDagongRuntimeSettings(), approvalPolicy: 'on-request' } }
     }))
     const ac = new AbortController()
     const sink: ThreadEventSink = {
@@ -1024,7 +1024,7 @@ describe('MagicPocketRuntimeProvider', () => {
         return { streamId: streamId ?? 'stream-1' }
       })
     })
-    const provider = new MagicPocketRuntimeProvider()
+    const provider = new DagongRuntimeProvider()
     await provider.subscribeThreadEvents('thr_1', 0, sink, ac.signal)
     expect(runtimeRequest).toHaveBeenCalledWith(
       '/v1/approvals/appr_event_auto',
@@ -1056,7 +1056,7 @@ describe('MagicPocketRuntimeProvider', () => {
       }
       const policySettings: AppSettingsV1 = {
         ...settings(),
-        agents: { magicpocket: { ...defaultMagicPocketRuntimeSettings(), approvalPolicy: policy } }
+        agents: { dagong: { ...defaultDagongRuntimeSettings(), approvalPolicy: policy } }
       }
       installDsGui({
         getSettings: vi.fn(async () => policySettings),
@@ -1083,7 +1083,7 @@ describe('MagicPocketRuntimeProvider', () => {
           return { streamId: streamId ?? 'stream-1' }
         })
       })
-      const provider = new MagicPocketRuntimeProvider()
+      const provider = new DagongRuntimeProvider()
       await provider.subscribeThreadEvents('thr_1', 0, sink, ac.signal)
       expect(sink.onApproval).toHaveBeenCalledWith({
         approvalId: `appr_${policy}`,
@@ -1100,7 +1100,7 @@ describe('MagicPocketRuntimeProvider', () => {
 })
 
 describe('registry', () => {
-  it('returns a cached provider for the magicpocket id', () => {
+  it('returns a cached provider for the dagong id', () => {
     resetProviderCacheForTests()
     const first = getProvider()
     const second = getProvider()

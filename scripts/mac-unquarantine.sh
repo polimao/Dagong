@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-APP_PATH="${1:-dist/mac-arm64/MagicPocket.app}"
+APP_PATH="${1:-dist/mac-arm64/Dagong.app}"
 if [ ! -d "$APP_PATH" ]; then
   echo "App not found: $APP_PATH" >&2
-  echo "Usage: npm run mac:unquarantine -- '/path/to/MagicPocket.app'" >&2
+  echo "Usage: npm run mac:unquarantine -- '/path/to/Dagong.app'" >&2
   exit 1
 fi
 xattr -cr "$APP_PATH"

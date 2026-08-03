@@ -32,11 +32,11 @@ import {
  */
 function releaseThreadWorktreeIfNeeded(threadId: string | null): void {
   if (!threadId || typeof window === 'undefined') return
-  if (typeof window.magicpocketGui?.releaseWorktree !== 'function') return
+  if (typeof window.dagongGui?.releaseWorktree !== 'function') return
   const record = readThreadWorktreeRegistry().worktrees[threadId]
   if (!record) return
   if (record.poolIndex === undefined) return
-  void window.magicpocketGui
+  void window.dagongGui
     .releaseWorktree({
       projectPath: record.projectPath,
       poolIndex: record.poolIndex
@@ -658,7 +658,7 @@ export function createMaintenanceActions(
     const wtRecord = readThreadWorktreeRegistry().worktrees[targetId]
     if (wtRecord?.poolIndex !== undefined) {
       try {
-        await window.magicpocketGui.releaseWorktree({
+        await window.dagongGui.releaseWorktree({
           projectPath: wtRecord.projectPath,
           poolIndex: wtRecord.poolIndex
         })
@@ -726,7 +726,7 @@ export function createMaintenanceActions(
     }
     const checkpointId = targetBlock.meta?.workspaceCheckpointId
     if (checkpointId) {
-      const restored = await window.magicpocketGui.restoreGitCheckpoint({ checkpointId }).catch((error) => ({
+      const restored = await window.dagongGui.restoreGitCheckpoint({ checkpointId }).catch((error) => ({
         ok: false as const,
         reason: 'error' as const,
         message: error instanceof Error ? error.message : String(error)
@@ -802,7 +802,7 @@ export function createMaintenanceActions(
       return
     }
     const { activeThreadId, workspaceRoot } = get()
-    let restored = await window.magicpocketGui.restoreGitCheckpoint({ checkpointId: targetCheckpointId }).catch((error) => ({
+    let restored = await window.dagongGui.restoreGitCheckpoint({ checkpointId: targetCheckpointId }).catch((error) => ({
       ok: false as const,
       reason: 'error' as const,
       message: error instanceof Error ? error.message : String(error)
@@ -828,7 +828,7 @@ export function createMaintenanceActions(
         set({ error: i18n.t('common:rollbackWorkspaceBusyError') })
         return
       }
-      restored = await window.magicpocketGui
+      restored = await window.dagongGui
         .restoreGitCheckpoint({ checkpointId: targetCheckpointId, allowPartialRestore: true })
         .catch((error) => ({
           ok: false as const,
@@ -889,7 +889,7 @@ export function createMaintenanceActions(
       }))
     } catch (e) {
       const msg = formatRuntimeError(e)
-      void window.magicpocketGui.logError('approval', 'Failed to submit approval decision', {
+      void window.dagongGui.logError('approval', 'Failed to submit approval decision', {
         message: msg,
         blockId
       }).catch(() => undefined)
@@ -976,7 +976,7 @@ export function createMaintenanceActions(
       }))
     } catch (e) {
       const msg = formatRuntimeError(e)
-      void window.magicpocketGui.logError('user-input', 'Failed to resolve user input', {
+      void window.dagongGui.logError('user-input', 'Failed to resolve user input', {
         message: msg,
         blockId
       }).catch(() => undefined)
@@ -1017,7 +1017,7 @@ export function createMaintenanceActions(
       await p.interruptTurn(activeThreadId, currentTurnId, { discard: options?.discard === true })
     } catch (e) {
       const msg = formatRuntimeError(e)
-      void window.magicpocketGui.logError('interrupt', 'Failed to interrupt turn', { message: msg }).catch(() => undefined)
+      void window.dagongGui.logError('interrupt', 'Failed to interrupt turn', { message: msg }).catch(() => undefined)
       set({
         error: msg,
         ...(shouldOpenSettingsForError(e)

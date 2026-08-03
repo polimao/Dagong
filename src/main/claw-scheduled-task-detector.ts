@@ -10,7 +10,7 @@ import {
   DEFAULT_SCHEDULE_REASONING_EFFORT,
   isCustomModelEndpointFormat,
   modelEndpointPath,
-  resolveMagicPocketRuntimeSettings,
+  resolveDagongRuntimeSettings,
   resolveModelEndpointFormat,
   resolveModelProviderProxyUrl
 } from '../shared/app-settings'
@@ -297,7 +297,7 @@ export async function detectClawScheduledTaskRequest(
   now = new Date()
 ): Promise<ParsedClawScheduledTaskRequest | null> {
   if (!looksLikeClawScheduledTaskCandidate(sourceText)) return null
-  const runtime = resolveMagicPocketRuntimeSettings(settings)
+  const runtime = resolveDagongRuntimeSettings(settings)
   const apiKey = runtime.apiKey.trim()
   if (!apiKey) return null
   const detectionRequest = buildDetectionRequest({

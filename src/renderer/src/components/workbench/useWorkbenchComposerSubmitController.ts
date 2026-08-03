@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import type { AttachmentReference, NormalizedThread } from '../../agent/types'
 import type { ChatState, SendMessageOverrides } from '../../store/chat-store-types'
 import { useChatStore } from '../../store/chat-store'
@@ -120,14 +120,14 @@ export function useWorkbenchComposerSubmitController({
   const { t } = useTranslation('common')
 
   const mirrorClawCommand = useCallback(async (userText: string, replyText: string): Promise<void> => {
-    if (!activeThreadId || typeof window.magicpocketGui?.mirrorClawChannelMessage !== 'function') return
-    const userResult = await window.magicpocketGui.mirrorClawChannelMessage(
+    if (!activeThreadId || typeof window.dagongGui?.mirrorClawChannelMessage !== 'function') return
+    const userResult = await window.dagongGui.mirrorClawChannelMessage(
       activeThreadId,
       userText,
       'user'
     )
     if (!userResult.ok) return
-    await window.magicpocketGui.mirrorClawChannelMessage(
+    await window.dagongGui.mirrorClawChannelMessage(
       activeThreadId,
       replyText,
       'assistant'
@@ -164,7 +164,7 @@ export function useWorkbenchComposerSubmitController({
       if (remainingChars <= 0) return
       const key = contextKey(reference.relativePath || reference.path)
       if (seen.has(key)) return
-      const result = await window.magicpocketGui.readWorkspaceFile({
+      const result = await window.dagongGui.readWorkspaceFile({
         ...(reference.workspaceRoot === null
           ? {}
           : { workspaceRoot: reference.workspaceRoot || workspace }),
@@ -235,9 +235,9 @@ export function useWorkbenchComposerSubmitController({
         v
       ].join('\n\n').trim()
       let retrieval: WriteRetrievalContext | null = null
-      if (retrievalQuery && typeof window.magicpocketGui?.retrieveWriteContext === 'function') {
+      if (retrievalQuery && typeof window.dagongGui?.retrieveWriteContext === 'function') {
         try {
-          const result = await window.magicpocketGui.retrieveWriteContext({
+          const result = await window.dagongGui.retrieveWriteContext({
             workspaceRoot: writeWorkspaceRoot,
             currentFilePath: writeState.activeFilePath ?? undefined,
             query: retrievalQuery,
@@ -246,7 +246,7 @@ export function useWorkbenchComposerSubmitController({
           })
           if (result.ok) retrieval = result.context
         } catch (error) {
-          void window.magicpocketGui?.logError?.('write-retrieval', 'Failed to retrieve write context', {
+          void window.dagongGui?.logError?.('write-retrieval', 'Failed to retrieve write context', {
             message: error instanceof Error ? error.message : String(error)
           })
         }
@@ -449,8 +449,8 @@ export function useWorkbenchComposerSubmitController({
         }
         setInput('')
         void (async () => {
-          const taskResult = typeof window.magicpocketGui?.createClawTaskFromText === 'function'
-            ? await window.magicpocketGui.createClawTaskFromText(v, {
+          const taskResult = typeof window.dagongGui?.createClawTaskFromText === 'function'
+            ? await window.dagongGui.createClawTaskFromText(v, {
                 channelId: activeClawChannelId,
                 modelHint: activeClawChannelModel,
                 ...(reasoningEffort ? { reasoningEffort } : {}),

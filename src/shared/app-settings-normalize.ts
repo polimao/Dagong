@@ -25,14 +25,14 @@ import {
 } from './app-settings-types'
 import { normalizeKeyboardShortcuts, type KeyboardShortcutsConfigV1 } from './keyboard-shortcuts'
 import {
-  defaultMagicPocketRuntimeSettings,
-  getMagicPocketRuntimeSettings,
-  magicpocketSettingsEnvelope,
-  mergeMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
+  getDagongRuntimeSettings,
+  dagongSettingsEnvelope,
+  mergeDagongRuntimeSettings,
   migrateLegacyAppSettings
-} from './app-settings-magicpocket'
+} from './app-settings-dagong'
 import {
-  defaultMiniMaxMediaGenerationMagicPocketPatch,
+  defaultMiniMaxMediaGenerationDagongPatch,
   normalizeModelProviderSettings
 } from './app-settings-provider'
 import { normalizeDeepseekBaseUrl } from './app-settings-normalizers'
@@ -62,17 +62,17 @@ export function normalizeAppSettings(settings: AppSettingsV1): AppSettingsV1 {
     terminal?: TerminalSettingsPatchV1
   }
   const providerSettings = normalizeModelProviderSettings(maybeSettings.provider)
-  const runtime = getMagicPocketRuntimeSettings(maybeSettings)
-  const rawMagicPocket = maybeSettings.agents?.magicpocket
-  const rawMediaPatch: Parameters<typeof defaultMiniMaxMediaGenerationMagicPocketPatch>[0]['magicpocketPatch'] = {
-    ...(rawMagicPocket?.textToSpeech !== undefined ? { textToSpeech: rawMagicPocket.textToSpeech } : {}),
-    ...(rawMagicPocket?.musicGeneration !== undefined ? { musicGeneration: rawMagicPocket.musicGeneration } : {}),
-    ...(rawMagicPocket?.videoGeneration !== undefined ? { videoGeneration: rawMagicPocket.videoGeneration } : {})
+  const runtime = getDagongRuntimeSettings(maybeSettings)
+  const rawDagong = maybeSettings.agents?.dagong
+  const rawMediaPatch: Parameters<typeof defaultMiniMaxMediaGenerationDagongPatch>[0]['dagongPatch'] = {
+    ...(rawDagong?.textToSpeech !== undefined ? { textToSpeech: rawDagong.textToSpeech } : {}),
+    ...(rawDagong?.musicGeneration !== undefined ? { musicGeneration: rawDagong.musicGeneration } : {}),
+    ...(rawDagong?.videoGeneration !== undefined ? { videoGeneration: rawDagong.videoGeneration } : {})
   }
-  const miniMaxMediaDefaults = defaultMiniMaxMediaGenerationMagicPocketPatch({
+  const miniMaxMediaDefaults = defaultMiniMaxMediaGenerationDagongPatch({
     providers: providerSettings.providers,
-    currentMagicPocket: runtime,
-    magicpocketPatch: rawMediaPatch
+    currentDagong: runtime,
+    dagongPatch: rawMediaPatch
   })
   return {
     ...migrated,
@@ -87,7 +87,7 @@ export function normalizeAppSettings(settings: AppSettingsV1): AppSettingsV1 {
     cursorSpotlight: maybeSettings.cursorSpotlight !== false,
     cursorSpotlightColor: normalizeCursorSpotlightColor(maybeSettings.cursorSpotlightColor),
     provider: providerSettings,
-    agents: magicpocketSettingsEnvelope(mergeMagicPocketRuntimeSettings(defaultMagicPocketRuntimeSettings(), {
+    agents: dagongSettingsEnvelope(mergeDagongRuntimeSettings(defaultDagongRuntimeSettings(), {
       ...runtime,
       baseUrl: runtime.baseUrl.trim() ? normalizeDeepseekBaseUrl(runtime.baseUrl) : '',
       ...(miniMaxMediaDefaults ?? {})
@@ -229,16 +229,16 @@ function shouldMigrateLegacySettings(settings: AppSettingsV1): boolean {
     agentProvider?: unknown
     deepseek?: unknown
     agents?: {
-      magicpocket?: Partial<ReturnType<typeof defaultMagicPocketRuntimeSettings>>
+      dagong?: Partial<ReturnType<typeof defaultDagongRuntimeSettings>>
       codewhale?: unknown
       reasonix?: unknown
     }
   }
-  if (!raw.agents?.magicpocket) return true
+  if (!raw.agents?.dagong) return true
   if ('agentProvider' in raw || 'deepseek' in raw) return true
   if (raw.agents.codewhale || raw.agents.reasonix) return true
-  const dataDir = typeof raw.agents.magicpocket.dataDir === 'string'
-    ? raw.agents.magicpocket.dataDir.replace(/\\/g, '/').toLowerCase()
+  const dataDir = typeof raw.agents.dagong.dataDir === 'string'
+    ? raw.agents.dagong.dataDir.replace(/\\/g, '/').toLowerCase()
     : ''
   return dataDir === '~/.deepseekgui/coreagent' || dataDir.endsWith('/.deepseekgui/coreagent')
 }

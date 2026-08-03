@@ -2,16 +2,16 @@
  * Async infographic placeholders.
  *
  * Clicking 生成信息图 inserts a markdown image whose src uses the
- * `magicpocket-pending-infographic:` scheme, so the document itself carries the
+ * `dagong-pending-infographic:` scheme, so the document itself carries the
  * placeholder position while generation runs in the background. All three
  * render surfaces (rich editor, live preview, split preview) recognize the
  * scheme and draw an animated "painting" canvas; when the IPC call resolves
  * the token is swapped for the real image path (or removed on failure).
  */
 
-export const PENDING_INFOGRAPHIC_PROTOCOL = 'magicpocket-pending-infographic:'
+export const PENDING_INFOGRAPHIC_PROTOCOL = 'dagong-pending-infographic:'
 
-const PENDING_SRC_PATTERN = /^magicpocket-pending-infographic:\/\/([A-Za-z0-9-]+)$/
+const PENDING_SRC_PATTERN = /^dagong-pending-infographic:\/\/([A-Za-z0-9-]+)$/
 
 export type PendingInfographicKind = 'infographic' | 'design' | 'prototype'
 
@@ -65,7 +65,7 @@ export function buildPendingInfographicMarkdown(alt: string, src: string): strin
   return `![${alt.replace(/[[\]]/g, '')}](${src})`
 }
 
-/** Parse `![alt](magicpocket-pending-infographic://id)` image markdown. */
+/** Parse `![alt](dagong-pending-infographic://id)` image markdown. */
 export function parsePendingInfographicImage(
   source: string
 ): { alt: string; id: string; src: string } | null {

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ClawImChannelV1 } from '@shared/app-settings'
 import type { ChatBlock } from '../agent/types'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import { CLAW_MANAGED_INSTRUCTIONS_HEADING } from '@shared/app-settings'
 import {
   MAX_TURN_MODEL_LABELS,
@@ -29,8 +29,8 @@ import {
   resolveComposerContextWindowTokens
 } from './chat-store-helpers'
 
-const TURN_MODEL_STORAGE_KEY = 'magicpocket.turnModelLabel'
-const THREAD_COMPOSER_SELECTION_STORAGE_KEY = 'magicpocket.threadComposerSelection.v1'
+const TURN_MODEL_STORAGE_KEY = 'dagong.turnModelLabel'
+const THREAD_COMPOSER_SELECTION_STORAGE_KEY = 'dagong.threadComposerSelection.v1'
 
 function createMemoryStorage(): Storage {
   const items = new Map<string, string>()
@@ -58,7 +58,7 @@ function clawChannel(): ClawImChannelV1 {
     label: 'Feishu Agent',
     enabled: true,
     model: 'auto',
-    threadId: 'magicpocket-channel',
+    threadId: 'dagong-channel',
     workspaceRoot: '/Users/zxy/project',
     agentProfile: {
       name: '',
@@ -76,7 +76,7 @@ function clawChannel(): ClawImChannelV1 {
         latestMessageId: 'message-1',
         senderId: 'sender-1',
         senderName: 'Alex',
-        localThreadId: 'magicpocket-conversation',
+        localThreadId: 'dagong-conversation',
         workspaceRoot: '/Users/zxy/project',
         createdAt: now,
         updatedAt: now
@@ -142,11 +142,11 @@ describe('chat-store Claw helpers', () => {
     expect(compacted).not.toContain(`/Users/zxy/project-${MAX_CODE_WORKSPACE_ROOTS}`)
   })
 
-  it('drops MagicPocket branch worktree paths from remembered code workspaces', () => {
+  it('drops Dagong branch worktree paths from remembered code workspaces', () => {
     expect(
       compactCodeWorkspaceRoots([
         '/Users/zxy/code/project-a',
-        '/Users/zxy/.magicpocket/worktrees/ab12/project-a'
+        '/Users/zxy/.dagong/worktrees/ab12/project-a'
       ])
     ).toEqual(['/Users/zxy/code/project-a'])
   })
@@ -176,8 +176,8 @@ describe('chat-store Claw helpers', () => {
   it('collects channel and conversation thread ids for Claw sessions', () => {
     const ids = clawThreadIdsFromChannels([clawChannel()])
 
-    expect(ids.has('magicpocket-channel')).toBe(true)
-    expect(ids.has('magicpocket-conversation')).toBe(true)
+    expect(ids.has('dagong-channel')).toBe(true)
+    expect(ids.has('dagong-conversation')).toBe(true)
   })
 
   it('uses product default agent names for new Claw channels', () => {
@@ -194,13 +194,13 @@ describe('chat-store Claw helpers', () => {
     expect(
       clawThreadTitleLooksManaged(`${CLAW_MANAGED_INSTRUCTIONS_HEADING} DeepSeek GUI scheduled-task tools`)
     ).toBe(true)
-    expect(isClawThread({ id: 'magicpocket-leaked', title: '[Claw:Feishu Agent]' })).toBe(true)
+    expect(isClawThread({ id: 'dagong-leaked', title: '[Claw:Feishu Agent]' })).toBe(true)
   })
 
   it('recognizes Claw sessions by registered thread id', () => {
     expect(
       isClawThread(
-        { id: 'magicpocket-conversation', title: 'hi' },
+        { id: 'dagong-conversation', title: 'hi' },
         [clawChannel()]
       )
     ).toBe(true)

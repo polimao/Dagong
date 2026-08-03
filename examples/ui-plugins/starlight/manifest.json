@@ -1,9 +1,9 @@
 {
   "id": "starlight",
-  "name": "星夜 MagicPocket",
+  "name": "星夜 Dagong",
   "version": "1.0.0",
-  "author": "MagicPocket Team",
-  "description": "官方示例插件:深紫星夜配色的 MagicPocket 形象,含主题色与进行中文案。",
+  "author": "Dagong Team",
+  "description": "官方示例插件:深紫星夜配色的 Dagong 形象,含主题色与进行中文案。",
   "figures": {
     "swim": "img/bird.png",
     "surf": "img/surf.png",

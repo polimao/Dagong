@@ -1,7 +1,7 @@
 import {
-  isMagicPocketBranchWorktreePath,
-  resolveMagicPocketBranchWorktreeProjectPath
-} from '@shared/magicpocket-worktree-path'
+  isDagongBranchWorktreePath,
+  resolveDagongBranchWorktreeProjectPath
+} from '@shared/dagong-worktree-path'
 import type { ThreadWorktreeRecord } from './thread-worktree-registry'
 import { normalizeWorkspaceRoot, workspaceRootIdentityKey } from './workspace-path'
 
@@ -22,7 +22,7 @@ export function resolveProjectWorkspacePath(
 ): string {
   const normalized = normalizeWorkspaceRoot(workspacePath)
   if (!normalized) return ''
-  if (!isMagicPocketBranchWorktreePath(normalized)) return normalized
+  if (!isDagongBranchWorktreePath(normalized)) return normalized
 
   const key = workspaceRootIdentityKey(normalized)
   for (const record of Object.values(options.threadWorktrees ?? {})) {
@@ -33,7 +33,7 @@ export function resolveProjectWorkspacePath(
     }
   }
 
-  const resolved = resolveMagicPocketBranchWorktreeProjectPath(
+  const resolved = resolveDagongBranchWorktreeProjectPath(
     normalized,
     options.candidateProjectPaths ?? []
   )
@@ -42,5 +42,5 @@ export function resolveProjectWorkspacePath(
 
 export function shouldOmitFromCodeWorkspaceRoots(workspacePath: string): boolean {
   const normalized = normalizeWorkspaceRoot(workspacePath)
-  return Boolean(normalized) && isMagicPocketBranchWorktreePath(normalized)
+  return Boolean(normalized) && isDagongBranchWorktreePath(normalized)
 }

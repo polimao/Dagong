@@ -270,10 +270,10 @@ export function useWorkbenchNavigationController({
     try {
       const writeState = useWriteWorkspaceStore.getState()
       writeState.setFileError(null)
-      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.dagongGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.magicpocketGui.pickWorkspaceDirectory(
+      const picked = await window.dagongGui.pickWorkspaceDirectory(
         writeState.workspaceRoot || writeState.defaultWorkspaceRoot || workspaceRoot || undefined
       )
       if (!picked.canceled && picked.path) {

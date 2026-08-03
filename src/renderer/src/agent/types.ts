@@ -8,7 +8,7 @@ import type {
   CoreRuntimeInfoJson,
   CoreRuntimeSkillJson,
   CoreRuntimeToolDiagnosticsJson
-} from './magicpocket-contract'
+} from './dagong-contract'
 import type { ApprovalPolicy, SandboxMode } from '@shared/app-settings'
 
 export type ToolItemKind = 'tool_call' | 'command_execution' | 'file_change'
@@ -410,7 +410,7 @@ export type ThreadErrorOptions = {
   terminal?: boolean
 }
 
-/** Cumulative usage/cost for a MagicPocket thread. */
+/** Cumulative usage/cost for a Dagong thread. */
 export type ThreadUsageSnapshot = {
   inputTokens: number
   outputTokens: number
@@ -448,7 +448,7 @@ export type ThreadEventSink = {
 }
 
 export interface AgentProvider {
-  readonly id: 'magicpocket'
+  readonly id: 'dagong'
   readonly displayName: string
   getCapabilities(): {
     interrupt: boolean
@@ -507,7 +507,7 @@ export interface AgentProvider {
   getToolDiagnostics?(): Promise<CoreRuntimeToolDiagnosticsJson>
   getMcpOAuthDiagnostics?(): Promise<CoreMcpOAuthDiagnosticJson[]>
   clearMcpOAuthCredentials?(serverId?: string): Promise<string[]>
-  authorizeMcpOAuthCredentials?(serverId: string): Promise<import('./magicpocket-contract').CoreMcpOAuthAuthorizeResponseJson>
+  authorizeMcpOAuthCredentials?(serverId: string): Promise<import('./dagong-contract').CoreMcpOAuthAuthorizeResponseJson>
   listSkills?(): Promise<CoreRuntimeSkillJson[]>
   uploadAttachment?(input: {
     name: string

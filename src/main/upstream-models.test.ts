@@ -7,7 +7,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -15,7 +15,7 @@ import {
   defaultTerminalSettings,
   type AppSettingsV1
 } from '../shared/app-settings'
-import { fetchUpstreamModelIds, readConfiguredMagicPocketModelIds } from './upstream-models'
+import { fetchUpstreamModelIds, readConfiguredDagongModelIds } from './upstream-models'
 
 function settings(dataDir: string, model = 'settings-model'): AppSettingsV1 {
   const provider = defaultModelProviderSettings()
@@ -41,15 +41,15 @@ function settings(dataDir: string, model = 'settings-model'): AppSettingsV1 {
       ]
     },
     agents: {
-      magicpocket: {
-        ...defaultMagicPocketRuntimeSettings(),
+      dagong: {
+        ...defaultDagongRuntimeSettings(),
         dataDir,
         model,
         providerId: 'custom-provider'
       }
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -68,7 +68,7 @@ function settings(dataDir: string, model = 'settings-model'): AppSettingsV1 {
 }
 
 describe('upstream model picker list', () => {
-  it('includes MagicPocket config model profiles, aliases, and the configured agent model', async () => {
+  it('includes Dagong config model profiles, aliases, and the configured agent model', async () => {
     const dataDir = mkdtempSync(join(tmpdir(), 'deepseek-gui-models-'))
     await mkdir(dataDir, { recursive: true })
     await writeFile(
@@ -90,7 +90,7 @@ describe('upstream model picker list', () => {
       'utf8'
     )
 
-    const ids = await readConfiguredMagicPocketModelIds(settings(dataDir))
+    const ids = await readConfiguredDagongModelIds(settings(dataDir))
 
     expect(ids).toEqual(expect.arrayContaining([
       'deepseek-v4-pro',

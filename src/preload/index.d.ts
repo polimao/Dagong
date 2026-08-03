@@ -1,9 +1,9 @@
-import type { MagicPocketGuiApi } from '../shared/magicpocket-gui-api'
+import type { DagongGuiApi } from '../shared/dagong-gui-api'
 
-export type * from '../shared/magicpocket-gui-api'
+export type * from '../shared/dagong-gui-api'
 
 declare global {
   interface Window {
-    magicpocketGui: MagicPocketGuiApi
+    dagongGui: DagongGuiApi
   }
 }

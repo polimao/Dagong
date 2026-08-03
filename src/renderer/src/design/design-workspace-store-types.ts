@@ -63,7 +63,7 @@ export type DesignWorkspaceState = {
   publishDesignSystem: boolean
   settingsLoaded: boolean
   fileError: string | null
-  /** Hash of the current published .magicpocket-design/DESIGN_SYSTEM.md ('' = none). */
+  /** Hash of the current published .dagong-design/DESIGN_SYSTEM.md ('' = none). */
   designSystemHash: string
   /** When true, the design page shows the in-page code-implement assistant. */
   implementOpen: boolean
@@ -151,7 +151,7 @@ export type DesignWorkspaceState = {
   updateDesignContext: (patch: Partial<DesignContext>) => void
   /** Hydrate workspace root + design context defaults from persisted settings. */
   loadDesignSettings: () => Promise<void>
-  /** Rebuild the artifact list from `.magicpocket-design/` on disk (durable list). */
+  /** Rebuild the artifact list from `.dagong-design/` on disk (durable list). */
   rehydrateArtifacts: () => Promise<void>
   /** Re-read DESIGN_SYSTEM.md and refresh designSystemHash (code-drift detection). */
   refreshDesignSystemHash: () => Promise<void>

@@ -1,6 +1,6 @@
 import type { WorkspaceFileTarget } from '@shared/workspace-file'
 
-export const WORKSPACE_FILE_PREVIEW_EVENT = 'magicpocket:workspace-file-preview'
+export const WORKSPACE_FILE_PREVIEW_EVENT = 'dagong:workspace-file-preview'
 
 export type WorkspaceFilePreviewDetail = WorkspaceFileTarget
 

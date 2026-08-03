@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import type { CoreMemoryRecordJson } from '../agent/magicpocket-contract'
+import type { CoreMemoryRecordJson } from '../agent/dagong-contract'
 import {
   MemorySettingsSection,
   attemptCloseMemoryDialog,
@@ -28,7 +28,7 @@ const labels: Record<string, string> = {
   memoryExport: 'Export',
   memoryExported: 'Memory exported',
   memoryExportUnavailable: 'Export unavailable',
-  memoryImportTitle: 'Import Memory into MagicPocket',
+  memoryImportTitle: 'Import Memory into Dagong',
   memoryImportStepPrompt: 'Copy prompt',
   memoryImportCopy: 'Copy',
   memoryImportCopied: 'Copied',
@@ -89,8 +89,8 @@ const labels: Record<string, string> = {
 function baseCtx(overrides: Record<string, any> = {}): Record<string, any> {
   return {
     t: (key: string) => labels[key] ?? key,
-    magicpocket: { memoryEnabled: true },
-    updateMagicPocket: () => undefined,
+    dagong: { memoryEnabled: true },
+    updateDagong: () => undefined,
     memoryDiagnostics: {
       enabled: true,
       activeCount: 1,

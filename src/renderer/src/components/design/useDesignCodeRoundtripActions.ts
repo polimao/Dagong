@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import { useChatStore } from '../../store/chat-store'
 import { providerIdForComposerModel } from '../../store/chat-store-helpers'
 import {

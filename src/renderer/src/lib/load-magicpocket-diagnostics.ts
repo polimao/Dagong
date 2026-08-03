@@ -2,23 +2,23 @@ import type {
   CoreMemoryRecordJson,
   CoreRuntimeInfoJson,
   CoreRuntimeToolDiagnosticsJson
-} from '../agent/magicpocket-contract'
+} from '../agent/dagong-contract'
 import type { AgentProvider } from '../agent/types'
 import { describeRuntimeError } from './format-runtime-error'
 
 type DiagnosticsProvider = Pick<AgentProvider, 'getRuntimeInfo' | 'getToolDiagnostics' | 'listMemories'>
 
-export type LoadedMagicPocketDiagnostics = {
+export type LoadedDagongDiagnostics = {
   runtimeInfo?: CoreRuntimeInfoJson | null
   toolDiagnostics?: CoreRuntimeToolDiagnosticsJson | null
   memoryRecords?: CoreMemoryRecordJson[]
   errors: string[]
 }
 
-export async function loadMagicPocketDiagnostics(
+export async function loadDagongDiagnostics(
   provider: DiagnosticsProvider,
   options: { listAllMemories?: boolean } = {}
-): Promise<LoadedMagicPocketDiagnostics> {
+): Promise<LoadedDagongDiagnostics> {
   const listAllMemories = options.listAllMemories !== false
   const [runtimeInfo, toolDiagnostics, memoryRecords] = await Promise.allSettled([
     provider.getRuntimeInfo ? provider.getRuntimeInfo() : Promise.resolve(null),
@@ -32,7 +32,7 @@ export async function loadMagicPocketDiagnostics(
       : Promise.resolve([])
   ])
 
-  const loaded: LoadedMagicPocketDiagnostics = { errors: [] }
+  const loaded: LoadedDagongDiagnostics = { errors: [] }
 
   if (runtimeInfo.status === 'fulfilled') {
     loaded.runtimeInfo = runtimeInfo.value ?? null

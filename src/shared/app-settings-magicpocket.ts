@@ -19,27 +19,27 @@ import {
   MODEL_REASONING_REQUEST_PROTOCOLS,
   normalizeModelEndpointFormat,
   type AppSettingsV1,
-  type MagicPocketComputerUseSettingsV1,
-  type MagicPocketContextCompactionSettingsV1,
-  type MagicPocketDesignQualitySettingsV1,
-  type MagicPocketDesignQualityStrictness,
-  type MagicPocketHistoryHygieneSettingsV1,
-  type MagicPocketImageGenerationSettingsV1,
-  type MagicPocketInstructionSettingsV1,
+  type DagongComputerUseSettingsV1,
+  type DagongContextCompactionSettingsV1,
+  type DagongDesignQualitySettingsV1,
+  type DagongDesignQualityStrictness,
+  type DagongHistoryHygieneSettingsV1,
+  type DagongImageGenerationSettingsV1,
+  type DagongInstructionSettingsV1,
   type ImageGenerationQuality,
-  type MagicPocketMcpSearchSettingsV1,
-  type MagicPocketMusicGenerationSettingsV1,
-  type MagicPocketRuntimeTuningSettingsV1,
-  type MagicPocketRuntimeSettingsPatchV1,
-  type MagicPocketRuntimeSettingsV1,
-  type MagicPocketSettingsEnvelopePatchV1,
-  type MagicPocketSettingsEnvelopeV1,
-  type MagicPocketSpeechToTextSettingsV1,
-  type MagicPocketStorageSettingsV1,
-  type MagicPocketToolOutputLimitsSettingsV1,
-  type MagicPocketTextToSpeechSettingsV1,
-  type MagicPocketTokenEconomySettingsV1,
-  type MagicPocketVideoGenerationSettingsV1,
+  type DagongMcpSearchSettingsV1,
+  type DagongMusicGenerationSettingsV1,
+  type DagongRuntimeTuningSettingsV1,
+  type DagongRuntimeSettingsPatchV1,
+  type DagongRuntimeSettingsV1,
+  type DagongSettingsEnvelopePatchV1,
+  type DagongSettingsEnvelopeV1,
+  type DagongSpeechToTextSettingsV1,
+  type DagongStorageSettingsV1,
+  type DagongToolOutputLimitsSettingsV1,
+  type DagongTextToSpeechSettingsV1,
+  type DagongTokenEconomySettingsV1,
+  type DagongVideoGenerationSettingsV1,
   type ImageGenerationProtocol,
   type MusicGenerationProtocol,
   type ModelProviderInputModality,
@@ -57,7 +57,7 @@ import {
 } from './app-settings-types'
 import {
   normalizeModelProviderSettings,
-  resolveMagicPocketRuntimeSettings
+  resolveDagongRuntimeSettings
 } from './app-settings-provider'
 import {
   LOCAL_WHISPER_DEFAULT_DOWNLOAD_SOURCE_ID,
@@ -66,7 +66,7 @@ import {
 
 const LEGACY_COREAGENT_DATA_DIR = '~/.deepseekgui/coreagent'
 const LEGACY_KUN_DEFAULT_MODEL = 'deepseek-chat'
-// 旧版真实落盘默认值, 用于把升级前配置迁移到当前 MagicPocket 默认端口。
+// 旧版真实落盘默认值, 用于把升级前配置迁移到当前 Dagong 默认端口。
 const LEGACY_LOCAL_HTTP_DEFAULT_PORT = 7878
 const PREVIOUS_KUN_DEFAULT_PORT = 8899
 
@@ -96,7 +96,7 @@ type LegacyReasoningRuntimeSettingsV1 = {
 }
 
 /**
- * MagicPocket runtime settings. Mirrors the `magicpocket serve` CLI
+ * Dagong runtime settings. Mirrors the `dagong serve` CLI
  * options. It is the only active agent settings object the GUI
  * stores after legacy settings have been migrated.
  */
@@ -126,9 +126,9 @@ function legacyReasoningRuntimeDefaults(): LegacyReasoningRuntimeSettingsV1 {
   }
 }
 
-export function defaultMagicPocketRuntimeSettings(
+export function defaultDagongRuntimeSettings(
   port = DEFAULT_KUN_PORT
-): MagicPocketRuntimeSettingsV1 {
+): DagongRuntimeSettingsV1 {
   return {
     binaryPath: '',
     port,
@@ -143,40 +143,40 @@ export function defaultMagicPocketRuntimeSettings(
     approvalPolicy: DEFAULT_APPROVAL_POLICY,
     sandboxMode: DEFAULT_SANDBOX_MODE,
     tokenEconomyMode: false,
-    tokenEconomy: defaultMagicPocketTokenEconomySettings(),
-    toolOutputLimits: defaultMagicPocketToolOutputLimitsSettings(),
+    tokenEconomy: defaultDagongTokenEconomySettings(),
+    toolOutputLimits: defaultDagongToolOutputLimitsSettings(),
     insecure: false,
-    mcpSearch: defaultMagicPocketMcpSearchSettings(),
-    storage: defaultMagicPocketStorageSettings(),
-    contextCompaction: defaultMagicPocketContextCompactionSettings(),
-    runtimeTuning: defaultMagicPocketRuntimeTuningSettings(),
-    imageGeneration: defaultMagicPocketImageGenerationSettings(),
-    speechToText: defaultMagicPocketSpeechToTextSettings(),
-    textToSpeech: defaultMagicPocketTextToSpeechSettings(),
-    musicGeneration: defaultMagicPocketMusicGenerationSettings(),
-    videoGeneration: defaultMagicPocketVideoGenerationSettings(),
+    mcpSearch: defaultDagongMcpSearchSettings(),
+    storage: defaultDagongStorageSettings(),
+    contextCompaction: defaultDagongContextCompactionSettings(),
+    runtimeTuning: defaultDagongRuntimeTuningSettings(),
+    imageGeneration: defaultDagongImageGenerationSettings(),
+    speechToText: defaultDagongSpeechToTextSettings(),
+    textToSpeech: defaultDagongTextToSpeechSettings(),
+    musicGeneration: defaultDagongMusicGenerationSettings(),
+    videoGeneration: defaultDagongVideoGenerationSettings(),
     modelProfiles: {},
     memoryEnabled: false,
-    instructions: defaultMagicPocketInstructionSettings(),
-    computerUse: defaultMagicPocketComputerUseSettings(),
-    quality: defaultMagicPocketQualitySettings()
+    instructions: defaultDagongInstructionSettings(),
+    computerUse: defaultDagongComputerUseSettings(),
+    quality: defaultDagongQualitySettings()
   }
 }
 
-export function defaultMagicPocketInstructionSettings(): MagicPocketInstructionSettingsV1 {
+export function defaultDagongInstructionSettings(): DagongInstructionSettingsV1 {
   return {
     enabled: true
   }
 }
 
-export function defaultMagicPocketToolOutputLimitsSettings(): MagicPocketToolOutputLimitsSettingsV1 {
+export function defaultDagongToolOutputLimitsSettings(): DagongToolOutputLimitsSettingsV1 {
   return {
     maxLines: DEFAULT_TOOL_OUTPUT_MAX_LINES,
     maxBytes: DEFAULT_TOOL_OUTPUT_MAX_BYTES
   }
 }
 
-export function defaultMagicPocketQualitySettings(): MagicPocketDesignQualitySettingsV1 {
+export function defaultDagongQualitySettings(): DagongDesignQualitySettingsV1 {
   return {
     enabled: true,
     strictness: 'standard',
@@ -186,7 +186,7 @@ export function defaultMagicPocketQualitySettings(): MagicPocketDesignQualitySet
   }
 }
 
-export function defaultMagicPocketComputerUseSettings(): MagicPocketComputerUseSettingsV1 {
+export function defaultDagongComputerUseSettings(): DagongComputerUseSettingsV1 {
   return {
     enabled: false,
     mode: 'auto',
@@ -195,7 +195,7 @@ export function defaultMagicPocketComputerUseSettings(): MagicPocketComputerUseS
   }
 }
 
-export function defaultMagicPocketImageGenerationSettings(): MagicPocketImageGenerationSettingsV1 {
+export function defaultDagongImageGenerationSettings(): DagongImageGenerationSettingsV1 {
   return {
     enabled: false,
     providerId: '',
@@ -209,7 +209,7 @@ export function defaultMagicPocketImageGenerationSettings(): MagicPocketImageGen
   }
 }
 
-export function defaultMagicPocketSpeechToTextSettings(): MagicPocketSpeechToTextSettingsV1 {
+export function defaultDagongSpeechToTextSettings(): DagongSpeechToTextSettingsV1 {
   return {
     enabled: false,
     providerId: '',
@@ -223,7 +223,7 @@ export function defaultMagicPocketSpeechToTextSettings(): MagicPocketSpeechToTex
   }
 }
 
-export function defaultMagicPocketTextToSpeechSettings(): MagicPocketTextToSpeechSettingsV1 {
+export function defaultDagongTextToSpeechSettings(): DagongTextToSpeechSettingsV1 {
   return {
     enabled: false,
     providerId: '',
@@ -237,7 +237,7 @@ export function defaultMagicPocketTextToSpeechSettings(): MagicPocketTextToSpeec
   }
 }
 
-export function defaultMagicPocketMusicGenerationSettings(): MagicPocketMusicGenerationSettingsV1 {
+export function defaultDagongMusicGenerationSettings(): DagongMusicGenerationSettingsV1 {
   return {
     enabled: false,
     providerId: '',
@@ -250,7 +250,7 @@ export function defaultMagicPocketMusicGenerationSettings(): MagicPocketMusicGen
   }
 }
 
-export function defaultMagicPocketVideoGenerationSettings(): MagicPocketVideoGenerationSettingsV1 {
+export function defaultDagongVideoGenerationSettings(): DagongVideoGenerationSettingsV1 {
   return {
     enabled: false,
     providerId: '',
@@ -265,7 +265,7 @@ export function defaultMagicPocketVideoGenerationSettings(): MagicPocketVideoGen
   }
 }
 
-export function defaultMagicPocketMcpSearchSettings(): MagicPocketMcpSearchSettingsV1 {
+export function defaultDagongMcpSearchSettings(): DagongMcpSearchSettingsV1 {
   return {
     enabled: false,
     mode: 'auto',
@@ -276,17 +276,17 @@ export function defaultMagicPocketMcpSearchSettings(): MagicPocketMcpSearchSetti
   }
 }
 
-export function defaultMagicPocketTokenEconomySettings(): MagicPocketTokenEconomySettingsV1 {
+export function defaultDagongTokenEconomySettings(): DagongTokenEconomySettingsV1 {
   return {
     enabled: false,
     compressToolDescriptions: true,
     compressToolResults: true,
     conciseResponses: true,
-    historyHygiene: defaultMagicPocketHistoryHygieneSettings()
+    historyHygiene: defaultDagongHistoryHygieneSettings()
   }
 }
 
-export function defaultMagicPocketHistoryHygieneSettings(): MagicPocketHistoryHygieneSettingsV1 {
+export function defaultDagongHistoryHygieneSettings(): DagongHistoryHygieneSettingsV1 {
   return {
     maxToolResultLines: 320,
     maxToolResultBytes: 32 * 1024,
@@ -297,14 +297,14 @@ export function defaultMagicPocketHistoryHygieneSettings(): MagicPocketHistoryHy
   }
 }
 
-export function defaultMagicPocketStorageSettings(): MagicPocketStorageSettingsV1 {
+export function defaultDagongStorageSettings(): DagongStorageSettingsV1 {
   return {
     backend: 'hybrid',
     sqlitePath: ''
   }
 }
 
-export function defaultMagicPocketContextCompactionSettings(): MagicPocketContextCompactionSettingsV1 {
+export function defaultDagongContextCompactionSettings(): DagongContextCompactionSettingsV1 {
   return {
     defaultSoftThreshold: 96_000,
     defaultHardThreshold: 108_800,
@@ -318,7 +318,7 @@ export function defaultMagicPocketContextCompactionSettings(): MagicPocketContex
   }
 }
 
-export function defaultMagicPocketRuntimeTuningSettings(): MagicPocketRuntimeTuningSettingsV1 {
+export function defaultDagongRuntimeTuningSettings(): DagongRuntimeTuningSettingsV1 {
   return {
     streamIdleTimeoutMs: 450_000,
     toolStorm: {
@@ -332,39 +332,39 @@ export function defaultMagicPocketRuntimeTuningSettings(): MagicPocketRuntimeTun
   }
 }
 
-export function getMagicPocketRuntimeSettings(
+export function getDagongRuntimeSettings(
   settings: AppSettingsV1
-): MagicPocketRuntimeSettingsV1 {
-  const raw = (settings as { agents?: { magicpocket?: Partial<MagicPocketRuntimeSettingsV1> } }).agents?.magicpocket
-  return mergeMagicPocketRuntimeSettings(defaultMagicPocketRuntimeSettings(), raw)
+): DagongRuntimeSettingsV1 {
+  const raw = (settings as { agents?: { dagong?: Partial<DagongRuntimeSettingsV1> } }).agents?.dagong
+  return mergeDagongRuntimeSettings(defaultDagongRuntimeSettings(), raw)
 }
 
-export function magicpocketSettingsEnvelope(
-  magicpocket: MagicPocketRuntimeSettingsV1
-): MagicPocketSettingsEnvelopeV1 {
-  return { magicpocket }
+export function dagongSettingsEnvelope(
+  dagong: DagongRuntimeSettingsV1
+): DagongSettingsEnvelopeV1 {
+  return { dagong }
 }
 
-export function magicpocketSettingsPatch(
-  magicpocket: MagicPocketRuntimeSettingsPatchV1 | undefined
-): MagicPocketSettingsEnvelopePatchV1 {
-  return magicpocket ? { magicpocket } : {}
+export function dagongSettingsPatch(
+  dagong: DagongRuntimeSettingsPatchV1 | undefined
+): DagongSettingsEnvelopePatchV1 {
+  return dagong ? { dagong } : {}
 }
 
-export function mergeMagicPocketRuntimeSettings(
-  current: MagicPocketRuntimeSettingsV1,
-  patch: MagicPocketRuntimeSettingsPatchV1 | undefined
-): MagicPocketRuntimeSettingsV1 {
-  const currentMcpSearch = normalizeMagicPocketMcpSearchSettings(current.mcpSearch)
-  const nextMcpSearch = normalizeMagicPocketMcpSearchSettings({
+export function mergeDagongRuntimeSettings(
+  current: DagongRuntimeSettingsV1,
+  patch: DagongRuntimeSettingsPatchV1 | undefined
+): DagongRuntimeSettingsV1 {
+  const currentMcpSearch = normalizeDagongMcpSearchSettings(current.mcpSearch)
+  const nextMcpSearch = normalizeDagongMcpSearchSettings({
     ...currentMcpSearch,
     ...(patch?.mcpSearch ?? {})
   })
-  const currentTokenEconomy = normalizeMagicPocketTokenEconomySettings(
+  const currentTokenEconomy = normalizeDagongTokenEconomySettings(
     current.tokenEconomy,
     current.tokenEconomyMode
   )
-  const patchedTokenEconomy = normalizeMagicPocketTokenEconomySettings({
+  const patchedTokenEconomy = normalizeDagongTokenEconomySettings({
     ...currentTokenEconomy,
     ...(patch?.tokenEconomy ?? {}),
     historyHygiene: {
@@ -381,17 +381,17 @@ export function mergeMagicPocketRuntimeSettings(
     ...patchedTokenEconomy,
     enabled: tokenEconomyEnabled
   }
-  const currentToolOutputLimits = normalizeMagicPocketToolOutputLimitsSettings(current.toolOutputLimits)
-  const nextToolOutputLimits = normalizeMagicPocketToolOutputLimitsSettings({
+  const currentToolOutputLimits = normalizeDagongToolOutputLimitsSettings(current.toolOutputLimits)
+  const nextToolOutputLimits = normalizeDagongToolOutputLimitsSettings({
     ...currentToolOutputLimits,
     ...(patch?.toolOutputLimits ?? {})
   })
-  const currentStorage = normalizeMagicPocketStorageSettings(current.storage)
-  const nextStorage = normalizeMagicPocketStorageSettings({
+  const currentStorage = normalizeDagongStorageSettings(current.storage)
+  const nextStorage = normalizeDagongStorageSettings({
     ...currentStorage,
     ...(patch?.storage ?? {})
   })
-  const currentContextCompaction = normalizeMagicPocketContextCompactionSettings(current.contextCompaction)
+  const currentContextCompaction = normalizeDagongContextCompactionSettings(current.contextCompaction)
   const contextCompactionPatch = patch?.contextCompaction ?? {}
   const nextContextCompactionInput = {
     ...currentContextCompaction,
@@ -403,44 +403,44 @@ export function mergeMagicPocketRuntimeSettings(
   ) {
     nextContextCompactionInput.defaultHardThreshold = contextCompactionPatch.defaultSoftThreshold
   }
-  const nextContextCompaction = normalizeMagicPocketContextCompactionSettings(nextContextCompactionInput)
-  const currentImageGeneration = normalizeMagicPocketImageGenerationSettings(current.imageGeneration)
-  const nextImageGeneration = normalizeMagicPocketImageGenerationSettings({
+  const nextContextCompaction = normalizeDagongContextCompactionSettings(nextContextCompactionInput)
+  const currentImageGeneration = normalizeDagongImageGenerationSettings(current.imageGeneration)
+  const nextImageGeneration = normalizeDagongImageGenerationSettings({
     ...currentImageGeneration,
     ...(patch?.imageGeneration ?? {})
   })
-  const currentSpeechToText = normalizeMagicPocketSpeechToTextSettings(current.speechToText)
-  const nextSpeechToText = normalizeMagicPocketSpeechToTextSettings({
+  const currentSpeechToText = normalizeDagongSpeechToTextSettings(current.speechToText)
+  const nextSpeechToText = normalizeDagongSpeechToTextSettings({
     ...currentSpeechToText,
     ...(patch?.speechToText ?? {})
   })
-  const currentTextToSpeech = normalizeMagicPocketTextToSpeechSettings(current.textToSpeech)
-  const nextTextToSpeech = normalizeMagicPocketTextToSpeechSettings({
+  const currentTextToSpeech = normalizeDagongTextToSpeechSettings(current.textToSpeech)
+  const nextTextToSpeech = normalizeDagongTextToSpeechSettings({
     ...currentTextToSpeech,
     ...(patch?.textToSpeech ?? {})
   })
-  const currentMusicGeneration = normalizeMagicPocketMusicGenerationSettings(current.musicGeneration)
-  const nextMusicGeneration = normalizeMagicPocketMusicGenerationSettings({
+  const currentMusicGeneration = normalizeDagongMusicGenerationSettings(current.musicGeneration)
+  const nextMusicGeneration = normalizeDagongMusicGenerationSettings({
     ...currentMusicGeneration,
     ...(patch?.musicGeneration ?? {})
   })
-  const currentVideoGeneration = normalizeMagicPocketVideoGenerationSettings(current.videoGeneration)
-  const nextVideoGeneration = normalizeMagicPocketVideoGenerationSettings({
+  const currentVideoGeneration = normalizeDagongVideoGenerationSettings(current.videoGeneration)
+  const nextVideoGeneration = normalizeDagongVideoGenerationSettings({
     ...currentVideoGeneration,
     ...(patch?.videoGeneration ?? {})
   })
-  const currentComputerUse = normalizeMagicPocketComputerUseSettings(current.computerUse)
-  const nextComputerUse = normalizeMagicPocketComputerUseSettings({
+  const currentComputerUse = normalizeDagongComputerUseSettings(current.computerUse)
+  const nextComputerUse = normalizeDagongComputerUseSettings({
     ...currentComputerUse,
     ...(patch?.computerUse ?? {})
   })
-  const currentQuality = normalizeMagicPocketQualitySettings(current.quality)
-  const nextQuality = normalizeMagicPocketQualitySettings({
+  const currentQuality = normalizeDagongQualitySettings(current.quality)
+  const nextQuality = normalizeDagongQualitySettings({
     ...currentQuality,
     ...(patch?.quality ?? {})
   })
-  const currentRuntimeTuning = normalizeMagicPocketRuntimeTuningSettings(current.runtimeTuning)
-  const nextRuntimeTuning = normalizeMagicPocketRuntimeTuningSettings({
+  const currentRuntimeTuning = normalizeDagongRuntimeTuningSettings(current.runtimeTuning)
+  const nextRuntimeTuning = normalizeDagongRuntimeTuningSettings({
     ...currentRuntimeTuning,
     ...(patch?.runtimeTuning
       ? {
@@ -458,25 +458,25 @@ export function mergeMagicPocketRuntimeSettings(
         }
       : {})
   })
-  const nextModelProfiles = normalizeMagicPocketModelProfiles(current.modelProfiles, patch?.modelProfiles)
+  const nextModelProfiles = normalizeDagongModelProfiles(current.modelProfiles, patch?.modelProfiles)
   const nextInstructions = {
     enabled: patch?.instructions?.enabled ?? current.instructions?.enabled ?? true
   }
-  const nextPort = normalizeMagicPocketLocalPort(patch?.port ?? current.port, DEFAULT_KUN_PORT)
-  // Optional role/small-model slots (agents.magicpocket.*). Patch wins when the key is
+  const nextPort = normalizeDagongLocalPort(patch?.port ?? current.port, DEFAULT_KUN_PORT)
+  // Optional role/small-model slots (agents.dagong.*). Patch wins when the key is
   // present (even as empty string => clear); otherwise inherit current. Empty/
   // whitespace strings are dropped so the field is omitted entirely.
   const nextRoleModelSlots = mergeOptionalModelSlot(current, patch)
   const nextRoleReasoningSlots = mergeOptionalReasoningSlot(current, patch)
   // NOTE: approvalPolicy/sandboxMode are merged through verbatim from the patch.
   // The unified 5-mode UI selector already resolves a mode to its concrete
-  // {approvalPolicy, sandboxMode} pair via magicpocketToolPermissionModeSettings before
+  // {approvalPolicy, sandboxMode} pair via dagongToolPermissionModeSettings before
   // dispatching the patch. We must NOT re-canonicalize here: the mode->settings
   // mapping is lossy (only 5 of the 6x4 policy/sandbox combos are representable),
   // so round-tripping would silently rewrite valid non-UI values — e.g. demote
   // approvalPolicy 'never'/'suggest' to 'on-request', or escalate a 'read-only'/
   // 'external-sandbox' sandbox to 'danger-full-access' — on every settings merge.
-  const merged: MagicPocketRuntimeSettingsV1 = {
+  const merged: DagongRuntimeSettingsV1 = {
     ...current,
     ...(patch ?? {}),
     port: nextPort,
@@ -525,8 +525,8 @@ const OPTIONAL_MODEL_SLOT_KEYS = [
 type OptionalModelSlotKey = (typeof OPTIONAL_MODEL_SLOT_KEYS)[number]
 
 function mergeOptionalModelSlot(
-  current: MagicPocketRuntimeSettingsV1,
-  patch: MagicPocketRuntimeSettingsPatchV1 | undefined
+  current: DagongRuntimeSettingsV1,
+  patch: DagongRuntimeSettingsPatchV1 | undefined
 ): Partial<Record<OptionalModelSlotKey, string>> {
   const out: Partial<Record<OptionalModelSlotKey, string>> = {}
   for (const key of OPTIONAL_MODEL_SLOT_KEYS) {
@@ -537,7 +537,7 @@ function mergeOptionalModelSlot(
   return out
 }
 
-// Per-role reasoning-depth slots (agents.magicpocket.*ReasoningEffort). Validated against
+// Per-role reasoning-depth slots (agents.dagong.*ReasoningEffort). Validated against
 // the ModelReasoningEffort enum; default 'off' is omitted so the field stays absent
 // unless the user opts into a deeper level. Must be stripped + re-applied exactly
 // like the model slots to avoid settings-sync round-trip drift.
@@ -550,8 +550,8 @@ const OPTIONAL_REASONING_SLOT_KEYS = [
 type OptionalReasoningSlotKey = (typeof OPTIONAL_REASONING_SLOT_KEYS)[number]
 
 function mergeOptionalReasoningSlot(
-  current: MagicPocketRuntimeSettingsV1,
-  patch: MagicPocketRuntimeSettingsPatchV1 | undefined
+  current: DagongRuntimeSettingsV1,
+  patch: DagongRuntimeSettingsPatchV1 | undefined
 ): Partial<Record<OptionalReasoningSlotKey, ModelReasoningEffort>> {
   const out: Partial<Record<OptionalReasoningSlotKey, ModelReasoningEffort>> = {}
   for (const key of OPTIONAL_REASONING_SLOT_KEYS) {
@@ -571,44 +571,44 @@ function normalizeReasoningEffortOrUndefined(
   return MODEL_REASONING_EFFORTS.includes(trimmed) ? trimmed : undefined
 }
 
-function normalizeMagicPocketImageGenerationSettings(
-  input: Partial<MagicPocketImageGenerationSettingsV1> | undefined
-): MagicPocketImageGenerationSettingsV1 {
-  const defaults = defaultMagicPocketImageGenerationSettings()
+function normalizeDagongImageGenerationSettings(
+  input: Partial<DagongImageGenerationSettingsV1> | undefined
+): DagongImageGenerationSettingsV1 {
+  const defaults = defaultDagongImageGenerationSettings()
   const defaultSize = typeof input?.defaultSize === 'string' ? input.defaultSize.trim() : ''
   return {
     enabled: input?.enabled === true,
     providerId: typeof input?.providerId === 'string' ? input.providerId.trim() : defaults.providerId,
-    protocol: normalizeMagicPocketImageGenerationProtocol(input?.protocol),
+    protocol: normalizeDagongImageGenerationProtocol(input?.protocol),
     baseUrl: typeof input?.baseUrl === 'string' ? input.baseUrl.trim() : defaults.baseUrl,
     apiKey: typeof input?.apiKey === 'string' ? input.apiKey.trim() : defaults.apiKey,
     model: typeof input?.model === 'string' ? input.model.trim() : defaults.model,
     defaultSize: /^(auto|\d+x\d+)$/.test(defaultSize) ? defaultSize : '',
-    quality: normalizeMagicPocketImageGenerationQuality(input?.quality),
+    quality: normalizeDagongImageGenerationQuality(input?.quality),
     timeoutMs: boundedPositiveInt(input?.timeoutMs, defaults.timeoutMs, 600_000)
   }
 }
 
-function normalizeMagicPocketImageGenerationQuality(value: unknown): ImageGenerationQuality {
+function normalizeDagongImageGenerationQuality(value: unknown): ImageGenerationQuality {
   return IMAGE_GENERATION_QUALITIES.includes(value as ImageGenerationQuality)
     ? value as ImageGenerationQuality
     : 'auto'
 }
 
-function normalizeMagicPocketImageGenerationProtocol(value: unknown): ImageGenerationProtocol {
+function normalizeDagongImageGenerationProtocol(value: unknown): ImageGenerationProtocol {
   if (value === 'minimax-image') return 'minimax-image'
   if (value === 'codex-responses-image') return 'codex-responses-image'
   return DEFAULT_IMAGE_GENERATION_PROTOCOL
 }
 
-function normalizeMagicPocketSpeechToTextSettings(
-  input: Partial<MagicPocketSpeechToTextSettingsV1> | undefined
-): MagicPocketSpeechToTextSettingsV1 {
-  const defaults = defaultMagicPocketSpeechToTextSettings()
+function normalizeDagongSpeechToTextSettings(
+  input: Partial<DagongSpeechToTextSettingsV1> | undefined
+): DagongSpeechToTextSettingsV1 {
+  const defaults = defaultDagongSpeechToTextSettings()
   return {
     enabled: input?.enabled === true,
     providerId: typeof input?.providerId === 'string' ? input.providerId.trim() : defaults.providerId,
-    protocol: normalizeMagicPocketSpeechToTextProtocol(input?.protocol),
+    protocol: normalizeDagongSpeechToTextProtocol(input?.protocol),
     baseUrl: typeof input?.baseUrl === 'string' ? input.baseUrl.trim() : defaults.baseUrl,
     apiKey: typeof input?.apiKey === 'string' ? input.apiKey.trim() : defaults.apiKey,
     model: typeof input?.model === 'string' ? input.model.trim() : defaults.model,
@@ -620,19 +620,19 @@ function normalizeMagicPocketSpeechToTextSettings(
   }
 }
 
-function normalizeMagicPocketSpeechToTextProtocol(value: unknown): SpeechToTextProtocol {
+function normalizeDagongSpeechToTextProtocol(value: unknown): SpeechToTextProtocol {
   if (value === 'local-whisper') return 'local-whisper'
   return value === 'mimo-asr' ? 'mimo-asr' : DEFAULT_SPEECH_TO_TEXT_PROTOCOL
 }
 
-function normalizeMagicPocketTextToSpeechSettings(
-  input: Partial<MagicPocketTextToSpeechSettingsV1> | undefined
-): MagicPocketTextToSpeechSettingsV1 {
-  const defaults = defaultMagicPocketTextToSpeechSettings()
+function normalizeDagongTextToSpeechSettings(
+  input: Partial<DagongTextToSpeechSettingsV1> | undefined
+): DagongTextToSpeechSettingsV1 {
+  const defaults = defaultDagongTextToSpeechSettings()
   return {
     enabled: input?.enabled === true,
     providerId: typeof input?.providerId === 'string' ? input.providerId.trim() : defaults.providerId,
-    protocol: normalizeMagicPocketTextToSpeechProtocol(input?.protocol),
+    protocol: normalizeDagongTextToSpeechProtocol(input?.protocol),
     baseUrl: typeof input?.baseUrl === 'string' ? input.baseUrl.trim() : defaults.baseUrl,
     apiKey: typeof input?.apiKey === 'string' ? input.apiKey.trim() : defaults.apiKey,
     model: typeof input?.model === 'string' ? input.model.trim() : defaults.model,
@@ -642,20 +642,20 @@ function normalizeMagicPocketTextToSpeechSettings(
   }
 }
 
-function normalizeMagicPocketTextToSpeechProtocol(value: unknown): TextToSpeechProtocol {
+function normalizeDagongTextToSpeechProtocol(value: unknown): TextToSpeechProtocol {
   return value === 'minimax-t2a' || value === 'mimo-tts'
     ? value
     : DEFAULT_TEXT_TO_SPEECH_PROTOCOL
 }
 
-function normalizeMagicPocketMusicGenerationSettings(
-  input: Partial<MagicPocketMusicGenerationSettingsV1> | undefined
-): MagicPocketMusicGenerationSettingsV1 {
-  const defaults = defaultMagicPocketMusicGenerationSettings()
+function normalizeDagongMusicGenerationSettings(
+  input: Partial<DagongMusicGenerationSettingsV1> | undefined
+): DagongMusicGenerationSettingsV1 {
+  const defaults = defaultDagongMusicGenerationSettings()
   return {
     enabled: input?.enabled === true,
     providerId: typeof input?.providerId === 'string' ? input.providerId.trim() : defaults.providerId,
-    protocol: normalizeMagicPocketMusicGenerationProtocol(input?.protocol),
+    protocol: normalizeDagongMusicGenerationProtocol(input?.protocol),
     baseUrl: typeof input?.baseUrl === 'string' ? input.baseUrl.trim() : defaults.baseUrl,
     apiKey: typeof input?.apiKey === 'string' ? input.apiKey.trim() : defaults.apiKey,
     model: typeof input?.model === 'string' ? input.model.trim() : defaults.model,
@@ -664,18 +664,18 @@ function normalizeMagicPocketMusicGenerationSettings(
   }
 }
 
-function normalizeMagicPocketMusicGenerationProtocol(value: unknown): MusicGenerationProtocol {
+function normalizeDagongMusicGenerationProtocol(value: unknown): MusicGenerationProtocol {
   return value === 'minimax-music' ? 'minimax-music' : DEFAULT_MUSIC_GENERATION_PROTOCOL
 }
 
-function normalizeMagicPocketVideoGenerationSettings(
-  input: Partial<MagicPocketVideoGenerationSettingsV1> | undefined
-): MagicPocketVideoGenerationSettingsV1 {
-  const defaults = defaultMagicPocketVideoGenerationSettings()
+function normalizeDagongVideoGenerationSettings(
+  input: Partial<DagongVideoGenerationSettingsV1> | undefined
+): DagongVideoGenerationSettingsV1 {
+  const defaults = defaultDagongVideoGenerationSettings()
   return {
     enabled: input?.enabled === true,
     providerId: typeof input?.providerId === 'string' ? input.providerId.trim() : defaults.providerId,
-    protocol: normalizeMagicPocketVideoGenerationProtocol(input?.protocol),
+    protocol: normalizeDagongVideoGenerationProtocol(input?.protocol),
     baseUrl: typeof input?.baseUrl === 'string' ? input.baseUrl.trim() : defaults.baseUrl,
     apiKey: typeof input?.apiKey === 'string' ? input.apiKey.trim() : defaults.apiKey,
     model: typeof input?.model === 'string' ? input.model.trim() : defaults.model,
@@ -688,14 +688,14 @@ function normalizeMagicPocketVideoGenerationSettings(
   }
 }
 
-function normalizeMagicPocketVideoGenerationProtocol(value: unknown): VideoGenerationProtocol {
+function normalizeDagongVideoGenerationProtocol(value: unknown): VideoGenerationProtocol {
   return value === 'minimax-video' ? 'minimax-video' : DEFAULT_VIDEO_GENERATION_PROTOCOL
 }
 
-function normalizeMagicPocketComputerUseSettings(
-  input: Partial<MagicPocketComputerUseSettingsV1> | undefined
-): MagicPocketComputerUseSettingsV1 {
-  const defaults = defaultMagicPocketComputerUseSettings()
+function normalizeDagongComputerUseSettings(
+  input: Partial<DagongComputerUseSettingsV1> | undefined
+): DagongComputerUseSettingsV1 {
+  const defaults = defaultDagongComputerUseSettings()
   const mode = input?.mode === 'always' || input?.mode === 'off' || input?.mode === 'auto'
     ? input.mode
     : defaults.mode
@@ -713,33 +713,33 @@ function normalizeAudioFormat(value: unknown, fallback: string): string {
   return /^(mp3|wav|flac|pcm16)$/.test(normalized) ? normalized : fallback
 }
 
-function normalizeMagicPocketTokenEconomySettings(
-  input: Partial<MagicPocketTokenEconomySettingsV1> | undefined,
+function normalizeDagongTokenEconomySettings(
+  input: Partial<DagongTokenEconomySettingsV1> | undefined,
   enabledFallback = false
-): MagicPocketTokenEconomySettingsV1 {
+): DagongTokenEconomySettingsV1 {
   return {
     enabled: typeof input?.enabled === 'boolean' ? input.enabled : enabledFallback,
     compressToolDescriptions: input?.compressToolDescriptions !== false,
     compressToolResults: input?.compressToolResults !== false,
     conciseResponses: input?.conciseResponses !== false,
-    historyHygiene: normalizeMagicPocketHistoryHygieneSettings(input?.historyHygiene)
+    historyHygiene: normalizeDagongHistoryHygieneSettings(input?.historyHygiene)
   }
 }
 
-function normalizeMagicPocketToolOutputLimitsSettings(
-  input: Partial<MagicPocketToolOutputLimitsSettingsV1> | undefined
-): MagicPocketToolOutputLimitsSettingsV1 {
-  const defaults = defaultMagicPocketToolOutputLimitsSettings()
+function normalizeDagongToolOutputLimitsSettings(
+  input: Partial<DagongToolOutputLimitsSettingsV1> | undefined
+): DagongToolOutputLimitsSettingsV1 {
+  const defaults = defaultDagongToolOutputLimitsSettings()
   return {
     maxLines: boundedPositiveInt(input?.maxLines, defaults.maxLines, 1_000_000),
     maxBytes: boundedPositiveInt(input?.maxBytes, defaults.maxBytes, 64 * 1024 * 1024)
   }
 }
 
-function normalizeMagicPocketHistoryHygieneSettings(
-  input: Partial<MagicPocketHistoryHygieneSettingsV1> | undefined
-): MagicPocketHistoryHygieneSettingsV1 {
-  const defaults = defaultMagicPocketHistoryHygieneSettings()
+function normalizeDagongHistoryHygieneSettings(
+  input: Partial<DagongHistoryHygieneSettingsV1> | undefined
+): DagongHistoryHygieneSettingsV1 {
+  const defaults = defaultDagongHistoryHygieneSettings()
   return {
     maxToolResultLines: boundedPositiveInt(input?.maxToolResultLines, defaults.maxToolResultLines, 100_000),
     maxToolResultBytes: boundedPositiveInt(input?.maxToolResultBytes, defaults.maxToolResultBytes, 8 * 1024 * 1024),
@@ -758,10 +758,10 @@ function normalizeMagicPocketHistoryHygieneSettings(
   }
 }
 
-function normalizeMagicPocketMcpSearchSettings(
-  input: Partial<MagicPocketMcpSearchSettingsV1> | undefined
-): MagicPocketMcpSearchSettingsV1 {
-  const defaults = defaultMagicPocketMcpSearchSettings()
+function normalizeDagongMcpSearchSettings(
+  input: Partial<DagongMcpSearchSettingsV1> | undefined
+): DagongMcpSearchSettingsV1 {
+  const defaults = defaultDagongMcpSearchSettings()
   const topKMax = positiveInt(input?.topKMax, defaults.topKMax)
   const topKDefault = Math.min(positiveInt(input?.topKDefault, defaults.topKDefault), topKMax)
   return {
@@ -799,10 +799,10 @@ function boundedNonNegativeInt(value: unknown, fallback: number, max = Number.MA
   return Math.min(Math.floor(value), max)
 }
 
-function normalizeMagicPocketStorageSettings(
-  input: Partial<MagicPocketStorageSettingsV1> | undefined
-): MagicPocketStorageSettingsV1 {
-  const defaults = defaultMagicPocketStorageSettings()
+function normalizeDagongStorageSettings(
+  input: Partial<DagongStorageSettingsV1> | undefined
+): DagongStorageSettingsV1 {
+  const defaults = defaultDagongStorageSettings()
   return {
     backend: input?.backend === 'file' || input?.backend === 'hybrid'
       ? input.backend
@@ -811,10 +811,10 @@ function normalizeMagicPocketStorageSettings(
   }
 }
 
-function normalizeMagicPocketContextCompactionSettings(
-  input: Partial<MagicPocketContextCompactionSettingsV1> | undefined
-): MagicPocketContextCompactionSettingsV1 {
-  const defaults = defaultMagicPocketContextCompactionSettings()
+function normalizeDagongContextCompactionSettings(
+  input: Partial<DagongContextCompactionSettingsV1> | undefined
+): DagongContextCompactionSettingsV1 {
+  const defaults = defaultDagongContextCompactionSettings()
   const defaultSoftThreshold = boundedPositiveInt(input?.defaultSoftThreshold, defaults.defaultSoftThreshold)
   const defaultHardThreshold = input?.defaultSoftThreshold !== undefined && input?.defaultHardThreshold === undefined
     ? defaultSoftThreshold
@@ -836,10 +836,10 @@ function normalizeMagicPocketContextCompactionSettings(
   }
 }
 
-function normalizeMagicPocketRuntimeTuningSettings(
-  input: Partial<MagicPocketRuntimeTuningSettingsV1> | undefined
-): MagicPocketRuntimeTuningSettingsV1 {
-  const defaults = defaultMagicPocketRuntimeTuningSettings()
+function normalizeDagongRuntimeTuningSettings(
+  input: Partial<DagongRuntimeTuningSettingsV1> | undefined
+): DagongRuntimeTuningSettingsV1 {
+  const defaults = defaultDagongRuntimeTuningSettings()
   return {
     streamIdleTimeoutMs: boundedNonNegativeInt(
       input?.streamIdleTimeoutMs,
@@ -861,16 +861,16 @@ function normalizeMagicPocketRuntimeTuningSettings(
   }
 }
 
-const KUN_DESIGN_QUALITY_STRICTNESS: readonly MagicPocketDesignQualityStrictness[] = [
+const KUN_DESIGN_QUALITY_STRICTNESS: readonly DagongDesignQualityStrictness[] = [
   'relaxed',
   'standard',
   'strict'
 ]
 
-function normalizeMagicPocketQualitySettings(
-  input: Partial<MagicPocketDesignQualitySettingsV1> | undefined
-): MagicPocketDesignQualitySettingsV1 {
-  const defaults = defaultMagicPocketQualitySettings()
+function normalizeDagongQualitySettings(
+  input: Partial<DagongDesignQualitySettingsV1> | undefined
+): DagongDesignQualitySettingsV1 {
+  const defaults = defaultDagongQualitySettings()
   const strictness =
     input?.strictness && KUN_DESIGN_QUALITY_STRICTNESS.includes(input.strictness)
       ? input.strictness
@@ -888,7 +888,7 @@ function normalizeMagicPocketQualitySettings(
   }
 }
 
-function normalizeMagicPocketModelProfiles(
+function normalizeDagongModelProfiles(
   current: Record<string, ModelProviderModelProfileV1> | undefined,
   patch: Record<string, ModelProviderModelProfilePatchV1 | null> | undefined
 ): Record<string, ModelProviderModelProfileV1> {
@@ -896,7 +896,7 @@ function normalizeMagicPocketModelProfiles(
   for (const [rawModelId, rawProfile] of Object.entries(current ?? {})) {
     const modelId = normalizeModelProfileId(rawModelId)
     if (!modelId) continue
-    profiles[modelId] = normalizeMagicPocketModelProfile(rawProfile)
+    profiles[modelId] = normalizeDagongModelProfile(rawProfile)
   }
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return profiles
   for (const [rawModelId, rawProfile] of Object.entries(patch)) {
@@ -906,7 +906,7 @@ function normalizeMagicPocketModelProfiles(
       delete profiles[modelId]
       continue
     }
-    profiles[modelId] = normalizeMagicPocketModelProfile({
+    profiles[modelId] = normalizeDagongModelProfile({
       ...(profiles[modelId] ?? {}),
       ...rawProfile
     })
@@ -914,10 +914,10 @@ function normalizeMagicPocketModelProfiles(
   return profiles
 }
 
-function normalizeMagicPocketModelProfile(
+function normalizeDagongModelProfile(
   input: ModelProviderModelProfilePatchV1 | undefined
 ): ModelProviderModelProfileV1 {
-  const inputModalities = normalizeMagicPocketModelInputModalities(input?.inputModalities)
+  const inputModalities = normalizeDagongModelInputModalities(input?.inputModalities)
   const fallbackMessageParts: ModelProviderMessagePartSupport[] = inputModalities.includes('image')
     ? ['text', 'image_url']
     : ['text']
@@ -931,33 +931,33 @@ function normalizeMagicPocketModelProfile(
     input.maxOutputTokens > 0
     ? input.maxOutputTokens
     : undefined
-  const reasoning = normalizeMagicPocketReasoningCapability(input?.reasoning)
+  const reasoning = normalizeDagongReasoningCapability(input?.reasoning)
   const endpointFormat = typeof input?.endpointFormat === 'string' && input.endpointFormat.trim()
     ? normalizeModelEndpointFormat(input.endpointFormat)
     : undefined
   return {
-    ...(normalizeMagicPocketProfileAliases(input?.aliases).length
-      ? { aliases: normalizeMagicPocketProfileAliases(input?.aliases) }
+    ...(normalizeDagongProfileAliases(input?.aliases).length
+      ? { aliases: normalizeDagongProfileAliases(input?.aliases) }
       : {}),
     ...(contextWindowTokens ? { contextWindowTokens } : {}),
     ...(maxOutputTokens ? { maxOutputTokens } : {}),
     inputModalities,
-    outputModalities: normalizeMagicPocketModelInputModalities(input?.outputModalities),
+    outputModalities: normalizeDagongModelInputModalities(input?.outputModalities),
     supportsToolCalling: input?.supportsToolCalling !== false,
-    messageParts: normalizeMagicPocketModelMessageParts(input?.messageParts, fallbackMessageParts),
+    messageParts: normalizeDagongModelMessageParts(input?.messageParts, fallbackMessageParts),
     ...(reasoning ? { reasoning } : {}),
     ...(endpointFormat ? { endpointFormat } : {})
   }
 }
 
-function normalizeMagicPocketReasoningCapability(
+function normalizeDagongReasoningCapability(
   input: ModelProviderModelProfilePatchV1['reasoning'] | undefined
 ): ModelProviderReasoningCapabilityV1 | undefined {
   if (!input || typeof input !== 'object') return undefined
-  const supportedEfforts = normalizeMagicPocketReasoningEfforts(input.supportedEfforts)
+  const supportedEfforts = normalizeDagongReasoningEfforts(input.supportedEfforts)
   if (supportedEfforts.length === 0) return undefined
-  const defaultEffort = normalizeMagicPocketReasoningEffort(input.defaultEffort)
-  const requestProtocol = normalizeMagicPocketReasoningRequestProtocol(input.requestProtocol)
+  const defaultEffort = normalizeDagongReasoningEffort(input.defaultEffort)
+  const requestProtocol = normalizeDagongReasoningRequestProtocol(input.requestProtocol)
   if (!requestProtocol) return undefined
   return {
     supportedEfforts,
@@ -968,17 +968,17 @@ function normalizeMagicPocketReasoningCapability(
   }
 }
 
-function normalizeMagicPocketReasoningEfforts(value: unknown): ModelProviderReasoningCapabilityV1['supportedEfforts'] {
+function normalizeDagongReasoningEfforts(value: unknown): ModelProviderReasoningCapabilityV1['supportedEfforts'] {
   if (!Array.isArray(value)) return []
   const efforts: ModelProviderReasoningCapabilityV1['supportedEfforts'] = []
   for (const item of value) {
-    const effort = normalizeMagicPocketReasoningEffort(item)
+    const effort = normalizeDagongReasoningEffort(item)
     if (effort && !efforts.includes(effort)) efforts.push(effort)
   }
   return efforts
 }
 
-function normalizeMagicPocketReasoningEffort(value: unknown): ModelProviderReasoningCapabilityV1['defaultEffort'] | undefined {
+function normalizeDagongReasoningEffort(value: unknown): ModelProviderReasoningCapabilityV1['defaultEffort'] | undefined {
   if (typeof value !== 'string') return undefined
   const normalized = value.trim().toLowerCase()
   return MODEL_REASONING_EFFORTS.includes(normalized as ModelProviderReasoningCapabilityV1['defaultEffort'])
@@ -986,7 +986,7 @@ function normalizeMagicPocketReasoningEffort(value: unknown): ModelProviderReaso
     : undefined
 }
 
-function normalizeMagicPocketReasoningRequestProtocol(
+function normalizeDagongReasoningRequestProtocol(
   value: unknown
 ): ModelProviderReasoningCapabilityV1['requestProtocol'] | undefined {
   if (typeof value !== 'string') return undefined
@@ -1000,7 +1000,7 @@ function normalizeModelProfileId(value: string): string {
   return value.trim().slice(0, 128)
 }
 
-function normalizeMagicPocketProfileAliases(value: unknown): string[] {
+function normalizeDagongProfileAliases(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   const aliases: string[] = []
   for (const item of value) {
@@ -1012,7 +1012,7 @@ function normalizeMagicPocketProfileAliases(value: unknown): string[] {
   return aliases
 }
 
-function normalizeMagicPocketModelInputModalities(value: unknown): ModelProviderInputModality[] {
+function normalizeDagongModelInputModalities(value: unknown): ModelProviderInputModality[] {
   if (!Array.isArray(value)) return ['text']
   const modalities: ModelProviderInputModality[] = []
   for (const item of value) {
@@ -1024,7 +1024,7 @@ function normalizeMagicPocketModelInputModalities(value: unknown): ModelProvider
   return modalities.length > 0 ? modalities : ['text']
 }
 
-function normalizeMagicPocketModelMessageParts(
+function normalizeDagongModelMessageParts(
   value: unknown,
   fallback: ModelProviderMessagePartSupport[]
 ): ModelProviderMessagePartSupport[] {
@@ -1042,45 +1042,45 @@ function normalizeMagicPocketModelMessageParts(
   return parts.length > 0 ? parts : [...fallback]
 }
 
-export function withMagicPocketRuntimeSettings(
+export function withDagongRuntimeSettings(
   settings: AppSettingsV1,
-  magicpocket: MagicPocketRuntimeSettingsV1
+  dagong: DagongRuntimeSettingsV1
 ): AppSettingsV1 {
   return {
     ...settings,
-    agents: magicpocketSettingsEnvelope(magicpocket)
+    agents: dagongSettingsEnvelope(dagong)
   }
 }
 
-export function applyMagicPocketRuntimePatch(
+export function applyDagongRuntimePatch(
   settings: AppSettingsV1,
-  patch: MagicPocketRuntimeSettingsPatchV1 | undefined
+  patch: DagongRuntimeSettingsPatchV1 | undefined
 ): AppSettingsV1 {
-  return withMagicPocketRuntimeSettings(
+  return withDagongRuntimeSettings(
     settings,
-    mergeMagicPocketRuntimeSettings(getMagicPocketRuntimeSettings(settings), patch)
+    mergeDagongRuntimeSettings(getDagongRuntimeSettings(settings), patch)
   )
 }
 
-export function isMagicPocketRuntimeInsecure(runtime: Pick<MagicPocketRuntimeSettingsV1, 'insecure' | 'runtimeToken'>): boolean {
+export function isDagongRuntimeInsecure(runtime: Pick<DagongRuntimeSettingsV1, 'insecure' | 'runtimeToken'>): boolean {
   return runtime.insecure === true
 }
 
 export function getActiveAgentApiKey(settings: AppSettingsV1): string {
-  return resolveMagicPocketRuntimeSettings(settings).apiKey?.trim() ?? ''
+  return resolveDagongRuntimeSettings(settings).apiKey?.trim() ?? ''
 }
 
 export function mergeAgentRuntimeSettings(
-  defaults: MagicPocketSettingsEnvelopeV1,
-  patch: MagicPocketSettingsEnvelopePatchV1 | undefined
-): MagicPocketSettingsEnvelopeV1 {
-  return magicpocketSettingsEnvelope(
-    mergeMagicPocketRuntimeSettings(defaults.magicpocket, patch?.magicpocket)
+  defaults: DagongSettingsEnvelopeV1,
+  patch: DagongSettingsEnvelopePatchV1 | undefined
+): DagongSettingsEnvelopeV1 {
+  return dagongSettingsEnvelope(
+    mergeDagongRuntimeSettings(defaults.dagong, patch?.dagong)
   )
 }
 
 type LegacyAgentsSettingsShape = {
-  magicpocket?: Partial<MagicPocketRuntimeSettingsV1>
+  dagong?: Partial<DagongRuntimeSettingsV1>
   codewhale?: Partial<LegacyLocalHttpRuntimeSettingsV1>
   reasonix?: Partial<LegacyReasoningRuntimeSettingsV1>
 }
@@ -1097,7 +1097,7 @@ function nonEmptyStringOrFallback(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim() ? value : fallback
 }
 
-function upgradeLegacyMagicPocketDefaultDataDir(value: unknown): string {
+function upgradeLegacyDagongDefaultDataDir(value: unknown): string {
   if (typeof value !== 'string') return DEFAULT_KUN_DATA_DIR
   const trimmed = value.trim()
   const normalized = trimmed.replace(/\\/g, '/').toLowerCase()
@@ -1111,16 +1111,16 @@ function upgradeLegacyMagicPocketDefaultDataDir(value: unknown): string {
   return trimmed
 }
 
-function upgradeLegacyMagicPocketDefaultModel(value: unknown, fallback: string): string {
+function upgradeLegacyDagongDefaultModel(value: unknown, fallback: string): string {
   const model = nonEmptyStringOrFallback(value, fallback).trim()
   return model === LEGACY_KUN_DEFAULT_MODEL ? DEFAULT_KUN_MODEL : model
 }
 
-function upgradeLegacyMagicPocketDefaultPort(value: unknown, fallback: number): number {
+function upgradeLegacyDagongDefaultPort(value: unknown, fallback: number): number {
   return value === LEGACY_LOCAL_HTTP_DEFAULT_PORT ? DEFAULT_KUN_PORT : fallback
 }
 
-function normalizeMagicPocketLocalPort(value: unknown, fallback: number): number {
+function normalizeDagongLocalPort(value: unknown, fallback: number): number {
   if (value === LEGACY_LOCAL_HTTP_DEFAULT_PORT || value === PREVIOUS_KUN_DEFAULT_PORT) {
     return DEFAULT_KUN_PORT
   }
@@ -1134,7 +1134,7 @@ export function migrateLegacyAppSettings(parsed: LegacyAppSettingsShape): Partia
   const isReasoningLegacy = rawAgentProvider === 'reasonix'
   const hasProviderSettings = typeof parsed.provider === 'object' && parsed.provider !== null
   const defaults = legacyLocalHttpRuntimeDefaults()
-  const magicpocketDefaults = defaultMagicPocketRuntimeSettings()
+  const dagongDefaults = defaultDagongRuntimeSettings()
   const legacyDeepseek = parsed.deepseek ?? {}
   const legacyLocalHttp = {
     ...defaults,
@@ -1145,65 +1145,65 @@ export function migrateLegacyAppSettings(parsed: LegacyAppSettingsShape): Partia
     ...legacyReasoningRuntimeDefaults(),
     ...(parsed.agents?.reasonix ?? {})
   }
-  const explicitMagicPocket: Partial<MagicPocketRuntimeSettingsV1> = parsed.agents?.magicpocket ?? {}
+  const explicitDagong: Partial<DagongRuntimeSettingsV1> = parsed.agents?.dagong ?? {}
   const legacySource = isReasoningLegacy ? legacyReasoning : legacyLocalHttp
   const legacySeed = {
-    binaryPath: magicpocketDefaults.binaryPath,
+    binaryPath: dagongDefaults.binaryPath,
     port: isReasoningLegacy
-      ? magicpocketDefaults.port
-      : upgradeLegacyMagicPocketDefaultPort(legacyLocalHttp.port, legacyLocalHttp.port),
+      ? dagongDefaults.port
+      : upgradeLegacyDagongDefaultPort(legacyLocalHttp.port, legacyLocalHttp.port),
     autoStart: isReasoningLegacy ? legacyReasoning.autoStart : legacyLocalHttp.autoStart,
     apiKey: legacySource.apiKey,
     baseUrl: legacySource.baseUrl,
     providerId: '',
     endpointFormat: DEFAULT_MODEL_ENDPOINT_FORMAT,
-    runtimeToken: isReasoningLegacy ? magicpocketDefaults.runtimeToken : legacyLocalHttp.runtimeToken,
-    model: isReasoningLegacy ? legacyReasoning.model : magicpocketDefaults.model,
-    approvalPolicy: isReasoningLegacy ? magicpocketDefaults.approvalPolicy : legacyLocalHttp.approvalPolicy,
-    sandboxMode: isReasoningLegacy ? magicpocketDefaults.sandboxMode : legacyLocalHttp.sandboxMode
+    runtimeToken: isReasoningLegacy ? dagongDefaults.runtimeToken : legacyLocalHttp.runtimeToken,
+    model: isReasoningLegacy ? legacyReasoning.model : dagongDefaults.model,
+    approvalPolicy: isReasoningLegacy ? dagongDefaults.approvalPolicy : legacyLocalHttp.approvalPolicy,
+    sandboxMode: isReasoningLegacy ? dagongDefaults.sandboxMode : legacyLocalHttp.sandboxMode
   }
   const provider = normalizeModelProviderSettings({
     apiKey: hasProviderSettings
       ? parsed.provider?.apiKey
-      : nonEmptyStringOrFallback(explicitMagicPocket.apiKey, legacySeed.apiKey),
+      : nonEmptyStringOrFallback(explicitDagong.apiKey, legacySeed.apiKey),
     baseUrl: hasProviderSettings
       ? parsed.provider?.baseUrl
-      : nonEmptyStringOrFallback(explicitMagicPocket.baseUrl, legacySeed.baseUrl),
+      : nonEmptyStringOrFallback(explicitDagong.baseUrl, legacySeed.baseUrl),
     proxy: parsed.provider?.proxy,
     providers: parsed.provider?.providers
   })
-  const magicpocket = {
-    ...magicpocketDefaults,
+  const dagong = {
+    ...dagongDefaults,
     ...legacySeed,
-    ...explicitMagicPocket,
-    port: normalizeMagicPocketLocalPort(explicitMagicPocket.port ?? legacySeed.port, magicpocketDefaults.port),
-    apiKey: hasProviderSettings ? explicitMagicPocket.apiKey ?? '' : '',
-    baseUrl: hasProviderSettings ? explicitMagicPocket.baseUrl ?? '' : '',
-    runtimeToken: nonEmptyStringOrFallback(explicitMagicPocket.runtimeToken, legacySeed.runtimeToken),
-    dataDir: upgradeLegacyMagicPocketDefaultDataDir(explicitMagicPocket.dataDir),
-    model: upgradeLegacyMagicPocketDefaultModel(explicitMagicPocket.model, legacySeed.model),
-    tokenEconomyMode: typeof explicitMagicPocket.tokenEconomy?.enabled === 'boolean'
-      ? explicitMagicPocket.tokenEconomy.enabled
-      : explicitMagicPocket.tokenEconomyMode ?? magicpocketDefaults.tokenEconomyMode,
-    tokenEconomy: normalizeMagicPocketTokenEconomySettings(
-      explicitMagicPocket.tokenEconomy,
-      explicitMagicPocket.tokenEconomyMode ?? magicpocketDefaults.tokenEconomyMode
+    ...explicitDagong,
+    port: normalizeDagongLocalPort(explicitDagong.port ?? legacySeed.port, dagongDefaults.port),
+    apiKey: hasProviderSettings ? explicitDagong.apiKey ?? '' : '',
+    baseUrl: hasProviderSettings ? explicitDagong.baseUrl ?? '' : '',
+    runtimeToken: nonEmptyStringOrFallback(explicitDagong.runtimeToken, legacySeed.runtimeToken),
+    dataDir: upgradeLegacyDagongDefaultDataDir(explicitDagong.dataDir),
+    model: upgradeLegacyDagongDefaultModel(explicitDagong.model, legacySeed.model),
+    tokenEconomyMode: typeof explicitDagong.tokenEconomy?.enabled === 'boolean'
+      ? explicitDagong.tokenEconomy.enabled
+      : explicitDagong.tokenEconomyMode ?? dagongDefaults.tokenEconomyMode,
+    tokenEconomy: normalizeDagongTokenEconomySettings(
+      explicitDagong.tokenEconomy,
+      explicitDagong.tokenEconomyMode ?? dagongDefaults.tokenEconomyMode
     ),
-    toolOutputLimits: normalizeMagicPocketToolOutputLimitsSettings(explicitMagicPocket.toolOutputLimits),
-    mcpSearch: normalizeMagicPocketMcpSearchSettings(explicitMagicPocket.mcpSearch),
-    storage: normalizeMagicPocketStorageSettings(explicitMagicPocket.storage),
-    contextCompaction: normalizeMagicPocketContextCompactionSettings(explicitMagicPocket.contextCompaction),
-    runtimeTuning: normalizeMagicPocketRuntimeTuningSettings(explicitMagicPocket.runtimeTuning),
-    imageGeneration: normalizeMagicPocketImageGenerationSettings(explicitMagicPocket.imageGeneration),
-    speechToText: normalizeMagicPocketSpeechToTextSettings(explicitMagicPocket.speechToText),
-    textToSpeech: normalizeMagicPocketTextToSpeechSettings(explicitMagicPocket.textToSpeech),
-    musicGeneration: normalizeMagicPocketMusicGenerationSettings(explicitMagicPocket.musicGeneration),
-    videoGeneration: normalizeMagicPocketVideoGenerationSettings(explicitMagicPocket.videoGeneration),
-    quality: normalizeMagicPocketQualitySettings(explicitMagicPocket.quality)
+    toolOutputLimits: normalizeDagongToolOutputLimitsSettings(explicitDagong.toolOutputLimits),
+    mcpSearch: normalizeDagongMcpSearchSettings(explicitDagong.mcpSearch),
+    storage: normalizeDagongStorageSettings(explicitDagong.storage),
+    contextCompaction: normalizeDagongContextCompactionSettings(explicitDagong.contextCompaction),
+    runtimeTuning: normalizeDagongRuntimeTuningSettings(explicitDagong.runtimeTuning),
+    imageGeneration: normalizeDagongImageGenerationSettings(explicitDagong.imageGeneration),
+    speechToText: normalizeDagongSpeechToTextSettings(explicitDagong.speechToText),
+    textToSpeech: normalizeDagongTextToSpeechSettings(explicitDagong.textToSpeech),
+    musicGeneration: normalizeDagongMusicGenerationSettings(explicitDagong.musicGeneration),
+    videoGeneration: normalizeDagongVideoGenerationSettings(explicitDagong.videoGeneration),
+    quality: normalizeDagongQualitySettings(explicitDagong.quality)
   }
   // Strip the legacy `agentProvider` discriminator and the legacy
   // per-provider settings from the surfaced migration result. The
-  // runtime now has a single agent (MagicPocket) and we no longer
+  // runtime now has a single agent (Dagong) and we no longer
   // round-trip the legacy value into the new settings shape.
   const { deepseek: _legacyDeepseek, agents: _agents, agentProvider: _agentProvider, ...rest } = parsed
   void _legacyDeepseek
@@ -1213,7 +1213,7 @@ export function migrateLegacyAppSettings(parsed: LegacyAppSettingsShape): Partia
     ...rest,
     provider,
     agents: {
-      magicpocket
+      dagong
     }
   }
 }

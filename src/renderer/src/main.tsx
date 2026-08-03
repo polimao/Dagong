@@ -16,7 +16,7 @@ import './i18n'
 import { applyCursorSpotlight } from './lib/apply-theme'
 import { installCursorSpotlightTracking } from './lib/cursor-spotlight'
 
-document.documentElement.dataset.platform = window.magicpocketGui?.platform ?? 'unknown'
+document.documentElement.dataset.platform = window.dagongGui?.platform ?? 'unknown'
 applyCursorSpotlight(true)
 installCursorSpotlightTracking()
 

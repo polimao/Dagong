@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { Check, ChevronDown, ChevronRight, ExternalLink, Hourglass, Loader2, TriangleAlert } from 'lucide-react'
 import type { ChatBlock, ToolBlock } from '../../agent/types'
 import { useChatStore } from '../../store/chat-store'
-import { AgentMagicPocket } from '../subagents/AgentMagicPocket'
+import { AgentDagong } from '../subagents/AgentDagong'
 
 /**
- * "MagicPocket Crew" — the subagent (`delegate_task`) visualization for the chat
+ * "Dagong Crew" — the subagent (`delegate_task`) visualization for the chat
  * timeline. A single delegation renders as one {@link SubagentCallCard}; sibling
  * delegations of one turn coalesce under a {@link SwarmHeader} (only N >= 2).
  *
- * Three independent visual channels: AgentMagicPocket **pose** = role, **motion** =
+ * Three independent visual channels: AgentDagong **pose** = role, **motion** =
  * liveness, **disc ring + status dot** = status. Bound only to fields that
  * exist today (`block.meta.child` + guarded parse of the tool `detail` JSON);
  * every read degrades gracefully so a contract change never blanks the card.
@@ -321,7 +321,7 @@ function AvatarDisc({
   animate: boolean
 }): ReactElement {
   // Failed: keep the pose, freeze motion, tint disc red (reads "stuck", not "asleep").
-  // Queued: AgentMagicPocket's disabled (resting) path, grayscale + static.
+  // Queued: AgentDagong's disabled (resting) path, grayscale + static.
   const disabled = status === 'queued'
   const frozen = !animate || status === 'failed' || isTerminal(status)
   const size = compact ? 'h-9 w-9' : 'h-11 w-11'
@@ -338,7 +338,7 @@ function AvatarDisc({
       }`}
       style={{ background: bg, boxShadow: DISC_RING[status] }}
     >
-      <AgentMagicPocket id={poseId} disabled={disabled} className={inner} />
+      <AgentDagong id={poseId} disabled={disabled} className={inner} />
       <StatusDot status={status} />
     </span>
   )
@@ -645,7 +645,7 @@ export function SubagentGroup({
                 background: 'radial-gradient(circle at 50% 36%,#fff,#eef4fb)'
               }}
             >
-              <AgentMagicPocket id={pose} className="h-5 w-5" />
+              <AgentDagong id={pose} className="h-5 w-5" />
             </span>
           ))}
           {overflow > 0 ? (

@@ -132,12 +132,12 @@ export function formatCacheMissReason(reason: string): string {
 }
 
 export async function loadThreadUsage(threadId: string): Promise<ThreadUsageSummary | null> {
-  if (typeof window.magicpocketGui?.runtimeRequest !== 'function') return null
+  if (typeof window.dagongGui?.runtimeRequest !== 'function') return null
   const params = new URLSearchParams({
     group_by: 'thread',
     thread_id: threadId
   })
-  const r = await window.magicpocketGui.runtimeRequest(`/v1/usage?${params.toString()}`, 'GET')
+  const r = await window.dagongGui.runtimeRequest(`/v1/usage?${params.toString()}`, 'GET')
   if (!r.ok || !r.body.trim()) return null
   const parsed = parseUsageResponse<{
     buckets?: Array<Record<string, unknown>>

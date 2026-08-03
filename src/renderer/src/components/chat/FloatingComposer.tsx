@@ -42,7 +42,7 @@ import {
   X
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import type { AttachmentReference, ChatBlock, ReviewTarget } from '../../agent/types'
 import { useChatStore } from '../../store/chat-store'
 import { normalizeWorkspaceRoot } from '../../lib/workspace-path'
@@ -800,12 +800,12 @@ export function FloatingComposer({
             : undefined
 
   useEffect(() => {
-    if (!useWorktreePool || !effectiveWorkspaceRoot || typeof window.magicpocketGui?.getGitBranches !== 'function') {
+    if (!useWorktreePool || !effectiveWorkspaceRoot || typeof window.dagongGui?.getGitBranches !== 'function') {
       setWorktreeBranches([])
       return
     }
     let cancelled = false
-    void window.magicpocketGui.getGitBranches(effectiveWorkspaceRoot).then((result) => {
+    void window.dagongGui.getGitBranches(effectiveWorkspaceRoot).then((result) => {
       if (cancelled || !result.ok) return
       const names = result.branches.map((branch) => branch.name)
       setWorktreeBranches(names)
@@ -1621,7 +1621,7 @@ export function FloatingComposer({
       const paths: string[] = []
       for (const file of pathFiles) {
         try {
-          const path = window.magicpocketGui.getPathForFile(file)
+          const path = window.dagongGui.getPathForFile(file)
           if (path) paths.push(path)
         } catch {
           // ignore files we cannot resolve a filesystem path for

@@ -47,7 +47,7 @@ describe('write markdown round-trip', () => {
   })
 
   it('keeps pending infographic tokens intact across the round trip', () => {
-    const token = '![信息图](magicpocket-pending-infographic://0a1b2c3d-e4f5-6789-abcd-ef0123456789)'
+    const token = '![信息图](dagong-pending-infographic://0a1b2c3d-e4f5-6789-abcd-ef0123456789)'
     const doc = `第一段。\n\n${token}\n\n第二段。\n`
     const firstPass = serializeWriteMarkdown(parseWriteMarkdown(doc))
     expect(firstPass).toContain(token)
@@ -66,9 +66,9 @@ describe('auditWriteMarkdownFidelity', () => {
 
   it('rejects ordered-list hard-wrapped continuations that lose characters', () => {
     const doc = [
-      '1. Add protocol fields in `magicpocket/src/contracts/`.',
-      '2. Add agent behavior in `magicpocket/src/loop/`, or a',
-      '   new port/adapter under `magicpocket/src/ports/`.',
+      '1. Add protocol fields in `dagong/src/contracts/`.',
+      '2. Add agent behavior in `dagong/src/loop/`, or a',
+      '   new port/adapter under `dagong/src/ports/`.',
       ''
     ].join('\n')
     const fidelity = auditWriteMarkdownFidelity(doc)

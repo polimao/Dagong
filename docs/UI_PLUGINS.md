@@ -1,12 +1,12 @@
 # UI 插件开发指南(形象工坊)
 
-MagicPocket 的「形象工坊」允许任何人制作并安装自己的吉祥物形象包,
+Dagong 的「形象工坊」允许任何人制作并安装自己的吉祥物形象包,
 换掉工作台里的泳动小鸟、欢迎/睡觉/坐着的状态形象、会话出没彩蛋、完成庆祝,甚至主题色和进行中文案。
 
-**iMagicPocket 模式就是最好的例子**:它不是硬编码的功能,而是一个随应用分发、
-首次启动自动安装的 UI 插件(id 为 `imagicpocket`,见 `src/main/ui-plugin-bundled.ts`)。
-你在形象工坊里看到的 iMagicPocket 卡片,与任何第三方插件完全同级 —— 可以启用、停用,也可以删除。
-(它额外享有一套手工制作的运球/快攻/喝奶茶动画,这部分由应用针对 `imagicpocket` id 特殊点亮,
+**iDagong 模式就是最好的例子**:它不是硬编码的功能,而是一个随应用分发、
+首次启动自动安装的 UI 插件(id 为 `idagong`,见 `src/main/ui-plugin-bundled.ts`)。
+你在形象工坊里看到的 iDagong 卡片,与任何第三方插件完全同级 —— 可以启用、停用,也可以删除。
+(它额外享有一套手工制作的运球/快攻/喝奶茶动画,这部分由应用针对 `idagong` id 特殊点亮,
 第三方插件则使用通用的泳动/状态动画框架。)
 
 **一个 UI 插件就是一个文件夹**:`manifest.json` + 若干图片。没有任何代码 ——
@@ -23,7 +23,7 @@ my-plugin/
 
 安装方式:`设置 → 形象工坊 → 安装插件文件夹…`,选中插件目录即可。
 应用会校验 manifest 后把 **manifest 和被引用到的图片** 复制进应用数据目录
-(`~/.magicpocket/ui-plugins/<id>/`),源目录中的其它文件一律不会被复制。
+(`~/.dagong/ui-plugins/<id>/`),源目录中的其它文件一律不会被复制。
 
 官方示例见 [`examples/ui-plugins/starlight/`](../examples/ui-plugins/starlight/)。
 
@@ -32,7 +32,7 @@ my-plugin/
 ```json
 {
   "id": "starlight",
-  "name": "星夜 MagicPocket",
+  "name": "星夜 Dagong",
   "version": "1.0.0",
   "author": "你的名字",
   "description": "一句话介绍(可选,≤240 字符)",
@@ -61,7 +61,7 @@ my-plugin/
 
 | 字段 | 必填 | 规则 |
 |---|---|---|
-| `id` | ✓ | 2–40 位小写字母/数字/连字符;保留字 `default` / `magicpocket` / `on` / `off` / `none` 不可用(`imagicpocket` 被预装示例占用,重装会覆盖它) |
+| `id` | ✓ | 2–40 位小写字母/数字/连字符;保留字 `default` / `dagong` / `on` / `off` / `none` 不可用(`idagong` 被预装示例占用,重装会覆盖它) |
 | `name` | ✓ | ≤60 字符 |
 | `version` | ✓ | 语义化版本,如 `1.0.0` |
 | `author` / `description` | | ≤80 / ≤240 字符 |
@@ -73,11 +73,11 @@ my-plugin/
 ### 形象槽位(figures)
 
 所有图片建议 **主体朝左**、透明背景、最长边 512px 左右。
-缺失的槽位会回退到默认 MagicPocket 美术或按下表的回退链借用你的其它槽位。
+缺失的槽位会回退到默认 Dagong 美术或按下表的回退链借用你的其它槽位。
 
 | 槽位 | 出现在哪里 | 缺失时回退 |
 |---|---|---|
-| `swim` | 回合进行中的泳动动画主体(推进/冲刺/潜入)、各处的最终兜底 | 默认 MagicPocket 鸟 |
+| `swim` | 回合进行中的泳动动画主体(推进/冲刺/潜入)、各处的最终兜底 | 默认 Dagong 鸟 |
 | `surf` | 泳动动画的冲浪姿态、庆祝「胜利巡游」 | `swim` |
 | `greet` | 欢迎卡片、侧边栏轮播、出没「探头」、庆祝「跃起欢呼」 | `swim` |
 | `sleep` | 运行时唤醒页、侧边栏轮播、出没「打盹」 | `sit` → `swim` |

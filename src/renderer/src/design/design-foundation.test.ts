@@ -16,17 +16,17 @@ function artifact(partial: Partial<DesignArtifact> & { id: string }): DesignArti
   return {
     kind: 'html',
     title: partial.id,
-    relativePath: `.magicpocket-design/doc/${partial.id}/v1.html`,
+    relativePath: `.dagong-design/doc/${partial.id}/v1.html`,
     createdAt,
     updatedAt: createdAt,
-    versions: [{ id: `${partial.id}-v1`, relativePath: `.magicpocket-design/doc/${partial.id}/v1.html`, createdAt, summary: '' }],
+    versions: [{ id: `${partial.id}-v1`, relativePath: `.dagong-design/doc/${partial.id}/v1.html`, createdAt, summary: '' }],
     ...partial
   }
 }
 
 describe('designSpecPath', () => {
   it('places design.md under the 设计稿 directory', () => {
-    expect(designSpecPath('abc123')).toBe('.magicpocket-design/abc123/design.md')
+    expect(designSpecPath('abc123')).toBe('.dagong-design/abc123/design.md')
   })
 })
 
@@ -45,12 +45,12 @@ describe('buildDesignSpecPrompt', () => {
   const prompt = buildDesignSpecPrompt({
     brief: 'An IKUN fan hub',
     workspaceRoot: '/ws',
-    designMdPath: '.magicpocket-design/doc/design.md',
-    existingPages: [{ name: 'Home', htmlPath: '.magicpocket-design/doc/home/v1.html', summary: 'landing' }]
+    designMdPath: '.dagong-design/doc/design.md',
+    existingPages: [{ name: 'Home', htmlPath: '.dagong-design/doc/home/v1.html', summary: 'landing' }]
   })
 
   it('writes design.md first, then requires a parseable pages block', () => {
-    expect(prompt).toContain('.magicpocket-design/doc/design.md')
+    expect(prompt).toContain('.dagong-design/doc/design.md')
     expect(prompt).toContain('Design target: Web')
     expect(prompt).toContain('1280x800 desktop page frame')
     expect(prompt).toContain('Web brief:')
@@ -62,7 +62,7 @@ describe('buildDesignSpecPrompt', () => {
   })
 
   it('restricts edits to design.md and forbids designing screens yet', () => {
-    expect(prompt).toContain('Modify ONLY `.magicpocket-design/doc/design.md`')
+    expect(prompt).toContain('Modify ONLY `.dagong-design/doc/design.md`')
     expect(prompt).toContain('do NOT design screens yet')
   })
 
@@ -75,7 +75,7 @@ describe('buildDesignSpecPrompt', () => {
     const appPrompt = buildDesignSpecPrompt({
       brief: 'A habit tracker',
       workspaceRoot: '/ws',
-      designMdPath: '.magicpocket-design/doc/design.md',
+      designMdPath: '.dagong-design/doc/design.md',
       designContext: { designTarget: 'app' }
     })
 
@@ -91,13 +91,13 @@ describe('buildDesignSystemBoardPrompt', () => {
   const prompt = buildDesignSystemBoardPrompt({
     brief: 'An IKUN fan hub',
     workspaceRoot: '/ws',
-    artifactRelativePath: '.magicpocket-design/doc/sys/v1.html',
+    artifactRelativePath: '.dagong-design/doc/sys/v1.html',
     designSystemMdPath: DESIGN_SYSTEM_MD_PATH,
-    designMdPath: '.magicpocket-design/doc/design.md'
+    designMdPath: '.dagong-design/doc/design.md'
   })
 
   it('builds a visual style guide AND writes the shared token file', () => {
-    expect(prompt).toContain('.magicpocket-design/doc/sys/v1.html')
+    expect(prompt).toContain('.dagong-design/doc/sys/v1.html')
     expect(prompt).toContain(`Also WRITE \`${DESIGN_SYSTEM_MD_PATH}\``)
     expect(prompt).toContain('Design-system target: Web')
     expect(prompt).toContain('#hex')
@@ -106,19 +106,19 @@ describe('buildDesignSystemBoardPrompt', () => {
 
   it('limits the writable files to the board and the token file', () => {
     expect(prompt).toContain(
-      'Modify ONLY `.magicpocket-design/doc/sys/v1.html` and `.magicpocket-design/DESIGN_SYSTEM.md`'
+      'Modify ONLY `.dagong-design/doc/sys/v1.html` and `.dagong-design/DESIGN_SYSTEM.md`'
     )
   })
 
   it('points the agent at the design brief to honor', () => {
-    expect(prompt).toContain('.magicpocket-design/doc/design.md')
+    expect(prompt).toContain('.dagong-design/doc/design.md')
   })
 
   it('adapts the style-guide board to app targets', () => {
     const appPrompt = buildDesignSystemBoardPrompt({
       brief: 'A habit tracker',
       workspaceRoot: '/ws',
-      artifactRelativePath: '.magicpocket-design/doc/sys/v1.html',
+      artifactRelativePath: '.dagong-design/doc/sys/v1.html',
       designSystemMdPath: DESIGN_SYSTEM_MD_PATH,
       designContext: { designTarget: 'app' }
     })
@@ -134,13 +134,13 @@ describe('buildDesignLogoPrompt', () => {
   const prompt = buildDesignLogoPrompt({
     brief: 'An IKUN fan hub',
     workspaceRoot: '/ws',
-    artifactRelativePath: '.magicpocket-design/doc/logo/v1.html',
+    artifactRelativePath: '.dagong-design/doc/logo/v1.html',
     designSystemMdPath: DESIGN_SYSTEM_MD_PATH,
     designContext: { brandColor: '#d4af37' }
   })
 
   it('lets the agent choose inline SVG or a generated raster', () => {
-    expect(prompt).toContain('.magicpocket-design/doc/logo/v1.html')
+    expect(prompt).toContain('.dagong-design/doc/logo/v1.html')
     expect(prompt).toContain('inline SVG')
     expect(prompt).toContain('generate_image')
   })
@@ -174,10 +174,10 @@ describe('buildFoundationFollowLines', () => {
 
   it('points pages at the brief, tokens, and on-canvas siblings', () => {
     const lines = buildFoundationFollowLines({
-      designMdPath: '.magicpocket-design/doc/design.md',
+      designMdPath: '.dagong-design/doc/design.md',
       designSystemMdPath: DESIGN_SYSTEM_MD_PATH
     }).join('\n')
-    expect(lines).toContain('.magicpocket-design/doc/design.md')
+    expect(lines).toContain('.dagong-design/doc/design.md')
     expect(lines).toContain(DESIGN_SYSTEM_MD_PATH)
     expect(lines).toContain('reuse the EXACT palette')
     expect(lines).toContain('already on the canvas')

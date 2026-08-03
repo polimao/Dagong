@@ -3,8 +3,8 @@ import {
   DEFAULT_DEEPSEEK_BASE_URL,
   defaultClawSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
-  defaultMiniMaxMediaGenerationMagicPocketPatch,
+  defaultDagongRuntimeSettings,
+  defaultMiniMaxMediaGenerationDagongPatch,
   defaultModelProviderSettings,
   getModelProviderPreset,
   isComposerChatModelId,
@@ -28,14 +28,14 @@ import {
   modelSupportsImageInput,
   defaultDesignSettings,
   normalizeModelProviderSettings,
-  resolveMagicPocketImageGenerationSettings,
-  resolveMagicPocketMusicGenerationSettings,
+  resolveDagongImageGenerationSettings,
+  resolveDagongMusicGenerationSettings,
   resolveModelProviderBaseUrl,
   resolveModelProviderProxyUrl,
-  resolveMagicPocketRuntimeSettings,
-  resolveMagicPocketSpeechToTextSettings,
-  resolveMagicPocketTextToSpeechSettings,
-  resolveMagicPocketVideoGenerationSettings,
+  resolveDagongRuntimeSettings,
+  resolveDagongSpeechToTextSettings,
+  resolveDagongTextToSpeechSettings,
+  resolveDagongVideoGenerationSettings,
   type AppSettingsV1,
   type ModelProviderModelProfileV1
 } from './app-settings'
@@ -63,14 +63,14 @@ function settings(): AppSettingsV1 {
       ]
     },
     agents: {
-      magicpocket: {
-        ...defaultMagicPocketRuntimeSettings(),
+      dagong: {
+        ...defaultDagongRuntimeSettings(),
         providerId: 'custom',
         model: 'custom-model'
       }
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -89,11 +89,11 @@ function settings(): AppSettingsV1 {
 }
 
 describe('model provider settings', () => {
-  it('resolves MagicPocket runtime credentials from the selected provider', () => {
+  it('resolves Dagong runtime credentials from the selected provider', () => {
     const state = settings()
-    state.agents.magicpocket.apiKey = 'sk-stale-runtime'
-    state.agents.magicpocket.baseUrl = 'https://stale-runtime.example/v1'
-    const runtime = resolveMagicPocketRuntimeSettings(state)
+    state.agents.dagong.apiKey = 'sk-stale-runtime'
+    state.agents.dagong.baseUrl = 'https://stale-runtime.example/v1'
+    const runtime = resolveDagongRuntimeSettings(state)
 
     expect(runtime.apiKey).toBe('sk-custom')
     expect(runtime.baseUrl).toBe('https://custom.example/v1')
@@ -161,12 +161,12 @@ describe('model provider settings', () => {
     expect(resolveModelProviderProxyUrl(noPort)).toBe('http://proxy.lan/')
   })
 
-  it('keeps legacy MagicPocket runtime credential overrides only when no provider is selected', () => {
+  it('keeps legacy Dagong runtime credential overrides only when no provider is selected', () => {
     const state = settings()
-    state.agents.magicpocket.providerId = ''
-    state.agents.magicpocket.apiKey = 'sk-legacy-runtime'
-    state.agents.magicpocket.baseUrl = 'https://legacy-runtime.example/v1'
-    const runtime = resolveMagicPocketRuntimeSettings(state)
+    state.agents.dagong.providerId = ''
+    state.agents.dagong.apiKey = 'sk-legacy-runtime'
+    state.agents.dagong.baseUrl = 'https://legacy-runtime.example/v1'
+    const runtime = resolveDagongRuntimeSettings(state)
 
     expect(runtime.apiKey).toBe('sk-legacy-runtime')
     expect(runtime.baseUrl).toBe('https://legacy-runtime.example/v1')
@@ -177,9 +177,9 @@ describe('model provider settings', () => {
     state.provider.providers = state.provider.providers.map((provider) =>
       provider.id === 'custom' ? { ...provider, apiKey: '' } : provider
     )
-    state.agents.magicpocket.providerId = 'custom'
-    state.agents.magicpocket.apiKey = 'sk-runtime-fallback'
-    const runtime = resolveMagicPocketRuntimeSettings(state)
+    state.agents.dagong.providerId = 'custom'
+    state.agents.dagong.apiKey = 'sk-runtime-fallback'
+    const runtime = resolveDagongRuntimeSettings(state)
 
     // The keyless provider must not erase a configured key — otherwise the
     // settings-apply gate reads "no API key" and strands a healthy runtime.
@@ -233,7 +233,7 @@ describe('model provider settings', () => {
     expect(custom?.modelProfiles.writer.maxOutputTokens).toBe(32_000)
   })
 
-  it('creates Xiaomi and MiniMax provider presets for MagicPocket runtime profiles', () => {
+  it('creates Xiaomi and MiniMax provider presets for Dagong runtime profiles', () => {
     const xiaomi = getModelProviderPreset('xiaomi')
     const minimax = getModelProviderPreset('minimax')
 
@@ -314,7 +314,7 @@ describe('model provider settings', () => {
     const minimax = getModelProviderPreset('minimax')
     expect(minimax).not.toBeNull()
     const minimaxProfile = modelProviderPresetProfile(minimax!, 'sk-minimax')
-    const resolved = resolveMagicPocketRuntimeSettings({
+    const resolved = resolveDagongRuntimeSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -324,8 +324,8 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           providerId: minimaxProfile.id,
           model: minimaxProfile.models[0]
         }
@@ -354,12 +354,12 @@ describe('model provider settings', () => {
     const minimax = getModelProviderPreset('minimax')
     expect(minimax).not.toBeNull()
     const minimaxProfile = modelProviderPresetProfile(minimax!, 'sk-minimax')
-    const patch = defaultMiniMaxMediaGenerationMagicPocketPatch({
+    const patch = defaultMiniMaxMediaGenerationDagongPatch({
       providers: [
         ...defaultModelProviderSettings().providers,
         minimaxProfile
       ],
-      currentMagicPocket: defaultMagicPocketRuntimeSettings()
+      currentDagong: defaultDagongRuntimeSettings()
     })
 
     expect(patch).toEqual(expect.objectContaining({
@@ -390,14 +390,14 @@ describe('model provider settings', () => {
     const minimaxProfile = modelProviderPresetProfile(minimax!, 'sk-minimax')
     const tokenPlanProfile = modelProviderTokenPlanProfile(minimax!, 'sk-cp-minimax')
     expect(tokenPlanProfile).not.toBeNull()
-    const patch = defaultMiniMaxMediaGenerationMagicPocketPatch({
+    const patch = defaultMiniMaxMediaGenerationDagongPatch({
       providers: [
         ...defaultModelProviderSettings().providers,
         minimaxProfile,
         tokenPlanProfile!
       ],
-      currentMagicPocket: {
-        ...defaultMagicPocketRuntimeSettings(),
+      currentDagong: {
+        ...defaultDagongRuntimeSettings(),
         providerId: tokenPlanProfile!.id
       }
     })
@@ -419,19 +419,19 @@ describe('model provider settings', () => {
       models: ['MiniMax-M3'],
       modelProfiles: {}
     }
-    const patch = defaultMiniMaxMediaGenerationMagicPocketPatch({
+    const patch = defaultMiniMaxMediaGenerationDagongPatch({
       providers: [
         ...defaultModelProviderSettings().providers,
         staleMiniMax
       ],
-      currentMagicPocket: {
-        ...defaultMagicPocketRuntimeSettings(),
+      currentDagong: {
+        ...defaultDagongRuntimeSettings(),
         textToSpeech: {
-          ...defaultMagicPocketRuntimeSettings().textToSpeech,
+          ...defaultDagongRuntimeSettings().textToSpeech,
           providerId: 'voice-lab'
         }
       },
-      magicpocketPatch: {
+      dagongPatch: {
         musicGeneration: { enabled: false }
       }
     })
@@ -466,20 +466,20 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           textToSpeech: {
-            ...defaultMagicPocketRuntimeSettings().textToSpeech,
+            ...defaultDagongRuntimeSettings().textToSpeech,
             enabled: true,
             providerId: 'minimax'
           },
           musicGeneration: {
-            ...defaultMagicPocketRuntimeSettings().musicGeneration,
+            ...defaultDagongRuntimeSettings().musicGeneration,
             enabled: true,
             providerId: 'minimax'
           },
           videoGeneration: {
-            ...defaultMagicPocketRuntimeSettings().videoGeneration,
+            ...defaultDagongRuntimeSettings().videoGeneration,
             enabled: true,
             providerId: 'minimax'
           }
@@ -488,17 +488,17 @@ describe('model provider settings', () => {
     }
 
     expect(listTextToSpeechProviderProfiles(state).map((profile) => profile.id)).toContain('minimax')
-    expect(resolveMagicPocketTextToSpeechSettings(state)).toEqual(expect.objectContaining({
+    expect(resolveDagongTextToSpeechSettings(state)).toEqual(expect.objectContaining({
       baseUrl: 'https://api.minimax.io',
       apiKey: 'sk-minimax',
       model: 'speech-2.8-hd'
     }))
-    expect(resolveMagicPocketMusicGenerationSettings(state)).toEqual(expect.objectContaining({
+    expect(resolveDagongMusicGenerationSettings(state)).toEqual(expect.objectContaining({
       baseUrl: 'https://api.minimax.io',
       apiKey: 'sk-minimax',
       model: 'music-2.6'
     }))
-    expect(resolveMagicPocketVideoGenerationSettings(state)).toEqual(expect.objectContaining({
+    expect(resolveDagongVideoGenerationSettings(state)).toEqual(expect.objectContaining({
       baseUrl: 'https://api.minimax.io',
       apiKey: 'sk-minimax',
       model: 'MiniMax-Hailuo-2.3'
@@ -509,7 +509,7 @@ describe('model provider settings', () => {
     const minimax = getModelProviderPreset('minimax')
     expect(minimax).not.toBeNull()
     const minimaxProfile = modelProviderPresetProfile(minimax!, 'sk-minimax')
-    const resolved = resolveMagicPocketImageGenerationSettings({
+    const resolved = resolveDagongImageGenerationSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -519,10 +519,10 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           imageGeneration: {
-            ...defaultMagicPocketRuntimeSettings().imageGeneration,
+            ...defaultDagongRuntimeSettings().imageGeneration,
             enabled: true,
             providerId: minimaxProfile.id,
             baseUrl: 'https://stale-image.example/v1',
@@ -555,7 +555,7 @@ describe('model provider settings', () => {
         models: ['image-01', 'image-01-live']
       }
     })
-    const resolved = resolveMagicPocketImageGenerationSettings({
+    const resolved = resolveDagongImageGenerationSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -565,10 +565,10 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           imageGeneration: {
-            ...defaultMagicPocketRuntimeSettings().imageGeneration,
+            ...defaultDagongRuntimeSettings().imageGeneration,
             enabled: true,
             providerId: minimaxTokenPlanProfile!.id
           }
@@ -607,7 +607,7 @@ describe('model provider settings', () => {
       }
     })
 
-    const resolved = resolveMagicPocketImageGenerationSettings({
+    const resolved = resolveDagongImageGenerationSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -617,10 +617,10 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           imageGeneration: {
-            ...defaultMagicPocketRuntimeSettings().imageGeneration,
+            ...defaultDagongRuntimeSettings().imageGeneration,
             enabled: true,
             providerId: codexProfile.id
           }
@@ -648,7 +648,7 @@ describe('model provider settings', () => {
       }))
     }
 
-    const resolved = resolveMagicPocketRuntimeSettings({
+    const resolved = resolveDagongRuntimeSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -658,8 +658,8 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           providerId: codexProfile.id,
           model: 'gpt-5.5'
         }
@@ -704,25 +704,25 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           imageGeneration: {
-            ...defaultMagicPocketRuntimeSettings().imageGeneration,
+            ...defaultDagongRuntimeSettings().imageGeneration,
             enabled: true,
             providerId: staleGlobalCapabilityOnCnProfile.id
           },
           textToSpeech: {
-            ...defaultMagicPocketRuntimeSettings().textToSpeech,
+            ...defaultDagongRuntimeSettings().textToSpeech,
             enabled: true,
             providerId: staleGlobalCapabilityOnCnProfile.id
           },
           musicGeneration: {
-            ...defaultMagicPocketRuntimeSettings().musicGeneration,
+            ...defaultDagongRuntimeSettings().musicGeneration,
             enabled: true,
             providerId: staleGlobalCapabilityOnCnProfile.id
           },
           videoGeneration: {
-            ...defaultMagicPocketRuntimeSettings().videoGeneration,
+            ...defaultDagongRuntimeSettings().videoGeneration,
             enabled: true,
             providerId: staleGlobalCapabilityOnCnProfile.id
           }
@@ -730,10 +730,10 @@ describe('model provider settings', () => {
       }
     }
 
-    expect(resolveMagicPocketImageGenerationSettings(state).baseUrl).toBe('https://api.minimaxi.com')
-    expect(resolveMagicPocketTextToSpeechSettings(state).baseUrl).toBe('https://api.minimaxi.com')
-    expect(resolveMagicPocketMusicGenerationSettings(state).baseUrl).toBe('https://api.minimaxi.com')
-    expect(resolveMagicPocketVideoGenerationSettings(state).baseUrl).toBe('https://api.minimaxi.com')
+    expect(resolveDagongImageGenerationSettings(state).baseUrl).toBe('https://api.minimaxi.com')
+    expect(resolveDagongTextToSpeechSettings(state).baseUrl).toBe('https://api.minimaxi.com')
+    expect(resolveDagongMusicGenerationSettings(state).baseUrl).toBe('https://api.minimaxi.com')
+    expect(resolveDagongVideoGenerationSettings(state).baseUrl).toBe('https://api.minimaxi.com')
   })
 
   it('exposes the Xiaomi preset speech capability', () => {
@@ -849,7 +849,7 @@ describe('model provider settings', () => {
 
   it('backfills preset model capabilities for stale stored providers', () => {
     const base = settings()
-    const resolved = resolveMagicPocketRuntimeSettings({
+    const resolved = resolveDagongRuntimeSettings({
       ...base,
       provider: {
         ...base.provider,
@@ -885,7 +885,7 @@ describe('model provider settings', () => {
       supportsToolCalling: false,
       messageParts: ['text']
     }
-    const resolved = resolveMagicPocketRuntimeSettings({
+    const resolved = resolveDagongRuntimeSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -901,8 +901,8 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           providerId: codexProfile.id,
           model: 'gpt-5.5'
         }
@@ -926,10 +926,10 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           speechToText: {
-            ...defaultMagicPocketRuntimeSettings().speechToText,
+            ...defaultDagongRuntimeSettings().speechToText,
             enabled: true,
             providerId: xiaomiProfile.id
           }
@@ -938,7 +938,7 @@ describe('model provider settings', () => {
     }
 
     expect(listSpeechToTextProviderProfiles(base).map((profile) => profile.id)).toEqual(['xiaomi'])
-    expect(resolveMagicPocketSpeechToTextSettings(base)).toEqual(expect.objectContaining({
+    expect(resolveDagongSpeechToTextSettings(base)).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'xiaomi',
       protocol: 'mimo-asr',
@@ -966,10 +966,10 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           textToSpeech: {
-            ...defaultMagicPocketRuntimeSettings().textToSpeech,
+            ...defaultDagongRuntimeSettings().textToSpeech,
             enabled: true,
             providerId: minimaxProfile.id,
             baseUrl: 'https://stale-tts.example/v1',
@@ -977,7 +977,7 @@ describe('model provider settings', () => {
             model: 'stale-voice-model'
           },
           musicGeneration: {
-            ...defaultMagicPocketRuntimeSettings().musicGeneration,
+            ...defaultDagongRuntimeSettings().musicGeneration,
             enabled: true,
             providerId: minimaxProfile.id,
             baseUrl: 'https://stale-music.example/v1',
@@ -985,7 +985,7 @@ describe('model provider settings', () => {
             model: 'stale-music-model'
           },
           videoGeneration: {
-            ...defaultMagicPocketRuntimeSettings().videoGeneration,
+            ...defaultDagongRuntimeSettings().videoGeneration,
             enabled: true,
             providerId: minimaxProfile.id,
             baseUrl: 'https://stale-video.example/v1',
@@ -999,7 +999,7 @@ describe('model provider settings', () => {
     expect(listTextToSpeechProviderProfiles(base).map((profile) => profile.id)).toEqual(['minimax', 'xiaomi'])
     expect(listMusicGenerationProviderProfiles(base).map((profile) => profile.id)).toEqual(['minimax'])
     expect(listVideoGenerationProviderProfiles(base).map((profile) => profile.id)).toEqual(['minimax'])
-    expect(resolveMagicPocketTextToSpeechSettings(base)).toEqual(expect.objectContaining({
+    expect(resolveDagongTextToSpeechSettings(base)).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-t2a',
@@ -1007,7 +1007,7 @@ describe('model provider settings', () => {
       apiKey: 'sk-minimax',
       model: 'speech-2.8-hd'
     }))
-    expect(resolveMagicPocketMusicGenerationSettings(base)).toEqual(expect.objectContaining({
+    expect(resolveDagongMusicGenerationSettings(base)).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-music',
@@ -1015,7 +1015,7 @@ describe('model provider settings', () => {
       apiKey: 'sk-minimax',
       model: 'music-2.6'
     }))
-    expect(resolveMagicPocketVideoGenerationSettings(base)).toEqual(expect.objectContaining({
+    expect(resolveDagongVideoGenerationSettings(base)).toEqual(expect.objectContaining({
       enabled: true,
       providerId: 'minimax',
       protocol: 'minimax-video',
@@ -1037,7 +1037,7 @@ describe('model provider settings', () => {
         baseUrl: 'https://api.xiaomimimo.com/v1'
       }
     }
-    const resolved = resolveMagicPocketSpeechToTextSettings({
+    const resolved = resolveDagongSpeechToTextSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
@@ -1047,10 +1047,10 @@ describe('model provider settings', () => {
         ]
       },
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           speechToText: {
-            ...defaultMagicPocketRuntimeSettings().speechToText,
+            ...defaultDagongRuntimeSettings().speechToText,
             enabled: true,
             providerId: staleTokenPlanProfile.id,
             model: 'mimo-v2.5-tts'
@@ -1070,13 +1070,13 @@ describe('model provider settings', () => {
   })
 
   it('keeps custom speech-to-text settings when no provider is selected', () => {
-    const resolved = resolveMagicPocketSpeechToTextSettings({
+    const resolved = resolveDagongSpeechToTextSettings({
       ...settings(),
       agents: {
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           speechToText: {
-            ...defaultMagicPocketRuntimeSettings().speechToText,
+            ...defaultDagongRuntimeSettings().speechToText,
             enabled: true,
             providerId: '',
             protocol: 'openai-transcriptions',
@@ -1289,7 +1289,7 @@ describe('provider presets', () => {
       const preset = getModelProviderPreset(presetId)
       expect(preset).not.toBeNull()
       const profile = modelProviderPresetProfile(preset!, `sk-${presetId}`)
-      const resolved = resolveMagicPocketRuntimeSettings({
+      const resolved = resolveDagongRuntimeSettings({
         ...settings(),
         provider: {
           ...defaultModelProviderSettings(),
@@ -1299,8 +1299,8 @@ describe('provider presets', () => {
           ]
         },
         agents: {
-          magicpocket: {
-            ...defaultMagicPocketRuntimeSettings(),
+          dagong: {
+            ...defaultDagongRuntimeSettings(),
             providerId: profile.id,
             model
           }
@@ -1331,14 +1331,14 @@ describe('provider presets', () => {
     expect(profile.modelProfiles['kimi-k2.7'].endpointFormat).toBeUndefined()
 
     // The override survives the full settings normalization round-trip.
-    const resolved = resolveMagicPocketRuntimeSettings({
+    const resolved = resolveDagongRuntimeSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
         providers: [...defaultModelProviderSettings().providers, profile]
       },
       agents: {
-        magicpocket: { ...defaultMagicPocketRuntimeSettings(), providerId: profile.id, model: 'minimax-m3' }
+        dagong: { ...defaultDagongRuntimeSettings(), providerId: profile.id, model: 'minimax-m3' }
       }
     })
     expect(resolved.modelProfiles['minimax-m3'].endpointFormat).toBe('messages')
@@ -1361,14 +1361,14 @@ describe('provider presets', () => {
       })
     }
 
-    const resolved = resolveMagicPocketRuntimeSettings({
+    const resolved = resolveDagongRuntimeSettings({
       ...settings(),
       provider: {
         ...defaultModelProviderSettings(),
         providers: [...defaultModelProviderSettings().providers, profile]
       },
       agents: {
-        magicpocket: { ...defaultMagicPocketRuntimeSettings(), providerId: profile.id, model: 'deepseek-v4-pro' }
+        dagong: { ...defaultDagongRuntimeSettings(), providerId: profile.id, model: 'deepseek-v4-pro' }
       }
     })
     expect(resolved.modelProfiles['deepseek-v4-pro']).toEqual(profile.modelProfiles['deepseek-v4-pro'])

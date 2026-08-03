@@ -12,7 +12,7 @@ import {
 const now = '2026-06-30T00:00:00.000Z'
 
 function htmlArtifact(id: string, title: string, extra: Partial<DesignArtifact> = {}): DesignArtifact {
-  const relativePath = `.magicpocket-design/doc/${id}/v1.html`
+  const relativePath = `.dagong-design/doc/${id}/v1.html`
   return {
     id,
     kind: 'html',
@@ -29,19 +29,19 @@ describe('PrototypePlayerOverlay', () => {
   it('waits for webview readiness before injecting navigation capture', () => {
     expect(shouldInjectPrototypeNavigationCapture({
       open: true,
-      webviewUrl: 'file:///workspace/.magicpocket-design/doc/home/v1.html?rev=1',
+      webviewUrl: 'file:///workspace/.dagong-design/doc/home/v1.html?rev=1',
       webviewReady: false,
       hasExecuteJavaScript: true
     })).toBe(false)
     expect(shouldInjectPrototypeNavigationCapture({
       open: true,
-      webviewUrl: 'file:///workspace/.magicpocket-design/doc/home/v1.html?rev=1',
+      webviewUrl: 'file:///workspace/.dagong-design/doc/home/v1.html?rev=1',
       webviewReady: true,
       hasExecuteJavaScript: true
     })).toBe(true)
     expect(shouldInjectPrototypeNavigationCapture({
       open: false,
-      webviewUrl: 'file:///workspace/.magicpocket-design/doc/home/v1.html?rev=1',
+      webviewUrl: 'file:///workspace/.dagong-design/doc/home/v1.html?rev=1',
       webviewReady: true,
       hasExecuteJavaScript: true
     })).toBe(false)
@@ -53,7 +53,7 @@ describe('PrototypePlayerOverlay', () => {
     })).toBe(false)
     expect(shouldInjectPrototypeNavigationCapture({
       open: true,
-      webviewUrl: 'file:///workspace/.magicpocket-design/doc/home/v1.html?rev=1',
+      webviewUrl: 'file:///workspace/.dagong-design/doc/home/v1.html?rev=1',
       webviewReady: true,
       hasExecuteJavaScript: false
     })).toBe(false)
@@ -89,7 +89,7 @@ describe('PrototypePlayerOverlay', () => {
   it('builds app viewport chrome CSS that hides native scrollbars', () => {
     const script = buildPrototypeViewportModeScript('app')
 
-    expect(script).toContain('data-magicpocket-prototype-viewport="app"')
+    expect(script).toContain('data-dagong-prototype-viewport="app"')
     expect(script).toContain('scrollbar-width: none')
     expect(script).toContain('::-webkit-scrollbar')
     expect(script).toContain('width: 0')
@@ -121,7 +121,7 @@ describe('PrototypePlayerOverlay', () => {
 
     expect(html).toContain('aspect-ratio:390 / 844')
     expect(html).toContain('height:100%')
-    expect(html).toContain('.magicpocket-design/doc/home/v1.html - App 390 x 844')
+    expect(html).toContain('.dagong-design/doc/home/v1.html - App 390 x 844')
     expect(html).toContain('aria-label="Prototype viewport"')
     expect(html).toContain('aria-pressed="true"')
     expect(html).toContain('rounded-[30px]')
@@ -129,8 +129,8 @@ describe('PrototypePlayerOverlay', () => {
     expect(html).toContain('All screens')
     expect(html).toContain('Home')
     expect(html).toContain('Settings')
-    expect(html).toContain('.magicpocket-design/doc/home/v1.html')
-    expect(html).toContain('.magicpocket-design/doc/settings/v1.html')
+    expect(html).toContain('.dagong-design/doc/home/v1.html')
+    expect(html).toContain('.dagong-design/doc/settings/v1.html')
   })
 
   it('renders a web-target prototype shell with desktop viewport fallback', () => {
@@ -147,13 +147,13 @@ describe('PrototypePlayerOverlay', () => {
 
     expect(html).toContain('aspect-ratio:1280 / 800')
     expect(html).toContain('width:100%')
-    expect(html).toContain('.magicpocket-design/doc/home/v1.html - Web 1280 x 800')
+    expect(html).toContain('.dagong-design/doc/home/v1.html - Web 1280 x 800')
     expect(html).toContain('1280 x 800 web prototype')
   })
 
   it('renders the current version path instead of stale screen paths', () => {
-    const v1 = '.magicpocket-design/doc/threads/v1.html'
-    const v2 = '.magicpocket-design/doc/threads/v2.html'
+    const v1 = '.dagong-design/doc/threads/v1.html'
+    const v2 = '.dagong-design/doc/threads/v2.html'
     const html = renderToStaticMarkup(
       createElement(PrototypePlayerOverlay, {
         open: true,

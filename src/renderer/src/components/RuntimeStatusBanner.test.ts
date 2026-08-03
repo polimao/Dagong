@@ -2,15 +2,15 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 import { vi } from 'vitest'
-import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
+import type { DagongRuntimeStatusPayload } from '@shared/dagong-gui-api'
 import { RuntimeStatusBanner } from './RuntimeStatusBanner'
 
 const storeState = vi.hoisted(() => ({
-  runtimeStatus: null as MagicPocketRuntimeStatusPayload | null
+  runtimeStatus: null as DagongRuntimeStatusPayload | null
 }))
 
 vi.mock('../store/chat-store', () => ({
-  useChatStore: (selector: (state: { runtimeStatus: MagicPocketRuntimeStatusPayload | null }) => unknown) =>
+  useChatStore: (selector: (state: { runtimeStatus: DagongRuntimeStatusPayload | null }) => unknown) =>
     selector(storeState)
 }))
 

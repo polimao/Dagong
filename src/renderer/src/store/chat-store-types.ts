@@ -12,7 +12,7 @@ import type {
   UserFileReference,
   UserInputAnswer
 } from '../agent/types'
-import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
+import type { DagongRuntimeStatusPayload } from '@shared/dagong-gui-api'
 import type {
   ClawImAgentProfileV1,
   ClawImChannelV1,
@@ -21,7 +21,7 @@ import type {
   ClawImSettingsV1,
   ClawModel
 } from '@shared/app-settings'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 
 export type QueuedUserMessage = {
   id: string
@@ -36,7 +36,7 @@ export type QueuedUserMessage = {
   attachments?: AttachmentReference[]
   fileReferences?: UserFileReference[]
   /**
-   * Optional GUI plan context forwarded to MagicPocket. The renderer
+   * Optional GUI plan context forwarded to Dagong. The renderer
    * attaches it for plan/refine turns so the runtime can advertise
    * the native `create_plan` tool and gate the write to the reserved
    * plan artifact.
@@ -54,7 +54,7 @@ export type QueuedUserMessage = {
 
 /**
  * GUI plan context attached to a send-message call. Mirrors the
- * MagicPocket `GuiPlanContextSchema` and is forwarded to the runtime
+ * Dagong `GuiPlanContextSchema` and is forwarded to the runtime
  * request body so plan/refine turns are scoped to a reserved path.
  */
 export type GuiPlanMessageContext = {
@@ -153,10 +153,10 @@ export type ChatState = {
   initialSetupMode: InitialSetupMode
   workspaceRoot: string
   workspaceLabel: string
-  /** 对话会话的工作目录根(默认 ~/Documents/MagicPocket),供侧边栏对话区块和项目保护使用。 */
+  /** 对话会话的工作目录根(默认 ~/Documents/Dagong),供侧边栏对话区块和项目保护使用。 */
   conversationWorkspaceRoot: string
   runtimeConnection: RuntimeConnectionStatus
-  runtimeStatus: MagicPocketRuntimeStatusPayload | null
+  runtimeStatus: DagongRuntimeStatusPayload | null
   codeWorkspaceRoots: string[]
   threads: NormalizedThread[]
   threadSearch: string

@@ -16,16 +16,16 @@ describe('tray session menu', () => {
     const menu = buildTrayMenuTemplate({
       locale: 'en',
       threads: [
-        thread('run', 'running', '2026-06-02T00:00:00.000Z', 'Fix tests', 'C:\\work\\MagicPocket'),
+        thread('run', 'running', '2026-06-02T00:00:00.000Z', 'Fix tests', 'C:\\work\\Dagong'),
         thread('recent', 'idle', '2026-06-01T00:00:00.000Z', 'Review PR', '/work/Docs')
       ],
       actions
     })
 
     expect(menu.map((item) => item.label).filter(Boolean)).toEqual([
-      'Running', 'Fix tests', 'Recent', 'Review PR', 'New Chat', 'Open MagicPocket', 'Exit'
+      'Running', 'Fix tests', 'Recent', 'Review PR', 'New Chat', 'Open Dagong', 'Exit'
     ])
-    expect(menu.find((item) => item.label === 'Fix tests')?.sublabel).toBe('MagicPocket')
+    expect(menu.find((item) => item.label === 'Fix tests')?.sublabel).toBe('Dagong')
     expect(menu.find((item) => item.label === 'Review PR')?.sublabel).toBe('Docs')
     menu.find((item) => item.label === 'Fix tests')?.click?.({} as never, undefined, {} as never)
     expect(actions.openThread).toHaveBeenCalledWith('run')
@@ -49,7 +49,7 @@ describe('tray session menu', () => {
       'thread-4',
       '更多',
       '新建会话',
-      '打开 MagicPocket',
+      '打开 Dagong',
       '退出'
     ])
   })

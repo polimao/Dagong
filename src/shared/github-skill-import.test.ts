@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  buildMagicPocketSkill,
+  buildDagongSkill,
   importSkillsFromGitHub,
   mapAllowedTools,
   parseGitHubSkillUrl,
@@ -76,7 +76,7 @@ describe('parseSkillFrontmatter', () => {
 })
 
 describe('mapAllowedTools', () => {
-  it('normalizes aliases into MagicPocket tool names', () => {
+  it('normalizes aliases into Dagong tool names', () => {
     expect(mapAllowedTools(['ReadFile', 'grep', 'shell', 'unknown_tool'])).toEqual([
       'read',
       'grep',
@@ -86,7 +86,7 @@ describe('mapAllowedTools', () => {
   })
 })
 
-describe('buildMagicPocketSkill', () => {
+describe('buildDagongSkill', () => {
   it('builds a modern skill package and de-duplicates dir names', () => {
     const used = new Set<string>()
     const parsed: ParsedSkillFrontmatter = {
@@ -98,8 +98,8 @@ describe('buildMagicPocketSkill', () => {
       body: '# Bug Hunt\n\nReproduce first.'
     }
 
-    const first = buildMagicPocketSkill(parsed, { defaultName: 'Bug Hunt', usedDirNames: used })
-    const second = buildMagicPocketSkill(parsed, { defaultName: 'Bug Hunt', usedDirNames: used })
+    const first = buildDagongSkill(parsed, { defaultName: 'Bug Hunt', usedDirNames: used })
+    const second = buildDagongSkill(parsed, { defaultName: 'Bug Hunt', usedDirNames: used })
 
     expect(first.manifest).toMatchObject({
       id: 'bug-hunt',

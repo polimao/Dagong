@@ -45,7 +45,7 @@ function addRect(x: number, y: number, w = 100, h = 80, parentId?: string): stri
 }
 
 function installHtmlArtifact(id = 'screen'): DesignArtifact {
-  const relativePath = `.magicpocket-design/doc/${id}/v1.html`
+  const relativePath = `.dagong-design/doc/${id}/v1.html`
   const artifact: DesignArtifact = {
     id,
     kind: 'html',
@@ -81,10 +81,10 @@ function installLinkedScreenFactory(): void {
     id: 'board',
     kind: 'canvas',
     title: 'Design board',
-    relativePath: '.magicpocket-design/doc/board/canvas.json',
+    relativePath: '.dagong-design/doc/board/canvas.json',
     createdAt,
     updatedAt: createdAt,
-    versions: [{ id: 'board-v1', relativePath: '.magicpocket-design/doc/board/canvas.json', createdAt, summary: '' }]
+    versions: [{ id: 'board-v1', relativePath: '.dagong-design/doc/board/canvas.json', createdAt, summary: '' }]
   }
   const doc: DesignDocument = {
     id: 'doc',
@@ -285,12 +285,12 @@ describe('AI image holder fill ops', () => {
         parentId: frame.id,
         shape: {
           type: 'image',
-          name: 'iMagicPocket Logo',
+          name: 'iDagong Logo',
           x: 132,
           y: 149,
           width: 430,
           height: 430,
-          imageUrl: '.deepseekgui-images/imagicpocket-logo.png'
+          imageUrl: '.deepseekgui-images/idagong-logo.png'
         }
       }
     ])
@@ -302,12 +302,12 @@ describe('AI image holder fill ops', () => {
     expect(shape).toMatchObject({
       id: frame.id,
       type: 'image',
-      name: 'iMagicPocket Logo',
+      name: 'iDagong Logo',
       x: 100,
       y: 120,
       width: 586,
       height: 643,
-      imageUrl: '.deepseekgui-images/imagicpocket-logo.png',
+      imageUrl: '.deepseekgui-images/idagong-logo.png',
       aiImageHolder: false
     })
     expect(shape.children).toEqual([])
@@ -569,10 +569,10 @@ describe('add-screens', () => {
       id: 'hidden-home',
       kind: 'html',
       title: 'Home',
-      relativePath: '.magicpocket-design/doc/hidden-home/v1.html',
+      relativePath: '.dagong-design/doc/hidden-home/v1.html',
       createdAt,
       updatedAt: createdAt,
-      versions: [{ id: 'hidden-home-v1', relativePath: '.magicpocket-design/doc/hidden-home/v1.html', createdAt, summary: '' }],
+      versions: [{ id: 'hidden-home-v1', relativePath: '.dagong-design/doc/hidden-home/v1.html', createdAt, summary: '' }],
       node: { x: 40, y: 60, width: 1280, height: 800, sizeMode: 'auto', boardHidden: true }
     }
     useDesignWorkspaceStore.setState({

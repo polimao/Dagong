@@ -2,12 +2,12 @@ import type { NormalizedThread } from '../agent/types'
 import { browserStorage, type BrowserStorageLike } from '../lib/browser-storage'
 import type { SddDraft } from './sdd-draft-store'
 
-const SDD_THREAD_REGISTRY_KEY = 'magicpocket.sdd.threadRegistry.v1'
+const SDD_THREAD_REGISTRY_KEY = 'dagong.sdd.threadRegistry.v1'
 const MAX_SDD_THREAD_RECORDS = 100
 const MAX_SDD_THREAD_IDS_PER_DRAFT = 20
-// Both layouts: retired pre-unit drafts (.magicpocketsdd/draft/) still have threads
+// Both layouts: retired pre-unit drafts (.dagongsdd/draft/) still have threads
 // in the runtime and must stay hidden from the chat sidebar.
-const SDD_DRAFT_PATH_FRAGMENTS = ['.magicpocketsdd/draft/', '.magicpocketsdd/requirements/']
+const SDD_DRAFT_PATH_FRAGMENTS = ['.dagongsdd/draft/', '.dagongsdd/requirements/']
 
 export type SddThreadRecord = {
   draftId: string

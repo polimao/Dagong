@@ -34,7 +34,7 @@ type QueueScreenDraftWriteOptions = {
 }
 
 function currentDraftWriteApi(api?: DraftWriteApi): DraftWriteApi | undefined {
-  return api ?? (typeof window !== 'undefined' ? window.magicpocketGui : undefined)
+  return api ?? (typeof window !== 'undefined' ? window.dagongGui : undefined)
 }
 
 function writeWorkspaceTextFile(

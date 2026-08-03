@@ -36,9 +36,9 @@ export type PrototypeMissingScreenPromptValues = {
   suggestedTitle: string
 }
 
-export const PROTOTYPE_NAV_HASH_PREFIX = 'magicpocket-proto-nav='
+export const PROTOTYPE_NAV_HASH_PREFIX = 'dagong-proto-nav='
 
-export const PROTOTYPE_BACK_HASH_PREFIX = 'magicpocket-proto-back='
+export const PROTOTYPE_BACK_HASH_PREFIX = 'dagong-proto-back='
 
 export const PROTOTYPE_NAV_SELECTOR =
   'a[href],[data-prototype-href],[data-href],[data-prototype-target],[data-target],[onclick],button[data-href],button[data-prototype-href],button[data-prototype-target],button[data-target]'

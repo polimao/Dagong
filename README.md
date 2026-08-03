@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src/asset/img/magicpocket.png" width="104" alt="MagicPocket 图标">
+  <img src="src/asset/img/dagong.png" width="104" alt="Dagong 图标">
 </p>
 
-<h1 align="center">MagicPocket</h1>
+<h1 align="center">Dagong</h1>
 
 <p align="center">
   <strong>探索需求先行的下一代 coding 范式。</strong><br>
@@ -14,7 +14,7 @@
   &nbsp;·&nbsp;
   <strong>简体中文</strong>
   &nbsp;·&nbsp;
-  <a href="https://github.com/MagicPocketAgent/MagicPocket/releases">下载</a>
+  <a href="https://github.com/DagongAgent/Dagong/releases">下载</a>
   &nbsp;·&nbsp;
   <a href="#文档地图">文档</a>
   &nbsp;·&nbsp;
@@ -22,64 +22,64 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/MagicPocketAgent/MagicPocket/releases"><img src="https://img.shields.io/github/v/release/MagicPocketAgent/MagicPocket?label=release" alt="GitHub release"></a>
+  <a href="https://github.com/DagongAgent/Dagong/releases"><img src="https://img.shields.io/github/v/release/DagongAgent/Dagong?label=release" alt="GitHub release"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue" alt="License: PolyForm Noncommercial 1.0.0"></a>
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platform">
   <img src="https://img.shields.io/badge/Electron-34-47848F?logo=electron&logoColor=white" alt="Electron 34">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
 </p>
 
-MagicPocket 是一次面向未来编程方式的产品实验：不再从“给 Agent 一句话，让它直接改代码”开始，而是从需求澄清开始，把需求文档、Design 设计稿、交互原型、实施计划、Todo、Agent 编码和变更审查放到一条连续的 GUI 工作流里。
+Dagong 是一次面向未来编程方式的产品实验：不再从“给 Agent 一句话，让它直接改代码”开始，而是从需求澄清开始，把需求文档、Design 设计稿、交互原型、实施计划、Todo、Agent 编码和变更审查放到一条连续的 GUI 工作流里。
 
-MagicPocket 面向希望把 AI Agent 真正放进日常工作的用户。它不是只聊天的客户端，也不是只给程序员的 CLI 外壳：你可以在 Code 模式把本地目录交给它处理代码、需求、计划和变更审查，在 Design 模式生成和迭代 UI 设计稿、交互原型与共享设计系统，也可以在独立的 Write 工作区里写作、润色和导出文档。
+Dagong 面向希望把 AI Agent 真正放进日常工作的用户。它不是只聊天的客户端，也不是只给程序员的 CLI 外壳：你可以在 Code 模式把本地目录交给它处理代码、需求、计划和变更审查，在 Design 模式生成和迭代 UI 设计稿、交互原型与共享设计系统，也可以在独立的 Write 工作区里写作、润色和导出文档。
 
-这也是 MagicPocket 为什么把 DeepSeek、Xiaomi MiMo、MiniMax 作为默认的一线模型组合，而不是把它们当成普通的“可选 Provider”。需求先行的 coding 范式会带来更多轮澄清、调研、结构化、规划、执行和验证，如果模型成本太高，这条流程很难成为日常工作方式。MagicPocket 选择三家来自中国的高性价比模型供应商，正是为了让完整流程跑得起、用得久、试得多。
+这也是 Dagong 为什么把 DeepSeek、Xiaomi MiMo、MiniMax 作为默认的一线模型组合，而不是把它们当成普通的“可选 Provider”。需求先行的 coding 范式会带来更多轮澄清、调研、结构化、规划、执行和验证，如果模型成本太高，这条流程很难成为日常工作方式。Dagong 选择三家来自中国的高性价比模型供应商，正是为了让完整流程跑得起、用得久、试得多。
 
-MagicPocket 内置同名本地运行时，通过 `magicpocket serve` 连接桌面端。会话、日志、偏好设置和运行时配置默认保存在本机；模型请求使用你自己的模型服务凭据。对会读写文件和执行命令的流程，MagicPocket 提供工具审批、权限模式、内联 diff 和变更审查面板。
+Dagong 内置同名本地运行时，通过 `dagong serve` 连接桌面端。会话、日志、偏好设置和运行时配置默认保存在本机；模型请求使用你自己的模型服务凭据。对会读写文件和执行命令的流程，Dagong 提供工具审批、权限模式、内联 diff 和变更审查面板。
 
 ---
 
 <p align="center">
   <a href="src/asset/img/code.mp4">
-    <img src="src/asset/img/code.gif" width="410" alt="MagicPocket Code 模式演示">
+    <img src="src/asset/img/code.gif" width="410" alt="Dagong Code 模式演示">
   </a>
   <a href="src/asset/img/write.mp4">
-    <img src="src/asset/img/write.gif" width="410" alt="MagicPocket Write 模式演示">
+    <img src="src/asset/img/write.gif" width="410" alt="Dagong Write 模式演示">
   </a>
 </p>
 
 ## 需求先行的 coding 范式
 
-MagicPocket 想探索的是“需求 -> 设计 -> 计划 -> 编码 -> 验证”的下一代编程工作流，而不是把一个聊天框简单贴到 IDE 上。
+Dagong 想探索的是“需求 -> 设计 -> 计划 -> 编码 -> 验证”的下一代编程工作流，而不是把一个聊天框简单贴到 IDE 上。
 
-这条工作流由三个并列的核心模式承载：**Code** 面向真实代码库与交付，**Design** 面向 UI 方案、原型和设计系统，**Write** 面向长文档、需求、说明和发布内容。三者共用同一个 MagicPocket 运行时、Provider 配置、审批机制和会话能力。
+这条工作流由三个并列的核心模式承载：**Code** 面向真实代码库与交付，**Design** 面向 UI 方案、原型和设计系统，**Write** 面向长文档、需求、说明和发布内容。三者共用同一个 Dagong 运行时、Provider 配置、审批机制和会话能力。
 
-| 阶段 | MagicPocket 的尝试 |
+| 阶段 | Dagong 的尝试 |
 | --- | --- |
 | **澄清需求** | 在 GUI 中新建需求草稿，让需求 AI 帮你补问题、做实现前调研、整理边界 |
-| **沉淀文档** | 把草稿保存为 `.magicpocketsdd/draft/.../requirement.md`，支持结构化需求块、验收标准和需求历史 |
+| **沉淀文档** | 把草稿保存为 `.dagongsdd/draft/.../requirement.md`，支持结构化需求块、验收标准和需求历史 |
 | **生成设计** | 进入 Design 模式，从需求片段生成 UI 设计稿、信息图、交互式 HTML 原型和共享设计系统，让需求不只停留在文字里 |
-| **形成计划** | 通过 `/plan` 和 `create_plan` 生成 GUI 管理的 `.magicpocketsdd/plan/...` 实施计划，并把计划步骤和需求关联 |
+| **形成计划** | 通过 `/plan` 和 `create_plan` 生成 GUI 管理的 `.dagongsdd/plan/...` 实施计划，并把计划步骤和需求关联 |
 | **Agent 编码** | 计划进入 Todo、文件编辑、命令执行和变更审查；需求变更后可以提示重规划，避免计划和需求脱节 |
 | **回到验收** | 结合需求块、验收标准、计划状态和 `/review`，把“做完了吗”落回最初的需求 |
 
-这条线是 MagicPocket 最重要的产品方向：让 AI coding 从“即时问答”走向“需求驱动的软件生产流程”。Code、Design、Write、模型、计划、审查和自动化都围绕这条线服务。
+这条线是 Dagong 最重要的产品方向：让 AI coding 从“即时问答”走向“需求驱动的软件生产流程”。Code、Design、Write、模型、计划、审查和自动化都围绕这条线服务。
 
 ## 核心模型组合
 
-MagicPocket 追求的是“完整能力 + 极致性价比”。需求先行的流程比普通聊天更长，也更依赖反复调用模型；首启和设置页围绕三家中国模型供应商组织，让用户可以用更低的模型成本覆盖更多 Agent 场景。
+Dagong 追求的是“完整能力 + 极致性价比”。需求先行的流程比普通聊天更长，也更依赖反复调用模型；首启和设置页围绕三家中国模型供应商组织，让用户可以用更低的模型成本覆盖更多 Agent 场景。
 
-| 供应商 | 在 MagicPocket 中的角色 |
+| 供应商 | 在 Dagong 中的角色 |
 | --- | --- |
 | **DeepSeek** | 默认文本与推理主模型，提供 `deepseek-v4-pro` / `deepseek-v4-flash`，支撑代码、计划、审查、长上下文会话和自动模型路由 |
 | **Xiaomi MiMo** | 高性价比多模态与语音入口，覆盖长上下文文本模型、视觉输入、ASR 语音转写、TTS 语音生成和 Token Plan |
 | **MiniMax** | 补齐完整媒体生成能力，覆盖 Anthropic Messages 文本模型、图片生成、语音生成、音乐生成、视频生成和 Token Plan |
 
-这套组合让 MagicPocket 可以把不同任务分配给更合适的能力：轻量澄清走高速模型，复杂代码和推理走更强模型，需求文档和 IM 场景接入语音，设计与创作场景接入图片、音乐和视频。你仍然可以添加 OpenAI 兼容、自托管或其他自定义 Provider，但 MagicPocket 的默认体验会优先围绕这三家高性价比模型服务展开。
+这套组合让 Dagong 可以把不同任务分配给更合适的能力：轻量澄清走高速模型，复杂代码和推理走更强模型，需求文档和 IM 场景接入语音，设计与创作场景接入图片、音乐和视频。你仍然可以添加 OpenAI 兼容、自托管或其他自定义 Provider，但 Dagong 的默认体验会优先围绕这三家高性价比模型服务展开。
 
-## 为什么选择 MagicPocket
+## 为什么选择 Dagong
 
-| 你想要 | MagicPocket 提供 |
+| 你想要 | Dagong 提供 |
 | --- | --- |
 | 探索下一代 coding 范式 | 从需求澄清、需求文档、设计稿、实施计划一路走到 Agent 编码和验收 |
 | 在同一个应用里完成设计 | Design 模式生成 UI 草图、交互式 HTML 原型、节点式设计流程和共享 `DESIGN_SYSTEM.md`，并一键交给 Code 实现 |
@@ -100,11 +100,11 @@ MagicPocket 追求的是“完整能力 + 极致性价比”。需求先行的�
 - **需求、计划与审查**：从需求草稿进入计划，再到 Todo、执行、复盘和代码审查；长会话可以压缩、恢复、分叉或归档。
 - **Write 写作模式**：独立 Markdown 工作区，支持文件树、预览模式切换、补全、选区改写、图片附件，以及 `HTML / PDF / DOC / DOCX` 导出。
 - **自动化与远程入口**：把桌面会话接到飞书 / Lark / 微信等 IM，支持本地 webhook、relay 和定时任务，让后台任务也能回到同一套 Agent loop。
-- **可视化工作流「创建 Loop」**：在定时任务之上提供 n8n / dify 风格的节点式编排画布，把多步 Agent 流程画成可运行、可复用的工作流——丰富的触发器与节点、类型化数据流、本地运行 API，可作为工具暴露给 MagicPocket，也能绑定到 hook 阶段。
+- **可视化工作流「创建 Loop」**：在定时任务之上提供 n8n / dify 风格的节点式编排画布，把多步 Agent 流程画成可运行、可复用的工作流——丰富的触发器与节点、类型化数据流、本地运行 API，可作为工具暴露给 Dagong，也能绑定到 hook 阶段。
 - **模型组合优先**：围绕 DeepSeek、Xiaomi MiMo、MiniMax 设计首启、Provider 预设和能力自动接线，用高性价比模型组合承担完整桌面 Agent 工作流。
 - **多模态与媒体能力**：支持图片附件、视觉输入、语音转写、图片生成、语音生成、音乐生成和视频生成；相关能力随 Provider 配置启用。
-- **MCP 与 Skills**：接入 Model Context Protocol 服务器，加载项目或全局 Skills，让 MagicPocket 按任务获得更专门的工具和工作方式。
-- **本地运行时**：`magicpocket serve` 提供 HTTP/SSE 边界，采用 cache-first agent loop、追加式事件日志、用量统计和上下文压缩策略。
+- **MCP 与 Skills**：接入 Model Context Protocol 服务器，加载项目或全局 Skills，让 Dagong 按任务获得更专门的工具和工作方式。
+- **本地运行时**：`dagong serve` 提供 HTTP/SSE 边界，采用 cache-first agent loop、追加式事件日志、用量统计和上下文压缩策略。
 
 ## 更多演示
 
@@ -123,17 +123,17 @@ MagicPocket 追求的是“完整能力 + 极致性价比”。需求先行的�
 <p align="center"><em>需求澄清、需求文档与计划演示</em></p>
 
 <p align="center">
-  <a href="src/asset/img/imagicpocket-ui-plugin.mp4">
-    <img src="src/asset/img/imagicpocket-ui-plugin.gif" width="680" alt="iMagicPocket UI 插件演示">
+  <a href="src/asset/img/idagong-ui-plugin.mp4">
+    <img src="src/asset/img/idagong-ui-plugin.gif" width="680" alt="iDagong UI 插件演示">
   </a>
 </p>
-<p align="center"><em>iMagicPocket UI 插件演示</em></p>
+<p align="center"><em>iDagong UI 插件演示</em></p>
 
 ## 快速开始
 
 ### 路径 A：下载发布版
 
-前往 [GitHub Releases](https://github.com/MagicPocketAgent/MagicPocket/releases) 下载最新版本。
+前往 [GitHub Releases](https://github.com/DagongAgent/Dagong/releases) 下载最新版本。
 
 | 平台 | 安装包 | 架构 |
 | --- | --- | --- |
@@ -159,8 +159,8 @@ MagicPocket 追求的是“完整能力 + 极致性价比”。需求先行的�
 | 模型服务凭据 | DeepSeek / Xiaomi MiMo / MiniMax / 自定义 Provider 至少一个 |
 
 ```bash
-git clone https://github.com/MagicPocketAgent/MagicPocket.git
-cd MagicPocket
+git clone https://github.com/DagongAgent/Dagong.git
+cd Dagong
 npm install
 npm run dev
 ```
@@ -175,7 +175,7 @@ npm install --registry=https://registry.npmmirror.com
 
 | 命令 | 说明 |
 | --- | --- |
-| `npm run dev` | 构建 MagicPocket 运行时并启动 Electron 开发环境 |
+| `npm run dev` | 构建 Dagong 运行时并启动 Electron 开发环境 |
 | `npm run build` | 生产构建 |
 | `npm run typecheck` | TypeScript 类型检查 |
 | `npm run lint` | ESLint 检查 |
@@ -188,16 +188,16 @@ npm install --registry=https://registry.npmmirror.com
 
 - 偏好设置、会话、日志、运行时配置和本地运行时数据默认保存在本机。
 - 模型调用通过你配置的 Provider 凭据发起；Provider 预设可以作为起点，字段仍可编辑。
-- Code / Design / Write / 连接手机共用同一个 `magicpocket` 运行时边界，便于复用会话、审批、工具和用量统计。
+- Code / Design / Write / 连接手机共用同一个 `dagong` 运行时边界，便于复用会话、审批、工具和用量统计。
 - 文件读写、命令执行、MCP 工具、媒体生成等高权限能力会经过权限与配置控制。
 
 ## 文档地图
 
 | 文档 | 内容 |
 | --- | --- |
-| [magicpocket/README.zh-CN.md](magicpocket/README.zh-CN.md) | MagicPocket 运行时、CLI、环境变量、HTTP API |
-| [docs/magicpocket-architecture.md](docs/magicpocket-architecture.md) | 单运行时架构与 GUI 集成 |
-| [docs/magicpocket-cache-optimization.md](docs/magicpocket-cache-optimization.md) | 缓存优化、token economy 与可观测性 |
+| [dagong/README.zh-CN.md](dagong/README.zh-CN.md) | Dagong 运行时、CLI、环境变量、HTTP API |
+| [docs/dagong-architecture.md](docs/dagong-architecture.md) | 单运行时架构与 GUI 集成 |
+| [docs/dagong-cache-optimization.md](docs/dagong-cache-optimization.md) | 缓存优化、token economy 与可观测性 |
 | [docs/DESIGN_MODE.md](docs/DESIGN_MODE.md) | Design 设计模式、画布、原型、设计系统与 Design -> Code 闭环 |
 | [docs/model-provider-presets.md](docs/model-provider-presets.md) | 模型 Provider 预设与扩展能力 |
 | [docs/workflow-loop.md](docs/workflow-loop.md) | Loop 循环节点与 loop-agent 思想（创建loop / 工作流） |
@@ -216,9 +216,9 @@ npm install --registry=https://registry.npmmirror.com
 - 发起 PR 前建议运行 `npm run typecheck`、`npm run build` 和 `npm run test`。
 - 外部贡献需接受 [Contributor License Agreement](./CLA.md)。
 
-### 加入 MagicPocket Builder
+### 加入 Dagong Builder
 
-如果你希望成为 MagicPocket Builder，请先通过常规贡献流程提交 PR。当你累计有 **5 个 PR 被正常 review 并合入** 后，可以发送邮件到 [zhongxingyuemail@gmail.com](mailto:zhongxingyuemail@gmail.com) 提出申请。
+如果你希望成为 Dagong Builder，请先通过常规贡献流程提交 PR。当你累计有 **5 个 PR 被正常 review 并合入** 后，可以发送邮件到 [zhongxingyuemail@gmail.com](mailto:zhongxingyuemail@gmail.com) 提出申请。
 
 申请邮件请附上你的 GitHub 用户名、5 个已合入 PR 的链接，以及你希望继续参与的方向，例如 Code、Design、Write、运行时、模型 Provider、工作流、文档或本地化。
 
@@ -226,8 +226,8 @@ npm install --registry=https://registry.npmmirror.com
 
 感谢 [LobsterAI](https://github.com/netease-youdao/LobsterAI)、DeepSeek、Xiaomi MiMo、MiniMax，以及所有提交 issue、建议、代码和文档的贡献者。
 
-<a href="https://github.com/MagicPocketAgent/MagicPocket/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=MagicPocketAgent/MagicPocket" alt="MagicPocket contributors" />
+<a href="https://github.com/DagongAgent/Dagong/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=DagongAgent/Dagong" alt="Dagong contributors" />
 </a>
 
 ## 许可证
@@ -238,4 +238,4 @@ npm install --registry=https://registry.npmmirror.com
 
 ## Star 历史
 
-[![Star History Chart](https://api.star-history.com/chart?repos=MagicPocketAgent/MagicPocket&type=date&legend=top-left)](https://www.star-history.com/?repos=MagicPocketAgent%2FMagicPocket&type=date&logscale=&legend=top-left)
+[![Star History Chart](https://api.star-history.com/chart?repos=DagongAgent/Dagong&type=date&legend=top-left)](https://www.star-history.com/?repos=DagongAgent%2FDagong&type=date&logscale=&legend=top-left)

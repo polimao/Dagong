@@ -5,7 +5,7 @@ import {
   type AppSettingsV1,
   type ModelEndpointFormat
 } from '../shared/app-settings'
-import type { ModelProviderProbeRequest, ModelProviderProbeResult } from '../shared/magicpocket-gui-api'
+import type { ModelProviderProbeRequest, ModelProviderProbeResult } from '../shared/dagong-gui-api'
 import { upstreamOpenAiModelsUrl } from '../shared/openai-compat-url'
 import { fetchWithOptionalProxy } from './proxy-fetch'
 import { isCodexOAuthCredentials, parseCodexCredentials } from './codex-auth'

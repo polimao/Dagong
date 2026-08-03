@@ -6,10 +6,10 @@ import type {
   LegacySessionDetectedSource,
   LegacySessionImportSummary,
   LegacySessionSourceKind
-} from '../../shared/magicpocket-gui-api'
+} from '../../shared/dagong-gui-api'
 
 /**
- * 把“DeepSeek GUI”时代遗留的会话目录导入到当前 MagicPocket 数据目录。
+ * 把“DeepSeek GUI”时代遗留的会话目录导入到当前 Dagong 数据目录。
  *
  * 关键事实(决定了实现方式):
  *   - 新旧版本会话的磁盘格式完全一致:每个线程一个目录,内含
@@ -32,19 +32,19 @@ const THREAD_DIR_MARKERS = ['metadata.jsonl', 'thread.json', 'messages.jsonl'] a
 export type LegacySessionSourceCandidate = {
   id: string
   kind: LegacySessionSourceKind
-  /** 旧版线程目录的绝对路径,如 ~/.deepseekgui/magicpocket/threads。 */
+  /** 旧版线程目录的绝对路径,如 ~/.deepseekgui/dagong/threads。 */
   path: string
 }
 
 export type LegacySessionImportLogger = (message: string, detail?: unknown) => void
 
 /**
- * 自动检测的旧数据来源。顺序即展示优先级:先列近期版本(magicpocket),
+ * 自动检测的旧数据来源。顺序即展示优先级:先列近期版本(dagong),
  * 再列更早的 coreagent 时代数据。两者磁盘格式相同。
  */
 export function defaultLegacySourceCandidates(homeDir: string): LegacySessionSourceCandidate[] {
   return [
-    { id: 'deepseekgui-magicpocket', kind: 'magicpocket', path: join(homeDir, '.deepseekgui', 'magicpocket', 'threads') },
+    { id: 'deepseekgui-dagong', kind: 'dagong', path: join(homeDir, '.deepseekgui', 'dagong', 'threads') },
     {
       id: 'deepseekgui-coreagent',
       kind: 'coreagent',
@@ -98,7 +98,7 @@ async function listThreadDirNames(parent: string): Promise<string[]> {
 
 /**
  * 把用户手选的文件夹解析成真正的 threads 目录:既支持直接选中 threads 目录,
- * 也支持选中它的上级(如 .../magicpocket),自动下探一层 threads。
+ * 也支持选中它的上级(如 .../dagong),自动下探一层 threads。
  */
 async function resolveSourceThreadsDir(picked: string): Promise<string> {
   if ((await listThreadDirNames(picked)).length > 0) return picked

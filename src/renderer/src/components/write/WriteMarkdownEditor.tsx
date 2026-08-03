@@ -570,8 +570,8 @@ export function WriteMarkdownEditor({
       language: 'markdown',
       getModel: () => completionModelRef.current,
       requestCompletion: async (context, mode) => {
-        if (typeof window.magicpocketGui?.requestWriteInlineCompletion !== 'function') return null
-        const result = await window.magicpocketGui.requestWriteInlineCompletion(
+        if (typeof window.dagongGui?.requestWriteInlineCompletion !== 'function') return null
+        const result = await window.dagongGui.requestWriteInlineCompletion(
           buildInlineCompletionPayload(context, {
             model: completionModelRef.current,
             workspaceRoot: workspaceRootRef.current,
@@ -645,10 +645,10 @@ export function WriteMarkdownEditor({
               event.preventDefault()
               return true
             }
-            if (typeof window.magicpocketGui?.saveWorkspaceClipboardImage !== 'function') return false
+            if (typeof window.dagongGui?.saveWorkspaceClipboardImage !== 'function') return false
 
             event.preventDefault()
-            void window.magicpocketGui
+            void window.dagongGui
               .saveWorkspaceClipboardImage({
                 workspaceRoot: nextWorkspaceRoot,
                 currentFilePath: nextFilePath,

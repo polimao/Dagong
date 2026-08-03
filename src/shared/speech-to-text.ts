@@ -1,4 +1,4 @@
-import type { MagicPocketSpeechToTextSettingsV1 } from './app-settings-types'
+import type { DagongSpeechToTextSettingsV1 } from './app-settings-types'
 
 /**
  * Base64 payload cap for one transcription request (~12 MB of audio).
@@ -18,7 +18,7 @@ export type SpeechTranscriptionRequest = {
   /** Optional recording duration, for logging/limits. */
   durationMs?: number
   /** Resolved provider settings from the renderer, including inherited provider credentials. */
-  speechToText?: MagicPocketSpeechToTextSettingsV1
+  speechToText?: DagongSpeechToTextSettingsV1
 }
 
 export type SpeechTranscriptionResult =

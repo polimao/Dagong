@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import type { MagicPocketRuntimeStatusPayload } from '@shared/magicpocket-gui-api'
+import type { DagongRuntimeStatusPayload } from '@shared/dagong-gui-api'
 import { RuntimeBanner } from '../RuntimeBanner'
 import {
   resolveWriteRuntimeBannerMessage,
@@ -8,7 +8,7 @@ import {
 import { shouldSuppressRuntimeErrorBanner } from '../../lib/runtime-banner-visibility'
 
 type UseWorkbenchRuntimeBannersInput = {
-  runtimeStatus: MagicPocketRuntimeStatusPayload | null
+  runtimeStatus: DagongRuntimeStatusPayload | null
   runtimeConnection: RuntimeConnectionLike
   runtimeLogPath: string
   runtimeError: string | null
@@ -54,8 +54,8 @@ export function useWorkbenchRuntimeBanners({
       runtimeReady={runtimeConnection === 'ready'}
       stageInsetClass={stageInsetClass}
       onOpenLogDir={
-        typeof window !== 'undefined' && typeof window.magicpocketGui?.openLogDir === 'function'
-          ? () => window.magicpocketGui.openLogDir()
+        typeof window !== 'undefined' && typeof window.dagongGui?.openLogDir === 'function'
+          ? () => window.dagongGui.openLogDir()
           : undefined
       }
       onOpenSettings={onOpenSettings}

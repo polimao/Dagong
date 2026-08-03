@@ -1,6 +1,6 @@
 # Security Policy
 
-Thank you for helping keep MagicPocket and its users safe.
+Thank you for helping keep Dagong and its users safe.
 
 ## Supported Versions
 

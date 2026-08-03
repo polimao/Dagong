@@ -52,8 +52,8 @@ type WebviewTitleEvent = Event & {
   title: string
 }
 
-const PREVIEW_URL_STORAGE_KEY = 'magicpocket.devPreview.url'
-const PREVIEW_AUTO_FOLLOW_STORAGE_KEY = 'magicpocket.devPreview.autoFollow'
+const PREVIEW_URL_STORAGE_KEY = 'dagong.devPreview.url'
+const PREVIEW_AUTO_FOLLOW_STORAGE_KEY = 'dagong.devPreview.autoFollow'
 
 function readStoredUrl(): string | null {
   try {
@@ -133,7 +133,7 @@ export function DevBrowserPanel({
   const detectedUrls = useMemo(() => extractDetectedDevPreviewUrls(blocks), [blocks])
   const latestDetectedUrl = detectedUrls[0] ?? null
   const useElectronWebview = canUseElectronWebviewEnvironment({
-    openExternalAvailable: typeof window.magicpocketGui?.openExternal === 'function',
+    openExternalAvailable: typeof window.dagongGui?.openExternal === 'function',
     userAgent: window.navigator.userAgent
   })
   const normalizedPreferredUrl = useMemo(
@@ -339,8 +339,8 @@ export function DevBrowserPanel({
     if (!activeUrl) return
     const normalized = normalizeDevPreviewUrlInput(activeUrl)
     if (!normalized) return
-    if (typeof window.magicpocketGui?.openExternal === 'function') {
-      void window.magicpocketGui.openExternal(normalized).catch(() => undefined)
+    if (typeof window.dagongGui?.openExternal === 'function') {
+      void window.dagongGui.openExternal(normalized).catch(() => undefined)
       return
     }
     window.open(normalized, '_blank', 'noopener,noreferrer')
@@ -582,7 +582,7 @@ export function DevBrowserPanel({
             key={`webview:${previewInstanceNonce}`}
             ref={webviewRef}
             src={activeUrl}
-            partition="persist:magicpocket-dev-browser"
+            partition="persist:dagong-dev-browser"
             webpreferences="contextIsolation=yes,nodeIntegration=no,sandbox=yes"
             className="flex h-full w-full bg-white"
           />

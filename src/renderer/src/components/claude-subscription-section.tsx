@@ -71,7 +71,7 @@ export function ClaudeSubscriptionSection({
 
   const checkSdk = async (): Promise<void> => {
     try {
-      const s = await window.magicpocketGui.claudeSubscriptionSdkStatus()
+      const s = await window.dagongGui.claudeSubscriptionSdkStatus()
       if (s.installed) {
         setSdk('ready')
         return
@@ -89,7 +89,7 @@ export function ClaudeSubscriptionSection({
     setSdk('downloading')
     setProgress({ received: 0, total: 0 })
     try {
-      applyDownload(await window.magicpocketGui.claudeSubscriptionSdkInstall())
+      applyDownload(await window.dagongGui.claudeSubscriptionSdkInstall())
     } catch (err) {
       setSdk('missing')
       setSdkNote(`${t('claudeSubSdkFailed')}: ${err instanceof Error ? err.message : ''}`)
@@ -102,7 +102,7 @@ export function ClaudeSubscriptionSection({
     setModelsBusy(true)
     setModelsNote(null)
     try {
-      const ids = await window.magicpocketGui.claudeSubscriptionModels(token?.trim() || undefined)
+      const ids = await window.dagongGui.claudeSubscriptionModels(token?.trim() || undefined)
       if (ids.length > 0) {
         onModelsChange(ids)
         setModelsNote(t('claudeSubModelsFetched').replace('{count}', String(ids.length)))
@@ -119,7 +119,7 @@ export function ClaudeSubscriptionSection({
   const refreshStatus = async (): Promise<void> => {
     setStatus('checking')
     try {
-      const res = await window.magicpocketGui.claudeSubscriptionStatus()
+      const res = await window.dagongGui.claudeSubscriptionStatus()
       setStatus(res.loggedIn ? 'logged-in' : 'logged-out')
     } catch {
       setStatus('logged-out')
@@ -130,13 +130,13 @@ export function ClaudeSubscriptionSection({
     void checkSdk()
   }, [])
   // The download runs in main; subscribe so progress shows even after remounting.
-  useEffect(() => window.magicpocketGui.onClaudeSubscriptionSdkProgress((state) => applyDownload(state)), [])
+  useEffect(() => window.dagongGui.onClaudeSubscriptionSdkProgress((state) => applyDownload(state)), [])
 
   const runLogin = async (): Promise<void> => {
     setBusy(true)
     setMessage(null)
     try {
-      const res = await window.magicpocketGui.claudeSubscriptionLogin()
+      const res = await window.dagongGui.claudeSubscriptionLogin()
       if (res.ok) {
         onTokenChange(res.token)
         setStatus('logged-in')

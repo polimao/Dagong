@@ -82,7 +82,7 @@ const FILE_MENTION_MAX_DIRECTORIES = 200
 const FILE_MENTION_MAX_FILES = 1600
 const FILE_MENTION_MAX_DIRECTORY_SUGGESTIONS = 400
 const FILE_MENTION_CACHE_TTL_MS = 30_000
-const DESIGN_DOCUMENTS_INDEX_PATH = '.magicpocket-design/documents.json'
+const DESIGN_DOCUMENTS_INDEX_PATH = '.dagong-design/documents.json'
 
 export type WorkspaceFileIndex = {
   files: ComposerFileReference[]
@@ -131,8 +131,8 @@ function parseDesignDocumentDirectoryReferences(raw: string, workspaceRoot: stri
 }
 
 async function loadDesignDocumentDirectoryReferences(workspaceRoot: string): Promise<ComposerFileReference[]> {
-  if (typeof window.magicpocketGui?.readWorkspaceFile !== 'function') return []
-  const result = await window.magicpocketGui
+  if (typeof window.dagongGui?.readWorkspaceFile !== 'function') return []
+  const result = await window.dagongGui
     .readWorkspaceFile({ workspaceRoot, path: DESIGN_DOCUMENTS_INDEX_PATH })
     .catch(() => null)
   return result && result.ok ? parseDesignDocumentDirectoryReferences(result.content, workspaceRoot) : []
@@ -173,7 +173,7 @@ async function buildWorkspaceFileIndex(root: string): Promise<WorkspaceFileIndex
     const current = queue.shift()
     if (!current) break
     visitedDirectories += 1
-    const result = await window.magicpocketGui.listWorkspaceDirectory({ workspaceRoot: root, path: current.path })
+    const result = await window.dagongGui.listWorkspaceDirectory({ workspaceRoot: root, path: current.path })
     if (!result.ok) continue
 
     for (const entry of result.entries) {
@@ -237,7 +237,7 @@ export async function loadWorkspaceDirectoryContextFiles(
 ): Promise<ComposerFileReference[]> {
   const root = workspaceRoot.trim()
   const maxFiles = Math.max(0, Math.floor(limit))
-  if (!root || maxFiles <= 0 || typeof window.magicpocketGui?.listWorkspaceDirectory !== 'function') return []
+  if (!root || maxFiles <= 0 || typeof window.dagongGui?.listWorkspaceDirectory !== 'function') return []
 
   const files: ComposerFileReference[] = []
   const queue: Array<{ path: string; depth: number }> = [
@@ -257,7 +257,7 @@ export async function loadWorkspaceDirectoryContextFiles(
     if (seenDirectories.has(key)) continue
     seenDirectories.add(key)
 
-    const result = await window.magicpocketGui
+    const result = await window.dagongGui
       .listWorkspaceDirectory({ workspaceRoot: root, path: currentPath })
       .catch(() => null)
     if (!result || !result.ok) continue
@@ -317,7 +317,7 @@ export async function loadWorkspaceMentionPathSuggestions(
   if (cached) return cached
 
   const task = (async () => {
-    const result = await window.magicpocketGui.listWorkspaceDirectory({ workspaceRoot: root, path: dir })
+    const result = await window.dagongGui.listWorkspaceDirectory({ workspaceRoot: root, path: dir })
     if (!result.ok) return []
     const references: ComposerFileReference[] = []
     for (const entry of result.entries) {

@@ -353,7 +353,7 @@ export function WriteWorkspaceView({
       setFileError(t(selection.ranges.length > 1 ? 'writeInlineEditMultiSelection' : 'writeInlineEditNoSelection'))
       return
     }
-    if (typeof window.magicpocketGui?.requestWriteInlineCompletion !== 'function') {
+    if (typeof window.dagongGui?.requestWriteInlineCompletion !== 'function') {
       setFileError(t('writeInlineEditUnavailable'))
       return
     }
@@ -375,7 +375,7 @@ export function WriteWorkspaceView({
 
     setInlineEditInFlight(true)
     try {
-      const result = await window.magicpocketGui.requestWriteInlineCompletion(
+      const result = await window.dagongGui.requestWriteInlineCompletion(
         buildWriteInlineEditCompletionRequest(draft.request)
       )
       if (!result.ok) {
@@ -493,7 +493,7 @@ export function WriteWorkspaceView({
       setFileError(t('writeInlineEditNoSelection'))
       return
     }
-    if (typeof window.magicpocketGui?.generateWriteInfographic !== 'function') {
+    if (typeof window.dagongGui?.generateWriteInfographic !== 'function') {
       setFileError(t('writeInfographicUnavailable'))
       return
     }
@@ -557,7 +557,7 @@ export function WriteWorkspaceView({
     let replacementMarkdown: string | null = null
     let failureMessage: string | null = null
     try {
-      const result = await window.magicpocketGui.generateWriteInfographic({
+      const result = await window.dagongGui.generateWriteInfographic({
         text: job.text,
         filePath: job.filePath,
         workspaceRoot
@@ -606,13 +606,13 @@ export function WriteWorkspaceView({
     // The document was switched away mid-generation; opening another file
     // flushed it to disk with the placeholder inside, so patch it on disk.
     if (
-      typeof window.magicpocketGui?.readWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.writeWorkspaceFile !== 'function'
+      typeof window.dagongGui?.readWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.writeWorkspaceFile !== 'function'
     ) {
       return false
     }
     try {
-      const file = await window.magicpocketGui.readWorkspaceFile({ path: job.filePath, workspaceRoot })
+      const file = await window.dagongGui.readWorkspaceFile({ path: job.filePath, workspaceRoot })
       if (!file.ok || file.truncated) return false
       const next = replacePendingInfographicInText(
         file.content,
@@ -620,7 +620,7 @@ export function WriteWorkspaceView({
         replacementMarkdown
       )
       if (next === null) return false
-      const written = await window.magicpocketGui.writeWorkspaceFile({
+      const written = await window.dagongGui.writeWorkspaceFile({
         path: job.filePath,
         workspaceRoot,
         content: next
@@ -634,10 +634,10 @@ export function WriteWorkspaceView({
   const pickWriteWorkspace = async (): Promise<void> => {
     try {
       setFileError(null)
-      if (typeof window.magicpocketGui?.pickWorkspaceDirectory !== 'function') {
+      if (typeof window.dagongGui?.pickWorkspaceDirectory !== 'function') {
         throw new Error('workspace:pick-directory unavailable')
       }
-      const picked = await window.magicpocketGui.pickWorkspaceDirectory(workspaceRoot || undefined)
+      const picked = await window.dagongGui.pickWorkspaceDirectory(workspaceRoot || undefined)
       if (!picked.canceled && picked.path) {
         await addWriteWorkspace(picked.path)
         if (runtimeConnection === 'ready') void ensureWriteThreadForWorkspace(picked.path)
@@ -650,7 +650,7 @@ export function WriteWorkspaceView({
   const exportCurrentFile = async (format: WriteExportFormat): Promise<void> => {
     if (!activeFilePath) return
     if (!activeFileIsText) return
-    if (typeof window.magicpocketGui?.exportWriteDocument !== 'function') {
+    if (typeof window.dagongGui?.exportWriteDocument !== 'function') {
       showExportNotice({ tone: 'error', message: t('writeExportUnavailable') })
       return
     }
@@ -658,7 +658,7 @@ export function WriteWorkspaceView({
     setExportMenuOpen(false)
     setExportingFormat(format)
     try {
-      const result = await window.magicpocketGui.exportWriteDocument({
+      const result = await window.dagongGui.exportWriteDocument({
         path: activeFilePath,
         workspaceRoot,
         format,
@@ -696,7 +696,7 @@ export function WriteWorkspaceView({
   const copyCurrentFileAsRichText = async (): Promise<void> => {
     if (!activeFilePath) return
     if (!activeFileIsText) return
-    if (typeof window.magicpocketGui?.copyWriteDocumentAsRichText !== 'function') {
+    if (typeof window.dagongGui?.copyWriteDocumentAsRichText !== 'function') {
       showExportNotice({ tone: 'error', message: t('writeCopyRichTextUnavailable') })
       return
     }
@@ -704,7 +704,7 @@ export function WriteWorkspaceView({
     setExportMenuOpen(false)
     setExportingFormat(WRITE_RICH_CLIPBOARD_ACTION)
     try {
-      const result = await window.magicpocketGui.copyWriteDocumentAsRichText({
+      const result = await window.dagongGui.copyWriteDocumentAsRichText({
         path: activeFilePath,
         workspaceRoot,
         content: fileContent
@@ -874,15 +874,15 @@ export function WriteWorkspaceView({
   useEffect(() => {
     if (!activeFilePath || !workspaceRoot.trim() || (!activeFileIsText && !activeFileIsImage)) return
     if (
-      typeof window.magicpocketGui?.watchWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.unwatchWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.onWorkspaceFileChanged !== 'function'
+      typeof window.dagongGui?.watchWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.unwatchWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.onWorkspaceFileChanged !== 'function'
     ) {
       return
     }
 
     return startWriteWorkspaceFileWatch({
-      api: window.magicpocketGui,
+      api: window.dagongGui,
       workspaceRoot,
       path: activeFilePath,
       kind: activeFileIsImage ? 'image' : 'text',

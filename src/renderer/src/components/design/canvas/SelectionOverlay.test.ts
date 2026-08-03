@@ -9,10 +9,10 @@ function artifact(patch: Partial<DesignArtifact> = {}): DesignArtifact {
     id: 'screen',
     kind: 'html',
     title: 'Screen',
-    relativePath: '.magicpocket-design/screen/v1.html',
+    relativePath: '.dagong-design/screen/v1.html',
     createdAt,
     updatedAt: createdAt,
-    versions: [{ id: 'screen-v1', relativePath: '.magicpocket-design/screen/v1.html', createdAt, summary: '' }],
+    versions: [{ id: 'screen-v1', relativePath: '.dagong-design/screen/v1.html', createdAt, summary: '' }],
     ...patch
   }
 }

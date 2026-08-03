@@ -9,8 +9,8 @@ DeepChat handles model suppliers in two layers:
 - A runtime registry maps each provider or API type to a request protocol such as
   OpenAI-compatible chat completions or Anthropic messages.
 
-MagicPocket already has the runtime half in a smaller form. Settings store
-`provider.providers[]`, the active MagicPocket runtime stores `providerId`, and the
+Dagong already has the runtime half in a smaller form. Settings store
+`provider.providers[]`, the active Dagong runtime stores `providerId`, and the
 runtime resolves the selected provider into API key, base URL, and endpoint
 format. The model endpoint formats already cover OpenAI Chat Completions,
 OpenAI Responses, and Anthropic Messages.
@@ -25,7 +25,7 @@ The Settings > Providers panel should let users:
 
 - add a blank custom provider as before,
 - add a known preset provider,
-- select the newly added preset as the active MagicPocket provider,
+- select the newly added preset as the active Dagong provider,
 - keep provider fields editable after creation,
 - configure optional image-generation capabilities on a provider.
 

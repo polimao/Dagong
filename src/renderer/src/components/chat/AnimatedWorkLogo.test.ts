@@ -7,29 +7,29 @@ import {
   AnimatedWorkLogo,
   IKUN_CAMEO_DURATIONS_MS,
   IKUN_CAMEO_TYPES,
-  ImagicpocketCameo,
+  IdagongCameo,
   IKUN_WORK_LOGO_VARIANTS,
   IKUN_WORK_LOGO_VARIANT_LABEL_KEYS,
   KUN_CELEBRATION_DURATIONS_MS,
   KUN_CELEBRATION_VARIANTS,
-  MagicPocketCelebration,
-  MagicPocketStateFigure,
+  DagongCelebration,
+  DagongStateFigure,
   SidebarMascot,
   UI_PLUGIN_CAMEO_SLOTS,
   UI_PLUGIN_CELEBRATION_SLOTS,
   UI_PLUGIN_STATE_SLOTS,
   WORK_LOGO_SWIM_MODES,
   WORK_LOGO_SWIM_MODE_LABEL_KEYS,
-  pickImagicpocketCameo,
-  pickMagicPocketCelebration
+  pickIdagongCameo,
+  pickDagongCelebration
 } from './AnimatedWorkLogo'
 import { WorkMetaRow } from './message-timeline-cards'
 
 describe('AnimatedWorkLogo', () => {
-  it('ships the MagicPocket bird asset used as the default work mark', async () => {
+  it('ships the Dagong bird asset used as the default work mark', async () => {
     const nodeFs = 'node:fs/promises'
     const { readFile } = await import(/* @vite-ignore */ nodeFs)
-    const birdFigure = await readFile(new URL('../../../../asset/img/magicpocket_bird.png', import.meta.url))
+    const birdFigure = await readFile(new URL('../../../../asset/img/dagong_bird.png', import.meta.url))
 
     expect(pngDimensions(birdFigure)).toEqual({ width: 751, height: 512 })
   })
@@ -61,18 +61,18 @@ describe('AnimatedWorkLogo', () => {
     expect(html).toContain('ds-work-logo-track')
     expect(html).toContain('ds-work-logo-body')
     expect(html).toContain('ds-work-logo-image')
-    expect(html).toContain('ds-imagicpocket-logo')
-    expect(html).toContain('ds-imagicpocket-figure')
-    expect(html).toMatch(/ds-imagicpocket-logo-(dribble|run|boba)/)
+    expect(html).toContain('ds-idagong-logo')
+    expect(html).toContain('ds-idagong-figure')
+    expect(html).toMatch(/ds-idagong-logo-(dribble|run|boba)/)
     expect(html).toMatch(/ds-work-logo-mode-(propel|sprint|dive|surf)/)
   })
 
   it('renders the state figures with their kind classes', () => {
     for (const kind of ['greet', 'sleep', 'sit'] as const) {
-      const html = renderToStaticMarkup(createElement(MagicPocketStateFigure, { kind }))
-      expect(html).toContain(`ds-magicpocket-state-${kind}`)
-      expect(html).toContain('ds-magicpocket-state-figure')
-      expect(html).toContain('ds-imagicpocket-state-figure')
+      const html = renderToStaticMarkup(createElement(DagongStateFigure, { kind }))
+      expect(html).toContain(`ds-dagong-state-${kind}`)
+      expect(html).toContain('ds-dagong-state-figure')
+      expect(html).toContain('ds-idagong-state-figure')
     }
   })
 
@@ -104,9 +104,9 @@ describe('AnimatedWorkLogo', () => {
 
     it('keeps default art when no plugin is active', () => {
       expect(useUiPluginStore.getState().activeRuntime).toBeNull()
-      const html = renderToStaticMarkup(createElement(MagicPocketStateFigure, { kind: 'greet' }))
+      const html = renderToStaticMarkup(createElement(DagongStateFigure, { kind: 'greet' }))
       expect(html).not.toContain('data:image')
-      expect(html).toContain('ds-magicpocket-state-figure')
+      expect(html).toContain('ds-dagong-state-figure')
     })
   })
 
@@ -118,59 +118,59 @@ describe('AnimatedWorkLogo', () => {
     expect(html).toContain('ds-work-logo-mode-dive')
   })
 
-  it('pins the imagicpocket variant when one is provided', () => {
+  it('pins the idagong variant when one is provided', () => {
     const html = renderToStaticMarkup(
-      createElement(AnimatedWorkLogo, { active: true, imagicpocketVariant: 'boba' })
+      createElement(AnimatedWorkLogo, { active: true, idagongVariant: 'boba' })
     )
 
-    expect(html).toContain('ds-imagicpocket-logo-boba')
+    expect(html).toContain('ds-idagong-logo-boba')
   })
 
   it('renders the sidebar mascot with a state figure', () => {
     const html = renderToStaticMarkup(createElement(SidebarMascot))
 
     expect(html).toContain('ds-sidebar-mascot')
-    expect(html).toMatch(/ds-magicpocket-state-(sit|greet|sleep)/)
+    expect(html).toMatch(/ds-dagong-state-(sit|greet|sleep)/)
   })
 
-  it('renders every imagicpocket cameo type with side classes', () => {
+  it('renders every idagong cameo type with side classes', () => {
     for (const type of ['dash', 'peek', 'boba', 'nap'] as const) {
-      const html = renderToStaticMarkup(createElement(ImagicpocketCameo, { cameo: { type, side: 'left' } }))
-      expect(html).toContain(`ds-imagicpocket-cameo-${type}`)
+      const html = renderToStaticMarkup(createElement(IdagongCameo, { cameo: { type, side: 'left' } }))
+      expect(html).toContain(`ds-idagong-cameo-${type}`)
       expect(html).toContain('is-left')
-      expect(html).toContain('ds-imagicpocket-cameo-figure')
+      expect(html).toContain('ds-idagong-cameo-figure')
     }
 
     const chaseHtml = renderToStaticMarkup(
-      createElement(ImagicpocketCameo, { cameo: { type: 'chase', side: 'right' } })
+      createElement(IdagongCameo, { cameo: { type: 'chase', side: 'right' } })
     )
-    expect(chaseHtml.match(/ds-imagicpocket-cameo-dash/g)?.length).toBe(2)
+    expect(chaseHtml.match(/ds-idagong-cameo-dash/g)?.length).toBe(2)
     expect(chaseHtml).toContain('is-second')
   })
 
   it('renders every celebration variant with dual figures and confetti', () => {
     for (const variant of KUN_CELEBRATION_VARIANTS) {
-      const html = renderToStaticMarkup(createElement(MagicPocketCelebration, { variant }))
-      expect(html).toContain(`ds-magicpocket-celebration-${variant}`)
-      expect(html).toContain('is-magicpocket')
-      expect(html).toContain('is-imagicpocket')
-      expect(html).toContain('ds-magicpocket-confetti')
+      const html = renderToStaticMarkup(createElement(DagongCelebration, { variant }))
+      expect(html).toContain(`ds-dagong-celebration-${variant}`)
+      expect(html).toContain('is-dagong')
+      expect(html).toContain('is-idagong')
+      expect(html).toContain('ds-dagong-confetti')
       expect(html.match(/<i><\/i>/g)?.length).toBe(10)
       expect(KUN_CELEBRATION_DURATIONS_MS[variant]).toBeGreaterThan(0)
     }
   })
 
   it('picks valid celebration variants with increasing ids', () => {
-    const first = pickMagicPocketCelebration()
-    const second = pickMagicPocketCelebration()
+    const first = pickDagongCelebration()
+    const second = pickDagongCelebration()
 
     expect(KUN_CELEBRATION_VARIANTS).toContain(first.variant)
     expect(second.id).toBeGreaterThan(first.id)
   })
 
   it('picks valid cameo specs with increasing ids and complete durations', () => {
-    const first = pickImagicpocketCameo()
-    const second = pickImagicpocketCameo()
+    const first = pickIdagongCameo()
+    const second = pickIdagongCameo()
 
     expect(IKUN_CAMEO_TYPES).toContain(first.type)
     expect(['left', 'right']).toContain(first.side)
@@ -181,7 +181,7 @@ describe('AnimatedWorkLogo', () => {
     }
   })
 
-  it('maps every swim mode and imagicpocket variant to a status label key in both locales', async () => {
+  it('maps every swim mode and idagong variant to a status label key in both locales', async () => {
     const nodeFs = 'node:fs/promises'
     const { readFile } = await import(/* @vite-ignore */ nodeFs)
     const zh = JSON.parse(await readFile(new URL('../../locales/zh/common.json', import.meta.url), 'utf8'))
@@ -279,32 +279,32 @@ describe('AnimatedWorkLogo', () => {
     expect(baseShellCss).toContain('@keyframes ds-work-logo-dive-path')
     expect(baseShellCss).toContain('@keyframes ds-work-logo-dive-figure')
     expect(baseShellCss).toContain('@keyframes ds-work-logo-surf-path')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-greet-wave')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-sleep-breathe')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-sit-sway')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-greet-wave')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-sleep-breathe')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-sit-sway')
     expect(baseShellCss).toContain('.ds-work-logo:hover')
-    expect(baseShellCss).toContain('.ds-magicpocket-state:hover')
-    expect(baseShellCss).toContain("[data-imagicpocket-mode='on'] .ds-work-logo .ds-imagicpocket-logo")
-    expect(baseShellCss).toContain("[data-imagicpocket-mode='on'] {")
-    expect(baseShellCss).toContain("[data-theme='dark'][data-imagicpocket-mode='on'],")
-    expect(baseShellCss).toContain("[data-theme='dark'][data-imagicpocket-mode='on'] .ds-workbench-shell")
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-dribble')
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-run')
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-boba')
-    expect(baseShellCss).toContain('.ds-imagicpocket-cameo-layer')
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-cameo-cross')
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-cameo-peek')
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-cameo-rise')
-    expect(baseShellCss).toContain('@keyframes ds-imagicpocket-cameo-doze')
-    expect(baseShellCss).toContain('.ds-magicpocket-celebration-layer')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-celebrate-cheer')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-celebrate-lap')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-celebrate-toast')
-    expect(baseShellCss).toContain('@keyframes ds-magicpocket-confetti-burst')
+    expect(baseShellCss).toContain('.ds-dagong-state:hover')
+    expect(baseShellCss).toContain("[data-idagong-mode='on'] .ds-work-logo .ds-idagong-logo")
+    expect(baseShellCss).toContain("[data-idagong-mode='on'] {")
+    expect(baseShellCss).toContain("[data-theme='dark'][data-idagong-mode='on'],")
+    expect(baseShellCss).toContain("[data-theme='dark'][data-idagong-mode='on'] .ds-workbench-shell")
+    expect(baseShellCss).toContain('@keyframes ds-idagong-dribble')
+    expect(baseShellCss).toContain('@keyframes ds-idagong-run')
+    expect(baseShellCss).toContain('@keyframes ds-idagong-boba')
+    expect(baseShellCss).toContain('.ds-idagong-cameo-layer')
+    expect(baseShellCss).toContain('@keyframes ds-idagong-cameo-cross')
+    expect(baseShellCss).toContain('@keyframes ds-idagong-cameo-peek')
+    expect(baseShellCss).toContain('@keyframes ds-idagong-cameo-rise')
+    expect(baseShellCss).toContain('@keyframes ds-idagong-cameo-doze')
+    expect(baseShellCss).toContain('.ds-dagong-celebration-layer')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-celebrate-cheer')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-celebrate-lap')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-celebrate-toast')
+    expect(baseShellCss).toContain('@keyframes ds-dagong-confetti-burst')
     expect(baseShellCss).toContain('@media (prefers-reduced-motion: reduce)')
-    expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-imagicpocket-cameo-layer")
-    expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-magicpocket-celebration-layer")
-    expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-magicpocket-state")
+    expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-idagong-cameo-layer")
+    expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-dagong-celebration-layer")
+    expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-dagong-state")
     expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-work-logo")
     expect(baseShellCss).toContain("[data-focus-mode='on'] .ds-work-logo-slot:has(.ds-work-logo)")
     expect(baseShellCss).toContain('display: none !important;')
@@ -312,34 +312,34 @@ describe('AnimatedWorkLogo', () => {
     expect(baseShellCss).not.toContain("[data-focus-mode='on'] .ds-runtime-wake-shell::before")
   })
 
-  it('keeps generated MagicPocket PNG icon dimensions stable for packaging', async () => {
+  it('keeps generated Dagong PNG icon dimensions stable for packaging', async () => {
     const nodeFs = 'node:fs/promises'
     const { readFile } = await import(/* @vite-ignore */ nodeFs)
-    const appIcon = await readFile(new URL('../../../../asset/img/magicpocket.png', import.meta.url))
-    const macIcon = await readFile(new URL('../../../../asset/img/magicpocket_mac.png', import.meta.url))
-    const trayIcon = await readFile(new URL('../../../../asset/img/magicpocket_tray.png', import.meta.url))
+    const appIcon = await readFile(new URL('../../../../asset/img/dagong.png', import.meta.url))
+    const macIcon = await readFile(new URL('../../../../asset/img/dagong_mac.png', import.meta.url))
+    const trayIcon = await readFile(new URL('../../../../asset/img/dagong_tray.png', import.meta.url))
 
     expect(pngDimensions(appIcon)).toEqual({ width: 1254, height: 1254 })
     expect(pngDimensions(macIcon)).toEqual({ width: 1024, height: 1024 })
     expect(pngDimensions(trayIcon)).toEqual({ width: 954, height: 994 })
   })
 
-  it('ships the iMagicPocket figure asset used by imagicpocket mode', async () => {
+  it('ships the iDagong figure asset used by idagong mode', async () => {
     const nodeFs = 'node:fs/promises'
     const { readFile } = await import(/* @vite-ignore */ nodeFs)
-    const imagicpocketFigure = await readFile(new URL('../../../../asset/img/imagicpocket.png', import.meta.url))
+    const idagongFigure = await readFile(new URL('../../../../asset/img/idagong.png', import.meta.url))
 
-    expect(pngDimensions(imagicpocketFigure)).toEqual({ width: 512, height: 512 })
+    expect(pngDimensions(idagongFigure)).toEqual({ width: 512, height: 512 })
   })
 
-  it('ships the MagicPocket state figure assets', async () => {
+  it('ships the Dagong state figure assets', async () => {
     const nodeFs = 'node:fs/promises'
     const { readFile } = await import(/* @vite-ignore */ nodeFs)
     const expected: Record<string, { width: number; height: number }> = {
-      magicpocket_greet: { width: 512, height: 460 },
-      magicpocket_sleep: { width: 512, height: 390 },
-      magicpocket_surf: { width: 512, height: 479 },
-      magicpocket_sit: { width: 512, height: 493 }
+      dagong_greet: { width: 512, height: 460 },
+      dagong_sleep: { width: 512, height: 390 },
+      dagong_surf: { width: 512, height: 479 },
+      dagong_sit: { width: 512, height: 493 }
     }
 
     for (const [name, dimensions] of Object.entries(expected)) {
@@ -348,15 +348,15 @@ describe('AnimatedWorkLogo', () => {
     }
   })
 
-  it('ships the iMagicPocket state and variant figure assets', async () => {
+  it('ships the iDagong state and variant figure assets', async () => {
     const nodeFs = 'node:fs/promises'
     const { readFile } = await import(/* @vite-ignore */ nodeFs)
     const expected: Record<string, { width: number; height: number }> = {
-      imagicpocket_sleep: { width: 455, height: 512 },
-      imagicpocket_boba: { width: 422, height: 512 },
-      imagicpocket_run: { width: 378, height: 512 },
-      imagicpocket_wave: { width: 435, height: 512 },
-      imagicpocket_stand: { width: 368, height: 512 }
+      idagong_sleep: { width: 455, height: 512 },
+      idagong_boba: { width: 422, height: 512 },
+      idagong_run: { width: 378, height: 512 },
+      idagong_wave: { width: 435, height: 512 },
+      idagong_stand: { width: 368, height: 512 }
     }
 
     for (const [name, dimensions] of Object.entries(expected)) {

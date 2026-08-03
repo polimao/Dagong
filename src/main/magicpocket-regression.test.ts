@@ -7,7 +7,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -16,11 +16,11 @@ import {
   migrateLegacyAppSettings,
   type AppSettingsV1
 } from '../shared/app-settings'
-import { magicpocketRuntimeAdapter } from './runtime/magicpocket-adapter'
+import { dagongRuntimeAdapter } from './runtime/dagong-adapter'
 import { JsonSettingsStore } from './settings-store'
 
-describe('MagicPocket single-agent regression', () => {
-  it('seeds provider credentials and MagicPocket port from legacy local HTTP settings', () => {
+describe('Dagong single-agent regression', () => {
+  it('seeds provider credentials and Dagong port from legacy local HTTP settings', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agentProvider: 'codewhale',
@@ -37,7 +37,7 @@ describe('MagicPocket single-agent regression', () => {
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
     expect(migrated.agents).toEqual({
-      magicpocket: expect.objectContaining({
+      dagong: expect.objectContaining({
         apiKey: '',
         baseUrl: '',
         binaryPath: '',
@@ -51,7 +51,7 @@ describe('MagicPocket single-agent regression', () => {
     }))
   })
 
-  it('does not carry legacy local-runtime binary paths into MagicPocket', () => {
+  it('does not carry legacy local-runtime binary paths into Dagong', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agentProvider: 'deepseek-runtime',
@@ -61,28 +61,28 @@ describe('MagicPocket single-agent regression', () => {
       }
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket).toEqual(expect.objectContaining({
+    expect(migrated.agents?.dagong).toEqual(expect.objectContaining({
       binaryPath: '',
       port: 18787
     }))
   })
 
-  it('does not keep the legacy default local HTTP port for MagicPocket', () => {
+  it('does not keep the legacy default local HTTP port for Dagong', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agentProvider: 'codewhale',
       agents: {
         codewhale: {
-          // 这里必须保留旧版真实写入值, 用于升级到当前 MagicPocket 默认端口。
+          // 这里必须保留旧版真实写入值, 用于升级到当前 Dagong 默认端口。
           port: 7878
         }
       }
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket?.port).toBe(18899)
+    expect(migrated.agents?.dagong?.port).toBe(18899)
   })
 
-  it('seeds provider credentials and MagicPocket model from legacy reasoning settings', () => {
+  it('seeds provider credentials and Dagong model from legacy reasoning settings', () => {
     const migrated = migrateLegacyAppSettings({
       version: 1,
       agentProvider: 'reasonix',
@@ -96,7 +96,7 @@ describe('MagicPocket single-agent regression', () => {
       }
     } as unknown as Parameters<typeof migrateLegacyAppSettings>[0])
 
-    expect(migrated.agents?.magicpocket).toEqual(expect.objectContaining({
+    expect(migrated.agents?.dagong).toEqual(expect.objectContaining({
       apiKey: '',
       baseUrl: '',
       model: 'deepseek-reasoner',
@@ -108,7 +108,7 @@ describe('MagicPocket single-agent regression', () => {
     }))
   })
 
-  it('MagicPocket adapter reports base url and id', () => {
+  it('Dagong adapter reports base url and id', () => {
     const settings: AppSettingsV1 = {
       version: 1,
       locale: 'en',
@@ -117,10 +117,10 @@ describe('MagicPocket single-agent regression', () => {
     chatContentMaxWidthPx: 896,
       provider: defaultModelProviderSettings(),
       agents: {
-        magicpocket: defaultMagicPocketRuntimeSettings(19000)
+        dagong: defaultDagongRuntimeSettings(19000)
       },
       workspaceRoot: '/tmp',
-      conversationWorkspaceRoot: '~/Documents/MagicPocket',
+      conversationWorkspaceRoot: '~/Documents/Dagong',
       log: { enabled: true, retentionDays: 7 },
       checkpointCleanup: { enabled: false, intervalDays: 3 },
       notifications: { turnComplete: true },
@@ -137,11 +137,11 @@ describe('MagicPocket single-agent regression', () => {
       disabledSkillIds: []
     }
 
-    expect(magicpocketRuntimeAdapter.id).toBe('magicpocket')
-    expect(magicpocketRuntimeAdapter.getBaseUrl(settings)).toBe('http://127.0.0.1:19000')
+    expect(dagongRuntimeAdapter.id).toBe('dagong')
+    expect(dagongRuntimeAdapter.getBaseUrl(settings)).toBe('http://127.0.0.1:19000')
   })
 
-  it('JsonSettingsStore saves only MagicPocket after legacy settings migration', async () => {
+  it('JsonSettingsStore saves only Dagong after legacy settings migration', async () => {
     const userDataDir = await mkdtemp(join(tmpdir(), 'ca-settings-'))
     await writeFile(
       join(userDataDir, 'deepseek-gui-settings.json'),
@@ -157,7 +157,7 @@ describe('MagicPocket single-agent regression', () => {
     const loaded = await store.load()
 
     expect(loaded.agents).toEqual({
-      magicpocket: expect.objectContaining({ port: 18787 })
+      dagong: expect.objectContaining({ port: 18787 })
     })
     await rm(userDataDir, { recursive: true, force: true })
   })

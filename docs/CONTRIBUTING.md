@@ -2,7 +2,7 @@
 
 [简体中文](./CONTRIBUTING.zh-CN.md)
 
-Thank you for contributing to MagicPocket.
+Thank you for contributing to Dagong.
 
 This document explains how contributors should collaborate on the project, what standards to follow, and how changes should be proposed.
 
@@ -10,7 +10,7 @@ This document explains how contributors should collaborate on the project, what 
 
 Code is easy. Good taste is rare.
 
-For MagicPocket, taste means clear workflows, restrained interfaces, humane copy, and behavior that feels obvious after one use. Strong contributions show judgment, not just implementation.
+For Dagong, taste means clear workflows, restrained interfaces, humane copy, and behavior that feels obvious after one use. Strong contributions show judgment, not just implementation.
 
 ## Contribution Scope
 
@@ -47,7 +47,7 @@ Rules:
 
 ## Shape of a Typical PR
 
-A well-structured PR for MagicPocket is focused and self-contained. It typically:
+A well-structured PR for Dagong is focused and self-contained. It typically:
 
 - Touches **1-3 new files** and modifies **2-5 existing files** for wiring
 - Scopes to a single feature, fix, or documentation update
@@ -172,15 +172,15 @@ Examples:
 
 - `docs: rewrite README and contribution guides`
 - `feat: improve runtime connection recovery`
-- `fix: handle missing MagicPocket binary path`
+- `fix: handle missing Dagong binary path`
 
 ## Reporting Issues
 
 When reporting issues, please include:
 
 - Operating system and version
-- MagicPocket version (from Settings or the About dialog)
-- Bundled `magicpocket` version (`magicpocket --version` in the same directory, if available)
+- Dagong version (from Settings or the About dialog)
+- Bundled `dagong` version (`dagong --version` in the same directory, if available)
 - Steps to reproduce the issue
 - Expected vs actual behavior
 - Relevant error messages, logs, or screenshots
@@ -205,7 +205,7 @@ If requirements are unclear, ask for clarification before making broad architect
 External contributions are accepted under the [Contributor License Agreement](../CLA.md).
 By submitting a contribution, you agree to grant the project owner the rights
 described in the CLA, including the right to sublicense and relicense your
-contribution as part of MagicPocket under commercial, proprietary, noncommercial, or
+contribution as part of Dagong under commercial, proprietary, noncommercial, or
 other license terms.
 
 The project itself remains available under the [PolyForm Noncommercial License 1.0.0](../LICENSE)
@@ -247,7 +247,7 @@ npm run typecheck
 npm run lint
 npm run test
 npm run build
-npm run build:magicpocket
+npm run build:dagong
 # Electron 手动启动 + 真飞书账号(本机 + 测试机器人 appId/secret)
 npm run dev
 ```

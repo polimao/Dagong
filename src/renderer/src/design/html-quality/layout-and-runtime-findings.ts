@@ -240,7 +240,7 @@ export function summarizeDesignHtmlQualityStatus(
     return {
       kind: 'checking',
       label: 'Quality check',
-      title: 'MagicPocket is checking the rendered design for layout and accessibility issues.',
+      title: 'Dagong is checking the rendered design for layout and accessibility issues.',
       count: 0
     }
   }

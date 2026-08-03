@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import {
   DEFAULT_MODEL_PROVIDER_ID,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   getModelProviderPreset,
   modelProviderPresetProfile,
@@ -20,9 +20,9 @@ const labels: Record<string, string> = {
   agents: 'Agents',
   providers: 'Providers',
   providersDesc: 'Providers description',
-  magicpocketProvider: 'Provider',
-  magicpocketProviderDesc: 'Provider description',
-  magicpocketProviderSelectDesc: 'Provider select description',
+  dagongProvider: 'Provider',
+  dagongProviderDesc: 'Provider description',
+  dagongProviderSelectDesc: 'Provider select description',
   modelProviderAdd: 'Add provider',
   modelProviderAddMenuCustom: 'Custom provider…',
   modelProviderSectionBasics: 'Provider basics',
@@ -63,123 +63,123 @@ const labels: Record<string, string> = {
   imageGenModel: 'Image model',
   imageGenBaseUrlPlaceholder: 'https://api.example.com/v1',
   baseUrlPlaceholder: 'https://api.example.com/v1',
-  magicpocketApiKey: 'MagicPocket API key',
-  magicpocketApiKeyDesc: 'MagicPocket API key description',
-  magicpocketApiKeyPlaceholder: 'Inherit API key',
-  magicpocketApiKeyInherited: 'Inherited API key',
-  magicpocketApiKeyMissing: 'Missing API key',
-  magicpocketApiKeyOverride: 'Override API key',
-  magicpocketBaseUrl: 'MagicPocket base URL',
-  magicpocketBaseUrlDesc: 'MagicPocket base URL description',
-  magicpocketBaseUrlPlaceholder: 'Inherit base URL',
-  magicpocketBaseUrlOfficial: 'Official base URL',
-  magicpocketBaseUrlInherited: 'Inherited base URL',
-  magicpocketBaseUrlOverride: 'Override base URL',
-  magicpocketAssistantAdvanced: 'Assistant advanced settings',
-  magicpocketAssistantAdvancedDesc: 'Assistant advanced settings description',
+  dagongApiKey: 'Dagong API key',
+  dagongApiKeyDesc: 'Dagong API key description',
+  dagongApiKeyPlaceholder: 'Inherit API key',
+  dagongApiKeyInherited: 'Inherited API key',
+  dagongApiKeyMissing: 'Missing API key',
+  dagongApiKeyOverride: 'Override API key',
+  dagongBaseUrl: 'Dagong base URL',
+  dagongBaseUrlDesc: 'Dagong base URL description',
+  dagongBaseUrlPlaceholder: 'Inherit base URL',
+  dagongBaseUrlOfficial: 'Official base URL',
+  dagongBaseUrlInherited: 'Inherited base URL',
+  dagongBaseUrlOverride: 'Override base URL',
+  dagongAssistantAdvanced: 'Assistant advanced settings',
+  dagongAssistantAdvancedDesc: 'Assistant advanced settings description',
   autoStart: 'Auto start',
   autoStartDesc: 'Auto start description',
   port: 'Port',
   portDesc: 'Port description',
-  magicpocketBinary: 'MagicPocket binary',
-  magicpocketBinaryDesc: 'MagicPocket binary description',
-  magicpocketBinaryPlaceholder: 'Bundled MagicPocket',
-  magicpocketDataDir: 'Data dir',
-  magicpocketDataDirDesc: 'Data dir description',
-  magicpocketModel: 'Model',
-  magicpocketModelDesc: 'Model description',
-  magicpocketTokenEconomy: 'Token-saving mode',
-  magicpocketTokenEconomyDesc: 'Token-saving mode description',
-  magicpocketTokenEconomySavings: 'Saved {{tokens}} tokens',
-  magicpocketTokenEconomySavingsLoading: 'Loading savings',
-  magicpocketTokenEconomySavingsEmpty: 'Savings empty',
-  magicpocketTokenEconomyAdvanced: 'Token-saving advanced settings',
-  magicpocketTokenEconomyAdvancedDesc: 'Token-saving advanced settings description',
-  magicpocketTokenEconomyOptions: 'Token-saving options',
-  magicpocketTokenEconomyOptionsDesc: 'Token-saving options description',
-  magicpocketCompressToolDescriptions: 'Compress tool descriptions',
-  magicpocketCompressToolResults: 'Compress tool results',
-  magicpocketConciseResponses: 'Concise responses',
-  magicpocketHistoryHygiene: 'History guard',
-  magicpocketHistoryHygieneDesc: 'History guard description',
-  magicpocketHistoryMaxResultLines: 'Max result lines',
-  magicpocketHistoryMaxResultBytes: 'Max result bytes',
-  magicpocketHistoryMaxResultTokens: 'Max result tokens',
-  magicpocketHistoryMaxArgumentBytes: 'Max argument bytes',
-  magicpocketHistoryMaxArgumentTokens: 'Max argument tokens',
-  magicpocketHistoryMaxArrayItems: 'Max array items',
+  dagongBinary: 'Dagong binary',
+  dagongBinaryDesc: 'Dagong binary description',
+  dagongBinaryPlaceholder: 'Bundled Dagong',
+  dagongDataDir: 'Data dir',
+  dagongDataDirDesc: 'Data dir description',
+  dagongModel: 'Model',
+  dagongModelDesc: 'Model description',
+  dagongTokenEconomy: 'Token-saving mode',
+  dagongTokenEconomyDesc: 'Token-saving mode description',
+  dagongTokenEconomySavings: 'Saved {{tokens}} tokens',
+  dagongTokenEconomySavingsLoading: 'Loading savings',
+  dagongTokenEconomySavingsEmpty: 'Savings empty',
+  dagongTokenEconomyAdvanced: 'Token-saving advanced settings',
+  dagongTokenEconomyAdvancedDesc: 'Token-saving advanced settings description',
+  dagongTokenEconomyOptions: 'Token-saving options',
+  dagongTokenEconomyOptionsDesc: 'Token-saving options description',
+  dagongCompressToolDescriptions: 'Compress tool descriptions',
+  dagongCompressToolResults: 'Compress tool results',
+  dagongConciseResponses: 'Concise responses',
+  dagongHistoryHygiene: 'History guard',
+  dagongHistoryHygieneDesc: 'History guard description',
+  dagongHistoryMaxResultLines: 'Max result lines',
+  dagongHistoryMaxResultBytes: 'Max result bytes',
+  dagongHistoryMaxResultTokens: 'Max result tokens',
+  dagongHistoryMaxArgumentBytes: 'Max argument bytes',
+  dagongHistoryMaxArgumentTokens: 'Max argument tokens',
+  dagongHistoryMaxArrayItems: 'Max array items',
   runtimeToken: 'Runtime token',
   runtimeTokenDesc: 'Runtime token description',
   showSecret: 'Show',
   hideSecret: 'Hide',
-  magicpocketInsecure: 'Insecure',
-  magicpocketInsecureDesc: 'Insecure description',
-  magicpocketInsecureForcedDesc: 'Insecure forced',
-  magicpocketAdvanced: 'Advanced runtime settings',
-  magicpocketAdvancedDetails: 'Storage, model context, and tool guards',
-  magicpocketAdvancedDetailsDesc: 'Per-model context policy comes from models.profiles',
-  magicpocketStorageBackend: 'Storage backend',
-  magicpocketStorageBackendDesc: 'Storage backend description',
-  magicpocketStorageHybrid: 'Hybrid storage',
-  magicpocketStorageFile: 'Pure JSONL file storage',
-  magicpocketStorageSqlitePath: 'SQLite path',
-  magicpocketStorageSqlitePathDesc: 'SQLite path description',
-  magicpocketStorageSqlitePathPlaceholder: 'Automatic SQLite path',
-  magicpocketModelContextProfile: 'Current model context policy',
-  magicpocketModelContextProfileDesc: 'Current model context policy description',
-  magicpocketModelContextModel: 'Matched model',
-  magicpocketModelContextWindow: 'Context window',
-  magicpocketModelContextSoft: 'Model soft threshold',
-  magicpocketModelContextHard: 'Model hard threshold',
-  magicpocketModelContextSourceBuiltIn: 'Built-in model config',
-  magicpocketModelContextSourceFallback: 'Fallback model config',
-  magicpocketCompactionThresholds: 'Fallback compaction thresholds',
-  magicpocketCompactionThresholdsDesc: 'Fallback compaction thresholds description',
-  magicpocketCompactionSoftThreshold: 'Fallback soft threshold',
-  magicpocketCompactionHardThreshold: 'Fallback hard threshold',
-  magicpocketCompactionSummary: 'Compaction summary',
-  magicpocketCompactionSummaryDesc: 'Compaction summary description',
-  magicpocketCompactionSummaryMode: 'Summary mode',
-  magicpocketCompactionSummaryHeuristic: 'Heuristic summary',
-  magicpocketCompactionSummaryModel: 'Model summary',
-  magicpocketCompactionSummaryTimeout: 'Summary timeout',
-  magicpocketCompactionSummaryMaxTokens: 'Summary max tokens',
-  magicpocketCompactionSummaryInputBytes: 'Summary input bytes',
-  magicpocketToolStorm: 'Tool storm',
-  magicpocketToolStormDesc: 'Tool storm description',
-  magicpocketToolStormLimits: 'Tool storm limits',
-  magicpocketToolStormLimitsDesc: 'Tool storm limits description',
-  magicpocketToolStormWindowSize: 'Tool storm window',
-  magicpocketToolStormThreshold: 'Tool storm threshold',
-  magicpocketToolOutputLimits: 'Tool output limits',
-  magicpocketToolOutputLimitsDesc: 'Tool output limits description',
-  magicpocketToolOutputMaxLines: 'Tool output max lines',
-  magicpocketToolOutputMaxBytes: 'Tool output max bytes',
-  magicpocketToolArgumentRepair: 'Tool argument repair',
-  magicpocketToolArgumentRepairDesc: 'Tool argument repair description',
-  magicpocketInstructions: 'AGENTS.md instructions',
-  magicpocketInstructionsDesc: 'AGENTS.md instructions description',
-  magicpocketInstructionsDiagnostics: '1 source injected last turn',
-  magicpocketDiagnostics: 'MagicPocket diagnostics',
-  magicpocketDiagnosticsAdvanced: 'Detailed diagnostics',
-  magicpocketDiagnosticsAdvancedDesc: 'Detailed diagnostics description',
-  magicpocketRuntimeCapabilities: 'Runtime capabilities',
-  magicpocketRuntimeCapabilitiesDesc: 'Runtime capabilities description',
-  magicpocketRuntimeModel: 'Runtime model',
-  magicpocketRuntimePid: 'Runtime PID',
-  magicpocketDiagnosticsRefresh: 'Refresh diagnostics',
-  magicpocketToolDiagnostics: 'Tool diagnostics',
-  magicpocketToolDiagnosticsDesc: 'Tool diagnostics description',
-  magicpocketDiagnosticsProviders: 'Providers',
-  magicpocketDiagnosticsMcpServers: 'MCP servers',
-  magicpocketDiagnosticsSkills: 'Discovered Skills',
-  magicpocketDiagnosticsAttachments: 'Attachments',
-  magicpocketMemoryRecords: 'Memory records',
-  magicpocketMemoryRecordsDesc: 'Memory records description',
-  magicpocketMemoryEmpty: 'No memories',
-  magicpocketMemoryDisable: 'Disable memory',
-  magicpocketMemoryDelete: 'Delete memory',
-  magicpocketMemoryDisabled: 'Disabled',
+  dagongInsecure: 'Insecure',
+  dagongInsecureDesc: 'Insecure description',
+  dagongInsecureForcedDesc: 'Insecure forced',
+  dagongAdvanced: 'Advanced runtime settings',
+  dagongAdvancedDetails: 'Storage, model context, and tool guards',
+  dagongAdvancedDetailsDesc: 'Per-model context policy comes from models.profiles',
+  dagongStorageBackend: 'Storage backend',
+  dagongStorageBackendDesc: 'Storage backend description',
+  dagongStorageHybrid: 'Hybrid storage',
+  dagongStorageFile: 'Pure JSONL file storage',
+  dagongStorageSqlitePath: 'SQLite path',
+  dagongStorageSqlitePathDesc: 'SQLite path description',
+  dagongStorageSqlitePathPlaceholder: 'Automatic SQLite path',
+  dagongModelContextProfile: 'Current model context policy',
+  dagongModelContextProfileDesc: 'Current model context policy description',
+  dagongModelContextModel: 'Matched model',
+  dagongModelContextWindow: 'Context window',
+  dagongModelContextSoft: 'Model soft threshold',
+  dagongModelContextHard: 'Model hard threshold',
+  dagongModelContextSourceBuiltIn: 'Built-in model config',
+  dagongModelContextSourceFallback: 'Fallback model config',
+  dagongCompactionThresholds: 'Fallback compaction thresholds',
+  dagongCompactionThresholdsDesc: 'Fallback compaction thresholds description',
+  dagongCompactionSoftThreshold: 'Fallback soft threshold',
+  dagongCompactionHardThreshold: 'Fallback hard threshold',
+  dagongCompactionSummary: 'Compaction summary',
+  dagongCompactionSummaryDesc: 'Compaction summary description',
+  dagongCompactionSummaryMode: 'Summary mode',
+  dagongCompactionSummaryHeuristic: 'Heuristic summary',
+  dagongCompactionSummaryModel: 'Model summary',
+  dagongCompactionSummaryTimeout: 'Summary timeout',
+  dagongCompactionSummaryMaxTokens: 'Summary max tokens',
+  dagongCompactionSummaryInputBytes: 'Summary input bytes',
+  dagongToolStorm: 'Tool storm',
+  dagongToolStormDesc: 'Tool storm description',
+  dagongToolStormLimits: 'Tool storm limits',
+  dagongToolStormLimitsDesc: 'Tool storm limits description',
+  dagongToolStormWindowSize: 'Tool storm window',
+  dagongToolStormThreshold: 'Tool storm threshold',
+  dagongToolOutputLimits: 'Tool output limits',
+  dagongToolOutputLimitsDesc: 'Tool output limits description',
+  dagongToolOutputMaxLines: 'Tool output max lines',
+  dagongToolOutputMaxBytes: 'Tool output max bytes',
+  dagongToolArgumentRepair: 'Tool argument repair',
+  dagongToolArgumentRepairDesc: 'Tool argument repair description',
+  dagongInstructions: 'AGENTS.md instructions',
+  dagongInstructionsDesc: 'AGENTS.md instructions description',
+  dagongInstructionsDiagnostics: '1 source injected last turn',
+  dagongDiagnostics: 'Dagong diagnostics',
+  dagongDiagnosticsAdvanced: 'Detailed diagnostics',
+  dagongDiagnosticsAdvancedDesc: 'Detailed diagnostics description',
+  dagongRuntimeCapabilities: 'Runtime capabilities',
+  dagongRuntimeCapabilitiesDesc: 'Runtime capabilities description',
+  dagongRuntimeModel: 'Runtime model',
+  dagongRuntimePid: 'Runtime PID',
+  dagongDiagnosticsRefresh: 'Refresh diagnostics',
+  dagongToolDiagnostics: 'Tool diagnostics',
+  dagongToolDiagnosticsDesc: 'Tool diagnostics description',
+  dagongDiagnosticsProviders: 'Providers',
+  dagongDiagnosticsMcpServers: 'MCP servers',
+  dagongDiagnosticsSkills: 'Discovered Skills',
+  dagongDiagnosticsAttachments: 'Attachments',
+  dagongMemoryRecords: 'Memory records',
+  dagongMemoryRecordsDesc: 'Memory records description',
+  dagongMemoryEmpty: 'No memories',
+  dagongMemoryDisable: 'Disable memory',
+  dagongMemoryDelete: 'Delete memory',
+  dagongMemoryDisabled: 'Disabled',
   skill: 'Skill',
   skillsLocation: 'Skill location',
   skillsLocationDesc: 'Skill location description',
@@ -272,8 +272,8 @@ function baseCtx(): Record<string, unknown> {
   const noop = () => undefined
   const asyncNoop = async () => undefined
   const ref = { current: null }
-  const magicpocket = {
-    ...defaultMagicPocketRuntimeSettings(),
+  const dagong = {
+    ...defaultDagongRuntimeSettings(),
     autoStart: true,
     runtimeToken: '',
     insecure: true
@@ -282,10 +282,10 @@ function baseCtx(): Record<string, unknown> {
     t,
     tCommon: t,
     form: { claw: { skills: { extraDirs: ['/tmp/project/.agents/skills'] } } },
-    magicpocket,
+    dagong,
     activeApiKey: '',
     update: noop,
-    updateMagicPocket: noop,
+    updateDagong: noop,
     updateSharedCredential: noop,
     sharedApiKey: '',
     sharedBaseUrl: '',
@@ -336,7 +336,7 @@ function baseCtx(): Record<string, unknown> {
     skillNotice: null,
     openSkillRoot: asyncNoop,
     openPlugins: noop,
-    mcpConfigPath: '/tmp/project/.magicpocket/mcp.json',
+    mcpConfigPath: '/tmp/project/.dagong/mcp.json',
     mcpConfigExists: true,
     mcpConfigText: '{"mcpServers":{}}',
     setMcpConfigText: noop,
@@ -351,7 +351,7 @@ function baseCtx(): Record<string, unknown> {
     memoryRecords: [],
     runtimeDiagnosticsBusy: false,
     runtimeDiagnosticsNotice: null,
-    refreshMagicPocketDiagnostics: asyncNoop,
+    refreshDagongDiagnostics: asyncNoop,
     disableMemoryRecord: asyncNoop,
     deleteMemoryRecord: asyncNoop,
     pickClawWorkspace: asyncNoop,
@@ -362,7 +362,7 @@ function baseCtx(): Record<string, unknown> {
   }
 }
 
-describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
+describe('AgentsSettingsSection Dagong diagnostics smoke', () => {
   it('builds a single patch when adding and selecting a model provider', () => {
     const provider = defaultModelProviderSettings()
     const customProvider = {
@@ -378,13 +378,13 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: [...provider.providers, customProvider],
-      magicpocket: { providerId: customProvider.id }
+      dagong: { providerId: customProvider.id }
     })
 
     expect(patch.provider?.providers).toEqual([...provider.providers, customProvider])
-    expect(patch.agents?.magicpocket?.providerId).toBe(customProvider.id)
-    expect(patch.agents?.magicpocket?.apiKey).toBe('')
-    expect(patch.agents?.magicpocket?.baseUrl).toBe('')
+    expect(patch.agents?.dagong?.providerId).toBe(customProvider.id)
+    expect(patch.agents?.dagong?.apiKey).toBe('')
+    expect(patch.agents?.dagong?.baseUrl).toBe('')
   })
 
   it('builds a single patch when removing the active model provider', () => {
@@ -407,13 +407,13 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
         ]
       },
       providers: provider.providers,
-      magicpocket: { providerId: DEFAULT_MODEL_PROVIDER_ID }
+      dagong: { providerId: DEFAULT_MODEL_PROVIDER_ID }
     })
 
     expect(patch.provider?.providers).toEqual(provider.providers)
-    expect(patch.agents?.magicpocket?.providerId).toBe(DEFAULT_MODEL_PROVIDER_ID)
-    expect(patch.agents?.magicpocket?.apiKey).toBe('')
-    expect(patch.agents?.magicpocket?.baseUrl).toBe('')
+    expect(patch.agents?.dagong?.providerId).toBe(DEFAULT_MODEL_PROVIDER_ID)
+    expect(patch.agents?.dagong?.apiKey).toBe('')
+    expect(patch.agents?.dagong?.baseUrl).toBe('')
   })
 
   it('builds a single patch when adding a preset model provider', () => {
@@ -425,7 +425,7 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: [...provider.providers, xiaomiProvider],
-      magicpocket: {
+      dagong: {
         providerId: xiaomiProvider.id,
         model: xiaomiProvider.models[0]
       }
@@ -439,7 +439,7 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
         models: expect.arrayContaining(['mimo-v2.5'])
       })
     ]))
-    expect(patch.agents?.magicpocket).toEqual(expect.objectContaining({
+    expect(patch.agents?.dagong).toEqual(expect.objectContaining({
       providerId: 'xiaomi',
       model: xiaomiProvider.models[0]
     }))
@@ -454,14 +454,14 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
     const patch = modelProvidersSettingsPatch({
       provider,
       providers: [...provider.providers, minimaxProvider],
-      currentMagicPocket: defaultMagicPocketRuntimeSettings(),
-      magicpocket: {
+      currentDagong: defaultDagongRuntimeSettings(),
+      dagong: {
         providerId: minimaxProvider.id,
         model: minimaxProvider.models[0]
       }
     })
 
-    expect(patch.agents?.magicpocket).toEqual(expect.objectContaining({
+    expect(patch.agents?.dagong).toEqual(expect.objectContaining({
       providerId: 'minimax',
       model: minimaxProvider.models[0],
       textToSpeech: expect.objectContaining({
@@ -500,8 +500,8 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
           ...provider,
           providers: [...provider.providers, customProvider]
         },
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           providerId: customProvider.id
         }
       }
@@ -535,8 +535,8 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
           ...provider,
           providers: [...provider.providers, modelProviderPresetProfile(xiaomi!)]
         },
-        magicpocket: {
-          ...defaultMagicPocketRuntimeSettings(),
+        dagong: {
+          ...defaultDagongRuntimeSettings(),
           providerId: 'xiaomi'
         }
       }
@@ -554,7 +554,7 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
       ctx: {
         ...baseCtx(),
         provider: defaultModelProviderSettings(),
-        magicpocket: defaultMagicPocketRuntimeSettings()
+        dagong: defaultDagongRuntimeSettings()
       }
     }))
 
@@ -655,7 +655,7 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
 
     const html = renderToStaticMarkup(createElement(AgentsSettingsSection, { ctx }))
 
-    expect(html).toContain('MagicPocket diagnostics')
+    expect(html).toContain('Dagong diagnostics')
     expect(html).toContain('MCP')
     expect(html).toContain('available')
     expect(html).toContain('2/2')
@@ -675,7 +675,7 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
     const html = renderToStaticMarkup(createElement(AgentsSettingsSection, { ctx: baseCtx() }))
 
     expect(html).toContain('External tool config path')
-    expect(html).toContain('/tmp/project/.magicpocket/mcp.json')
+    expect(html).toContain('/tmp/project/.dagong/mcp.json')
     expect(html).toContain('Model and API credentials do not live in this MCP file')
     expect(html).not.toContain('DeepSeek auth')
     expect(html).not.toContain('Base URL are stored in this file')
@@ -701,9 +701,9 @@ describe('AgentsSettingsSection MagicPocket diagnostics smoke', () => {
           skillCount: 2
         },
         {
-          id: 'global-magicpocket',
-          disableKey: 'global-magicpocket',
-          path: '/home/me/.magicpocket/skills',
+          id: 'global-dagong',
+          disableKey: 'global-dagong',
+          path: '/home/me/.dagong/skills',
           scope: 'global',
           source: 'common',
           exists: true,

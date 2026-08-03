@@ -54,7 +54,7 @@ type Props = {
 }
 
 const COPY_RESET_MS = 1400
-const MARKDOWN_DEFAULT_ORIGIN = 'https://magicpocket.local'
+const MARKDOWN_DEFAULT_ORIGIN = 'https://dagong.local'
 const markdownRehypePlugins = [
   rehypeRaw,
   [
@@ -217,7 +217,7 @@ export function WorkspaceFilePreviewPanel({
       return
     }
 
-    void window.magicpocketGui
+    void window.dagongGui
       .readWorkspaceFile({
         ...target,
         workspaceRoot: target.workspaceRoot ?? workspaceRoot
@@ -317,7 +317,7 @@ export function WorkspaceFilePreviewPanel({
       target?.workspaceRoot ?? workspaceRoot
     ).then((next) => {
       if (!next.ok) {
-        void window.magicpocketGui?.logError?.('editor-open', 'Failed to open previewed file', {
+        void window.dagongGui?.logError?.('editor-open', 'Failed to open previewed file', {
           message: next.message,
           target
         })?.catch(() => undefined)
@@ -534,7 +534,7 @@ export function WorkspaceFilePreviewPanel({
                           onClick={(event) => {
                             if (!href) return
                             event.preventDefault()
-                            void window.magicpocketGui?.openExternal?.(href)?.catch(() => undefined)
+                            void window.dagongGui?.openExternal?.(href)?.catch(() => undefined)
                           }}
                         >
                           {children}

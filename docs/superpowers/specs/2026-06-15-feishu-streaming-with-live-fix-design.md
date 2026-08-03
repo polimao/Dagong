@@ -238,7 +238,7 @@ UI 沿用"卡片-列表-SettingRow"模式,与 `channel.enabled` / `channel.weixi
 
 ## 不在本期范围
 
-- 任何对 `magicpocket/` runtime 包的修改
+- 任何对 `dagong/` runtime 包的修改
 - 任何对 `processIncomingImPrompt` / `waitForAssistantResult` 主体逻辑的修改
 - `runStreamingReply` 的通用抽象抽取(为后续 wechat 渠道铺路)
 - WeChat 渠道接入(见后续 `feat/weixin-block-streaming-v2` PR)

@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -22,13 +22,13 @@ function settings(apiKey: string): AppSettingsV1 {
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
     agents: {
-      magicpocket: {
-        ...defaultMagicPocketRuntimeSettings(),
+      dagong: {
+        ...defaultDagongRuntimeSettings(),
         apiKey
       }
     },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: false, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -55,7 +55,7 @@ describe('rendererRuntimeClient', () => {
   it('caches settings reads until invalidated', async () => {
     const getSettings = vi.fn(async () => settings('sk-1'))
     vi.stubGlobal('window', {
-      magicpocketGui: {
+      dagongGui: {
         getSettings,
         setSettings: vi.fn(),
         runtimeRequest: vi.fn(),
@@ -71,8 +71,8 @@ describe('rendererRuntimeClient', () => {
     const first = await rendererRuntimeClient.getSettings()
     const second = await rendererRuntimeClient.getSettings()
 
-    expect(first.agents.magicpocket.apiKey).toBe('sk-1')
-    expect(second.agents.magicpocket.apiKey).toBe('sk-1')
+    expect(first.agents.dagong.apiKey).toBe('sk-1')
+    expect(second.agents.dagong.apiKey).toBe('sk-1')
     expect(getSettings).toHaveBeenCalledTimes(1)
   })
 
@@ -80,7 +80,7 @@ describe('rendererRuntimeClient', () => {
     const getSettings = vi.fn(async () => settings('sk-1'))
     const setSettings = vi.fn(async () => settings('sk-2'))
     vi.stubGlobal('window', {
-      magicpocketGui: {
+      dagongGui: {
         getSettings,
         setSettings,
         runtimeRequest: vi.fn(),
@@ -97,8 +97,8 @@ describe('rendererRuntimeClient', () => {
     const next = await rendererRuntimeClient.setSettings({ workspaceRoot: '/tmp/next' })
     const cached = await rendererRuntimeClient.getSettings()
 
-    expect(next.agents.magicpocket.apiKey).toBe('sk-2')
-    expect(cached.agents.magicpocket.apiKey).toBe('sk-2')
+    expect(next.agents.dagong.apiKey).toBe('sk-2')
+    expect(cached.agents.dagong.apiKey).toBe('sk-2')
     expect(getSettings).toHaveBeenCalledTimes(1)
     expect(setSettings).toHaveBeenCalledTimes(1)
   })
@@ -106,7 +106,7 @@ describe('rendererRuntimeClient', () => {
   it('forwards explicit runtime restarts through the preload bridge', async () => {
     const restartRuntime = vi.fn(async () => undefined)
     vi.stubGlobal('window', {
-      magicpocketGui: {
+      dagongGui: {
         getSettings: vi.fn(),
         setSettings: vi.fn(),
         runtimeRequest: vi.fn(),

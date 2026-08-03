@@ -24,16 +24,16 @@ Loop: describe in right pane → agent writes a single-file HTML artifact → ce
 - **Workbench routing** = one ternary chain in `Workbench.tsx`: sidebar choice 2390-2428 (`route === 'write' ? <WriteSidebar/> : <Sidebar/>`), main-panel chain 2444-2480 (`plugins ? … : schedule ? … : write ? <WriteWorkspaceView/> + {renderRightPanel()} : chat`), `renderRightPanel()` 2194-2243 gates `WriteAssistantPanel` on `route === 'write' && writeAssistantOpen`. Mode helpers `openCodeMode`/`openWriteMode` 2082-2090.
 - **AppShell** `AppShell.tsx:60` only forks `settings` vs `Workbench` — **no change needed** (design renders inside Workbench, like write).
 - **Agent turn dispatch (reuse path):** prototype turn = `SddDraftEditorView` `onPrototypeTurn` → `sendSddPrototypeTurn` (`Workbench.tsx:1590-1664`) → `sendMessage(prompt, 'agent', { displayText, model, providerId, attachmentIds })`. `sendWritePrompt` (`Workbench.tsx:1139`) uses `ensureWriteThreadForWorkspace` then the same `sendMessage`.
-- **Live HTML render** = `src/renderer/src/write/html-embed-dom.ts`: `window.magicpocketGui.authorizeWritePrototype({ path, workspaceRoot })` (also allow-lists path for the `will-attach-webview` guard) → `<webview src=fileUrl partition="magicpocket-proto" webpreferences="contextIsolation=yes,nodeIntegration=no,sandbox=yes">`. IPC: `src/main/services/prototype-embed-registry.ts` + `src/main/index.ts` + `register-app-ipc-handlers.ts` + `preload/index.ts`. **DesignCanvas reuses `authorizeWritePrototype`.**
+- **Live HTML render** = `src/renderer/src/write/html-embed-dom.ts`: `window.dagongGui.authorizeWritePrototype({ path, workspaceRoot })` (also allow-lists path for the `will-attach-webview` guard) → `<webview src=fileUrl partition="dagong-proto" webpreferences="contextIsolation=yes,nodeIntegration=no,sandbox=yes">`. IPC: `src/main/services/prototype-embed-registry.ts` + `src/main/index.ts` + `register-app-ipc-handlers.ts` + `preload/index.ts`. **DesignCanvas reuses `authorizeWritePrototype`.**
 - **Generation prompt** `src/renderer/src/sdd/sdd-prototype-prompt.ts` (`buildSddPrototypeTurnPrompt`) embeds `WRITE_PROTOTYPE_DEFAULT_PROMPT` + `WRITE_PROTOTYPE_MAX_TEXT_CHARS` from `src/shared/write-prototype.ts`; single-file-HTML / incremental-write / <4000-char-per-tool-call contract.
 - **Design context** `SddDesignContext` is in `src/renderer/src/sdd/sdd-draft-store.ts:12` (NOT in `sdd-design-context.ts`, which holds `SDD_DESIGN_TONE_OPTIONS` + `formatSddDesignContextLines`).
-- **Design-quality hook** `magicpocket/src/hooks/builtins/design-quality-hook.ts` fires on `PostToolUse` for any frontend path (`isFrontendPath`) — **zero wiring needed**; design artifacts are `.html`, so `design_quality_review` blocks fold automatically.
+- **Design-quality hook** `dagong/src/hooks/builtins/design-quality-hook.ts` fires on `PostToolUse` for any frontend path (`isFrontendPath`) — **zero wiring needed**; design artifacts are `.html`, so `design_quality_review` blocks fold automatically.
 - **Settings end-to-end (the landmine) — five places:**
   1. Type `AppSettingsV1` `app-settings-types.ts:853`.
   2. Defaults `src/main/settings-store.ts:195-223` `defaultSettings()` + `buildMergedSettings` 228-245.
   3. Normalize `src/shared/app-settings-normalize.ts:32` `normalizeAppSettings`, line 92 `write: normalizeWriteSettings(...)`.
   4. **Strict patch schema** `src/main/ipc/app-ipc-schemas.ts:721-744` `settingsPatchObjectSchema = z.object({ … }).strict()` — unknown top-level key is rejected by `.strict()`, triggering save→reject→resave loop.
-  5. `sanitizeMagicPocketConfigSections` `src/main/magicpocket-process.ts:979-994` — MagicPocket-runtime config only; **MVP design slice is GUI-only → NOT needed here** (but required in 1-4). See R5.
+  5. `sanitizeDagongConfigSections` `src/main/dagong-process.ts:979-994` — Dagong-runtime config only; **MVP design slice is GUI-only → NOT needed here** (but required in 1-4). See R5.
 - **Tests that break** if `design` is a *required* `AppSettingsV1` field: literals at `src/shared/app-settings.test.ts:44-66` and `src/main/ipc/app-ipc-schemas.test.ts:135-183` (Step B6).
 
 ---
@@ -96,7 +96,7 @@ const designSettingsPatchSchema = z.object({
 ```
 and inside `settingsPatchObjectSchema` (736-738) add `design: designSettingsPatchSchema.optional(),`.
 
-**B6.** Fix test literals: `src/shared/app-settings.test.ts:44-66` add `design: defaultDesignSettings()`; `src/main/ipc/app-ipc-schemas.test.ts` add a `design: {...}` assertion (135-183). Add a code comment that `sanitizeMagicPocketConfigSections` is intentionally NOT touched (GUI-only slice).
+**B6.** Fix test literals: `src/shared/app-settings.test.ts:44-66` add `design: defaultDesignSettings()`; `src/main/ipc/app-ipc-schemas.test.ts` add a `design: {...}` assertion (135-183). Add a code comment that `sanitizeDagongConfigSections` is intentionally NOT touched (GUI-only slice).
 
 **B7. (before ship; deferrable past empty-mode milestone)** Settings UI: (create) `src/renderer/src/components/settings-section-design.tsx` (mirror `settings-section-write.tsx:62`) with brandColor / tone chips / preset select. `SettingsView.tsx`: add `'design'` to `SettingsCategory` (62); `settingsSection === 'design'` → `setCategory('design')` (mirror 257-258); render `{category === 'design' ? <DesignSettingsSection/> : null}` (~990); include `design` in the save block (778/793).
 
@@ -108,7 +108,7 @@ and inside `settingsPatchObjectSchema` (736-738) add `design: designSettingsPatc
 
 **C2. (create) `src/renderer/src/design/design-context.ts`**: `DesignContext = SddDesignContext + designSystemPreset?`. `DESIGN_TONE_OPTIONS` (copy `SDD_DESIGN_TONE_OPTIONS`). `formatDesignContextLines(ctx)` = copy `formatSddDesignContextLines` + append `- Design system: …` when preset !== 'none'.
 
-**C3. (create) `src/renderer/src/design/design-thread-registry.ts`** (copy `write-thread-registry.ts`; key `magicpocket.design.threadRegistry.v1`, title `'Design Assistant'`, fns `isDesignThreadId`/`markDesignThread`/`hydrateDesignThreadRegistry`/`activeDesignThreadForWorkspace`). **MVP may stub to one fixed thread** (R3) but keep the file's surface so D/E wiring doesn't change later.
+**C3. (create) `src/renderer/src/design/design-thread-registry.ts`** (copy `write-thread-registry.ts`; key `dagong.design.threadRegistry.v1`, title `'Design Assistant'`, fns `isDesignThreadId`/`markDesignThread`/`hydrateDesignThreadRegistry`/`activeDesignThreadForWorkspace`). **MVP may stub to one fixed thread** (R3) but keep the file's surface so D/E wiring doesn't change later.
 
 ---
 
@@ -117,8 +117,8 @@ and inside `settingsPatchObjectSchema` (736-738) add `design: designSettingsPatc
 **D1. `DesignWorkspaceView.tsx`** — layout host (mirror `WriteWorkspaceView.tsx` skeleton: `{ leftSidebarCollapsed, onToggleLeftSidebar, input, setInput, onSubmitPrompt?, onOpenAgentSettings? }`), much thinner. Owns empty-state (no workspace → `pickWorkspaceDirectory`, cf. `WriteWorkspaceView.pickWriteWorkspace` 634-648), top bar (viewport switch + Preview/Code toggle), mounts `DesignCanvas`.
 
 **D2. `DesignCanvas.tsx`** — switch on `canvasView`:
-- `'preview'`: render via `html-embed-dom.ts`. **Recommend** inlining `authorizeWritePrototype` → `<webview partition="magicpocket-proto">` (copy `html-embed-dom.ts:64-87,138-158`) for a borderless full-bleed canvas. Apply viewport as max-width wrapper (mobile 390 / tablet 768 / desktop 100%).
-- `'code'`: `window.magicpocketGui.readWorkspaceFile` → read-only source (CodeMirror viewer or `<pre>` for MVP).
+- `'preview'`: render via `html-embed-dom.ts`. **Recommend** inlining `authorizeWritePrototype` → `<webview partition="dagong-proto">` (copy `html-embed-dom.ts:64-87,138-158`) for a borderless full-bleed canvas. Apply viewport as max-width wrapper (mobile 390 / tablet 768 / desktop 100%).
+- `'code'`: `window.dagongGui.readWorkspaceFile` → read-only source (CodeMirror viewer or `<pre>` for MVP).
 - **Seam:** future `case 'graph'` / `case 'penpot'` slot here.
 
 **D3. `DesignSidebar.tsx`** — left pane (mirror `WriteSidebar.tsx` shell, add `onDesignOpen`). Body: list `artifacts`; under active artifact list its `versions` (click → load snapshot). New-artifact button.
@@ -143,7 +143,7 @@ Copy `buildSddPrototypeTurnPrompt` (24-56) verbatim EXCEPT: drop SDD-requirement
 
 **E2.** In `Workbench.tsx` add `sendDesignTurn` next to `sendSddPrototypeTurn` (1590): ensure design thread (`ensureDesignThreadForWorkspace`), open design agent panel, `return sendMessage(prompt, 'agent', { displayText, model, providerId })` with `useDesignWorkspaceStore.getState().assistantModel`. Image-mode optional (reuse `uploadSddImagesAsAttachments`/`readWorkspaceImage` 1620-1644). Pass `sendDesignTurn` into `DesignAgentPanel.onSend` (or `DesignWorkspaceView.onSubmitPrompt`, like `sendWritePrompt` at 2474).
 
-**E3.** After a turn, when the file exists at `artifactRelativePath`, call `addArtifact`/`addVersion`. **Decision R2:** reserved-path dir `<workspaceRoot>/.magicpocket-design/<artifactId>/v<N>.html` (parallels SDD `unitProtoDir` `SddDraftEditorView.tsx:798-812`). Agent is told the exact path (E1); canvas authorizes/polls it (D2); versions are per-turn snapshot copies.
+**E3.** After a turn, when the file exists at `artifactRelativePath`, call `addArtifact`/`addVersion`. **Decision R2:** reserved-path dir `<workspaceRoot>/.dagong-design/<artifactId>/v<N>.html` (parallels SDD `unitProtoDir` `SddDraftEditorView.tsx:798-812`). Agent is told the exact path (E1); canvas authorizes/polls it (D2); versions are per-turn snapshot copies.
 
 ---
 
@@ -166,7 +166,7 @@ Copy `buildSddPrototypeTurnPrompt` (24-56) verbatim EXCEPT: drop SDD-requirement
 
 ## G. Build / verify checkpoints
 
-- **G1 (empty mode renders):** after A1, F1-F4 with STUB components + minimal store → `npm run typecheck`; launch app, click Design → route switches, sidebar swaps, center placeholder, no console errors, **settings still save** (watch for repeated "Refusing to write invalid GUI-managed MagicPocket config" `magicpocket-process.ts:496` = a missing B touchpoint).
+- **G1 (empty mode renders):** after A1, F1-F4 with STUB components + minimal store → `npm run typecheck`; launch app, click Design → route switches, sidebar swaps, center placeholder, no console errors, **settings still save** (watch for repeated "Refusing to write invalid GUI-managed Dagong config" `dagong-process.ts:496` = a missing B touchpoint).
 - **G2 (settings):** after B1-B6 → settings tests pass; toggle a design setting, reload, value persists.
 - **G3 (canvas):** after D2 → hand-place a `.html` under the reserved dir; webview authorizes + renders, viewport resizes, Preview/Code toggles.
 - **G4 (agent):** after E1-E3 → run a design turn; agent writes reserved HTML, canvas live-refreshes, version row appears, `design_quality_review` shows in the turn (proves zero-wiring reuse).
@@ -188,12 +188,12 @@ DesignTurnTarget   = 'html'              // P2: | 'graph'   P3: | 'penpot'
 ## Risks / decisions to confirm
 
 - **R1 — `openWrite` defined twice; which to mirror?** Resolved: plain `set({ route })` (app-actions, like `openSchedule`) — the override-winner only adds write-thread hydration, which design defers (R3). *Confirm no design-thread hydration needed on entry.*
-- **R2 — artifact persistence location.** Proposed: `<workspaceRoot>/.magicpocket-design/<id>/v<N>.html` (parallels SDD `unitProtoDir`). Alt: reuse the write file-tree as ordinary files. *Genuine decision — no existing design-artifact dir convention found. Changes D2 + E3.*
+- **R2 — artifact persistence location.** Proposed: `<workspaceRoot>/.dagong-design/<id>/v<N>.html` (parallels SDD `unitProtoDir`). Alt: reuse the write file-tree as ordinary files. *Genuine decision — no existing design-artifact dir convention found. Changes D2 + E3.*
 - **R3 — thread-registry depth for MVP.** Write registry is ~320 lines. MVP can ship one fixed design thread per workspace and still dispatch via `sendMessage`. *Confirm; full registry is a fast-follow.*
 - **R4 — own workspace root vs share write's?** Plan gives `design.defaultWorkspaceRoot` but store can fall back to chat `workspaceRoot` (cf. `sendWritePrompt` `writeState.workspaceRoot || workspaceRoot` 1149). *Confirm independent vs shared.*
-- **R5 — `sanitizeMagicPocketConfigSections`.** MVP correctly skips it (GUI-only). If a design setting must reach the MagicPocket runtime later, it must thread through `sanitizeMagicPocketConfigSections` + the MagicPocket config schema or be silently dropped.
+- **R5 — `sanitizeDagongConfigSections`.** MVP correctly skips it (GUI-only). If a design setting must reach the Dagong runtime later, it must thread through `sanitizeDagongConfigSections` + the Dagong config schema or be silently dropped.
 - **R6 — Workbench is write-aware in ~8 spots** (935, 938, 1867, 1928, 1942, 2108, 2206, 2465). Each needs a `route === 'design'` companion — missing one = behavior bug (wrong model / missing panel), not a build break.
-- **R7 — webview guard naming.** `authorizeWritePrototype` is write-named; verify `prototype-embed-registry.ts` doesn't hard-scope authorized paths to the write workspace (rejecting `.magicpocket-design/`). If it does, widen it or add `authorizeDesignArtifact`. *Verify before G3.*
+- **R7 — webview guard naming.** `authorizeWritePrototype` is write-named; verify `prototype-embed-registry.ts` doesn't hard-scope authorized paths to the write workspace (rejecting `.dagong-design/`). If it does, widen it or add `authorizeDesignArtifact`. *Verify before G3.*
 
 ---
 
@@ -202,4 +202,4 @@ DesignTurnTarget   = 'html'              // P2: | 'graph'   P3: | 'penpot'
 1. A1 + F1 (just `"design"` label) + F2 (3rd tab + prop propagation) + F3 + F4 with STUB `DesignSidebar`/`DesignWorkspaceView`/`DesignAgentPanel` (one-line placeholders) + minimal `design-workspace-store.ts` (`agentPanelOpen` + `canvasView` only).
 2. Settings B1-B6 (required — empty slice OK, B7 deferred).
 3. `tsc` typecheck → fix any missed prop in F2/F4.
-4. Launch, click **Design**: route flips, placeholders render, Code/Write still work, **no** repeated invalid-MagicPocket-config writes. Proves routing + settings wired before any canvas/agent code.
+4. Launch, click **Design**: route flips, placeholders render, Code/Write still work, **no** repeated invalid-Dagong-config writes. Proves routing + settings wired before any canvas/agent code.

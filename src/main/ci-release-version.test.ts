@@ -33,7 +33,7 @@ describe('CI release version computation', () => {
     ).toEqual({
       version: '0.1.1',
       tag: 'v0.1.1',
-      releaseName: 'MagicPocket 0.1.1',
+      releaseName: 'Dagong 0.1.1',
       previousTag: '',
       existingTag: false
     })

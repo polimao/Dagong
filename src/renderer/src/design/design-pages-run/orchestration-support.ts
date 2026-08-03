@@ -174,10 +174,10 @@ export async function writeWorkspaceTextFile(
   path: string,
   content: string
 ): Promise<boolean> {
-  if (typeof window === 'undefined' || typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') {
+  if (typeof window === 'undefined' || typeof window.dagongGui?.writeWorkspaceFile !== 'function') {
     return false
   }
-  const res = await window.magicpocketGui.writeWorkspaceFile({ path, workspaceRoot, content }).catch(() => null)
+  const res = await window.dagongGui.writeWorkspaceFile({ path, workspaceRoot, content }).catch(() => null)
   return Boolean(res && res.ok)
 }
 
@@ -395,7 +395,7 @@ export async function createFoundationCard(opts: {
   title: string
 }): Promise<{ id: string; relativePath: string } | null> {
   const id = createDesignArtifactId()
-  const relativePath = `.magicpocket-design/${opts.docId}/${id}/v1.html`
+  const relativePath = `.dagong-design/${opts.docId}/${id}/v1.html`
   const createdAt = new Date().toISOString()
   const index = useDesignWorkspaceStore.getState().artifacts.length
   useDesignWorkspaceStore.getState().upsertArtifact({

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  resolveMagicPocketSpeechToTextSettings,
+  resolveDagongSpeechToTextSettings,
   type AppSettingsV1,
-  type MagicPocketSpeechToTextSettingsV1
+  type DagongSpeechToTextSettingsV1
 } from '@shared/app-settings'
 import { SPEECH_TRANSCRIPTION_MAX_DURATION_MS } from '@shared/speech-to-text'
 import { SETTINGS_CHANGED_EVENT } from '../../lib/keyboard-shortcut-settings'
@@ -18,16 +18,16 @@ const MIN_RECORDING_MS = 500
 const RECORDER_MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4']
 
 /** Resolved speech-to-text settings, kept in sync with the settings screen. */
-export function useSpeechToTextSettings(): MagicPocketSpeechToTextSettingsV1 | null {
-  const [speechToText, setSpeechToText] = useState<MagicPocketSpeechToTextSettingsV1 | null>(null)
+export function useSpeechToTextSettings(): DagongSpeechToTextSettingsV1 | null {
+  const [speechToText, setSpeechToText] = useState<DagongSpeechToTextSettingsV1 | null>(null)
 
   useEffect(() => {
     let cancelled = false
     const apply = (settings: AppSettingsV1): void => {
-      if (!cancelled) setSpeechToText(resolveMagicPocketSpeechToTextSettings(settings))
+      if (!cancelled) setSpeechToText(resolveDagongSpeechToTextSettings(settings))
     }
-    if (typeof window.magicpocketGui?.getSettings === 'function') {
-      void window.magicpocketGui.getSettings().then(apply).catch(() => undefined)
+    if (typeof window.dagongGui?.getSettings === 'function') {
+      void window.dagongGui.getSettings().then(apply).catch(() => undefined)
     }
     const onSettingsChanged = (event: Event): void => {
       apply((event as CustomEvent<AppSettingsV1>).detail)
@@ -47,7 +47,7 @@ export function useVoiceDictation({
   speechToText
 }: {
   onText: (text: string, intent: VoiceDictationIntent) => void
-  speechToText?: MagicPocketSpeechToTextSettingsV1 | null
+  speechToText?: DagongSpeechToTextSettingsV1 | null
 }): {
   status: VoiceDictationStatus
   error: string | null
@@ -116,7 +116,7 @@ export function useVoiceDictation({
   const transcribeBlob = useCallback(async (blob: Blob, durationMs: number, intent: VoiceDictationIntent): Promise<void> => {
     try {
       const wav = await encodeBlobAsWav(blob)
-      const result = await window.magicpocketGui.transcribeSpeech({
+      const result = await window.dagongGui.transcribeSpeech({
         audioBase64: wav.base64,
         mimeType: 'audio/wav',
         durationMs: Math.min(durationMs, SPEECH_TRANSCRIPTION_MAX_DURATION_MS),

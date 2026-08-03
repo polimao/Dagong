@@ -216,7 +216,7 @@ export type CoreRuntimeCapabilityManifestJson = {
     configuredRoots: number
     discoveredSkills: number
   }
-  /** Optional so the GUI keeps working against older MagicPocket builds without the capability. */
+  /** Optional so the GUI keeps working against older Dagong builds without the capability. */
   instructions?: CoreRuntimeCapabilityStateJson & {
     lastSourceCount?: number
     lastInjectedBytes?: number
@@ -243,7 +243,7 @@ export type CoreRuntimeCapabilityManifestJson = {
     scopes: Array<'user' | 'workspace' | 'project'>
     maxInjectedRecords: number
   }
-  /** Optional so the GUI keeps working against older MagicPocket builds without the capability. */
+  /** Optional so the GUI keeps working against older Dagong builds without the capability. */
   imageGen?: CoreRuntimeCapabilityStateJson & {
     model?: string
   }
@@ -513,7 +513,7 @@ export type CoreReviewOutputJson = {
 
 /**
  * Structured plan metadata the renderer expects on a successful
- * `create_plan` tool result. Mirrors the MagicPocket output contract
+ * `create_plan` tool result. Mirrors the Dagong output contract
  * so the Workbench can reload the saved plan file and update the
  * Plan panel without parsing assistant prose.
  */
@@ -565,7 +565,7 @@ export type CoreResumeSessionResponseJson = {
 
 /**
  * Optional plan context attached to a start-turn request. Carries the
- * reserved plan id, workspace root, and relative path the MagicPocket
+ * reserved plan id, workspace root, and relative path the Dagong
  * should expose to the model via the `create_plan` tool.
  */
 export type CoreStartTurnPlanContextJson = {
@@ -578,7 +578,7 @@ export type CoreStartTurnPlanContextJson = {
 }
 
 /**
- * Native MagicPocket plan tool name. Re-exported alongside the shared
+ * Native Dagong plan tool name. Re-exported alongside the shared
  * constant for renderer consumers.
  */
 export const CORE_PLAN_TOOL_NAME = GUI_PLAN_CREATE_PLAN_TOOL_NAME

@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import type {
   ClaudeSubscriptionLoginResult,
   ClaudeSubscriptionStatus
-} from '../shared/magicpocket-gui-api'
+} from '../shared/dagong-gui-api'
 
 // `claude setup-token` prints a long-lived OAuth token; capture the first match.
 const OAUTH_TOKEN_PATTERN = /sk-ant-oat[\w-]+/
@@ -28,10 +28,10 @@ export function claudeSubscriptionStatus(): ClaudeSubscriptionStatus {
  * Resolve the Claude Code binary that the Agent SDK bundles as a per-platform
  * optional dependency (`@anthropic-ai/claude-agent-sdk-<plat>-<arch>/claude`).
  * Using it means the user needs NO separate CLI install. Returns the first
- * existing candidate under the given magicpocket roots, or undefined to fall back to a
+ * existing candidate under the given dagong roots, or undefined to fall back to a
  * `claude` on PATH.
  */
-export function resolveBundledClaudeBinary(magicpocketRoots: readonly string[]): string | undefined {
+export function resolveBundledClaudeBinary(dagongRoots: readonly string[]): string | undefined {
   const arch =
     process.arch === 'arm64' ? 'arm64' : process.arch === 'x64' ? 'x64' : undefined
   const platform =
@@ -51,7 +51,7 @@ export function resolveBundledClaudeBinary(magicpocketRoots: readonly string[]):
           `@anthropic-ai/claude-agent-sdk-${platform}-${arch}-musl`
         ]
       : [`@anthropic-ai/claude-agent-sdk-${platform}-${arch}`]
-  for (const root of magicpocketRoots) {
+  for (const root of dagongRoots) {
     for (const pkg of pkgs) {
       const candidate = join(root, 'node_modules', pkg, binName)
       if (existsSync(candidate)) return candidate

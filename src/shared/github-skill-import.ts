@@ -36,13 +36,13 @@ export type ParsedSkillFrontmatter = {
   body: string
 }
 
-export type BuiltMagicPocketSkill = {
+export type BuiltDagongSkill = {
   manifest: ImportedSkillManifest
   entryContent: string
   dirName: string
 }
 
-export type ImportedSkill = BuiltMagicPocketSkill & {
+export type ImportedSkill = BuiltDagongSkill & {
   sourcePath: string
   sourceUrl: string
 }
@@ -172,14 +172,14 @@ export function mapAllowedTools(rawTools: string[]): string[] {
   return [...new Set(mapped)]
 }
 
-export function buildMagicPocketSkill(
+export function buildDagongSkill(
   parsed: ParsedSkillFrontmatter,
   meta: {
     defaultName: string
     suggestedDirName?: string
     usedDirNames?: Set<string>
   }
-): BuiltMagicPocketSkill {
+): BuiltDagongSkill {
   const name = (parsed.frontmatter.name?.trim() || meta.defaultName.trim() || 'Imported Skill')
   const description = parsed.frontmatter.description?.trim() || firstMarkdownParagraph(parsed.body)
   const dirBase = slug(meta.suggestedDirName || parsed.frontmatter.id || name)
@@ -217,7 +217,7 @@ export async function importSkillsFromGitHub(
   }
   const usedDirNames = new Set<string>()
   return files.map((file) => {
-    const built = buildMagicPocketSkill(parseSkillFrontmatter(file.content), {
+    const built = buildDagongSkill(parseSkillFrontmatter(file.content), {
       defaultName: titleCase(file.name.replace(/\.md$/i, '')),
       suggestedDirName: suggestedDirNameFromFile(file.path, file.name),
       usedDirNames

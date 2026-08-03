@@ -127,8 +127,8 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
       }
       set({ composerModel: modelId, composerProviderId: nextProviderId })
       const trimmed = modelId.trim()
-      if (!activeThreadId && trimmed && trimmed.toLowerCase() !== 'auto' && typeof window.magicpocketGui !== 'undefined') {
-        void window.magicpocketGui.saveSettingsSilent({ agents: { magicpocket: { model: trimmed } } })
+      if (!activeThreadId && trimmed && trimmed.toLowerCase() !== 'auto' && typeof window.dagongGui !== 'undefined') {
+        void window.dagongGui.saveSettingsSilent({ agents: { dagong: { model: trimmed } } })
       }
     },
 
@@ -138,9 +138,9 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
 
     loadComposerModels: async () => {
       if (getComposerModelLoadPromise()) return getComposerModelLoadPromise()!
-      if (typeof window.magicpocketGui === 'undefined') return
+      if (typeof window.dagongGui === 'undefined') return
       const task = (async () => {
-        const res = await window.magicpocketGui.fetchUpstreamModels()
+        const res = await window.dagongGui.fetchUpstreamModels()
         const pick = mergeComposerPickList(res.ok, res.ok ? res.modelIds : [])
         const groups = res.ok ? res.modelGroups ?? [] : []
         const runtimeDefault = res.ok ? res.defaultModelId?.trim() ?? '' : ''
@@ -246,7 +246,7 @@ export function createAppActions(options: CreateAppActionsOptions): Pick<
     },
 
     reloadUiSettings: async () => {
-      if (typeof window.magicpocketGui === 'undefined') return
+      if (typeof window.dagongGui === 'undefined') return
       const settings = await rendererRuntimeClient.getSettings({ forceRefresh: true })
       const workspaceRoot = normalizeWorkspaceRoot(settings.workspaceRoot)
       applyTheme(settings.theme)

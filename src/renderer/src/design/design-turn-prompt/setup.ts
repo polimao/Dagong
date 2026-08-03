@@ -32,7 +32,7 @@ export type PrepareDesignTurnFilesOptions = {
 }
 
 function currentSetupApi(api?: DesignTurnSetupApi): DesignTurnSetupApi | undefined {
-  return api ?? (typeof window !== 'undefined' ? window.magicpocketGui : undefined)
+  return api ?? (typeof window !== 'undefined' ? window.dagongGui : undefined)
 }
 
 function selectedContextForNotes(target: ResolvedDesignTurnTarget) {

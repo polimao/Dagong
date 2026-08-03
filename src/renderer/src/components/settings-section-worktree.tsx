@@ -25,7 +25,7 @@ export function WorktreeSettingsSection({ ctx }: { ctx: Record<string, any> }): 
   const worktreeRoot = ctx.form?.worktreeRootPath
     ? expandHomePath(String(ctx.form.worktreeRootPath))
     : undefined
-  const projectPath = expandHomePath(String(ctx.form?.workspaceRoot || ctx.magicpocket?.workspaceRoot || '')).trim()
+  const projectPath = expandHomePath(String(ctx.form?.workspaceRoot || ctx.dagong?.workspaceRoot || '')).trim()
   const [result, setResult] = useState<GitBranchWorktreesResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [busyPath, setBusyPath] = useState<string | null>(null)
@@ -36,7 +36,7 @@ export function WorktreeSettingsSection({ ctx }: { ctx: Record<string, any> }): 
     setLoading(true)
     setError(null)
     try {
-      const next = await window.magicpocketGui.listGitBranchWorktrees({
+      const next = await window.dagongGui.listGitBranchWorktrees({
         projectPath,
         worktreeRoot
       })
@@ -86,7 +86,7 @@ export function WorktreeSettingsSection({ ctx }: { ctx: Record<string, any> }): 
     setBusyPath(path)
     setError(null)
     try {
-      await window.magicpocketGui.removeGitBranchWorktree({
+      await window.dagongGui.removeGitBranchWorktree({
         workspaceRoot: projectPath,
         worktreePath: path
       })

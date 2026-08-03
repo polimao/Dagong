@@ -4,9 +4,9 @@
 
 **Goal:** 在 `feat/feishu-streaming` 分支上把飞书 / Lark bot 的回复改为 SDK markdown 流式卡,并修复上一版"`onClawChannelActivity` 触发时 Connect phone 视图卡住"的两处 bug(`selectThread` HTTP 抢在 SSE 之前 + `showLiveAssistant` 被 `isProcessing` 隐藏)。重做版额外把 `subscribeThreadEventsLive` 改造为"并行 fetch + SSE"以保留历史视图。
 
-**Architecture:** 在 `ClawRuntime.handleFeishuMessage` 内部根据 `channel.feishuStream === true` 开关分两路 —— 开:经由 `runStreamingReply` 走 `FeishuStreamer` + `bridge.stream` + 自管 SSE 订阅(失败时退到一次性 `bridge.send`);关:走原 `processIncomingImPrompt` 轮询路径。Renderer 侧新增 `subscribeThreadEventsLive` action(**并行 fetch + SSE**:同步切 activeThreadId + 立即开 SSE sinceSeq:0 + 并行 getThreadDetail 拉历史,fetch 完成后 merge 写入),并把 `MessageTimeline` 的 live bubble 门控改为只检查 `liveContent`。WeChat、magicpocket runtime、既有 `processIncomingImPrompt` 路径全部保留。
+**Architecture:** 在 `ClawRuntime.handleFeishuMessage` 内部根据 `channel.feishuStream === true` 开关分两路 —— 开:经由 `runStreamingReply` 走 `FeishuStreamer` + `bridge.stream` + 自管 SSE 订阅(失败时退到一次性 `bridge.send`);关:走原 `processIncomingImPrompt` 轮询路径。Renderer 侧新增 `subscribeThreadEventsLive` action(**并行 fetch + SSE**:同步切 activeThreadId + 立即开 SSE sinceSeq:0 + 并行 getThreadDetail 拉历史,fetch 完成后 merge 写入),并把 `MessageTimeline` 的 live bubble 门控改为只检查 `liveContent`。WeChat、dagong runtime、既有 `processIncomingImPrompt` 路径全部保留。
 
-**Tech Stack:** Electron + React 19 + TypeScript + Zustand + Vitest + Lark SDK(`@larksuiteoapi/node-sdk`)。runtime 还是单一 `magicpocket`(无新增 / 切换 runtime)。
+**Tech Stack:** Electron + React 19 + TypeScript + Zustand + Vitest + Lark SDK(`@larksuiteoapi/node-sdk`)。runtime 还是单一 `dagong`(无新增 / 切换 runtime)。
 
 **Spec:** [`docs/superpowers/specs/2026-06-15-feishu-streaming-with-live-fix-design.md`](../specs/2026-06-15-feishu-streaming-with-live-fix-design.md)
 
@@ -17,7 +17,7 @@
 - **TDD**:原分支上的红绿循环已嵌入到 `feishu-streamer.test.ts` / `claw-runtime.test.ts` / `chat-store-thread-actions.test.ts` 的 case 集合中。重做版保留所有原有 case,`subscribeThreadEventsLive` 的新行为(fetch + merge + lastSeq max + fetch 失败 fallback)在测试中显式覆盖。
 - **commit 粒度**:5 个 commit(见下文 Commit 分组),每个 commit 完成立刻 commit。
 - **YAGNI**:本期不做 card JSON 2.0、reasoning 透出、per-channel 已实现无需 YAGNI。
-- **不动 `magicpocket/` runtime 包**:magicpocket 的 `/v1/threads/{id}/events` SSE 端点已经存在;本计划只用它。
+- **不动 `dagong/` runtime 包**:dagong 的 `/v1/threads/{id}/events` SSE 端点已经存在;本计划只用它。
 - **不复用 `src/main/runtime-sse-ipc.ts`**:那是给 renderer→main IPC 用的;main 直接 `fetch` + 自管 SSE 解析循环(`subscribeRuntimeThreadEvents`)。
 - **路径风格**:本计划所有路径用正斜杠,跨平台可读。
 - **改动核心调用**:`bridge.stream(chatId, { markdown: producer }, replyOptions)`(**不是** `bridge.send` —— 上版踩坑);SSE 字段读 `event.item.text`(**不是** `event.item.delta` —— 上版踩坑)。两个 spec 注释里都写明。
@@ -61,8 +61,8 @@
 | `docs/superpowers/plans/2026-06-15-feishu-streaming-with-live-fix.md` | 本文件 |
 
 ### 不在本计划里(明确不动的文件)
-- `magicpocket/` runtime 包
-- `src/renderer/src/agent/magicpocket-runtime.ts`
+- `dagong/` runtime 包
+- `src/renderer/src/agent/dagong-runtime.ts`
 - `src/main/runtime-sse-ipc.ts`
 - `src/main/claw-runtime.ts` 里 `processIncomingImPrompt` / `waitForAssistantResult` 主体逻辑
 - `src/shared/app-settings-types.ts` 里 `ClawImSettingsV1`(不持有 `feishuStream`,迁移规则不变)
@@ -218,7 +218,7 @@ npm test            # 完整测试;预期 9 个 baseline 失败(4 文件:packagi
 
 | 文件 | 失败数 | 原因 |
 |------|--------|------|
-| `src/main/packaging-config.test.ts` | 2 | electron-builder MagicPocket packaging 既有 baseline |
+| `src/main/packaging-config.test.ts` | 2 | electron-builder Dagong packaging 既有 baseline |
 | `src/main/ipc/app-ipc-schemas.test.ts` | 1 | 既有 baseline |
 | `src/main/ipc/register-app-ipc-handlers.test.ts` | 1 | 既有 baseline |
 | `src/main/services/git-service.test.ts` | 5 | Windows 平台 `path.normalize` 行为差异(`/ vs \`);用 stash 验证与本 PR 无关 |
@@ -227,7 +227,7 @@ npm test            # 完整测试;预期 9 个 baseline 失败(4 文件:packagi
 
 ## 不在本计划里
 
-- 任何对 `magicpocket/` runtime 包的修改
+- 任何对 `dagong/` runtime 包的修改
 - 任何对 `processIncomingImPrompt` / `waitForAssistantResult` 主体逻辑的修改
 - `runStreamingReply` 的通用抽象抽取(为后续 wechat 渠道铺路)
 - WeChat 渠道接入(见后续 `feat/weixin-block-streaming-v2` PR)

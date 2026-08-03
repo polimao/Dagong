@@ -41,8 +41,8 @@ describe('design tool protocol', () => {
 
     expect(manifest).toMatchObject({
       version: 1,
-      kind: 'magicpocket.design.tool-protocol',
-      source: 'magicpocket-design-mode'
+      kind: 'dagong.design.tool-protocol',
+      source: 'dagong-design-mode'
     })
     expect(manifest.tools.map((tool) => tool.id)).toEqual([
       'design.plan',
@@ -365,7 +365,7 @@ describe('design tool protocol', () => {
 
     const template = executeDesignToolInvocation({
       toolId: 'design.system',
-      input: { action: 'template', name: 'MagicPocket Kit', seedColor: '#D4AF37', template: 'saas' }
+      input: { action: 'template', name: 'Dagong Kit', seedColor: '#D4AF37', template: 'saas' }
     })
     expect(template).toMatchObject({ ok: true, status: 'applied' })
     expect((template.output as { after: { tokenCount: number; componentCount: number } }).after).toMatchObject({
@@ -570,7 +570,7 @@ describe('design tool protocol', () => {
     const output = result.output as { path: string; markdown: string }
 
     expect(result).toMatchObject({ ok: true, status: 'ready', affectedIds: [] })
-    expect(output.path).toBe('.magicpocket-design/DESIGN.md')
+    expect(output.path).toBe('.dagong-design/DESIGN.md')
     expect(output.markdown).toContain('# DESIGN.md: Checkout redesign')
     expect(output.markdown).toContain('Improve checkout conversion.')
   })

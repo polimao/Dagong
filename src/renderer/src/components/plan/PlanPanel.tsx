@@ -137,7 +137,7 @@ export function PlanPanel({
     }
     let cancelled = false
     setOperationStatus('idle')
-    void window.magicpocketGui
+    void window.dagongGui
       .readWorkspaceFile({
         workspaceRoot: normalizedWorkspace,
         path: remembered.relativePath
@@ -176,7 +176,7 @@ export function PlanPanel({
       if (snapshot.activePlan?.id !== activePlan.id || snapshot.saveStatus !== 'dirty') return
       const contentToSave = snapshot.content
       setSaveStatus('saving')
-      void window.magicpocketGui
+      void window.dagongGui
         .writeWorkspaceFile({
           workspaceRoot: activePlan.workspaceRoot,
           path: activePlan.relativePath,

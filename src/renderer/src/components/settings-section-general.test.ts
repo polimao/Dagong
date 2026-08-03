@@ -7,7 +7,7 @@ const labels: Record<string, string> = {
   sectionGeneral: 'General',
   workspaceRoot: 'Default workspace',
   workspaceRootDesc: 'Default workspace description',
-  workspaceRootPlaceholder: '~/.magicpocket/default_workspace',
+  workspaceRootPlaceholder: '~/.dagong/default_workspace',
   restoreWorkspaceDefault: 'Restore default',
   browse: 'Browse'
 }
@@ -48,9 +48,9 @@ function baseCtx(): Record<string, unknown> {
         retentionDays: 3
       }
     },
-    magicpocket: {},
+    dagong: {},
     update: noop,
-    updateMagicPocket: noop,
+    updateDagong: noop,
     showRuntimeToken: false,
     setShowRuntimeToken: noop,
     portError: '',
@@ -105,7 +105,7 @@ function baseCtx(): Record<string, unknown> {
 
 describe('GeneralSettingsSection workspace layout', () => {
   beforeEach(() => {
-    vi.stubGlobal('window', { magicpocketGui: {} })
+    vi.stubGlobal('window', { dagongGui: {} })
   })
 
   afterEach(() => {

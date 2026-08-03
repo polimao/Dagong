@@ -10,13 +10,13 @@ import {
 import { WORKSPACE_FILE_PREVIEW_EVENT, type WorkspaceFilePreviewDetail } from '../lib/workspace-file-preview'
 import type { RightPanelMode } from './chat/WorkbenchTopBar'
 
-const LEFT_PANEL_WIDTH_KEY = 'magicpocket.layout.leftSidebarWidth'
-const LEFT_PANEL_COLLAPSED_KEY = 'magicpocket.layout.leftSidebarCollapsed'
-const RIGHT_PANEL_WIDTH_KEY = 'magicpocket.layout.rightInspectorWidth'
-const RIGHT_RAIL_COLLAPSED_KEY = 'magicpocket.layout.rightRailCollapsed'
-const RIGHT_PANEL_MODE_KEY = 'magicpocket.layout.rightPanelMode'
-const TERMINAL_OPEN_KEY = 'magicpocket.layout.terminalOpen'
-const TERMINAL_HEIGHT_KEY = 'magicpocket.layout.terminalHeight'
+const LEFT_PANEL_WIDTH_KEY = 'dagong.layout.leftSidebarWidth'
+const LEFT_PANEL_COLLAPSED_KEY = 'dagong.layout.leftSidebarCollapsed'
+const RIGHT_PANEL_WIDTH_KEY = 'dagong.layout.rightInspectorWidth'
+const RIGHT_RAIL_COLLAPSED_KEY = 'dagong.layout.rightRailCollapsed'
+const RIGHT_PANEL_MODE_KEY = 'dagong.layout.rightPanelMode'
+const TERMINAL_OPEN_KEY = 'dagong.layout.terminalOpen'
+const TERMINAL_HEIGHT_KEY = 'dagong.layout.terminalHeight'
 const LEFT_PANEL_DEFAULT = 304
 const RIGHT_PANEL_DEFAULT = 360
 export const CODE_PANEL_PREFERRED = 560

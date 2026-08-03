@@ -26,7 +26,7 @@ function channel(enabled: boolean, provider: ClawImChannelV1['provider'] = 'feis
     threadId: '',
     workspaceRoot: '',
     agentProfile: {
-      name: 'magicpocket',
+      name: 'dagong',
       description: '',
       identity: '',
       personality: '',
@@ -54,13 +54,13 @@ describe('ConnectPhoneView', () => {
       })
     )
 
-    expect(html).toContain('Use your phone to connect magicpocket')
+    expect(html).toContain('Use your phone to connect dagong')
     expect(html).toContain('Generate authorization QR')
     expect(html).toContain('max-w-[760px]')
     expect(html).toContain('grid-cols-4')
     expect(html).toContain('w-full min-w-0 items-center justify-center')
     expect(html).toContain('TELE')
-    expect(html).not.toContain('MagicPocket usage')
+    expect(html).not.toContain('Dagong usage')
   })
 
   it('maps scan targets to the matching install API provider', () => {
@@ -85,9 +85,9 @@ describe('ConnectPhoneView', () => {
     expect(formatConnectPhoneUserCode('', 'abcd1234-rest-of-token')).toBe('ABCD-1234')
   })
 
-  it('builds the default magicpocket channel payload after a successful scan', () => {
+  it('builds the default dagong channel payload after a successful scan', () => {
     expect(createConnectPhoneAgentProfile()).toEqual({
-      name: 'magicpocket',
+      name: 'dagong',
       description: '',
       identity: '',
       personality: '',

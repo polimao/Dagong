@@ -7,35 +7,35 @@ import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { promisify } from 'node:util'
 import {
-  defaultMagicPocketTokenEconomySettings,
-  isMagicPocketRuntimeInsecure,
-  getMagicPocketRuntimeSettings,
+  defaultDagongTokenEconomySettings,
+  isDagongRuntimeInsecure,
+  getDagongRuntimeSettings,
   getModelProviderSettings,
   resolveModelProviderProxyUrl,
-  resolveMagicPocketRuntimeSettings,
+  resolveDagongRuntimeSettings,
   type ModelProviderModelProfileV1,
   type ModelProviderProfileV1,
-  type MagicPocketRuntimeSettingsV1,
-  type MagicPocketSubagentsSettingsV1,
+  type DagongRuntimeSettingsV1,
+  type DagongSubagentsSettingsV1,
   type AppSettingsV1
 } from '../shared/app-settings'
 import {
-  buildMagicPocketServeArgs,
-  resolveMagicPocketExecutable,
-  shouldRunMagicPocketServeAsElectronChild
-} from './resolve-magicpocket-binary'
+  buildDagongServeArgs,
+  resolveDagongExecutable,
+  shouldRunDagongServeAsElectronChild
+} from './resolve-dagong-binary'
 import { resolveCodexOAuthApiKey } from './codex-auth'
 import {
-  MagicPocketConfigSchema,
-  type MagicPocketConfig,
-  MagicPocketServeConfigSchema,
+  DagongConfigSchema,
+  type DagongConfig,
+  DagongServeConfigSchema,
   ModelConfigSchema,
   ContextCompactionConfigSchema,
   QualityConfigSchema,
   RuntimeTuningConfigSchema,
   RolesConfigSchema
-} from '../../magicpocket/src/config/magicpocket-config.js'
-import { HooksConfigSchema } from '../../magicpocket/src/hooks/hook-config.js'
+} from '../../dagong/src/config/dagong-config.js'
+import { HooksConfigSchema } from '../../dagong/src/hooks/hook-config.js'
 import {
   AttachmentsCapabilityConfig,
   ComputerUseCapabilityConfig,
@@ -50,16 +50,16 @@ import {
   SubagentsCapabilityConfig,
   VideoGenCapabilityConfig,
   WebCapabilityConfig
-} from '../../magicpocket/src/contracts/capabilities.js'
+} from '../../dagong/src/contracts/capabilities.js'
 import {
   buildClawScheduleMcpArgs,
   GUI_SCHEDULE_MCP_SERVER_NAME,
   resolveClawScheduleMcpCommand,
-  resolveMagicPocketMcpJsonPath,
+  resolveDagongMcpJsonPath,
   type ClawScheduleMcpLaunchConfig
 } from './claw-schedule-mcp-config'
-import { defaultMagicPocketDataDir } from './runtime/magicpocket-adapter'
-import { isMagicPocketHealthResponseBody } from './magicpocket-health'
+import { defaultDagongDataDir } from './runtime/dagong-adapter'
+import { isDagongHealthResponseBody } from './dagong-health'
 import { resolveClaudeBinary } from './agent-sdk-installer'
 import { appendManagedLogLine } from './logger'
 import {
@@ -73,32 +73,32 @@ import {
 
 let child: ChildProcess | null = null
 let childPort: number | null = null
-let childLogCapture: MagicPocketChildLogCapture | null = null
+let childLogCapture: DagongChildLogCapture | null = null
 let lastResolvedBinary: string | null = null
-let magicpocketStartPromise: Promise<void> | null = null
+let dagongStartPromise: Promise<void> | null = null
 let childStderrTail = ''
 /** Children killed on purpose (stop/quit/settings restart) — their exit is not a crash. */
 const intentionalStops = new WeakSet<ChildProcess>()
 /** Children that completed the ready handshake — only their exits count as runtime crashes. */
 const readyChildren = new WeakSet<ChildProcess>()
 
-export type MagicPocketUnexpectedExitInfo = {
+export type DagongUnexpectedExitInfo = {
   code: number | null
   signal: NodeJS.Signals | null
   stderrTail: string
 }
 
-let onUnexpectedMagicPocketExit: ((info: MagicPocketUnexpectedExitInfo) => void) | null = null
+let onUnexpectedDagongExit: ((info: DagongUnexpectedExitInfo) => void) | null = null
 
 /**
- * Called when a READY magicpocket child exits without the GUI asking for it.
+ * Called when a READY dagong child exits without the GUI asking for it.
  * Startup failures are excluded: those are already reported to the
- * caller of startMagicPocketChild via the thrown error.
+ * caller of startDagongChild via the thrown error.
  */
-export function setMagicPocketUnexpectedExitHandler(
-  handler: ((info: MagicPocketUnexpectedExitInfo) => void) | null
+export function setDagongUnexpectedExitHandler(
+  handler: ((info: DagongUnexpectedExitInfo) => void) | null
 ): void {
-  onUnexpectedMagicPocketExit = handler
+  onUnexpectedDagongExit = handler
 }
 
 const execFileAsync = promisify(execFile)
@@ -107,8 +107,8 @@ const KUN_STARTUP_TIMEOUT_FLOOR_MS = 15_000
 const KUN_STARTUP_TIMEOUT_CEILING_MS = 600_000
 
 /**
- * How long to wait for a freshly spawned magicpocket to report ready before giving
- * up and killing it. magicpocket emits its ready marker only after the HTTP server
+ * How long to wait for a freshly spawned dagong to report ready before giving
+ * up and killing it. dagong emits its ready marker only after the HTTP server
  * is actually listening, which it does only after sqlite opens, the thread
  * store finishes its backfill, usage carryover replays every thread's
  * events, and the MCP fast-connect race runs. On a slow disk (Windows +
@@ -117,14 +117,14 @@ const KUN_STARTUP_TIMEOUT_CEILING_MS = 600_000
  * respawn loop (#188, #544).
  *
  * A generous ceiling is free on fast machines: the parallel /health probe
- * in waitForMagicPocketStartup settles the moment the server responds, and a process
+ * in waitForDagongStartup settles the moment the server responds, and a process
  * that actually crashes rejects immediately via its exit event rather than
  * waiting out the timeout. Only a slow-but-progressing boot uses the extra
  * runway. Windows gets the larger default; everything is overridable via the
  * KUN_STARTUP_TIMEOUT_MS env var (milliseconds, clamped to 15s–10min) for
  * extreme cases without a rebuild.
  */
-export function resolveMagicPocketStartupTimeoutMs(
+export function resolveDagongStartupTimeoutMs(
   platform: NodeJS.Platform,
   env: NodeJS.ProcessEnv
 ): number {
@@ -141,7 +141,7 @@ export function resolveMagicPocketStartupTimeoutMs(
   return platform === 'win32' ? 90_000 : 60_000
 }
 
-const KUN_STARTUP_TIMEOUT_MS = resolveMagicPocketStartupTimeoutMs(process.platform, process.env)
+const KUN_STARTUP_TIMEOUT_MS = resolveDagongStartupTimeoutMs(process.platform, process.env)
 const KUN_STARTUP_HEALTH_POLL_MS = 500
 const KUN_STARTUP_HEALTH_REQUEST_TIMEOUT_MS = 1_000
 const KUN_STOP_GRACE_MS = 5_000
@@ -175,8 +175,8 @@ const DEFAULT_KUN_MODEL_PROFILES: Record<string, Record<string, unknown>> = {
   }
 }
 
-type MagicPocketLogStream = 'stdout' | 'stderr' | 'lifecycle'
-type MagicPocketChildLogCapture = {
+type DagongLogStream = 'stdout' | 'stderr' | 'lifecycle'
+type DagongChildLogCapture = {
   captureStdout: (chunk: Buffer | string) => void
   captureStderr: (chunk: Buffer | string) => void
   logLifecycle: (message: string) => void
@@ -192,13 +192,13 @@ function appendTail(current: string, nextChunk: string, maxChars = STDERR_TAIL_M
   return combined.length > maxChars ? combined.slice(-maxChars) : combined
 }
 
-function formatMagicPocketLogLine(
-  stream: MagicPocketLogStream,
+function formatDagongLogLine(
+  stream: DagongLogStream,
   pid: number | undefined,
   message: string
 ): string {
   const stamp = new Date().toISOString()
-  const pidLabel = typeof pid === 'number' ? `magicpocket pid=${pid}` : 'magicpocket'
+  const pidLabel = typeof pid === 'number' ? `dagong pid=${pid}` : 'dagong'
   return `[${stamp}] [${stream.toUpperCase()}] [${pidLabel}] ${message}\n`
 }
 
@@ -206,15 +206,15 @@ function normalizeCapturedChunk(chunk: Buffer | string): string {
   return String(chunk).replace(/\r\n/g, '\n').replace(/\r/g, '\n')
 }
 
-function createMagicPocketChildLogCapture(pid: number | undefined): MagicPocketChildLogCapture {
+function createDagongChildLogCapture(pid: number | undefined): DagongChildLogCapture {
   let stdoutRemainder = ''
   let stderrRemainder = ''
   let closed = false
   let pending = Promise.resolve()
 
-  const writeLine = (stream: MagicPocketLogStream, message: string): void => {
+  const writeLine = (stream: DagongLogStream, message: string): void => {
     pending = pending
-      .then(() => appendManagedLogLine('magicpocket', formatMagicPocketLogLine(stream, pid, message)))
+      .then(() => appendManagedLogLine('dagong', formatDagongLogLine(stream, pid, message)))
       .catch(() => undefined)
   }
 
@@ -283,10 +283,10 @@ function resolveNodeScriptCommand(command: string): string {
   })
 }
 
-export function resolveMagicPocketDataDir(runtime: { dataDir: string }): string {
+export function resolveDagongDataDir(runtime: { dataDir: string }): string {
   const trimmed = runtime.dataDir?.trim()
   if (trimmed) return expandHomePath(trimmed)
-  return defaultMagicPocketDataDir()
+  return defaultDagongDataDir()
 }
 
 function expandHomePath(path: string): string {
@@ -297,59 +297,59 @@ function expandHomePath(path: string): string {
   return path
 }
 
-export function isMagicPocketChildRunning(): boolean {
+export function isDagongChildRunning(): boolean {
   return child !== null && child.exitCode === null && child.signalCode === null
 }
 
-function isCurrentMagicPocketChildPid(pid: number): boolean {
-  return Boolean(child?.pid === pid && isMagicPocketChildRunning())
+function isCurrentDagongChildPid(pid: number): boolean {
+  return Boolean(child?.pid === pid && isDagongChildRunning())
 }
 
 /**
- * Resolve once any in-flight magicpocket launch has settled — whether it became
+ * Resolve once any in-flight dagong launch has settled — whether it became
  * ready or failed. The settings/MCP-apply paths use this to avoid
  * SIGTERM-ing a child that is still inside its (deliberately generous)
  * startup window: interrupting a slow-but-healthy boot only restarts the
  * clock and is what turns one slow start into the #544 restart storm.
  *
- * Deadlock-safe by construction: `magicpocketStartPromise` is only set once a launch
+ * Deadlock-safe by construction: `dagongStartPromise` is only set once a launch
  * has already passed the settings-apply gate, so an apply that awaits it can
  * never be the thing that launch is itself waiting on.
  */
-export function waitForMagicPocketStartupSettled(): Promise<void> {
-  return magicpocketStartPromise ? magicpocketStartPromise.catch(() => undefined) : Promise.resolve()
+export function waitForDagongStartupSettled(): Promise<void> {
+  return dagongStartPromise ? dagongStartPromise.catch(() => undefined) : Promise.resolve()
 }
 
-export function startMagicPocketChild(settings: AppSettingsV1): Promise<void> {
-  if (magicpocketStartPromise) return magicpocketStartPromise
-  const runtime = resolveMagicPocketRuntimeSettings(settings)
-  if (isMagicPocketChildRunning()) return Promise.resolve()
+export function startDagongChild(settings: AppSettingsV1): Promise<void> {
+  if (dagongStartPromise) return dagongStartPromise
+  const runtime = resolveDagongRuntimeSettings(settings)
+  if (isDagongChildRunning()) return Promise.resolve()
   if (!runtime.autoStart) return Promise.resolve()
   let promise: Promise<void>
-  promise = startMagicPocketChildOnce(settings, runtime).finally(() => {
-    if (magicpocketStartPromise === promise) magicpocketStartPromise = null
+  promise = startDagongChildOnce(settings, runtime).finally(() => {
+    if (dagongStartPromise === promise) dagongStartPromise = null
   })
-  magicpocketStartPromise = promise
+  dagongStartPromise = promise
   return promise
 }
 
-async function startMagicPocketChildOnce(
+async function startDagongChildOnce(
   settings: AppSettingsV1,
-  runtime: MagicPocketRuntimeSettingsV1
+  runtime: DagongRuntimeSettingsV1
 ): Promise<void> {
   if (childLogCapture) {
     await childLogCapture.close()
     childLogCapture = null
   }
   const root = appRoot()
-  const resolution = resolveMagicPocketExecutable(root, runtime.binaryPath)
+  const resolution = resolveDagongExecutable(root, runtime.binaryPath)
   if (resolution.command === process.execPath && !existsSync(resolution.args[0])) {
     throw new Error(
-      `MagicPocket runtime build is missing at ${resolution.args[0]}. Run \`npm run build:magicpocket\` before starting the GUI.`
+      `Dagong runtime build is missing at ${resolution.args[0]}. Run \`npm run build:dagong\` before starting the GUI.`
     )
   }
-  const dataDir = resolveMagicPocketDataDir(runtime)
-  await syncGuiManagedMagicPocketConfig(dataDir, runtime, {
+  const dataDir = resolveDagongDataDir(runtime)
+  await syncGuiManagedDagongConfig(dataDir, runtime, {
     scheduleMcp: {
       settings,
       launch: {
@@ -362,7 +362,7 @@ async function startMagicPocketChildOnce(
   lastResolvedBinary = resolution.command === process.execPath
     ? resolution.args.join(' ')
     : resolution.command
-  const args = buildMagicPocketServeArgs({
+  const args = buildDagongServeArgs({
     resolution,
     host: '127.0.0.1',
     port: runtime.port,
@@ -374,18 +374,18 @@ async function startMagicPocketChildOnce(
     approvalPolicy: runtime.approvalPolicy,
     sandboxMode: runtime.sandboxMode,
     tokenEconomyMode: runtime.tokenEconomyMode,
-    insecure: isMagicPocketRuntimeInsecure(runtime)
+    insecure: isDagongRuntimeInsecure(runtime)
   })
   // On macOS, libnut links AppKit and calls `[NSApplication sharedApplication]`
   // on its first screen-grab/mouse/keyboard call. That promotes a pure-Node
-  // (ELECTRON_RUN_AS_NODE) child to a regular Cocoa app and a second MagicPocket icon
+  // (ELECTRON_RUN_AS_NODE) child to a regular Cocoa app and a second Dagong icon
   // appears in the Dock. In dev, when computer-use is enabled, we instead
-  // spawn magicpocket as a real Electron instance so it can call `app.dock.hide()`
-  // itself (see magicpocket/src/cli/serve-entry.ts). Packaged .app executables are not
+  // spawn dagong as a real Electron instance so it can call `app.dock.hide()`
+  // itself (see dagong/src/cli/serve-entry.ts). Packaged .app executables are not
   // generic Electron script runners: passing serve-entry.js to the main app
-  // launches the GUI process instead of magicpocket serve, so packaged builds must use
+  // launches the GUI process instead of dagong serve, so packaged builds must use
   // the Node helper path even when computer-use is enabled.
-  const runAsElectron = shouldRunMagicPocketServeAsElectronChild({
+  const runAsElectron = shouldRunDagongServeAsElectronChild({
     platform: process.platform,
     isPackaged: app.isPackaged,
     computerUseEnabled: runtime.computerUse?.enabled === true
@@ -399,12 +399,12 @@ async function startMagicPocketChildOnce(
   // the runtime so its dispatch routes default-provider turns (thread.providerId
   // absent or equal to it) to the embedded SDK instead of the HTTP default.
   const activeProviderKind = (getModelProviderSettings(settings).providers as ModelProviderProfileV1[]).find(
-    (provider) => provider.id?.trim() === getMagicPocketRuntimeSettings(settings).providerId.trim()
+    (provider) => provider.id?.trim() === getDagongRuntimeSettings(settings).providerId.trim()
   )?.kind
   // Point the runtime at the on-demand Claude Code binary (the ~222MB binary is
   // not bundled; it's downloaded into userData). Absent in dev when it's still
-  // resolvable from magicpocket/node_modules — the SDK auto-resolves it there.
-  const claudeBinary = resolveClaudeBinary(app.getPath('userData'), [join(appRoot(), 'magicpocket')])
+  // resolvable from dagong/node_modules — the SDK auto-resolves it there.
+  const claudeBinary = resolveClaudeBinary(app.getPath('userData'), [join(appRoot(), 'dagong')])
   const childEnv: NodeJS.ProcessEnv = {
     ...process.env,
     KUN_RUNTIME_TOKEN: runtime.runtimeToken,
@@ -421,7 +421,7 @@ async function startMagicPocketChildOnce(
   })
   const startedChild = child
   childPort = runtime.port
-  const startedLogCapture = createMagicPocketChildLogCapture(startedChild.pid)
+  const startedLogCapture = createDagongChildLogCapture(startedChild.pid)
   childLogCapture = startedLogCapture
   childStderrTail = ''
   startedLogCapture.logLifecycle(`spawned on port ${runtime.port} using data dir ${dataDir}`)
@@ -442,7 +442,7 @@ async function startMagicPocketChildOnce(
       childPort = null
     }
     if (readyChildren.has(startedChild) && !intentionalStops.has(startedChild)) {
-      onUnexpectedMagicPocketExit?.({
+      onUnexpectedDagongExit?.({
         code: code ?? null,
         signal: signal ?? null,
         stderrTail: childStderrTail
@@ -455,12 +455,12 @@ async function startMagicPocketChildOnce(
     )
   })
   try {
-    await waitForMagicPocketStartup(startedChild, runtime.port)
+    await waitForDagongStartup(startedChild, runtime.port)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     startedLogCapture.logLifecycle(`startup failed before ready: ${message}`)
     if (child === startedChild) {
-      await stopMagicPocketChildAndWait()
+      await stopDagongChildAndWait()
     }
     throw error
   }
@@ -468,10 +468,10 @@ async function startMagicPocketChildOnce(
   startedLogCapture.logLifecycle(`ready marker received on port ${runtime.port}`)
 }
 
-export async function syncGuiManagedMagicPocketConfig(
+export async function syncGuiManagedDagongConfig(
   dataDir: string,
   runtime: Pick<
-    MagicPocketRuntimeSettingsV1,
+    DagongRuntimeSettingsV1,
     | 'apiKey'
     | 'mcpSearch'
     | 'tokenEconomy'
@@ -505,11 +505,11 @@ export async function syncGuiManagedMagicPocketConfig(
     }
     mcpConfigPath?: string
   }
-): Promise<MagicPocketConfig> {
+): Promise<DagongConfig> {
   const configPath = join(dataDir, 'config.json')
-  const existing = sanitizeMagicPocketConfigSections(await readJsonObjectIfExists(configPath))
+  const existing = sanitizeDagongConfigSections(await readJsonObjectIfExists(configPath))
   const importedMcpServers = await readGuiManagedMcpServers(
-    options?.mcpConfigPath ?? resolveMagicPocketMcpJsonPath()
+    options?.mcpConfigPath ?? resolveDagongMcpJsonPath()
   )
   const hasImportedEnabledMcpServer = Object.values(importedMcpServers).some(
     (server) => objectValue(server).enabled !== false
@@ -539,7 +539,7 @@ export async function syncGuiManagedMagicPocketConfig(
   const skillCapability = await skillCapabilityConfigForRuntime(skills, options?.scheduleMcp?.settings)
   const workflowHookEntries = buildWorkflowHookEntries(options?.scheduleMcp?.settings.workflow)
   // Mirror every configured GUI provider (apiKey + baseUrl + endpointFormat)
-  // into the magicpocket config so the runtime's MultiProviderModelClient can route
+  // into the dagong config so the runtime's MultiProviderModelClient can route
   // per-request `providerId` overrides (workflow / scheduled task / IM
   // bridge) without restart. Empty when no GUI settings are reachable, in
   // which case the runtime stays single-provider.
@@ -604,7 +604,7 @@ export async function syncGuiManagedMagicPocketConfig(
           ...importedMcpServers,
           ...(options?.scheduleMcp
           ? {
-              [GUI_SCHEDULE_MCP_SERVER_NAME]: buildGuiScheduleMagicPocketMcpServer(
+              [GUI_SCHEDULE_MCP_SERVER_NAME]: buildGuiScheduleDagongMcpServer(
                 options.scheduleMcp.settings,
                 options.scheduleMcp.launch
               )
@@ -624,10 +624,10 @@ export async function syncGuiManagedMagicPocketConfig(
     },
     ...(workflowHookEntries.length ? { hooks: workflowHookEntries } : {})
   }
-  const parsedNext = MagicPocketConfigSchema.safeParse(next)
+  const parsedNext = DagongConfigSchema.safeParse(next)
   if (!parsedNext.success) {
     throw new Error(
-      `Refusing to write invalid GUI-managed MagicPocket config at ${configPath}: ${JSON.stringify(parsedNext.error.issues, null, 2)}`
+      `Refusing to write invalid GUI-managed Dagong config at ${configPath}: ${JSON.stringify(parsedNext.error.issues, null, 2)}`
     )
   }
   const nextText = `${JSON.stringify(next, null, 2)}\n`
@@ -637,7 +637,7 @@ export async function syncGuiManagedMagicPocketConfig(
   return parsedNext.data
 }
 
-function buildGuiScheduleMagicPocketMcpServer(
+function buildGuiScheduleDagongMcpServer(
   settings: AppSettingsV1,
   launch: ClawScheduleMcpLaunchConfig
 ): Record<string, unknown> {
@@ -658,7 +658,7 @@ async function skillCapabilityConfigForRuntime(
   existing: Record<string, unknown>,
   settings?: AppSettingsV1
 ): Promise<Record<string, unknown>> {
-  // Carry over only the roots a user added by hand to the MagicPocket config file.
+  // Carry over only the roots a user added by hand to the Dagong config file.
   // Drop previously-persisted GUI-managed roots so disabling a directory in
   // settings actually removes it — otherwise a toggled-off root would stick
   // around forever via `existing.roots`.
@@ -697,7 +697,7 @@ async function skillCapabilityConfigForRuntime(
     enabled: roots.length > 0 || globalRoots.length > 0 || existing.enabled === true,
     roots,
     workspaceRoots: guiSkillWorkspaceRootsForRuntime(settings),
-    // #149: Pass global skill roots from settings (e.g. ~/.magicpocket/skills)
+    // #149: Pass global skill roots from settings (e.g. ~/.dagong/skills)
     globalRoots,
     // Skills the user disabled in the GUI. Forwarded so the runtime drops them
     // from discovery — without this they stay loadable via load_skill and keep
@@ -886,18 +886,18 @@ function modelConfigProfilesFromProviderProfiles(
 
 /**
  * Mirror every configured GUI provider (apiKey + baseUrl + endpointFormat
- * + per-provider proxy) into the magicpocket config's `serve.providers` map so the
+ * + per-provider proxy) into the dagong config's `serve.providers` map so the
  * runtime's MultiProviderModelClient can route a workflow / scheduled-task
  * / IM-bridge turn to a non-runtime provider per request. Skips entries
  * whose baseUrl is empty — those couldn't be reached anyway.
  *
- * The magicpocket runtime's own bound provider is included too; the wrapper's
+ * The dagong runtime's own bound provider is included too; the wrapper's
  * default client handles it identically, so duplicate entries are
  * idempotent.
  */
 function providersConfigForRuntime(settings: AppSettingsV1): Record<string, Record<string, unknown>> {
   const out: Record<string, Record<string, unknown>> = {}
-  const runtimeProviderId = getMagicPocketRuntimeSettings(settings).providerId.trim()
+  const runtimeProviderId = getDagongRuntimeSettings(settings).providerId.trim()
   const proxyUrl = resolveModelProviderProxyUrl(settings)
   for (const provider of getModelProviderSettings(settings).providers as ModelProviderProfileV1[]) {
     const id = provider.id?.trim()
@@ -929,10 +929,10 @@ function providersConfigForRuntime(settings: AppSettingsV1): Record<string, Reco
 }
 
 function tokenEconomyConfigForRuntime(
-  tokenEconomy: Pick<MagicPocketRuntimeSettingsV1, 'tokenEconomy'>['tokenEconomy'] | undefined,
+  tokenEconomy: Pick<DagongRuntimeSettingsV1, 'tokenEconomy'>['tokenEconomy'] | undefined,
   existing: Record<string, unknown>
 ): Record<string, unknown> {
-  const defaults = defaultMagicPocketTokenEconomySettings()
+  const defaults = defaultDagongTokenEconomySettings()
   const normalized = {
     ...defaults,
     ...(tokenEconomy ?? {}),
@@ -961,7 +961,7 @@ function tokenEconomyConfigForRuntime(
 }
 
 function toolOutputLimitsConfigForRuntime(
-  toolOutputLimits: Pick<MagicPocketRuntimeSettingsV1, 'toolOutputLimits'>['toolOutputLimits'] | undefined
+  toolOutputLimits: Pick<DagongRuntimeSettingsV1, 'toolOutputLimits'>['toolOutputLimits'] | undefined
 ): Record<string, unknown> {
   return {
     maxLines: toolOutputLimits?.maxLines,
@@ -970,7 +970,7 @@ function toolOutputLimitsConfigForRuntime(
 }
 
 function storageConfigForRuntime(
-  storage: Pick<MagicPocketRuntimeSettingsV1, 'storage'>['storage']
+  storage: Pick<DagongRuntimeSettingsV1, 'storage'>['storage']
 ): Record<string, unknown> {
   const sqlitePath = storage.sqlitePath.trim()
   return {
@@ -980,7 +980,7 @@ function storageConfigForRuntime(
 }
 
 function contextCompactionConfigForRuntime(
-  contextCompaction: Pick<MagicPocketRuntimeSettingsV1, 'contextCompaction'>['contextCompaction'],
+  contextCompaction: Pick<DagongRuntimeSettingsV1, 'contextCompaction'>['contextCompaction'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   return {
@@ -997,13 +997,13 @@ function contextCompactionConfigForRuntime(
 }
 
 /**
- * Build the magicpocket `roles` config (internal-LLM model routing) from GUI settings.
+ * Build the dagong `roles` config (internal-LLM model routing) from GUI settings.
  * Only non-empty fields are emitted so the strict RolesConfigSchema accepts the
  * result and a cleared field removes itself from config.json.
  */
 function rolesConfigForRuntime(
   runtime: Pick<
-    MagicPocketRuntimeSettingsV1,
+    DagongRuntimeSettingsV1,
     | 'smallModel'
     | 'smallModelProviderId'
     | 'titleModel'
@@ -1039,7 +1039,7 @@ function rolesConfigForRuntime(
 }
 
 function computerUseConfigForRuntime(
-  computerUse: Pick<MagicPocketRuntimeSettingsV1, 'computerUse'>['computerUse'],
+  computerUse: Pick<DagongRuntimeSettingsV1, 'computerUse'>['computerUse'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   // GUI owns enabled/mode/limits. `existing` was already passed through the
@@ -1055,7 +1055,7 @@ function computerUseConfigForRuntime(
 }
 
 function imageGenConfigForRuntime(
-  imageGeneration: Pick<MagicPocketRuntimeSettingsV1, 'imageGeneration'>['imageGeneration'],
+  imageGeneration: Pick<DagongRuntimeSettingsV1, 'imageGeneration'>['imageGeneration'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   // GUI settings own these fields: cleared values must be removed from the
@@ -1086,7 +1086,7 @@ function imageGenConfigForRuntime(
 }
 
 function speechGenConfigForRuntime(
-  textToSpeech: Pick<MagicPocketRuntimeSettingsV1, 'textToSpeech'>['textToSpeech'],
+  textToSpeech: Pick<DagongRuntimeSettingsV1, 'textToSpeech'>['textToSpeech'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   const next: Record<string, unknown> = {
@@ -1111,7 +1111,7 @@ function speechGenConfigForRuntime(
 }
 
 function musicGenConfigForRuntime(
-  musicGeneration: Pick<MagicPocketRuntimeSettingsV1, 'musicGeneration'>['musicGeneration'],
+  musicGeneration: Pick<DagongRuntimeSettingsV1, 'musicGeneration'>['musicGeneration'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   const next: Record<string, unknown> = {
@@ -1135,7 +1135,7 @@ function musicGenConfigForRuntime(
 }
 
 function videoGenConfigForRuntime(
-  videoGeneration: Pick<MagicPocketRuntimeSettingsV1, 'videoGeneration'>['videoGeneration'],
+  videoGeneration: Pick<DagongRuntimeSettingsV1, 'videoGeneration'>['videoGeneration'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   const next: Record<string, unknown> = {
@@ -1161,7 +1161,7 @@ function videoGenConfigForRuntime(
 }
 
 function runtimeTuningConfigForRuntime(
-  runtimeTuning: Pick<MagicPocketRuntimeSettingsV1, 'runtimeTuning'>['runtimeTuning'],
+  runtimeTuning: Pick<DagongRuntimeSettingsV1, 'runtimeTuning'>['runtimeTuning'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   const existingToolStorm = objectValue(existing.toolStorm)
@@ -1183,7 +1183,7 @@ function runtimeTuningConfigForRuntime(
 }
 
 function qualityConfigForRuntime(
-  quality: Pick<MagicPocketRuntimeSettingsV1, 'quality'>['quality'],
+  quality: Pick<DagongRuntimeSettingsV1, 'quality'>['quality'],
   existing: Record<string, unknown>
 ): Record<string, unknown> {
   return {
@@ -1214,7 +1214,7 @@ function stripBlankProfileFields(profile: Record<string, unknown>): Record<strin
   return next
 }
 
-export function subagentProfilesForRuntime(subagents: MagicPocketSubagentsSettingsV1): SubagentsCapabilityConfig {
+export function subagentProfilesForRuntime(subagents: DagongSubagentsSettingsV1): SubagentsCapabilityConfig {
   const profiles: Record<string, unknown> = {}
   for (const profile of subagents.profiles) {
     if (!profile.enabled) continue
@@ -1250,8 +1250,8 @@ export function subagentProfilesForRuntime(subagents: MagicPocketSubagentsSettin
   const parsed = SubagentsCapabilityConfig.safeParse(candidate)
   if (parsed.success) return parsed.data
   void appendManagedLogLine(
-    'magicpocket',
-    formatMagicPocketLogLine(
+    'dagong',
+    formatDagongLogLine(
       'lifecycle',
       undefined,
       `[settings] dropped invalid subagent profiles: ${JSON.stringify(parsed.error.issues)}`
@@ -1274,7 +1274,7 @@ async function readJsonObjectIfExists(path: string): Promise<Record<string, unkn
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
     if (error instanceof SyntaxError) {
       // 不静默吞掉 JSON 解析错误：mcp.json 损坏时记录日志，避免所有连接器静默消失却无任何提示
-      console.warn(`[magicpocket] failed to parse JSON config at ${path}: ${error.message}`)
+      console.warn(`[dagong] failed to parse JSON config at ${path}: ${error.message}`)
       return null
     }
     throw error
@@ -1287,7 +1287,7 @@ type SafeParseSchema = {
     | { success: false }
 }
 
-function parseMagicPocketConfigSection(
+function parseDagongConfigSection(
   schema: SafeParseSchema,
   value: unknown
 ): Record<string, unknown> {
@@ -1295,39 +1295,39 @@ function parseMagicPocketConfigSection(
   return parsed.success ? objectValue(parsed.data) : {}
 }
 
-function sanitizeMagicPocketCapabilitiesConfig(value: unknown): Record<string, unknown> {
+function sanitizeDagongCapabilitiesConfig(value: unknown): Record<string, unknown> {
   const raw = objectValue(value)
   const next: Record<string, unknown> = {}
-  if ('mcp' in raw) next.mcp = parseMagicPocketConfigSection(McpCapabilityConfig, raw.mcp)
-  if ('web' in raw) next.web = parseMagicPocketConfigSection(WebCapabilityConfig, raw.web)
+  if ('mcp' in raw) next.mcp = parseDagongConfigSection(McpCapabilityConfig, raw.mcp)
+  if ('web' in raw) next.web = parseDagongConfigSection(WebCapabilityConfig, raw.web)
   if ('instructions' in raw) {
-    next.instructions = parseMagicPocketConfigSection(InstructionsCapabilityConfig, raw.instructions)
+    next.instructions = parseDagongConfigSection(InstructionsCapabilityConfig, raw.instructions)
   }
-  if ('skills' in raw) next.skills = parseMagicPocketConfigSection(SkillsCapabilityConfig, raw.skills)
+  if ('skills' in raw) next.skills = parseDagongConfigSection(SkillsCapabilityConfig, raw.skills)
   if ('subagents' in raw) {
-    next.subagents = parseMagicPocketConfigSection(SubagentsCapabilityConfig, raw.subagents)
+    next.subagents = parseDagongConfigSection(SubagentsCapabilityConfig, raw.subagents)
   }
   if ('attachments' in raw) {
-    next.attachments = parseMagicPocketConfigSection(AttachmentsCapabilityConfig, raw.attachments)
+    next.attachments = parseDagongConfigSection(AttachmentsCapabilityConfig, raw.attachments)
   }
-  if ('memory' in raw) next.memory = parseMagicPocketConfigSection(MemoryCapabilityConfig, raw.memory)
-  if ('imageGen' in raw) next.imageGen = parseMagicPocketConfigSection(ImageGenCapabilityConfig, raw.imageGen)
-  if ('speechGen' in raw) next.speechGen = parseMagicPocketConfigSection(SpeechGenCapabilityConfig, raw.speechGen)
-  if ('musicGen' in raw) next.musicGen = parseMagicPocketConfigSection(MusicGenCapabilityConfig, raw.musicGen)
-  if ('videoGen' in raw) next.videoGen = parseMagicPocketConfigSection(VideoGenCapabilityConfig, raw.videoGen)
+  if ('memory' in raw) next.memory = parseDagongConfigSection(MemoryCapabilityConfig, raw.memory)
+  if ('imageGen' in raw) next.imageGen = parseDagongConfigSection(ImageGenCapabilityConfig, raw.imageGen)
+  if ('speechGen' in raw) next.speechGen = parseDagongConfigSection(SpeechGenCapabilityConfig, raw.speechGen)
+  if ('musicGen' in raw) next.musicGen = parseDagongConfigSection(MusicGenCapabilityConfig, raw.musicGen)
+  if ('videoGen' in raw) next.videoGen = parseDagongConfigSection(VideoGenCapabilityConfig, raw.videoGen)
   if ('computerUse' in raw) {
-    next.computerUse = parseMagicPocketConfigSection(ComputerUseCapabilityConfig, raw.computerUse)
+    next.computerUse = parseDagongConfigSection(ComputerUseCapabilityConfig, raw.computerUse)
   }
   return next
 }
 
 /** Validate the GUI-managed `hooks` array (workflow + command entries). Array, not an object. */
-function parseMagicPocketHooksSection(value: unknown): unknown[] {
+function parseDagongHooksSection(value: unknown): unknown[] {
   const parsed = HooksConfigSchema.safeParse(Array.isArray(value) ? value : [])
   return parsed.success ? parsed.data : []
 }
 
-/** Build magicpocket `hooks` entries from the GUI's workflow hook triggers (workflow-backed hooks). */
+/** Build dagong `hooks` entries from the GUI's workflow hook triggers (workflow-backed hooks). */
 function buildWorkflowHookEntries(workflow: AppSettingsV1['workflow'] | undefined): unknown[] {
   if (!workflow) return []
   const baseUrl = `http://127.0.0.1:${workflow.webhookPort}`
@@ -1345,23 +1345,23 @@ function buildWorkflowHookEntries(workflow: AppSettingsV1['workflow'] | undefine
     }))
 }
 
-function sanitizeMagicPocketConfigSections(
+function sanitizeDagongConfigSections(
   existing: Record<string, unknown> | null
 ): Record<string, unknown> | null {
   if (!existing) return null
-  const hooks = parseMagicPocketHooksSection(existing.hooks)
+  const hooks = parseDagongHooksSection(existing.hooks)
   return {
-    serve: parseMagicPocketConfigSection(MagicPocketServeConfigSchema, existing.serve),
-    models: parseMagicPocketConfigSection(ModelConfigSchema, existing.models),
-    contextCompaction: parseMagicPocketConfigSection(
+    serve: parseDagongConfigSection(DagongServeConfigSchema, existing.serve),
+    models: parseDagongConfigSection(ModelConfigSchema, existing.models),
+    contextCompaction: parseDagongConfigSection(
       ContextCompactionConfigSchema,
       existing.contextCompaction
     ),
-    runtime: parseMagicPocketConfigSection(RuntimeTuningConfigSchema, existing.runtime),
-    quality: parseMagicPocketConfigSection(QualityConfigSchema, existing.quality),
-    capabilities: sanitizeMagicPocketCapabilitiesConfig(existing.capabilities),
+    runtime: parseDagongConfigSection(RuntimeTuningConfigSchema, existing.runtime),
+    quality: parseDagongConfigSection(QualityConfigSchema, existing.quality),
+    capabilities: sanitizeDagongCapabilitiesConfig(existing.capabilities),
     ...('roles' in existing
-      ? { roles: parseMagicPocketConfigSection(RolesConfigSchema, existing.roles) }
+      ? { roles: parseDagongConfigSection(RolesConfigSchema, existing.roles) }
       : {}),
     ...(hooks.length ? { hooks } : {})
   }
@@ -1373,7 +1373,7 @@ function objectValue(value: unknown): Record<string, unknown> {
     : {}
 }
 
-export async function stopMagicPocketChildAndWait(): Promise<void> {
+export async function stopDagongChildAndWait(): Promise<void> {
   if (!child) {
     if (childLogCapture) {
       const capture = childLogCapture
@@ -1432,34 +1432,34 @@ function waitForChildExit(process: ChildProcess, timeoutMs: number): Promise<boo
   })
 }
 
-export async function reclaimMagicPocketPort(
+export async function reclaimDagongPort(
   port: number
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (port <= 0) return { ok: true }
   if (await canBindTcpPort(port, '127.0.0.1')) return { ok: true }
-  if (await killStaleMagicPocketOnPort(port) && await canBindTcpPort(port, '127.0.0.1')) {
+  if (await killStaleDagongOnPort(port) && await canBindTcpPort(port, '127.0.0.1')) {
     return { ok: true }
   }
   return { ok: false, message: `port ${port} is in use` }
 }
 
-export async function resolveAvailableMagicPocketPort(
+export async function resolveAvailableDagongPort(
   preferredPort: number
 ): Promise<{ port: number; changed: boolean; message?: string }> {
   if (preferredPort > 0) {
     // A temporarily unresponsive managed child still owns its configured
     // endpoint. Moving settings to another port here strands the live child
     // and makes every concurrent request launch/probe a port with no server.
-    if (isMagicPocketChildRunning() && childPort === preferredPort) {
+    if (isDagongChildRunning() && childPort === preferredPort) {
       return { port: preferredPort, changed: false }
     }
     if (await canBindTcpPort(preferredPort, '127.0.0.1')) {
       return { port: preferredPort, changed: false }
     }
-    // Prefer reclaiming the configured port from a stale magicpocket left by a
+    // Prefer reclaiming the configured port from a stale dagong left by a
     // crashed previous app run over silently moving to a new port.
     if (
-      await killStaleMagicPocketOnPort(preferredPort) &&
+      await killStaleDagongOnPort(preferredPort) &&
       await canBindTcpPort(preferredPort, '127.0.0.1')
     ) {
       return { port: preferredPort, changed: false }
@@ -1483,7 +1483,7 @@ export async function resolveAvailableMagicPocketPort(
 }
 
 /**
- * Kill a stale magicpocket serve process from a previous app run that is still
+ * Kill a stale dagong serve process from a previous app run that is still
  * holding the configured port. Only processes whose command line looks
  * like our serve entry are touched; anything else keeps the port and we
  * fall back to allocating a different one.
@@ -1492,11 +1492,11 @@ export async function resolveAvailableMagicPocketPort(
  * identify the holder as our own serve-entry leaves it untouched and the
  * caller allocates a different port instead.
  */
-async function killStaleMagicPocketOnPort(port: number): Promise<boolean> {
+async function killStaleDagongOnPort(port: number): Promise<boolean> {
   const pids = await listListeningPidsOnPort(port)
   let reclaimed = false
   for (const pid of pids) {
-    if (isCurrentMagicPocketChildPid(pid)) continue
+    if (isCurrentDagongChildPid(pid)) continue
     let command = ''
     try {
       command = await processCommandLine(pid)
@@ -1505,8 +1505,8 @@ async function killStaleMagicPocketOnPort(port: number): Promise<boolean> {
     }
     if (!command.includes('serve-entry')) continue
     void appendManagedLogLine(
-      'magicpocket',
-      formatMagicPocketLogLine('lifecycle', pid, `killing stale magicpocket process holding port ${port}`)
+      'dagong',
+      formatDagongLogLine('lifecycle', pid, `killing stale dagong process holding port ${port}`)
     )
     if (await terminateStalePid(pid)) reclaimed = true
   }
@@ -1579,7 +1579,7 @@ async function processCommandLine(pid: number): Promise<string> {
   return stdout.trim()
 }
 
-/** Terminate a positively-identified stale magicpocket process. */
+/** Terminate a positively-identified stale dagong process. */
 async function terminateStalePid(pid: number): Promise<boolean> {
   if (process.platform === 'win32') {
     try {
@@ -1660,15 +1660,15 @@ function allocateTcpPort(host: string): Promise<number> {
         cleanup()
         if (error) reject(error)
         else if (port > 0) resolve(port)
-        else reject(new Error('failed to allocate an available MagicPocket port'))
+        else reject(new Error('failed to allocate an available Dagong port'))
       })
     })
   })
 }
 
-async function waitForMagicPocketStartup(startedChild: ChildProcess, port?: number): Promise<void> {
+async function waitForDagongStartup(startedChild: ChildProcess, port?: number): Promise<void> {
   if (startedChild.exitCode !== null) {
-    throw new Error(describeMagicPocketExit(startedChild.exitCode, null))
+    throw new Error(describeDagongExit(startedChild.exitCode, null))
   }
   await new Promise<void>((resolve, reject) => {
     let settled = false
@@ -1681,7 +1681,7 @@ async function waitForMagicPocketStartup(startedChild: ChildProcess, port?: numb
       if (settled) return
       settled = true
       cleanup()
-      reject(new Error(describeMagicPocketStartupTimeout(stderrTail, readyMarkerSeen && Boolean(port))))
+      reject(new Error(describeDagongStartupTimeout(stderrTail, readyMarkerSeen && Boolean(port))))
     }, KUN_STARTUP_TIMEOUT_MS)
     // The stdout ready marker can lag behind the actual server (pipe
     // buffering) or get lost in unusual spawn environments; the HTTP
@@ -1693,7 +1693,7 @@ async function waitForMagicPocketStartup(startedChild: ChildProcess, port?: numb
       ? setInterval(() => {
           if (settled || healthProbeInFlight) return
           healthProbeInFlight = true
-          void probeMagicPocketHealth(port)
+          void probeDagongHealth(port)
             .then((healthy) => {
               if (healthy) {
                 healthConfirmed = true
@@ -1723,7 +1723,7 @@ async function waitForMagicPocketStartup(startedChild: ChildProcess, port?: numb
       if (!jsonLine) return false
       try {
         const parsed = JSON.parse(jsonLine) as { service?: string; mode?: string; port?: number }
-        return parsed.service === 'magicpocket' && parsed.mode === 'serve' && typeof parsed.port === 'number'
+        return parsed.service === 'dagong' && parsed.mode === 'serve' && typeof parsed.port === 'number'
       } catch {
         return false
       }
@@ -1749,7 +1749,7 @@ async function waitForMagicPocketStartup(startedChild: ChildProcess, port?: numb
       if (settled) return
       settled = true
       cleanup()
-      reject(new Error(describeMagicPocketExit(code, signal, stderrTail)))
+      reject(new Error(describeDagongExit(code, signal, stderrTail)))
     }
     const onError = (error: Error): void => {
       if (settled) return
@@ -1764,32 +1764,32 @@ async function waitForMagicPocketStartup(startedChild: ChildProcess, port?: numb
   })
 }
 
-function describeMagicPocketExit(
+function describeDagongExit(
   code: number | null,
   signal: NodeJS.Signals | null,
   stderrTail = ''
 ): string {
   const suffix = stderrTail.trim() ? `\n${stderrTail.trim()}` : ''
-  if (signal) return `MagicPocket exited during startup with signal ${signal}${suffix}`
-  if (typeof code === 'number') return `MagicPocket exited during startup with code ${code}${suffix}`
-  return `MagicPocket exited during startup${suffix}`
+  if (signal) return `Dagong exited during startup with signal ${signal}${suffix}`
+  if (typeof code === 'number') return `Dagong exited during startup with code ${code}${suffix}`
+  return `Dagong exited during startup${suffix}`
 }
 
-function describeMagicPocketStartupTimeout(stderrTail: string, sawReadyMarker = false): string {
+function describeDagongStartupTimeout(stderrTail: string, sawReadyMarker = false): string {
   const suffix = stderrTail.trim() ? `\n${stderrTail.trim()}` : ''
   if (sawReadyMarker) {
-    return `MagicPocket reported ready but did not pass health checks within ${KUN_STARTUP_TIMEOUT_MS}ms${suffix}`
+    return `Dagong reported ready but did not pass health checks within ${KUN_STARTUP_TIMEOUT_MS}ms${suffix}`
   }
-  return `MagicPocket did not report ready within ${KUN_STARTUP_TIMEOUT_MS}ms${suffix}`
+  return `Dagong did not report ready within ${KUN_STARTUP_TIMEOUT_MS}ms${suffix}`
 }
 
-async function probeMagicPocketHealth(port: number): Promise<boolean> {
+async function probeDagongHealth(port: number): Promise<boolean> {
   try {
     const response = await fetch(`http://127.0.0.1:${port}/health`, {
       signal: AbortSignal.timeout(KUN_STARTUP_HEALTH_REQUEST_TIMEOUT_MS)
     })
     if (!response.ok) return false
-    return isMagicPocketHealthResponseBody(await response.text())
+    return isDagongHealthResponseBody(await response.text())
   } catch {
     return false
   }

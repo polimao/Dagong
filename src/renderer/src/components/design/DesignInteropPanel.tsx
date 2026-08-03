@@ -72,7 +72,7 @@ export function DesignInteropPanel({ workspaceRoot, document }: Props): ReactEle
 
   const exportPenpotPackage = async (): Promise<void> => {
     if (exportDisabled) return
-    if (typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') {
+    if (typeof window.dagongGui?.writeWorkspaceFile !== 'function') {
       setExportState({ status: 'error', message: t('designInteropUnavailable') })
       return
     }
@@ -83,7 +83,7 @@ export function DesignInteropPanel({ workspaceRoot, document }: Props): ReactEle
         canvasDocument: useCanvasShapeStore.getState().document,
         designSystem: useDesignSystemStore.getState().system
       })
-      await window.magicpocketGui.writeWorkspaceFile({
+      await window.dagongGui.writeWorkspaceFile({
         path: PENPOT_HANDOFF_PACKAGE_PATH,
         workspaceRoot,
         content: serializePenpotHandoffPackage(latest)
@@ -96,7 +96,7 @@ export function DesignInteropPanel({ workspaceRoot, document }: Props): ReactEle
 
   const exportDesignResources = async (): Promise<void> => {
     if (exportDisabled) return
-    if (typeof window.magicpocketGui?.writeWorkspaceFile !== 'function') {
+    if (typeof window.dagongGui?.writeWorkspaceFile !== 'function') {
       setExportState({ status: 'error', message: t('designInteropUnavailable') })
       return
     }
@@ -107,7 +107,7 @@ export function DesignInteropPanel({ workspaceRoot, document }: Props): ReactEle
         canvasDocument: useCanvasShapeStore.getState().document,
         designSystem: useDesignSystemStore.getState().system
       })
-      await window.magicpocketGui.writeWorkspaceFile({
+      await window.dagongGui.writeWorkspaceFile({
         path: DESIGN_RESOURCE_SURFACE_PATH,
         workspaceRoot,
         content: serializeDesignResourceSurface(latest)
@@ -121,8 +121,8 @@ export function DesignInteropPanel({ workspaceRoot, document }: Props): ReactEle
   const exportOpenUiReport = async (): Promise<void> => {
     if (exportDisabled) return
     if (
-      typeof window.magicpocketGui?.readWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.writeWorkspaceFile !== 'function'
+      typeof window.dagongGui?.readWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.writeWorkspaceFile !== 'function'
     ) {
       setExportState({ status: 'error', message: t('designInteropUnavailable') })
       return
@@ -132,11 +132,11 @@ export function DesignInteropPanel({ workspaceRoot, document }: Props): ReactEle
       const htmlArtifacts = (document?.artifacts ?? []).filter((artifact) => artifact.kind === 'html')
       const items = []
       for (const artifact of htmlArtifacts) {
-        const result = await window.magicpocketGui.readWorkspaceFile({ path: artifact.relativePath, workspaceRoot })
+        const result = await window.dagongGui.readWorkspaceFile({ path: artifact.relativePath, workspaceRoot })
         if (result?.ok) items.push({ artifact, html: result.content })
       }
       const report = buildOpenUiNormalizationReport({ items })
-      await window.magicpocketGui.writeWorkspaceFile({
+      await window.dagongGui.writeWorkspaceFile({
         path: OPENUI_NORMALIZATION_REPORT_PATH,
         workspaceRoot,
         content: serializeOpenUiNormalizationReport(report)

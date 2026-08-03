@@ -30,7 +30,7 @@ describe('design turn prompt design mode context', () => {
       target: 'canvas',
       mode: 'text',
       text: 'Start a dashboard direction',
-      artifactRelativePath: '.magicpocket-design/doc/board.canvas.json',
+      artifactRelativePath: '.dagong-design/doc/board.canvas.json',
       workspaceRoot: '/workspace',
       designModeManifest: manifest
     })
@@ -55,7 +55,7 @@ describe('design turn prompt design mode context', () => {
       target: 'canvas',
       mode: 'text',
       text: 'Sketch an API flow',
-      artifactRelativePath: '.magicpocket-design/doc/board.canvas.json',
+      artifactRelativePath: '.dagong-design/doc/board.canvas.json',
       workspaceRoot: '/workspace',
       canvasSurface: 'code',
       designModeManifest: manifest

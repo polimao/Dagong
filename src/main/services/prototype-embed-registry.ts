@@ -23,8 +23,8 @@ export type AuthorizePrototypeResult =
 
 function hasPrototypeDirSegment(path: string): boolean {
   const segments = path.replaceAll('\\', '/').split('/')
-  // `proto` = write/SDD prototypes; `.magicpocket-design` = design-mode artifacts.
-  return segments.includes('proto') || segments.includes('.magicpocket-design')
+  // `proto` = write/SDD prototypes; `.dagong-design` = design-mode artifacts.
+  return segments.includes('proto') || segments.includes('.dagong-design')
 }
 
 export async function authorizePrototypePath(
@@ -43,7 +43,7 @@ export async function authorizePrototypePath(
     return { ok: false, message: error instanceof Error ? error.message : String(error) }
   }
   if (!hasPrototypeDirSegment(absolutePath)) {
-    return { ok: false, message: 'prototypes must live in a proto or .magicpocket-design directory' }
+    return { ok: false, message: 'prototypes must live in a proto or .dagong-design directory' }
   }
   try {
     const info = await stat(absolutePath)

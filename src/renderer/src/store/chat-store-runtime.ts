@@ -269,7 +269,7 @@ function notifyTurnComplete(threadId: string | null, state: ChatState, dedupeKey
   if (
     !threadId ||
     typeof window === 'undefined' ||
-    typeof window.magicpocketGui?.showTurnCompleteNotification !== 'function'
+    typeof window.dagongGui?.showTurnCompleteNotification !== 'function'
   ) {
     return
   }
@@ -279,22 +279,22 @@ function notifyTurnComplete(threadId: string | null, state: ChatState, dedupeKey
     state.threads.find((thread) => thread.id === threadId)?.title?.trim() ||
     i18n.t('common:untitledThread')
 
-  void window.magicpocketGui
+  void window.dagongGui
     .showTurnCompleteNotification({
       threadId,
       title: i18n.t('common:turnCompleteNotificationTitle'),
       body: i18n.t('common:turnCompleteNotificationBody', { title: threadTitle })
     })
     .then((result) => {
-      if (result.ok || typeof window.magicpocketGui?.logError !== 'function') return
-      void window.magicpocketGui.logError('notification', 'Turn completion notification failed', {
+      if (result.ok || typeof window.dagongGui?.logError !== 'function') return
+      void window.dagongGui.logError('notification', 'Turn completion notification failed', {
         message: result.message,
         threadId
       }).catch(() => undefined)
     })
     .catch((error: unknown) => {
-      if (typeof window.magicpocketGui?.logError !== 'function') return
-      void window.magicpocketGui.logError('notification', 'Turn completion notification failed', {
+      if (typeof window.dagongGui?.logError !== 'function') return
+      void window.dagongGui.logError('notification', 'Turn completion notification failed', {
         message: error instanceof Error ? error.message : String(error),
         threadId
       }).catch(() => undefined)
@@ -312,11 +312,11 @@ function notifyTurnComplete(threadId: string | null, state: ChatState, dedupeKey
  */
 function releaseThreadWorktreeIfNeeded(threadId: string | null): void {
   if (!threadId || typeof window === 'undefined') return
-  if (typeof window.magicpocketGui?.releaseWorktree !== 'function') return
+  if (typeof window.dagongGui?.releaseWorktree !== 'function') return
   const record = readThreadWorktreeRegistry().worktrees[threadId]
   if (!record) return
   if (record.poolIndex === undefined) return
-  void window.magicpocketGui
+  void window.dagongGui
     .releaseWorktree({
       projectPath: record.projectPath,
       poolIndex: record.poolIndex
@@ -693,7 +693,7 @@ async function reconcileCompletedTurnFromThreadDetail(input: {
     })
   } catch (error) {
     if (typeof window === 'undefined') return
-    void window.magicpocketGui?.logError?.('turn-completion-reconcile', 'Failed to reconcile completed turn', {
+    void window.dagongGui?.logError?.('turn-completion-reconcile', 'Failed to reconcile completed turn', {
       message: error instanceof Error ? error.message : String(error),
       threadId
     }).catch(() => undefined)
@@ -720,7 +720,7 @@ export function buildThreadEventSink(
       // Re-arm the busy watchdog on every live tick so it behaves as an
       // *inactivity* timer rather than an absolute one. onSeq fires for
       // every SSE batch — both content events and the runtime's 15s
-      // heartbeat (magicpocket events route) — so a healthy turn always keeps the
+      // heartbeat (dagong events route) — so a healthy turn always keeps the
       // watchdog postponed, even a long-running tool call that produces no
       // output for minutes. Recovery ("正在恢复运行时事件流…") then only
       // triggers after the heartbeat genuinely stops for BUSY_WATCHDOG_MS
@@ -1292,8 +1292,8 @@ export function buildThreadEventSink(
         }
         return base
       })
-      if (pendingMirror && assistantMirrorText && typeof window.magicpocketGui?.mirrorClawChannelMessage === 'function') {
-        void window.magicpocketGui.mirrorClawChannelMessage(
+      if (pendingMirror && assistantMirrorText && typeof window.dagongGui?.mirrorClawChannelMessage === 'function') {
+        void window.dagongGui.mirrorClawChannelMessage(
           pendingMirror.threadId,
           assistantMirrorText,
           'assistant'

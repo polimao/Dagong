@@ -28,7 +28,7 @@ import {
 } from '../../sdd/pm-skill-frameworks'
 import type { AttachmentReference, ChatBlock, RuntimeConnectionStatus } from '../../agent/types'
 import type { QueuedUserMessage } from '../../store/chat-store-types'
-import type { ModelProviderModelGroup } from '@shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '@shared/dagong-gui-api'
 import type { SddDraft } from '../../sdd/sdd-draft-store'
 import { MessageTimeline } from '../chat/MessageTimeline'
 import { FloatingComposer } from '../chat/FloatingComposer'

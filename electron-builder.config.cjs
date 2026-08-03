@@ -3,8 +3,8 @@ const { join } = require('node:path')
 
 // 品牌升级后构建环境变量改用 KUN_* 前缀;旧的 DEEPSEEK_GUI_* 仍然
 // 兼容读取,避免 CI / 本地发布脚本一刀切失效。
-function envWithLegacyFallback(magicpocketName, legacyName) {
-  const value = process.env[magicpocketName]
+function envWithLegacyFallback(dagongName, legacyName) {
+  const value = process.env[dagongName]
   if (value !== undefined && value !== '') return value
   return process.env[legacyName]
 }
@@ -53,8 +53,8 @@ const hasNotaryToolCredentials = Boolean(
 
 // R2 release prefix 维持旧值不动:线上老版本轮询的就是
 // `…/deepseek-gui/channels/<channel>/latest/`,prefix 一改老客户端就再也
-// 收不到更新。默认公开域名优先使用 magicpocket-agent,运行时仍会兜底旧域名。
-const r2PublicBaseUrl = (process.env.R2_PUBLIC_BASE_URL || 'https://www.magicpocket-agent.com/api/r2')
+// 收不到更新。默认公开域名优先使用 dagong-agent,运行时仍会兜底旧域名。
+const r2PublicBaseUrl = (process.env.R2_PUBLIC_BASE_URL || 'https://www.dagong-agent.com/api/r2')
   .trim()
   .replace(/\/+$/, '')
 const r2ReleasePrefix = (process.env.R2_RELEASE_PREFIX || 'deepseek-gui')
@@ -93,19 +93,19 @@ if (releaseArtifactVersion && !artifactVersionPattern.test(releaseArtifactVersio
 }
 
 module.exports = {
-  // appId 永远保持旧值,即使品牌已改名 MagicPocket:
+  // appId 永远保持旧值,即使品牌已改名 Dagong:
   //  - macOS 端 Squirrel.Mac 校验更新包签名时锚定 bundle identifier,
   //    换了 id 老版本会拒绝安装新版本;
   //  - Windows 端 NSIS 以 appId 派生卸载 GUID,换了 id 升级安装不会
   //    卸载旧版本,用户会装出两份应用;
   //  - macOS TCC 权限、通知授权也都挂在这个 id 上。
   appId: 'com.xingyuzhong.deepseekgui',
-  productName: 'MagicPocket',
+  productName: 'Dagong',
   asar: true,
   asarUnpack: [
-    '**/magicpocket/dist/**/*',
-    '**/magicpocket/package*.json',
-    '**/magicpocket/node_modules/**/*',
+    '**/dagong/dist/**/*',
+    '**/dagong/package*.json',
+    '**/dagong/node_modules/**/*',
     '**/node_modules/better-sqlite3/**/*',
     '**/node_modules/node-pty/**/*',
     '**/node_modules/bindings/**/*',
@@ -122,14 +122,14 @@ module.exports = {
   files: [
     'out/**/*',
     'package.json',
-    'magicpocket/dist/**/*',
-    'magicpocket/package.json',
-    'magicpocket/package-lock.json',
-    'magicpocket/node_modules/**/*',
+    'dagong/dist/**/*',
+    'dagong/package.json',
+    'dagong/package-lock.json',
+    'dagong/node_modules/**/*',
     // The Agent SDK ships a ~222MB per-platform Claude Code binary as an optional
     // dep; do NOT bundle it into the installer. It's downloaded on demand into the
     // user-data dir (see src/main/agent-sdk-installer.ts). The small SDK JS stays.
-    '!magicpocket/node_modules/@anthropic-ai/claude-agent-sdk-*/**',
+    '!dagong/node_modules/@anthropic-ai/claude-agent-sdk-*/**',
     '!**/*.map',
     '!**/*.d.ts',
     '!**/*.ts',
@@ -147,7 +147,7 @@ module.exports = {
       filter: ['**/*']
     }
   ],
-  artifactName: `MagicPocket-${artifactVersion}-\${os}-\${arch}.\${ext}`,
+  artifactName: `Dagong-${artifactVersion}-\${os}-\${arch}.\${ext}`,
   publish: [
     {
       provider: 'generic',
@@ -170,10 +170,10 @@ module.exports = {
     entitlementsInherit: 'build/entitlements.mac.inherit.plist',
     extendInfo: {
       // 语音输入：渲染进程通过 getUserMedia 录音做语音转文字。
-      NSMicrophoneUsageDescription: 'MagicPocket uses the microphone for voice-to-text input.'
+      NSMicrophoneUsageDescription: 'Dagong uses the microphone for voice-to-text input.'
     },
     // macOS 不会自动套圆角遮罩,图标文件本身需要是「圆角方块 + 透明边距」
-    icon: './src/asset/img/magicpocket_mac.png',
+    icon: './src/asset/img/dagong_mac.png',
     // arm64 (Apple Silicon) + x64 (Intel). On M 系列 Mac 本地打包会各出一组 dmg/zip。
     target: [
       { target: 'dmg', arch: ['arm64', 'x64'] },
@@ -188,7 +188,7 @@ module.exports = {
     // desktop/start-menu/taskbar shortcuts do not show a hard square edge.
     // Ship a multi-size .ico (16/24/32/48/64/72/96/128/256) so Explorer and
     // the desktop render crisp icons at small sizes (#222). Regenerate with:
-    // npx --yes png2icons src/asset/img/magicpocket_mac.png build/icon -icowe -bc
+    // npx --yes png2icons src/asset/img/dagong_mac.png build/icon -icowe -bc
     icon: './build/icon.ico',
     target: [{ target: 'nsis', arch: ['x64'] }]
   },
@@ -202,13 +202,13 @@ module.exports = {
     // 明确创建快捷方式；always 在覆盖安装时也会重建（即使用户曾删掉桌面图标）
     createDesktopShortcut: 'always',
     createStartMenuShortcut: true,
-    shortcutName: 'MagicPocket',
-    uninstallDisplayName: 'MagicPocket',
+    shortcutName: 'Dagong',
+    uninstallDisplayName: 'Dagong',
     deleteAppDataOnUninstall: false
   },
   linux: {
     category: 'Development',
-    icon: './src/asset/img/magicpocket.png',
+    icon: './src/asset/img/dagong.png',
     target: [{ target: 'AppImage', arch: ['x64'] }]
   },
   extraMetadata: {

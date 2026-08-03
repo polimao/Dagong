@@ -17,7 +17,7 @@ describe('exportMemoryMarkdown', () => {
 
   beforeEach(async () => {
     if (tempDir) await rm(tempDir, { recursive: true, force: true })
-    tempDir = mkdtempSync(join(tmpdir(), 'magicpocket-memory-export-'))
+    tempDir = mkdtempSync(join(tmpdir(), 'dagong-memory-export-'))
     vi.mocked(dialog.showSaveDialog).mockReset()
   })
 

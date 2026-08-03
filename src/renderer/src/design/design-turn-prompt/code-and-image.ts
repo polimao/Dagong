@@ -70,7 +70,7 @@ export type DesignImageNodeOptions = {
  */
 export function buildDesignImageNodePrompt(options: DesignImageNodeOptions): string {
   const lines = [
-    'MagicPocket is asking you to generate an IMAGE for a design node.',
+    'Dagong is asking you to generate an IMAGE for a design node.',
     `Workspace: ${options.workspaceRoot}`,
     `Reserved output file: ${options.outputRelativePath}`,
     ...formatDesignTargetAssetLines(options.designContext),
@@ -104,7 +104,7 @@ export type DesignFromCodeOptions = {
  */
 export function buildDesignFromCodePrompt(options: DesignFromCodeOptions): string {
   const lines = [
-    'MagicPocket is asking you to produce a design exploration based on existing code.',
+    'Dagong is asking you to produce a design exploration based on existing code.',
     `Workspace: ${options.workspaceRoot}`,
     `Source UI code: ${options.sourceRelativePath}`,
     `Reserved artifact file: ${options.artifactRelativePath}`,

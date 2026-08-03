@@ -43,7 +43,7 @@ export function ModuleManager({ modules, onChange, onClose }: Props): ReactEleme
     }
     let cancelled = false
     const handle = setTimeout(() => {
-      window.magicpocketGui
+      window.dagongGui
         .checkWorkflowCode(selected.language, selected.code)
         .then((result) => {
           if (!cancelled) setCodeCheck(result)

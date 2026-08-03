@@ -43,7 +43,7 @@ export type ProcessSection = {
 
 /**
  * A `delegate_task` tool call (or any block carrying child runtime metadata)
- * is rendered as a "MagicPocket Crew" subagent card, not a generic tool row.
+ * is rendered as a "Dagong Crew" subagent card, not a generic tool row.
  */
 export function isSubagentBlock(block: ChatBlock): boolean {
   if (block.kind !== 'tool') return false
@@ -823,7 +823,7 @@ function ProcessFileReference({
     event.stopPropagation()
     void openWorkspacePathInEditor({ path }, workspaceRoot).then((result) => {
       if (!result.ok) {
-        void window.magicpocketGui?.logError?.('editor-open', 'Failed to open process file reference', {
+        void window.dagongGui?.logError?.('editor-open', 'Failed to open process file reference', {
           message: result.message,
           target: { path, workspaceRoot }
         })?.catch(() => undefined)

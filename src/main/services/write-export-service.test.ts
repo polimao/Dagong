@@ -133,14 +133,14 @@ describe('write-export-service helpers', () => {
   })
 
   it('exports content without requiring a source file', async () => {
-    const targetPath = join(workspaceRoot, 'MagicPocket-answer.html')
+    const targetPath = join(workspaceRoot, 'Dagong-answer.html')
     vi.mocked(dialog.showSaveDialog).mockResolvedValue({
       canceled: false,
       filePath: targetPath
     })
 
     const result = await exportWriteDocument({
-      title: 'MagicPocket answer',
+      title: 'Dagong answer',
       workspaceRoot,
       format: 'html',
       content: '# Answer\n\nShareable content'

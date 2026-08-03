@@ -148,9 +148,9 @@ export function normalizeModelUsageResponse(raw: RawModelUsageResponse): ModelUs
 }
 
 export async function loadModelUsage(range: DailyUsageRange): Promise<ModelUsageSummary | null> {
-  if (typeof window.magicpocketGui?.runtimeRequest !== 'function') return null
+  if (typeof window.dagongGui?.runtimeRequest !== 'function') return null
   const response = await withUsageRequestTimeout(
-    window.magicpocketGui.runtimeRequest(buildModelUsagePath(range), 'GET'),
+    window.dagongGui.runtimeRequest(buildModelUsagePath(range), 'GET'),
     'model usage'
   )
   if (!response.ok || !response.body.trim()) {

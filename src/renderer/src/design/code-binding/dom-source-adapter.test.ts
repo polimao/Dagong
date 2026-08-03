@@ -97,7 +97,7 @@ describe('DOM source adapter', () => {
         kind: 'dom-node',
         status: 'active',
         createdAt: '2026-07-01T00:00:00.000Z',
-        target: { sourceFile: '.magicpocket-design/home.html', domId: 'home' }
+        target: { sourceFile: '.dagong-design/home.html', domId: 'home' }
       },
       {
         id: 'binding_other_frame',
@@ -105,7 +105,7 @@ describe('DOM source adapter', () => {
         kind: 'dom-node',
         status: 'active',
         createdAt: '2026-07-01T00:00:00.000Z',
-        target: { sourceFile: '.magicpocket-design/settings.html', domId: 'settings' }
+        target: { sourceFile: '.dagong-design/settings.html', domId: 'settings' }
       }
     ]
 
@@ -116,7 +116,7 @@ describe('DOM source adapter', () => {
       matches: [
         {
           designObjectId: 'frame_1',
-          node: { tagName: 'main', sourceFile: '.magicpocket-design/home.html', domId: 'home-v2' }
+          node: { tagName: 'main', sourceFile: '.dagong-design/home.html', domId: 'home-v2' }
         }
       ]
     })

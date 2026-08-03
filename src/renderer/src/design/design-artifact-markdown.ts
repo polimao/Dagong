@@ -90,7 +90,7 @@ ${formatPersistedDesignContext(options.designContext)}
 ## Visual Direction
 
 - Establish the page layout, hierarchy, color system, typography, spacing, and responsive behavior for this screen.
-- Keep visual decisions consistent with \`.magicpocket-design/DESIGN_SYSTEM.md\` when that shared file exists.
+- Keep visual decisions consistent with \`.dagong-design/DESIGN_SYSTEM.md\` when that shared file exists.
 
 ## Interaction Notes
 

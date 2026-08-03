@@ -452,15 +452,15 @@ export function SddDraftEditorView({
   useEffect(() => {
     if (!activeDraftId || !activeDraftWorkspaceRoot || !activeDraftRelativePath) return
     if (
-      typeof window.magicpocketGui?.watchWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.unwatchWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.onWorkspaceFileChanged !== 'function'
+      typeof window.dagongGui?.watchWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.unwatchWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.onWorkspaceFileChanged !== 'function'
     ) {
       return
     }
 
     return startWriteWorkspaceFileWatch({
-      api: window.magicpocketGui,
+      api: window.dagongGui,
       workspaceRoot: activeDraftWorkspaceRoot,
       path: activeDraftAbsolutePath ?? activeDraftRelativePath,
       kind: 'text',
@@ -570,7 +570,7 @@ export function SddDraftEditorView({
       ))
       return
     }
-    if (typeof window.magicpocketGui?.requestWriteInlineCompletion !== 'function') {
+    if (typeof window.dagongGui?.requestWriteInlineCompletion !== 'function') {
       setOperationStatus('error', t('writeInlineEditUnavailable'))
       return
     }
@@ -592,7 +592,7 @@ export function SddDraftEditorView({
 
     setInlineEditInFlight(true)
     try {
-      const result = await window.magicpocketGui.requestWriteInlineCompletion(
+      const result = await window.dagongGui.requestWriteInlineCompletion(
         buildWriteInlineEditCompletionRequest(draft.request)
       )
       if (!result.ok) {
@@ -725,7 +725,7 @@ export function SddDraftEditorView({
       setOperationStatus('error', t('writeInlineEditNoSelection'))
       return
     }
-    if (typeof window.magicpocketGui?.generateWriteInfographic !== 'function') {
+    if (typeof window.dagongGui?.generateWriteInfographic !== 'function') {
       setOperationStatus('error', t('writeInfographicUnavailable'))
       return
     }
@@ -741,7 +741,7 @@ export function SddDraftEditorView({
 
   const generateDesignDraftFromImage = async (image: WriteSelectedImage): Promise<void> => {
     if (readOnly || !unitImageDir) return
-    if (typeof window.magicpocketGui?.generateWriteInfographic !== 'function') {
+    if (typeof window.dagongGui?.generateWriteInfographic !== 'function') {
       setOperationStatus('error', t('writeInfographicUnavailable'))
       return
     }
@@ -911,9 +911,9 @@ export function SddDraftEditorView({
       if (latest.activeDraft?.id === draftId) {
         return latest.content.includes(job.pendingMarkdown)
       }
-      if (typeof window.magicpocketGui?.readWorkspaceFile !== 'function') return true
+      if (typeof window.dagongGui?.readWorkspaceFile !== 'function') return true
       try {
-        const file = await window.magicpocketGui.readWorkspaceFile({
+        const file = await window.dagongGui.readWorkspaceFile({
           path: docAbsolutePath,
           workspaceRoot: draftWorkspaceRoot
         })
@@ -929,7 +929,7 @@ export function SddDraftEditorView({
     let lastContent: string | null = null
     const tick = async (): Promise<void> => {
       try {
-        const file = await window.magicpocketGui.readWorkspaceFile({
+        const file = await window.dagongGui.readWorkspaceFile({
           path: prototypePath,
           workspaceRoot: draftWorkspaceRoot
         })
@@ -974,7 +974,7 @@ export function SddDraftEditorView({
     let replacementMarkdown: string | null = null
     let failureMessage: string | null = null
     try {
-      const result = await window.magicpocketGui.generateWriteInfographic({
+      const result = await window.dagongGui.generateWriteInfographic({
         text: job.text,
         filePath: docAbsolutePath,
         workspaceRoot: draftWorkspaceRoot,
@@ -1032,13 +1032,13 @@ export function SddDraftEditorView({
     // The draft was closed mid-generation; dismissing flushed it to disk with
     // the placeholder inside, so patch it on disk.
     if (
-      typeof window.magicpocketGui?.readWorkspaceFile !== 'function' ||
-      typeof window.magicpocketGui?.writeWorkspaceFile !== 'function'
+      typeof window.dagongGui?.readWorkspaceFile !== 'function' ||
+      typeof window.dagongGui?.writeWorkspaceFile !== 'function'
     ) {
       return false
     }
     try {
-      const file = await window.magicpocketGui.readWorkspaceFile({
+      const file = await window.dagongGui.readWorkspaceFile({
         path: docAbsolutePath,
         workspaceRoot: draftWorkspaceRoot
       })
@@ -1049,7 +1049,7 @@ export function SddDraftEditorView({
         replacementMarkdown
       )
       if (next === null) return false
-      const written = await window.magicpocketGui.writeWorkspaceFile({
+      const written = await window.dagongGui.writeWorkspaceFile({
         path: docAbsolutePath,
         workspaceRoot: draftWorkspaceRoot,
         content: next

@@ -12,7 +12,7 @@ import type { CanvasToolHandler } from '../../../../design/canvas/tools/tool-typ
 import type { CanvasDocument, CanvasTool, Rect, ViewBox } from '../../../../design/canvas/canvas-types'
 import { isHtmlFrame, shapeBounds, shapeGeometry } from '../../../../design/canvas/canvas-types'
 
-const CANVAS_VIEWPORT_STORAGE_PREFIX = 'magicpocket.design.canvasViewport'
+const CANVAS_VIEWPORT_STORAGE_PREFIX = 'dagong.design.canvasViewport'
 const IMAGE_ANNOTATION_ACTION_WIDTH = 112
 const IMAGE_ANNOTATION_ACTION_HEIGHT = 30
 const IMAGE_ANNOTATION_ACTION_GAP = 10

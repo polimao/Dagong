@@ -460,7 +460,7 @@ async function bufferFromDocxResult(result: ArrayBuffer | Blob | Buffer | Uint8A
 }
 
 async function renderHtmlDocument(html: string, format: 'pdf' | 'png'): Promise<Buffer> {
-  const tempDir = await mkdtemp(join(tmpdir(), 'magicpocket-export-'))
+  const tempDir = await mkdtemp(join(tmpdir(), 'dagong-export-'))
   const tempHtmlPath = join(tempDir, 'document.html')
   await writeFile(tempHtmlPath, html, 'utf8')
 
@@ -550,7 +550,7 @@ export async function exportWriteDocument(
       }
       sourcePath = resolved.path
     } else {
-      const title = payload.title?.trim() || 'MagicPocket answer'
+      const title = payload.title?.trim() || 'Dagong answer'
       const safeTitle = Array.from(title, (character) => {
         const code = character.charCodeAt(0)
         return code <= 31 || '<>:"/\\|?*'.includes(character) ? '-' : character
@@ -580,7 +580,7 @@ export async function exportWriteDocument(
     } else if (payload.format === 'docx') {
       const docx = await htmlToDocx(html, null, {
         title,
-        creator: 'MagicPocket',
+        creator: 'Dagong',
         keywords: ['markdown', 'export'],
         description: `Exported from ${basename(sourcePath)}`,
         font: 'Arial',

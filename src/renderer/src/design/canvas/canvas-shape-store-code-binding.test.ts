@@ -19,7 +19,7 @@ describe('canvas shape store code bindings', () => {
           designObjectId: frame.id,
           node: {
             tagName: 'main',
-            sourceFile: '.magicpocket-design/home.html',
+            sourceFile: '.dagong-design/home.html',
             domId: 'home-root'
           }
         }
@@ -30,7 +30,7 @@ describe('canvas shape store code bindings', () => {
       designObjectId: frame.id,
       status: 'active',
       target: {
-        sourceFile: '.magicpocket-design/home.html',
+        sourceFile: '.dagong-design/home.html',
         domId: 'home-root'
       }
     })

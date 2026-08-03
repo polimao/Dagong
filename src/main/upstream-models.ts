@@ -8,11 +8,11 @@ import {
   listNonTextModelIds,
   modelProfileSupportsTextChat,
   modelProviderModelProfile,
-  resolveMagicPocketRuntimeSettings,
+  resolveDagongRuntimeSettings,
   type AppSettingsV1
 } from '../shared/app-settings'
 import { DEFAULT_COMPOSER_MODEL_IDS } from '../shared/default-composer-models'
-import type { ModelProviderModelGroup } from '../shared/magicpocket-gui-api'
+import type { ModelProviderModelGroup } from '../shared/dagong-gui-api'
 
 export type FetchUpstreamModelsResult =
   | { ok: true; modelIds: string[]; defaultModelId?: string; modelGroups?: ModelProviderModelGroup[] }
@@ -42,10 +42,10 @@ export async function fetchUpstreamModelIds(
   settings: AppSettingsV1,
   _apiKey?: string
 ): Promise<FetchUpstreamModelsResult> {
-  const configuredModelIds = await readConfiguredMagicPocketModelIds(settings)
+  const configuredModelIds = await readConfiguredDagongModelIds(settings)
   const configuredGroups = await readConfiguredModelGroups(settings)
   const nonTextModelIds = listNonTextModelIds(settings)
-  const runtime = resolveMagicPocketRuntimeSettings(settings)
+  const runtime = resolveDagongRuntimeSettings(settings)
   const runtimeModel = runtime.model.trim()
   const defaultModelId = isComposerChatModelId(runtimeModel, nonTextModelIds) ? runtimeModel : ''
   return modelListOrError(
@@ -56,8 +56,8 @@ export async function fetchUpstreamModelIds(
   )
 }
 
-export async function readConfiguredMagicPocketModelIds(settings: AppSettingsV1): Promise<string[]> {
-  const runtime = resolveMagicPocketRuntimeSettings(settings)
+export async function readConfiguredDagongModelIds(settings: AppSettingsV1): Promise<string[]> {
+  const runtime = resolveDagongRuntimeSettings(settings)
   const configPath = join(expandHome(runtime.dataDir), 'config.json')
   const nonTextModelIds = listNonTextModelIds(settings)
   const ids = [runtime.model, ...listModelProviderModelIds(settings)].filter((id) =>

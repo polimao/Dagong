@@ -47,11 +47,11 @@ describe('gui-plan path validation', () => {
   })
 
   it('produces a stable plan id from workspace and path', () => {
-    expect(buildGuiPlanId('/tmp/ws', '.magicpocketsdd/plan/login.md')).toBe(
-      '/tmp/ws:.magicpocketsdd/plan/login.md'
+    expect(buildGuiPlanId('/tmp/ws', '.dagongsdd/plan/login.md')).toBe(
+      '/tmp/ws:.dagongsdd/plan/login.md'
     )
-    expect(buildGuiPlanId('/tmp/ws', '.magicpocketsdd/plan/Login.md')).toBe(
-      buildGuiPlanId('/tmp/ws', '.magicpocketsdd/plan/login.md')
+    expect(buildGuiPlanId('/tmp/ws', '.dagongsdd/plan/Login.md')).toBe(
+      buildGuiPlanId('/tmp/ws', '.dagongsdd/plan/login.md')
     )
     expect(buildGuiPlanId('/tmp/ws', '.deepseekgui/plan/Login.md')).toBe(
       buildGuiPlanId('/tmp/ws', '.deepseekgui/plan/login.md')

@@ -17,13 +17,13 @@ import {
   CUSTOM_VIDEO_GENERATION_PROVIDER_ID,
   type AppSettingsV1,
   type ImageGenerationProtocol,
-  type MagicPocketImageGenerationSettingsV1,
-  type MagicPocketMusicGenerationSettingsV1,
-  type MagicPocketRuntimeSettingsV1,
-  type MagicPocketRuntimeSettingsPatchV1,
-  type MagicPocketSpeechToTextSettingsV1,
-  type MagicPocketTextToSpeechSettingsV1,
-  type MagicPocketVideoGenerationSettingsV1,
+  type DagongImageGenerationSettingsV1,
+  type DagongMusicGenerationSettingsV1,
+  type DagongRuntimeSettingsV1,
+  type DagongRuntimeSettingsPatchV1,
+  type DagongSpeechToTextSettingsV1,
+  type DagongTextToSpeechSettingsV1,
+  type DagongVideoGenerationSettingsV1,
   type MusicGenerationProtocol,
   type ModelProviderImageCapabilityPatchV1,
   type ModelProviderImageCapabilityV1,
@@ -49,8 +49,8 @@ import {
   type TextToSpeechProtocol,
   type VideoGenerationProtocol
 } from './app-settings-types'
-import { normalizeModelEndpointFormat, type ModelEndpointFormat } from '../../magicpocket/src/contracts/model-endpoint-format.js'
-import { getMagicPocketRuntimeSettings } from './app-settings-magicpocket'
+import { normalizeModelEndpointFormat, type ModelEndpointFormat } from '../../dagong/src/contracts/model-endpoint-format.js'
+import { getDagongRuntimeSettings } from './app-settings-dagong'
 import { normalizeDeepseekBaseUrl } from './app-settings-normalizers'
 import { DEFAULT_COMPOSER_MODEL_IDS } from './default-composer-models'
 import {
@@ -384,7 +384,7 @@ type TokenPlanCapabilityWithOptionalBaseUrl = {
   models: readonly string[]
 }
 
-type MagicPocketMediaSettingCore = Partial<{
+type DagongMediaSettingCore = Partial<{
   enabled: boolean
   providerId: string
   baseUrl: string
@@ -395,14 +395,14 @@ type MagicPocketMediaSettingCore = Partial<{
 const MINIMAX_PROVIDER_ID = 'minimax'
 const MINIMAX_TOKEN_PLAN_PROVIDER_ID = `${MINIMAX_PROVIDER_ID}${TOKEN_PLAN_PROVIDER_ID_SUFFIX}`
 
-export function defaultMiniMaxMediaGenerationMagicPocketPatch(input: {
+export function defaultMiniMaxMediaGenerationDagongPatch(input: {
   providers: readonly ModelProviderProfileV1[]
-  currentMagicPocket?: Partial<MagicPocketRuntimeSettingsV1>
-  magicpocketPatch?: MagicPocketRuntimeSettingsPatchV1
-}): MagicPocketRuntimeSettingsPatchV1 | undefined {
-  const patch: MagicPocketRuntimeSettingsPatchV1 = {}
-  if (!input.magicpocketPatch?.textToSpeech && isBlankMagicPocketMediaSetting(input.currentMagicPocket?.textToSpeech)) {
-    const match = configuredMiniMaxMediaCapability(input.providers, 'textToSpeech', input.currentMagicPocket?.providerId)
+  currentDagong?: Partial<DagongRuntimeSettingsV1>
+  dagongPatch?: DagongRuntimeSettingsPatchV1
+}): DagongRuntimeSettingsPatchV1 | undefined {
+  const patch: DagongRuntimeSettingsPatchV1 = {}
+  if (!input.dagongPatch?.textToSpeech && isBlankDagongMediaSetting(input.currentDagong?.textToSpeech)) {
+    const match = configuredMiniMaxMediaCapability(input.providers, 'textToSpeech', input.currentDagong?.providerId)
     if (match) {
       patch.textToSpeech = {
         enabled: true,
@@ -414,8 +414,8 @@ export function defaultMiniMaxMediaGenerationMagicPocketPatch(input: {
       }
     }
   }
-  if (!input.magicpocketPatch?.musicGeneration && isBlankMagicPocketMediaSetting(input.currentMagicPocket?.musicGeneration)) {
-    const match = configuredMiniMaxMediaCapability(input.providers, 'music', input.currentMagicPocket?.providerId)
+  if (!input.dagongPatch?.musicGeneration && isBlankDagongMediaSetting(input.currentDagong?.musicGeneration)) {
+    const match = configuredMiniMaxMediaCapability(input.providers, 'music', input.currentDagong?.providerId)
     if (match) {
       patch.musicGeneration = {
         enabled: true,
@@ -427,8 +427,8 @@ export function defaultMiniMaxMediaGenerationMagicPocketPatch(input: {
       }
     }
   }
-  if (!input.magicpocketPatch?.videoGeneration && isBlankMagicPocketMediaSetting(input.currentMagicPocket?.videoGeneration)) {
-    const match = configuredMiniMaxMediaCapability(input.providers, 'video', input.currentMagicPocket?.providerId)
+  if (!input.dagongPatch?.videoGeneration && isBlankDagongMediaSetting(input.currentDagong?.videoGeneration)) {
+    const match = configuredMiniMaxMediaCapability(input.providers, 'video', input.currentDagong?.providerId)
     if (match) {
       patch.videoGeneration = {
         enabled: true,
@@ -443,7 +443,7 @@ export function defaultMiniMaxMediaGenerationMagicPocketPatch(input: {
   return Object.keys(patch).length > 0 ? patch : undefined
 }
 
-function isBlankMagicPocketMediaSetting(setting: MagicPocketMediaSettingCore | undefined): boolean {
+function isBlankDagongMediaSetting(setting: DagongMediaSettingCore | undefined): boolean {
   return setting?.enabled !== true &&
     !setting?.providerId?.trim() &&
     !setting?.baseUrl?.trim() &&
@@ -520,8 +520,8 @@ function firstCapabilityModel(models: readonly string[]): string {
   return models.map((model) => model.trim()).find(Boolean) ?? ''
 }
 
-export function resolveMagicPocketSpeechToTextSettings(settings: AppSettingsV1): MagicPocketSpeechToTextSettingsV1 {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongSpeechToTextSettings(settings: AppSettingsV1): DagongSpeechToTextSettingsV1 {
+  const runtime = getDagongRuntimeSettings(settings)
   const speechToText = runtime.speechToText
   const providerId = normalizeModelProviderId(speechToText.providerId)
   if (!providerId || providerId === CUSTOM_SPEECH_TO_TEXT_PROVIDER_ID) {
@@ -687,8 +687,8 @@ function resolveProviderSpeechModel(configuredModel: string, providerModels: rea
   return TEXT_TO_SPEECH_MODEL_PATTERN.test(model) ? providerModels[0] ?? model : model
 }
 
-export function resolveMagicPocketTextToSpeechSettings(settings: AppSettingsV1): MagicPocketTextToSpeechSettingsV1 {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongTextToSpeechSettings(settings: AppSettingsV1): DagongTextToSpeechSettingsV1 {
+  const runtime = getDagongRuntimeSettings(settings)
   const textToSpeech = runtime.textToSpeech
   const providerId = normalizeModelProviderId(textToSpeech.providerId)
   if (!providerId || providerId === CUSTOM_TEXT_TO_SPEECH_PROVIDER_ID) {
@@ -717,8 +717,8 @@ export function resolveMagicPocketTextToSpeechSettings(settings: AppSettingsV1):
   }
 }
 
-export function resolveMagicPocketMusicGenerationSettings(settings: AppSettingsV1): MagicPocketMusicGenerationSettingsV1 {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongMusicGenerationSettings(settings: AppSettingsV1): DagongMusicGenerationSettingsV1 {
+  const runtime = getDagongRuntimeSettings(settings)
   const musicGeneration = runtime.musicGeneration
   const providerId = normalizeModelProviderId(musicGeneration.providerId)
   if (!providerId || providerId === CUSTOM_MUSIC_GENERATION_PROVIDER_ID) {
@@ -747,8 +747,8 @@ export function resolveMagicPocketMusicGenerationSettings(settings: AppSettingsV
   }
 }
 
-export function resolveMagicPocketVideoGenerationSettings(settings: AppSettingsV1): MagicPocketVideoGenerationSettingsV1 {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongVideoGenerationSettings(settings: AppSettingsV1): DagongVideoGenerationSettingsV1 {
+  const runtime = getDagongRuntimeSettings(settings)
   const videoGeneration = runtime.videoGeneration
   const providerId = normalizeModelProviderId(videoGeneration.providerId)
   if (!providerId || providerId === CUSTOM_VIDEO_GENERATION_PROVIDER_ID) {
@@ -777,8 +777,8 @@ export function resolveMagicPocketVideoGenerationSettings(settings: AppSettingsV
   }
 }
 
-export function resolveMagicPocketMemoryEnabled(settings: AppSettingsV1): boolean {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongMemoryEnabled(settings: AppSettingsV1): boolean {
+  const runtime = getDagongRuntimeSettings(settings)
   return runtime.memoryEnabled ?? false
 }
 
@@ -823,8 +823,8 @@ function canonicalBaseUrl(value: string): string {
   return value.trim().replace(/\/+$/, '')
 }
 
-export function resolveMagicPocketImageGenerationSettings(settings: AppSettingsV1): MagicPocketImageGenerationSettingsV1 {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongImageGenerationSettings(settings: AppSettingsV1): DagongImageGenerationSettingsV1 {
+  const runtime = getDagongRuntimeSettings(settings)
   const imageGeneration = runtime.imageGeneration
   const providerId = normalizeModelProviderId(imageGeneration.providerId)
   if (!providerId || providerId === CUSTOM_IMAGE_GENERATION_PROVIDER_ID) {
@@ -853,8 +853,8 @@ export function resolveMagicPocketImageGenerationSettings(settings: AppSettingsV
   }
 }
 
-export function resolveMagicPocketRuntimeSettings(settings: AppSettingsV1): MagicPocketRuntimeSettingsV1 {
-  const runtime = getMagicPocketRuntimeSettings(settings)
+export function resolveDagongRuntimeSettings(settings: AppSettingsV1): DagongRuntimeSettingsV1 {
+  const runtime = getDagongRuntimeSettings(settings)
   const provider = getModelProviderProfile(settings, runtime.providerId)
   const providerId = normalizeModelProviderId(runtime.providerId)
   const runtimeApiKey = runtime.apiKey?.trim() ?? ''
@@ -868,7 +868,7 @@ export function resolveMagicPocketRuntimeSettings(settings: AppSettingsV1): Magi
     // to the agent's own runtime.apiKey if the profile happens to be keyless.
     // A providerId pointing at a keyless profile must NOT resolve to an empty
     // key (issue #329) — that briefly reads as "no API key" and the
-    // settings-apply gate then stops a perfectly healthy MagicPocket runtime.
+    // settings-apply gate then stops a perfectly healthy Dagong runtime.
     apiKey: useProviderCredentials
       ? provider.apiKey.trim() || runtimeApiKey
       : runtimeApiKey || provider.apiKey.trim(),
@@ -877,13 +877,13 @@ export function resolveMagicPocketRuntimeSettings(settings: AppSettingsV1): Magi
         ? normalizeDeepseekBaseUrl(runtimeBaseUrl)
         : normalizeDeepseekBaseUrl(providerBaseUrl),
     endpointFormat: provider.endpointFormat,
-    imageGeneration: resolveMagicPocketImageGenerationSettings(settings),
-    speechToText: resolveMagicPocketSpeechToTextSettings(settings),
-    textToSpeech: resolveMagicPocketTextToSpeechSettings(settings),
-    musicGeneration: resolveMagicPocketMusicGenerationSettings(settings),
-    videoGeneration: resolveMagicPocketVideoGenerationSettings(settings),
+    imageGeneration: resolveDagongImageGenerationSettings(settings),
+    speechToText: resolveDagongSpeechToTextSettings(settings),
+    textToSpeech: resolveDagongTextToSpeechSettings(settings),
+    musicGeneration: resolveDagongMusicGenerationSettings(settings),
+    videoGeneration: resolveDagongVideoGenerationSettings(settings),
     modelProfiles: modelProviderModelProfilesForSettings(settings),
-    memoryEnabled: resolveMagicPocketMemoryEnabled(settings)
+    memoryEnabled: resolveDagongMemoryEnabled(settings)
   }
 }
 

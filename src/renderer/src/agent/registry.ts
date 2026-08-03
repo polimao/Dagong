@@ -1,11 +1,11 @@
 import type { AgentProvider } from './types'
-import { MagicPocketRuntimeProvider } from './magicpocket-runtime'
+import { DagongRuntimeProvider } from './dagong-runtime'
 
 let cachedProvider: AgentProvider | null = null
 
 export function getProvider(): AgentProvider {
   if (cachedProvider) return cachedProvider
-  cachedProvider = new MagicPocketRuntimeProvider()
+  cachedProvider = new DagongRuntimeProvider()
   return cachedProvider
 }
 

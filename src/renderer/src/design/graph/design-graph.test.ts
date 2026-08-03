@@ -19,11 +19,11 @@ function htmlArtifact(id: string): DesignArtifact {
     id,
     kind: 'html',
     title: 'Checkout',
-    relativePath: `.magicpocket-design/doc/${id}/v1.html`,
+    relativePath: `.dagong-design/doc/${id}/v1.html`,
     createdAt,
     updatedAt: createdAt,
-    versions: [{ id: `${id}-v1`, relativePath: `.magicpocket-design/doc/${id}/v1.html`, createdAt, summary: '' }],
-    designMdPath: `.magicpocket-design/doc/${id}/DESIGN.md`,
+    versions: [{ id: `${id}-v1`, relativePath: `.dagong-design/doc/${id}/v1.html`, createdAt, summary: '' }],
+    designMdPath: `.dagong-design/doc/${id}/DESIGN.md`,
     direction: { id: 'dir_checkout', name: 'Checkout direction', status: 'active', createdAt }
   }
 }
@@ -163,7 +163,7 @@ describe('design graph', () => {
     const image = createDefaultShape('image', 32, 48)
     image.id = 'asset_logo'
     image.name = 'Logo asset'
-    image.imageUrl = '.magicpocket-design/assets/logo.png'
+    image.imageUrl = '.dagong-design/assets/logo.png'
     doc.objects[image.id] = { ...image, parentId: doc.rootId }
     doc.objects[doc.rootId] = { ...doc.objects[doc.rootId], children: [image.id] }
 
@@ -177,13 +177,13 @@ describe('design graph', () => {
       name: 'Logo asset',
       source: {
         canvasShapeId: 'asset_logo',
-        assetPath: '.magicpocket-design/assets/logo.png'
+        assetPath: '.dagong-design/assets/logo.png'
       },
       metadata: {
         asset: {
           id: 'asset_logo',
           kind: 'image',
-          path: '.magicpocket-design/assets/logo.png',
+          path: '.dagong-design/assets/logo.png',
           sourceKind: 'workspace',
           modelReady: true
         }

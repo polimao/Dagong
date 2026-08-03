@@ -3,7 +3,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -98,18 +98,18 @@ function settings(): AppSettingsV1 {
     cursorSpotlight: true,
     provider: defaultModelProviderSettings(),
     agents: {
-      magicpocket: {
-        ...defaultMagicPocketRuntimeSettings(),
-        binaryPath: '~/bin/magicpocket',
-        dataDir: '~/.magicpocket/data',
+      dagong: {
+        ...defaultDagongRuntimeSettings(),
+        binaryPath: '~/bin/dagong',
+        dataDir: '~/.dagong/data',
         storage: {
-          ...defaultMagicPocketRuntimeSettings().storage,
-          sqlitePath: '~/Library/Application Support/MagicPocket/magicpocket.sqlite3'
+          ...defaultDagongRuntimeSettings().storage,
+          sqlitePath: '~/Library/Application Support/Dagong/dagong.sqlite3'
         }
       }
     },
-    workspaceRoot: '~/.magicpocket/default_workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    workspaceRoot: '~/.dagong/default_workspace',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: true, retentionDays: 2 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -117,9 +117,9 @@ function settings(): AppSettingsV1 {
     keyboardShortcuts: defaultKeyboardShortcuts(),
     write: {
       ...defaultWriteSettings(),
-      defaultWorkspaceRoot: '~/.magicpocket/write_workspace',
+      defaultWorkspaceRoot: '~/.dagong/write_workspace',
       activeWorkspaceRoot: '~/drafts',
-      workspaces: ['~/.magicpocket/write_workspace', '~/drafts']
+      workspaces: ['~/.dagong/write_workspace', '~/drafts']
     },
     claw: {
       ...defaultClawSettings(),
@@ -153,10 +153,10 @@ function settings(): AppSettingsV1 {
 
 describe('settings home paths', () => {
   it('compacts absolute home paths on macOS and Linux', () => {
-    expect(compactHomePathForSettingsDisplay('/Users/mothra/.magicpocket/default_workspace', '/Users/mothra', 'darwin'))
-      .toBe('~/.magicpocket/default_workspace')
-    expect(compactHomePathForSettingsDisplay('/home/mothra/.magicpocket/default_workspace', '/home/mothra', 'linux'))
-      .toBe('~/.magicpocket/default_workspace')
+    expect(compactHomePathForSettingsDisplay('/Users/mothra/.dagong/default_workspace', '/Users/mothra', 'darwin'))
+      .toBe('~/.dagong/default_workspace')
+    expect(compactHomePathForSettingsDisplay('/home/mothra/.dagong/default_workspace', '/home/mothra', 'linux'))
+      .toBe('~/.dagong/default_workspace')
     expect(compactHomePathForSettingsDisplay('/Users/mothra/work/', '/Users/mothra', 'darwin'))
       .toBe('~/work/')
     expect(compactHomePathForSettingsDisplay('/Users/mothra/', '/Users/mothra', 'darwin'))
@@ -164,17 +164,17 @@ describe('settings home paths', () => {
   })
 
   it('does not compact home paths on Windows', () => {
-    expect(compactHomePathForSettingsDisplay('C:\\Users\\mothra\\.magicpocket', 'C:\\Users\\mothra', 'win32'))
-      .toBe('C:\\Users\\mothra\\.magicpocket')
+    expect(compactHomePathForSettingsDisplay('C:\\Users\\mothra\\.dagong', 'C:\\Users\\mothra', 'win32'))
+      .toBe('C:\\Users\\mothra\\.dagong')
   })
 
   it('expands tilde input on macOS and Linux only', () => {
-    expect(expandHomePathForSettingsUse('~/.magicpocket/data', '/Users/mothra', 'darwin'))
-      .toBe('/Users/mothra/.magicpocket/data')
-    expect(expandHomePathForSettingsUse('~/.magicpocket/data', '/home/mothra', 'linux'))
-      .toBe('/home/mothra/.magicpocket/data')
-    expect(expandHomePathForSettingsUse('~\\.magicpocket\\data', '/Users/mothra', 'win32'))
-      .toBe('~\\.magicpocket\\data')
+    expect(expandHomePathForSettingsUse('~/.dagong/data', '/Users/mothra', 'darwin'))
+      .toBe('/Users/mothra/.dagong/data')
+    expect(expandHomePathForSettingsUse('~/.dagong/data', '/home/mothra', 'linux'))
+      .toBe('/home/mothra/.dagong/data')
+    expect(expandHomePathForSettingsUse('~\\.dagong\\data', '/Users/mothra', 'win32'))
+      .toBe('~\\.dagong\\data')
   })
 
   it('keeps multiline path text shape while compacting and expanding', () => {
@@ -188,12 +188,12 @@ describe('settings home paths', () => {
   it('expands nested settings paths before saving', () => {
     const expanded = expandSettingsHomePathsForUse(settings(), '/Users/mothra', 'darwin')
 
-    expect(expanded.workspaceRoot).toBe('/Users/mothra/.magicpocket/default_workspace')
-    expect(expanded.conversationWorkspaceRoot).toBe('/Users/mothra/Documents/MagicPocket')
-    expect(expanded.agents.magicpocket.binaryPath).toBe('/Users/mothra/bin/magicpocket')
-    expect(expanded.agents.magicpocket.dataDir).toBe('/Users/mothra/.magicpocket/data')
-    expect(expanded.agents.magicpocket.storage.sqlitePath).toBe('/Users/mothra/Library/Application Support/MagicPocket/magicpocket.sqlite3')
-    expect(expanded.write.defaultWorkspaceRoot).toBe('/Users/mothra/.magicpocket/write_workspace')
+    expect(expanded.workspaceRoot).toBe('/Users/mothra/.dagong/default_workspace')
+    expect(expanded.conversationWorkspaceRoot).toBe('/Users/mothra/Documents/Dagong')
+    expect(expanded.agents.dagong.binaryPath).toBe('/Users/mothra/bin/dagong')
+    expect(expanded.agents.dagong.dataDir).toBe('/Users/mothra/.dagong/data')
+    expect(expanded.agents.dagong.storage.sqlitePath).toBe('/Users/mothra/Library/Application Support/Dagong/dagong.sqlite3')
+    expect(expanded.write.defaultWorkspaceRoot).toBe('/Users/mothra/.dagong/write_workspace')
     expect(expanded.write.activeWorkspaceRoot).toBe('/Users/mothra/drafts')
     expect(expanded.claw.im.workspaceRoot).toBe('/Users/mothra/claw')
     expect(expanded.claw.skills.extraDirs).toEqual(['/Users/mothra/skills'])

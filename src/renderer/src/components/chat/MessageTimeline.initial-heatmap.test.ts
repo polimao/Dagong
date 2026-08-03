@@ -30,25 +30,25 @@ describe('MessageTimeline initial heatmap empty hero routing', () => {
     await i18n.changeLanguage('en')
   })
 
-  it('shows the collapsed MagicPocket calendar for eligible initial chat states', () => {
+  it('shows the collapsed Dagong calendar for eligible initial chat states', () => {
     const html = renderHero()
 
     expect(html).toContain('Expand calendar')
-    expect(html).not.toContain('Daily MagicPocket usage calendar')
+    expect(html).not.toContain('Daily Dagong usage calendar')
     expect(html).not.toContain('Start a new conversation')
   })
 
   it('keeps offline, missing-workspace, and Claw empty states gated away from the heatmap', () => {
     const offlineHtml = renderHero({ ready: false })
-    expect(offlineHtml).toContain('MagicPocket is waking the local agent')
-    expect(offlineHtml).toContain('ds-magicpocket-state-sleep')
+    expect(offlineHtml).toContain('Dagong is waking the local agent')
+    expect(offlineHtml).toContain('ds-dagong-state-sleep')
     const workspaceHtml = renderHero({ hasWorkspace: false })
     expect(workspaceHtml).toContain('Choose working directory')
-    expect(workspaceHtml).toContain('ds-magicpocket-state-sit')
+    expect(workspaceHtml).toContain('ds-dagong-state-sit')
     const clawHtml = renderHero({ route: 'claw' })
     expect(clawHtml).toContain('Start a conversation with this assistant')
-    expect(clawHtml).toContain('ds-magicpocket-state-greet')
-    expect(clawHtml).not.toContain('MagicPocket usage')
+    expect(clawHtml).toContain('ds-dagong-state-greet')
+    expect(clawHtml).not.toContain('Dagong usage')
   })
 
   it('shows the runtime error in the offline hero when one is available', () => {

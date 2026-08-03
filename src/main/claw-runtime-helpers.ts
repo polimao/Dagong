@@ -142,7 +142,7 @@ export function formatFeishuMirrorText(text: string, direction: 'user' | 'assist
   const trimmed = text.trim()
   if (direction === 'user') {
     return {
-      markdown: `**From MagicPocket**\n\n> ${trimmed.replace(/\n/g, '\n> ')}`
+      markdown: `**From Dagong**\n\n> ${trimmed.replace(/\n/g, '\n> ')}`
     }
   }
   return { markdown: trimmed || '(empty reply)' }

@@ -29,7 +29,7 @@ import type {
   TurnCompleteNotificationPayload,
   UpstreamModelsResult,
   WorkspacePickResult
-} from '../../shared/magicpocket-gui-api'
+} from '../../shared/dagong-gui-api'
 import type { WorkspaceFileSaveAsResult } from '../../shared/workspace-file'
 import type { GuiUpdateDownloadResult, GuiUpdateInfo, GuiUpdateInstallResult, GuiUpdateState } from '../../shared/gui-update'
 import {
@@ -103,7 +103,7 @@ import {
 } from './app-ipc-schemas'
 import {
   DEFAULT_KUN_DATA_DIR,
-  resolveMagicPocketRuntimeSettings,
+  resolveDagongRuntimeSettings,
   resolveModelProviderProxyUrl
 } from '../../shared/app-settings'
 import { detectLegacySessions, importLegacySessions } from '../services/legacy-session-import-service'
@@ -238,8 +238,8 @@ type RegisterAppIpcHandlersOptions = {
   pollFeishuInstall: (deviceCode: string) => Promise<ClawImInstallPollResult>
   startWeixinInstallQrcode: (weixinBridgeUrl?: string) => Promise<ClawImInstallQrResult>
   pollWeixinInstall: (deviceCode: string, weixinBridgeUrl?: string) => Promise<ClawImInstallPollResult>
-  resolveMagicPocketConfigPath: () => string
-  onMagicPocketMcpConfigWritten?: (path: string, content: string) => Promise<void> | void
+  resolveDagongConfigPath: () => string
+  onDagongMcpConfigWritten?: (path: string, content: string) => Promise<void> | void
   showTurnCompleteNotification: (
     payload: TurnCompleteNotificationPayload
   ) => Promise<SystemNotificationResult>
@@ -410,8 +410,8 @@ function runDesktopCommand(
 }
 
 export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): void {
-  // Seed the built-in "design system & craft" skill into ~/.magicpocket/skills/ once.
-  void ensureBundledSkills(join(homedir(), '.magicpocket'))
+  // Seed the built-in "design system & craft" skill into ~/.dagong/skills/ once.
+  void ensureBundledSkills(join(homedir(), '.dagong'))
   const {
     store,
     getMainWindow,
@@ -427,8 +427,8 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     pollFeishuInstall,
     startWeixinInstallQrcode,
     pollWeixinInstall,
-    resolveMagicPocketConfigPath,
-    onMagicPocketMcpConfigWritten,
+    resolveDagongConfigPath,
+    onDagongMcpConfigWritten,
     showTurnCompleteNotification,
     getAppVersion,
     readGuiUpdateState,
@@ -528,16 +528,16 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
   // OAuth; we only detect it / capture the setup-token).
   ipcMain.handle('claude-subscription:status', async () => claudeSubscriptionStatus())
   // The Claude Code binary (~222MB) is NOT bundled — it's downloaded on demand
-  // into userData/agent-sdk and resolved from there (or magicpocket/node_modules in dev).
-  const claudeSubMagicPocketDirs = (): string[] =>
+  // into userData/agent-sdk and resolved from there (or dagong/node_modules in dev).
+  const claudeSubDagongDirs = (): string[] =>
     [
       app.isPackaged ? app.getAppPath().replace(/app\.asar$/, 'app.asar.unpacked') : app.getAppPath(),
       process.cwd()
-    ].map((root) => join(root, 'magicpocket'))
+    ].map((root) => join(root, 'dagong'))
   const claudeSubBinary = (): string | undefined =>
-    resolveClaudeBinary(app.getPath('userData'), claudeSubMagicPocketDirs())
+    resolveClaudeBinary(app.getPath('userData'), claudeSubDagongDirs())
   ipcMain.handle('claude-subscription:sdk-status', async () => ({
-    ...agentSdkStatus(app.getPath('userData'), claudeSubMagicPocketDirs()),
+    ...agentSdkStatus(app.getPath('userData'), claudeSubDagongDirs()),
     download: agentSdkDownloadState()
   }))
   ipcMain.handle('claude-subscription:sdk-install', async () =>
@@ -552,7 +552,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
   ipcMain.handle('claude-subscription:models', async (_event, token: unknown) =>
     fetchSdkModels({
       token: typeof token === 'string' ? token : undefined,
-      magicpocketRoots: claudeSubMagicPocketDirs(),
+      dagongRoots: claudeSubDagongDirs(),
       binaryPath: claudeSubBinary()
     })
   )
@@ -954,9 +954,9 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
   })
 
   ipcMain.handle('ui-plugin:list', async () => {
-    const magicpocketHomeDir = join(homedir(), '.magicpocket')
-    await ensureBundledUiPlugins(magicpocketHomeDir)
-    return { plugins: await listUiPlugins(magicpocketHomeDir) }
+    const dagongHomeDir = join(homedir(), '.dagong')
+    await ensureBundledUiPlugins(dagongHomeDir)
+    return { plugins: await listUiPlugins(dagongHomeDir) }
   })
 
   ipcMain.handle('ui-plugin:install', async () => {
@@ -972,7 +972,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     if (picked.canceled || !sourceDir) {
       return { canceled: true as const }
     }
-    const result = await installUiPluginFromDirectory(join(homedir(), '.magicpocket'), sourceDir)
+    const result = await installUiPluginFromDirectory(join(homedir(), '.dagong'), sourceDir)
     if (!result.ok) {
       return { canceled: false as const, ok: false as const, errors: result.errors }
     }
@@ -981,18 +981,18 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
 
   ipcMain.handle('ui-plugin:remove', async (_, payload: unknown) => {
     const request = parseIpcPayload('ui-plugin:remove', uiPluginIdPayloadSchema, payload)
-    return { ok: await removeUiPlugin(join(homedir(), '.magicpocket'), request.id) }
+    return { ok: await removeUiPlugin(join(homedir(), '.dagong'), request.id) }
   })
 
   ipcMain.handle('ui-plugin:load', async (_, payload: unknown) => {
     const request = parseIpcPayload('ui-plugin:load', uiPluginIdPayloadSchema, payload)
-    const magicpocketHomeDir = join(homedir(), '.magicpocket')
-    await ensureBundledUiPlugins(magicpocketHomeDir)
-    return loadUiPluginFigures(magicpocketHomeDir, request.id)
+    const dagongHomeDir = join(homedir(), '.dagong')
+    await ensureBundledUiPlugins(dagongHomeDir)
+    return loadUiPluginFigures(dagongHomeDir, request.id)
   })
 
-  ipcMain.handle('magicpocket:config:read', async () => {
-    const path = resolveMagicPocketConfigPath()
+  ipcMain.handle('dagong:config:read', async () => {
+    const path = resolveDagongConfigPath()
     try {
       const content = await readFile(path, 'utf8')
       return { path, content, exists: true as const }
@@ -1004,18 +1004,18 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     }
   })
 
-  ipcMain.handle('magicpocket:config:write', async (_, content: unknown) => {
+  ipcMain.handle('dagong:config:write', async (_, content: unknown) => {
     const validatedContent = parseIpcPayload(
-      'magicpocket:config:write',
+      'dagong:config:write',
       deepseekConfigContentSchema,
       content
     )
-    const path = resolveMagicPocketConfigPath()
+    const path = resolveDagongConfigPath()
     validateMcpConfigContent(validatedContent)
     await mkdir(dirname(path), { recursive: true })
     await writeFile(path, validatedContent, 'utf8')
     try {
-      await onMagicPocketMcpConfigWritten?.(path, validatedContent)
+      await onDagongMcpConfigWritten?.(path, validatedContent)
     } catch (error: unknown) {
       logError('mcp-config', 'Failed to apply MCP config change after write', {
         path,
@@ -1025,9 +1025,9 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     return { ok: true as const, path }
   })
 
-  ipcMain.handle('magicpocket:config:open-dir', async () => {
+  ipcMain.handle('dagong:config:open-dir', async () => {
     try {
-      const path = resolveMagicPocketConfigPath()
+      const path = resolveDagongConfigPath()
       const dirPath = dirname(path)
       await mkdir(dirPath, { recursive: true })
       return openPathWithShell(dirPath)
@@ -1039,9 +1039,9 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     }
   })
 
-  const resolveMagicPocketThreadsDataDir = async (): Promise<string> => {
+  const resolveDagongThreadsDataDir = async (): Promise<string> => {
     const settings = await store.load()
-    const runtime = resolveMagicPocketRuntimeSettings(settings)
+    const runtime = resolveDagongRuntimeSettings(settings)
     return expandHomePath(runtime.dataDir?.trim() || DEFAULT_KUN_DATA_DIR)
   }
 
@@ -1055,16 +1055,16 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     ...(cfg.maxPerThread !== undefined ? { maxPerThread: cfg.maxPerThread } : {})
   })
 
-  ipcMain.handle('magicpocket:sessions:detect-legacy', async () =>
-    detectLegacySessions({ homeDir: homedir(), destDataDir: await resolveMagicPocketThreadsDataDir() })
+  ipcMain.handle('dagong:sessions:detect-legacy', async () =>
+    detectLegacySessions({ homeDir: homedir(), destDataDir: await resolveDagongThreadsDataDir() })
   )
 
-  ipcMain.handle('magicpocket:sessions:import-legacy', async (_, payload: unknown) => {
-    const request = parseIpcPayload('magicpocket:sessions:import-legacy', legacySessionImportPayloadSchema, payload)
+  ipcMain.handle('dagong:sessions:import-legacy', async (_, payload: unknown) => {
+    const request = parseIpcPayload('dagong:sessions:import-legacy', legacySessionImportPayloadSchema, payload)
     try {
       const summary = await importLegacySessions({
         homeDir: homedir(),
-        destDataDir: await resolveMagicPocketThreadsDataDir(),
+        destDataDir: await resolveDagongThreadsDataDir(),
         ...(request.sourceDir ? { sourceDir: request.sourceDir } : {}),
         log: (message, detail) => logError('legacy-session-import', message, detail)
       })
@@ -1077,7 +1077,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     }
   })
 
-  ipcMain.handle('magicpocket:sessions:pick-source-dir', async (): Promise<WorkspacePickResult> => {
+  ipcMain.handle('dagong:sessions:pick-source-dir', async (): Promise<WorkspacePickResult> => {
     const options: Electron.OpenDialogOptions = {
       title: 'Select a folder containing previous conversations',
       properties: ['openDirectory', 'dontAddToRecent']
@@ -1117,7 +1117,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     const request = parseIpcPayload('git:checkpoint:create', gitCheckpointCreatePayloadSchema, payload)
     const settings = await store.load()
     return createGitCheckpoint({
-      dataDir: await resolveMagicPocketThreadsDataDir(),
+      dataDir: await resolveDagongThreadsDataDir(),
       workspaceRoot: request.workspaceRoot,
       threadId: request.threadId,
       storage: resolveCheckpointStorageOptions(settings.checkpointCleanup)
@@ -1127,7 +1127,7 @@ export function registerAppIpcHandlers(options: RegisterAppIpcHandlersOptions): 
     const request = parseIpcPayload('git:checkpoint:restore', gitCheckpointRestorePayloadSchema, payload)
     const settings = await store.load()
     return restoreGitCheckpoint({
-      dataDir: await resolveMagicPocketThreadsDataDir(),
+      dataDir: await resolveDagongThreadsDataDir(),
       checkpointId: request.checkpointId,
       ...(request.allowPartialRestore ? { allowPartialRestore: true } : {}),
       storage: resolveCheckpointStorageOptions(settings.checkpointCleanup),

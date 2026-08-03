@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import {
   DEFAULT_MODEL_PROVIDER_ID,
   KUN_TOOL_PERMISSION_MODES,
-  magicpocketToolPermissionModeSettings,
+  dagongToolPermissionModeSettings,
   normalizeAppSettings,
   type AppSettingsPatch,
   type AppSettingsV1,
-  type MagicPocketToolPermissionMode,
+  type DagongToolPermissionMode,
   type ModelProviderPreset
 } from '@shared/app-settings'
 import {
@@ -59,7 +59,7 @@ const themeOptions: { value: ThemePref; icon: typeof Sun; labelKey: string }[] =
 const DEEPSEEK_USAGE_URL = 'https://platform.deepseek.com/usage'
 
 type PermissionOption = {
-  value: MagicPocketToolPermissionMode
+  value: DagongToolPermissionMode
   labelKey: string
   descriptionKey: string
   Icon: typeof Hand
@@ -256,8 +256,8 @@ export function InitialSetupDialog(): ReactElement {
   }
 
   const handleOpenKeyPage = (url: string) => {
-    if (typeof window.magicpocketGui?.openExternal !== 'function') return
-    void window.magicpocketGui.openExternal(url).catch(() => undefined)
+    if (typeof window.dagongGui?.openExternal !== 'function') return
+    void window.dagongGui.openExternal(url).catch(() => undefined)
   }
 
   const selectedCard = PROVIDER_CARDS.find((card) => card.presetId === selection.presetId) ?? PROVIDER_CARDS[0]
@@ -280,7 +280,7 @@ export function InitialSetupDialog(): ReactElement {
     setSelection((current) => ({ ...current, mode }))
   }
 
-  const selectPermissionMode = (permissionMode: MagicPocketToolPermissionMode): void => {
+  const selectPermissionMode = (permissionMode: DagongToolPermissionMode): void => {
     setError(null)
     setSelection((current) => ({ ...current, permissionMode }))
     const current = formRef.current
@@ -288,9 +288,9 @@ export function InitialSetupDialog(): ReactElement {
     updateForm({
       agents: {
         ...current.agents,
-        magicpocket: {
-          ...current.agents.magicpocket,
-          ...magicpocketToolPermissionModeSettings(permissionMode)
+        dagong: {
+          ...current.agents.dagong,
+          ...dagongToolPermissionModeSettings(permissionMode)
         }
       }
     } as SetupFormPatch)

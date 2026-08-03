@@ -1,7 +1,7 @@
 import type {
   CoreRuntimeInfoJson,
   CoreRuntimeToolDiagnosticsJson
-} from '../agent/magicpocket-contract'
+} from '../agent/dagong-contract'
 
 export type McpMarketplaceOverlayStatus =
   | 'offline'

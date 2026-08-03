@@ -9,7 +9,7 @@ import {
   parseMemoryProfileImport,
   type MemoryImportEntry
 } from '@shared/memory-import-export'
-import type { CoreMemoryRecordJson } from '../agent/magicpocket-contract'
+import type { CoreMemoryRecordJson } from '../agent/dagong-contract'
 import { confirmDialog } from '../lib/confirm-dialog'
 import { workspaceRootIdentityKey } from '../lib/workspace-path'
 import { SettingsCard, SettingRow, Toggle } from './settings-controls'
@@ -130,8 +130,8 @@ function memoryImportDedupKey(input: {
 export function MemorySettingsSection({ ctx }: { ctx: Record<string, any> }): ReactElement {
   const {
     t,
-    magicpocket,
-    updateMagicPocket,
+    dagong,
+    updateDagong,
     expandHomePath,
     memoryRecords,
     memoryDiagnostics,
@@ -213,14 +213,14 @@ export function MemorySettingsSection({ ctx }: { ctx: Record<string, any> }): Re
       .filter(Boolean)
 
   const exportMemories = async (): Promise<void> => {
-    if (typeof window.magicpocketGui?.exportMemoryMarkdown !== 'function') {
+    if (typeof window.dagongGui?.exportMemoryMarkdown !== 'function') {
       setNotice(t('memoryExportUnavailable'))
       return
     }
     setExportBusy(true)
     setNotice(null)
     try {
-      const result = await window.magicpocketGui.exportMemoryMarkdown({
+      const result = await window.dagongGui.exportMemoryMarkdown({
         markdown: buildMemoryMarkdownExport({ records: memoryRecords ?? [] }),
         defaultFileName: defaultMemoryExportFileName()
       })
@@ -340,8 +340,8 @@ export function MemorySettingsSection({ ctx }: { ctx: Record<string, any> }): Re
         description={t('memoryEnableDesc')}
         control={
           <Toggle
-            checked={magicpocket?.memoryEnabled ?? false}
-            onChange={(checked: boolean) => updateMagicPocket({ memoryEnabled: checked })}
+            checked={dagong?.memoryEnabled ?? false}
+            onChange={(checked: boolean) => updateDagong({ memoryEnabled: checked })}
           />
         }
       />

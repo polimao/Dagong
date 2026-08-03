@@ -5,7 +5,7 @@ import {
   defaultClawSettings,
   defaultDesignSettings,
   defaultKeyboardShortcuts,
-  defaultMagicPocketRuntimeSettings,
+  defaultDagongRuntimeSettings,
   defaultModelProviderSettings,
   defaultScheduleSettings,
   defaultWorkflowSettings,
@@ -94,9 +94,9 @@ function buildSettings(): AppSettingsV1 {
     uiFontScale: 0.88,
     chatContentMaxWidthPx: 896,
     provider: defaultModelProviderSettings(),
-    agents: { magicpocket: defaultMagicPocketRuntimeSettings() },
+    agents: { dagong: defaultDagongRuntimeSettings() },
     workspaceRoot: '/tmp/workspace',
-    conversationWorkspaceRoot: '~/Documents/MagicPocket',
+    conversationWorkspaceRoot: '~/Documents/Dagong',
     log: { enabled: true, retentionDays: 7 },
     checkpointCleanup: { enabled: false, intervalDays: 3 },
     notifications: { turnComplete: true },
@@ -166,7 +166,7 @@ function buildTelegramSettings(): AppSettingsV1 {
       kind: 'telegram',
       botToken: '123456:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi',
       allowedChatIds: '123456789',
-      botUsername: 'magicpocket_test_bot',
+      botUsername: 'dagong_test_bot',
       createdAt: '2026-06-19T00:00:00.000Z'
     },
     conversations: [],
@@ -234,7 +234,7 @@ describe('ClawSettingsSection', () => {
     )
 
     expect(html).toContain('Telegram Bot Credentials')
-    expect(html).toContain('@magicpocket_test_bot is connected and saved locally.')
+    expect(html).toContain('@dagong_test_bot is connected and saved locally.')
     expect(html).not.toContain('Connect Telegram Bot')
   })
 })

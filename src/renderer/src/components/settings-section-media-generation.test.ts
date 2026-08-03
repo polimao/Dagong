@@ -69,7 +69,7 @@ describe('MediaGenerationSettingsSection', () => {
       ctx: {
         t,
         selectControlClass: 'select',
-        updateMagicPocket: vi.fn(),
+        updateDagong: vi.fn(),
         provider: {
           providers: [{
             id: 'minimax',
@@ -92,7 +92,7 @@ describe('MediaGenerationSettingsSection', () => {
             }
           }]
         },
-        magicpocket: {
+        dagong: {
           textToSpeech: {
             enabled: true,
             providerId: 'minimax',
