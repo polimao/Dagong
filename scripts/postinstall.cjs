@@ -80,3 +80,38 @@ try {
 } catch (error) {
   console.warn('[postinstall] skipped node-pty electron prebuild:', error.message)
 }
+
+// Electron publishes only an npm shim; the actual binary (dist/Electron.app)
+// is downloaded by its own postinstall (install.js). pnpm v9+ does not run
+// dependency build scripts unless explicitly allowed, and a reinstall can wipe
+// dist/, which then surfaces as `Electron uninstall` at `pnpm dev` time.
+// Guarantee the binary is present after every install so the dev server starts.
+try {
+  const fs = require('node:fs')
+  const path = require('node:path')
+  const electronResolved = require.resolve('electron')
+  let binaryExists = false
+  try {
+    const electronBinary = require('electron')
+    binaryExists = typeof electronBinary === 'string' && fs.existsSync(electronBinary)
+  } catch {
+    // electron's index.js throws when path.txt/dist is missing — treat as absent.
+  }
+  if (!binaryExists) {
+    console.log('[postinstall] Electron binary missing — downloading via mirror…')
+    const electronPkgDir = path.dirname(electronResolved)
+    process.env.ELECTRON_MIRROR = process.env.ELECTRON_MIRROR
+      || 'https://registry.npmmirror.com/-/binary/electron/'
+    const res = run('node', [path.join(electronPkgDir, 'install.js')])
+    if (res.status !== 0) {
+      console.warn(
+        '[postinstall] Electron binary download failed; `pnpm dev` may report ' +
+        '"Electron uninstall". Manually run: node node_modules/electron/install.js'
+      )
+    } else {
+      console.log('[postinstall] Electron binary downloaded.')
+    }
+  }
+} catch (error) {
+  console.warn('[postinstall] skipped Electron binary check:', error.message)
+}
