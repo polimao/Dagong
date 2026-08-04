@@ -455,7 +455,7 @@ export function InitialSetupDialog(): ReactElement {
               {t('language')}
             </label>
             <div className="grid grid-cols-1 gap-2 sm:gap-2.5 min-[440px]:grid-cols-2">
-              {(['en', 'zh'] as const).map((lang) => {
+              {(['zh', 'en'] as const).map((lang) => {
                 const isActive = form.locale === lang
                 return (
                   <button

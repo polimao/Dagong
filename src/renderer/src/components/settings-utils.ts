@@ -113,7 +113,7 @@ export function coerceRendererSettings(settings: AppSettingsV1): AppSettingsV1 {
   const chatContentMaxWidthPx = normalizeChatContentMaxWidth(raw.chatContentMaxWidthPx)
   return {
     version: 1,
-    locale: raw.locale === 'zh' ? 'zh' : 'en',
+    locale: raw.locale === 'en' ? 'en' : 'zh',
     theme,
     uiFontScale,
     chatContentMaxWidthPx,

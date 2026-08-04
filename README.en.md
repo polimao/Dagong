@@ -5,7 +5,7 @@
 <h1 align="center">Dagong</h1>
 
 <p align="center">
-  <strong>An experiment in requirement-first coding for the next programming paradigm.</strong><br>
+  <strong>An experiment in requirement-first Agent for the next paradigm.</strong><br>
   Use DeepSeek, Xiaomi MiMo, and MiniMax to connect requirements, Design, Code, and Write into one loop.
 </p>
 
@@ -29,11 +29,11 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
 </p>
 
-Dagong is a product experiment for the future of programming: instead of starting from “ask the agent to edit code,” it starts from requirement clarification and connects requirement documents, Design drafts, interactive prototypes, implementation plans, todos, agent coding, and change review in one GUI workflow.
+Dagong is a product experiment for the future of programming: instead of starting from “ask the agent to edit code,” it starts from requirement clarification and connects requirement documents, Design drafts, interactive prototypes, implementation plans, todos, agentic work, and change review in one GUI workflow.
 
 Dagong is for users who want to put AI agents into real everyday work. It is not just a chat client, and it is not only a CLI shell for programmers: in Code mode you can hand it a local folder for code, requirements, plans, and change review; in Design mode you can generate and iterate UI drafts, interactive prototypes, and a shared design system; in Write mode you can work on long-form Markdown, editing, and document export.
 
-This is also why Dagong treats DeepSeek, Xiaomi MiMo, and MiniMax as the default first-class model stack, not just ordinary optional providers. Requirement-first coding requires more rounds of clarification, research, structuring, planning, execution, and verification. If model cost is too high, that richer workflow cannot become an everyday habit. Dagong chooses three cost-efficient Chinese model providers so the full loop is affordable to run, repeat, and refine.
+This is also why Dagong treats DeepSeek, Xiaomi MiMo, and MiniMax as the default first-class model stack, not just ordinary optional providers. Requirement-first agentic work requires more rounds of clarification, research, structuring, planning, execution, and verification. If model cost is too high, that richer workflow cannot become an everyday habit. Dagong chooses three cost-efficient Chinese model providers so the full loop is affordable to run, repeat, and refine.
 
 Dagong includes the local `dagong serve` runtime for the desktop app. Preferences, sessions, logs, and runtime config stay on your machine; model calls use your own provider credentials. For workflows that can read/write files or run commands, Dagong gives you tool approvals, filesystem permission modes, inline diffs, and a change-review panel.
 
@@ -48,9 +48,9 @@ Dagong includes the local `dagong serve` runtime for the desktop app. Preference
   </a>
 </p>
 
-## Requirement-First Coding
+## Requirement-First Agentic Workflow
 
-Dagong explores a next-generation programming workflow: **requirement -> design -> plan -> code -> verify**. It is not just a chat box attached to an IDE.
+Dagong explores a next-generation agentic workflow: **requirement -> design -> plan -> code -> verify**. It is not just a chat box attached to an IDE.
 
 That workflow is carried by three first-class modes: **Code** for real repositories and shipping changes, **Design** for UI direction, prototypes, and design systems, and **Write** for long-form documents, requirements, release notes, and essays. All three share the same Dagong runtime, provider config, approvals, and thread capabilities.
 
@@ -63,7 +63,7 @@ That workflow is carried by three first-class modes: **Code** for real repositor
 | **Code** | Move from plan into todos, file edits, command execution, and change review; when requirements change, Dagong can surface affected replanning |
 | **Verify** | Bring requirement blocks, acceptance criteria, plan state, and `/review` back together to answer whether the original requirement is done |
 
-This is Dagong's most important product direction: moving AI coding from instant Q&A into a requirement-driven software production workflow. Code, Design, Write, models, planning, review, and automation all serve that line.
+This is Dagong's most important product direction: moving AI agents from instant Q&A into a requirement-driven software production workflow. Code, Design, Write, models, planning, review, and automation all serve that line.
 
 ## Core Model Stack
 
@@ -71,17 +71,17 @@ Dagong optimizes for **complete capability + extreme cost efficiency**. A requir
 
 | Provider | Role in Dagong |
 | --- | --- |
-| **DeepSeek** | Default text and reasoning provider with `deepseek-v4-pro` / `deepseek-v4-flash`, powering coding, planning, review, long-context sessions, and auto model routing |
+| **DeepSeek** | Default text and reasoning provider with `deepseek-v4-pro` / `deepseek-v4-flash`, powering agentic tasks, planning, review, long-context sessions, and auto model routing |
 | **Xiaomi MiMo** | Cost-efficient multimodal and speech entry point, covering long-context text models, vision input, ASR transcription, TTS generation, and Token Plan |
 | **MiniMax** | Full media generation complement, covering Anthropic Messages text models, image generation, speech generation, music generation, video generation, and Token Plan |
 
-This stack lets Dagong route different jobs to the right capability: fast models for lightweight clarification, stronger models for complex coding and reasoning, speech for writing and IM flows, and image/music/video generation for design and creative work. You can still add OpenAI-compatible, self-hosted, or other custom providers, but Dagong's default experience is built around these three cost-efficient model services.
+This stack lets Dagong route different jobs to the right capability: fast models for lightweight clarification, stronger models for complex agentic tasks and reasoning, speech for writing and IM flows, and image/music/video generation for design and creative work. You can still add OpenAI-compatible, self-hosted, or other custom providers, but Dagong's default experience is built around these three cost-efficient model services.
 
 ## Why Dagong
 
 | You want | Dagong provides |
 | --- | --- |
-| A next-generation coding workflow | Requirement clarification, requirement documents, design drafts, implementation plans, agent coding, and verification in one line |
+| A next-generation agentic workflow | Requirement clarification, requirement documents, design drafts, implementation plans, agentic work, and verification in one line |
 | Design in the same app | Design mode generates UI drafts, interactive HTML prototypes, node-based design flows, and a shared `DESIGN_SYSTEM.md`, then hands approved work to Code |
 | Complete agent capability at extreme cost efficiency | DeepSeek, Xiaomi MiMo, and MiniMax as the core stack for text, reasoning, vision, speech, image, music, and video |
 | AI that works on real projects | Bind a local workspace, read and edit files, search code, run commands, and inspect tool calls and results |
@@ -94,7 +94,7 @@ This stack lets Dagong route different jobs to the right capability: fast models
 
 ## Core Features
 
-- **Requirement-first coding**: draft requirements, clarify and structure them with AI, generate design drafts or prototypes, then move into implementation plans, todos, agent coding, and verification.
+- **Requirement-first agentic**: draft requirements, clarify and structure them with AI, generate design drafts or prototypes, then move into implementation plans, todos, agentic work, and verification.
 - **Code workbench**: bind a local project folder, chat around real codebases, read and edit files, run commands, and inspect tool calls and file changes.
 - **Design mode**: generate design drafts, interactive HTML prototypes, and design flow graphs from natural language, requirement drafts, or existing UI; iterate versions, preview on canvas, export, publish a shared design system, and hand designs to Code for implementation.
 - **Planning and review**: new requirements, `/plan`, todos, `/goal`, `/review`, side conversations, thread compaction, forking, and archiving.
@@ -202,41 +202,6 @@ npm install --registry=https://registry.npmmirror.com
 | [docs/DESIGN_MODE.md](docs/DESIGN_MODE.md) | Design mode, canvas, prototypes, design systems, and the Design -> Code loop |
 | [docs/model-provider-presets.md](docs/model-provider-presets.md) | Model provider presets |
 | [docs/workflow-loop.en.md](docs/workflow-loop.en.md) | The Loop node and the loop-agent idea (Create Loop workflows) |
-| [docs/CONTRIBUTING.en.md](docs/CONTRIBUTING.en.md) | Contribution guide |
 | [docs/DEVELOPMENT.en.md](docs/DEVELOPMENT.en.md) | Local development workflow |
 | [SECURITY.md](SECURITY.md) | Security disclosure policy |
 
-## Contributing
-
-Bug fixes, UI/UX improvements, documentation, localization, build/release work, and runtime integration contributions are welcome.
-
-Project conventions:
-
-- Day-to-day integration happens on `develop`; stable releases land on `master`.
-- Open pull requests into `develop` by default.
-- Before opening a PR, run `npm run typecheck`, `npm run build`, and `npm run test` when possible.
-- External contributions require acceptance of the [Contributor License Agreement](./CLA.md).
-
-### Join Dagong Builder
-
-If you want to become a Dagong Builder, start by contributing through the normal pull request flow. After you have **5 pull requests reviewed and merged normally**, you can email [zhongxingyuemail@gmail.com](mailto:zhongxingyuemail@gmail.com) to apply.
-
-Include your GitHub username, links to the 5 merged pull requests, and the areas where you want to keep contributing, such as Code, Design, Write, runtime, model providers, workflows, documentation, or localization.
-
-## Thanks
-
-Thanks to [LobsterAI](https://github.com/netease-youdao/LobsterAI), DeepSeek, Xiaomi MiMo, MiniMax, and everyone who contributes issues, ideas, code, and documentation.
-
-<a href="https://github.com/DagongAgent/Dagong/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=DagongAgent/Dagong" />
-</a>
-
-## License
-
-This project is provided for learning and reference only and may not be used for any commercial purpose. Commercial use, commercial distribution, SaaS/hosted services, resale, or integration into commercial products requires separate written authorization from the author.
-
-Educational institutions and public-interest educational organizations may use the project for noncommercial teaching, research, coursework, experiments, and learning/reference purposes. See [PolyForm Noncommercial License 1.0.0](./LICENSE) for the full terms.
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=DagongAgent/Dagong&type=date&legend=top-left)](https://www.star-history.com/?repos=DagongAgent%2FDagong&type=date&logscale=&legend=top-left)

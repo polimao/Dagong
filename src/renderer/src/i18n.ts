@@ -10,7 +10,7 @@ void i18n.use(initReactI18next).init({
     en: { common: enCommon, settings: enSettings },
     zh: { common: zhCommon, settings: zhSettings }
   },
-  lng: 'en',
+  lng: 'zh',
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
   defaultNS: 'common',

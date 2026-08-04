@@ -5,7 +5,7 @@
 <h1 align="center">Dagong</h1>
 
 <p align="center">
-  <strong>探索需求先行的下一代 coding 范式。</strong><br>
+  <strong>探索需求先行的下一代 Agent 范式。</strong><br>
   用 DeepSeek、Xiaomi MiMo、MiniMax 的高性价比组合，把需求澄清、Design 设计、Code 编码和 Write 写作串成完整闭环。
 </p>
 
@@ -33,7 +33,7 @@ Dagong 是一次面向未来编程方式的产品实验：不再从“给 Agent 
 
 Dagong 面向希望把 AI Agent 真正放进日常工作的用户。它不是只聊天的客户端，也不是只给程序员的 CLI 外壳：你可以在 Code 模式把本地目录交给它处理代码、需求、计划和变更审查，在 Design 模式生成和迭代 UI 设计稿、交互原型与共享设计系统，也可以在独立的 Write 工作区里写作、润色和导出文档。
 
-这也是 Dagong 为什么把 DeepSeek、Xiaomi MiMo、MiniMax 作为默认的一线模型组合，而不是把它们当成普通的“可选 Provider”。需求先行的 coding 范式会带来更多轮澄清、调研、结构化、规划、执行和验证，如果模型成本太高，这条流程很难成为日常工作方式。Dagong 选择三家来自中国的高性价比模型供应商，正是为了让完整流程跑得起、用得久、试得多。
+这也是 Dagong 为什么把 DeepSeek、Xiaomi MiMo、MiniMax 作为默认的一线模型组合，而不是把它们当成普通的“可选 Provider”。需求先行的 Agent 范式会带来更多轮澄清、调研、结构化、规划、执行和验证，如果模型成本太高，这条流程很难成为日常工作方式。Dagong 选择三家来自中国的高性价比模型供应商，正是为了让完整流程跑得起、用得久、试得多。
 
 Dagong 内置同名本地运行时，通过 `dagong serve` 连接桌面端。会话、日志、偏好设置和运行时配置默认保存在本机；模型请求使用你自己的模型服务凭据。对会读写文件和执行命令的流程，Dagong 提供工具审批、权限模式、内联 diff 和变更审查面板。
 
@@ -48,9 +48,9 @@ Dagong 内置同名本地运行时，通过 `dagong serve` 连接桌面端。会
   </a>
 </p>
 
-## 需求先行的 coding 范式
+## 需求先行的 Agent 范式
 
-Dagong 想探索的是“需求 -> 设计 -> 计划 -> 编码 -> 验证”的下一代编程工作流，而不是把一个聊天框简单贴到 IDE 上。
+Dagong 想探索的是“需求 -> 设计 -> 计划 -> 编码 -> 验证”的下一代 Agent 工作流，而不是把一个聊天框简单贴到 IDE 上。
 
 这条工作流由三个并列的核心模式承载：**Code** 面向真实代码库与交付，**Design** 面向 UI 方案、原型和设计系统，**Write** 面向长文档、需求、说明和发布内容。三者共用同一个 Dagong 运行时、Provider 配置、审批机制和会话能力。
 
@@ -63,7 +63,7 @@ Dagong 想探索的是“需求 -> 设计 -> 计划 -> 编码 -> 验证”的下
 | **Agent 编码** | 计划进入 Todo、文件编辑、命令执行和变更审查；需求变更后可以提示重规划，避免计划和需求脱节 |
 | **回到验收** | 结合需求块、验收标准、计划状态和 `/review`，把“做完了吗”落回最初的需求 |
 
-这条线是 Dagong 最重要的产品方向：让 AI coding 从“即时问答”走向“需求驱动的软件生产流程”。Code、Design、Write、模型、计划、审查和自动化都围绕这条线服务。
+这条线是 Dagong 最重要的产品方向：让 AI Agent 从“即时问答”走向“需求驱动的软件生产流程”。Code、Design、Write、模型、计划、审查和自动化都围绕这条线服务。
 
 ## 核心模型组合
 
@@ -81,7 +81,7 @@ Dagong 追求的是“完整能力 + 极致性价比”。需求先行的流程�
 
 | 你想要 | Dagong 提供 |
 | --- | --- |
-| 探索下一代 coding 范式 | 从需求澄清、需求文档、设计稿、实施计划一路走到 Agent 编码和验收 |
+| 探索下一代 Agent 范式 | 从需求澄清、需求文档、设计稿、实施计划一路走到 Agent 编码和验收 |
 | 在同一个应用里完成设计 | Design 模式生成 UI 草图、交互式 HTML 原型、节点式设计流程和共享 `DESIGN_SYSTEM.md`，并一键交给 Code 实现 |
 | 极致性价比的完整 Agent 能力 | 以 DeepSeek、Xiaomi MiMo、MiniMax 为核心组合，覆盖文本、推理、视觉、语音、图片、音乐和视频 |
 | 让 AI 面向真实项目工作 | 绑定本地工作区，读写文件、搜索代码、执行命令、查看工具调用和结果 |
@@ -94,7 +94,7 @@ Dagong 追求的是“完整能力 + 极致性价比”。需求先行的流程�
 
 ## 核心能力
 
-- **需求先行 coding**：新建需求草稿，AI 澄清和结构化需求，生成设计稿或交互原型，再进入实施计划、Todo、Agent 编码和验收。
+- **需求先行 Agent**：新建需求草稿，AI 澄清和结构化需求，生成设计稿或交互原型，再进入实施计划、Todo、Agent 编码和验收。
 - **Code 工作台**：围绕真实代码库对话，读取项目上下文，执行 shell 命令，修改文件，并在提交前审查每一次变更。
 - **Design 设计模式**：从自然语言、需求草稿或现有界面生成设计稿、交互式 HTML 原型和设计流程图；支持版本迭代、画布预览、导出、共享设计系统，以及 Design -> Code 的实现交接。
 - **需求、计划与审查**：从需求草稿进入计划，再到 Todo、执行、复盘和代码审查；长会话可以压缩、恢复、分叉或归档。
@@ -202,40 +202,5 @@ npm install --registry=https://registry.npmmirror.com
 | [docs/model-provider-presets.md](docs/model-provider-presets.md) | 模型 Provider 预设与扩展能力 |
 | [docs/workflow-loop.md](docs/workflow-loop.md) | Loop 循环节点与 loop-agent 思想（创建loop / 工作流） |
 | [docs/DEVELOPMENT.zh-CN.md](docs/DEVELOPMENT.zh-CN.md) | 本地开发流程、分支策略和发布说明 |
-| [docs/CONTRIBUTING.zh-CN.md](docs/CONTRIBUTING.zh-CN.md) | 贡献说明 |
 | [SECURITY.zh-CN.md](SECURITY.zh-CN.md) | 安全漏洞披露方式 |
 
-## 贡献
-
-欢迎提交 bug 修复、UI/UX 优化、文档改进、本地化内容、构建发布流程和运行时集成相关改动。
-
-协作约定：
-
-- 日常协作与集成分支为 `develop`，稳定发布分支为 `master`。
-- PR 默认提交到 `develop`。
-- 发起 PR 前建议运行 `npm run typecheck`、`npm run build` 和 `npm run test`。
-- 外部贡献需接受 [Contributor License Agreement](./CLA.md)。
-
-### 加入 Dagong Builder
-
-如果你希望成为 Dagong Builder，请先通过常规贡献流程提交 PR。当你累计有 **5 个 PR 被正常 review 并合入** 后，可以发送邮件到 [zhongxingyuemail@gmail.com](mailto:zhongxingyuemail@gmail.com) 提出申请。
-
-申请邮件请附上你的 GitHub 用户名、5 个已合入 PR 的链接，以及你希望继续参与的方向，例如 Code、Design、Write、运行时、模型 Provider、工作流、文档或本地化。
-
-## 致谢
-
-感谢 [LobsterAI](https://github.com/netease-youdao/LobsterAI)、DeepSeek、Xiaomi MiMo、MiniMax，以及所有提交 issue、建议、代码和文档的贡献者。
-
-<a href="https://github.com/DagongAgent/Dagong/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=DagongAgent/Dagong" alt="Dagong contributors" />
-</a>
-
-## 许可证
-
-本项目仅供学习和参考，不可用于任何商业用途。商业使用、商业分发、SaaS/托管服务、二次销售或集成到商业产品中，均需要获得作者的单独书面授权。
-
-教育机构与公益教育机构可用于非商业教学、研究、课程实验和学习参考。完整条款见 [PolyForm Noncommercial License 1.0.0](./LICENSE)。
-
-## Star 历史
-
-[![Star History Chart](https://api.star-history.com/chart?repos=DagongAgent/Dagong&type=date&legend=top-left)](https://www.star-history.com/?repos=DagongAgent%2FDagong&type=date&logscale=&legend=top-left)
