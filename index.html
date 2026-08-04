@@ -157,12 +157,9 @@
       <img src="https://raw.githubusercontent.com/polimao/Dagong/master/src/asset/img/dagong.png" alt="Dagong" />
       Dagong
     </a>
-    <a class="brand" href="#top"><img src="https://raw.githubusercontent.com/polimao/Dagong/master/src/asset/img/dagong.png" data-brand-alt="" alt="大工"> <span data-brand="">大工</span></a>
+    <a class="brand" href="https://polimao.github.io/rixing"><img src="https://raw.githubusercontent.com/polimao/Dagong/master/src/asset/img/dagong.png" data-brand-alt="" alt="大工"> <span data-brand="">大工</span></a>
     
     <div class="nav-links">
-      <a href="#modes">核心模式</a>
-      <a href="#flow">工作流</a>
-      <a href="#models">模型组合</a>
       <a href="#features">核心能力</a>
       <a href="#shots">演示</a>
       <a href="#start">快速开始</a>
@@ -197,125 +194,6 @@
     </div>
   </div>
 </header>
-
-<!-- MODES -->
-<section id="modes">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="kicker">Three Modes</div>
-      <h2>三大核心模式，一条运行时</h2>
-      <p>Code 面向真实代码库与交付，Design 面向 UI 方案与原型，Write 面向长文档与发布内容。三者共用同一个 Dagong 运行时、Provider 配置、审批机制与会话能力。</p>
-    </div>
-    <div class="grid-3">
-      <div class="card reveal">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
-        </div>
-        <h3>Code</h3>
-        <p>把本地目录交给它处理代码、需求、计划与变更审查。读取项目上下文、执行命令、修改文件，提交前逐次审查变更。</p>
-        <div class="tagline">真实代码库 · 变更审查</div>
-      </div>
-      <div class="card reveal">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
-        </div>
-        <h3>Design</h3>
-        <p>从自然语言、需求草稿或现有界面生成设计稿、交互式 HTML 原型与共享设计系统，并一键交给 Code 实现。</p>
-        <div class="tagline">UI 原型 · Design→Code</div>
-      </div>
-      <div class="card reveal">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-        </div>
-        <h3>Write</h3>
-        <p>独立 Markdown 工作区，支持文件树、Live/Source/Split/Preview、选区 inline agent，以及 HTML / PDF / DOC / DOCX 导出。</p>
-        <div class="tagline">长文写作 · 多格式导出</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FLOW -->
-<section id="flow" class="sec-soft">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="kicker">Requirement-First</div>
-      <h2>需求 → 设计 → 计划 → 编码 → 验收</h2>
-      <p>Dagong 想探索的是下一代 Agent 工作流，而不是把一个聊天框简单贴到 IDE 上。让 AI Agent 从“即时问答”走向“需求驱动的软件生产流程”。</p>
-    </div>
-    <div class="flow reveal">
-      <div class="step">
-        <div class="num">1</div>
-        <h4>澄清需求</h4>
-        <p>在 GUI 新建需求草稿，需求 AI 帮你补问题、做实现前调研、整理边界。</p>
-        <span class="arrow">→</span>
-      </div>
-      <div class="step">
-        <div class="num">2</div>
-        <h4>沉淀文档</h4>
-        <p>保存为结构化需求块、验收标准与需求历史的 Markdown 文档。</p>
-        <span class="arrow">→</span>
-      </div>
-      <div class="step">
-        <div class="num">3</div>
-        <h4>生成设计</h4>
-        <p>从需求片段生成 UI 设计稿、信息图与交互式 HTML 原型，让需求不只停留在文字里。</p>
-        <span class="arrow">→</span>
-      </div>
-      <div class="step">
-        <div class="num">4</div>
-        <h4>形成计划</h4>
-        <p>通过 /plan 生成 GUI 管理的实施计划，并把计划步骤和需求关联。</p>
-        <span class="arrow">→</span>
-      </div>
-      <div class="step">
-        <div class="num">5</div>
-        <h4>Agent 编码</h4>
-        <p>计划进入 Todo、文件编辑、命令执行与变更审查；需求变更可提示重规划。</p>
-        <span class="arrow">→</span>
-      </div>
-      <div class="step">
-        <div class="num">6</div>
-        <h4>回到验收</h4>
-        <p>结合需求块、验收标准、计划状态与 /review，把“做完了吗”落回最初的需求。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MODELS -->
-<section id="models">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="kicker">Model Stack</div>
-      <h2>核心模型组合：完整能力 + 极致性价比</h2>
-      <p>需求先行的流程比普通聊天更长、更依赖反复调用模型。Dagong 以 DeepSeek、Xiaomi MiMo、MiniMax 为核心组合，用高性价比模型承担完整桌面 Agent 工作流。</p>
-    </div>
-    <div class="prov">
-      <div class="card reveal">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>DeepSeek</h3>
-        <p>默认文本与推理主模型，提供 deepseek-v4-pro / deepseek-v4-flash，支撑代码、计划、审查、长上下文会话与自动模型路由。</p>
-      </div>
-      <div class="card reveal">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg>
-        </div>
-        <h3>Xiaomi MiMo</h3>
-        <p>高性价比多模态与语音入口，覆盖长上下文文本、视觉输入、ASR 语音转写、TTS 语音生成与 Token Plan。</p>
-      </div>
-      <div class="card reveal">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        </div>
-        <h3>MiniMax</h3>
-        <p>补齐完整媒体生成能力，覆盖文本模型、图片生成、语音生成、音乐生成、视频生成与 Token Plan。</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- FEATURES -->
 <section id="features" class="sec-soft">
