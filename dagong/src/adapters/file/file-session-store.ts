@@ -120,7 +120,7 @@ export class FileSessionStore implements SessionStore {
     const seen = new Set<string>()
     // Walk newest→oldest keeping each id's latest write, push (O(1) amortized),
     // then reverse once. The previous unshift-per-item was O(n²) and blocked the
-    // event loop for seconds on large threads, starving /health (DagongAgent/Dagong#621).
+    // event loop for seconds on large threads, starving /health (polimao/Dagong#621).
     const deduped: TurnItem[] = []
     for (let index = raw.length - 1; index >= 0; index -= 1) {
       const item = raw[index]!

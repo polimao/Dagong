@@ -696,7 +696,7 @@ export type AgentLoopOptions = {
     maxStringBytes?: number
   }
   /**
-   * Tuning + test seams for goal auto-resume (DagongAgent/Dagong#370). Defaults
+   * Tuning + test seams for goal auto-resume (polimao/Dagong#370). Defaults
    * back off exponentially and bound consecutive no-progress retries; tests
    * inject a synchronous timer and small caps for determinism.
    */
@@ -1179,7 +1179,7 @@ export class AgentLoop {
    *
    * A goal still `active` once the turn ends means the model never marked it
    * complete or blocked, so the objective is unfinished and nothing is running
-   * (DagongAgent/Dagong#370). Mirroring codex's idle-relaunch-while-active policy, we
+   * (polimao/Dagong#370). Mirroring codex's idle-relaunch-while-active policy, we
    * drive a fresh continuation turn — routed through the backoff coordinator —
    * not only after a `failed` turn (error / step-budget) but also after a
    * `completed` turn that left the goal active (e.g. the model stopped early or

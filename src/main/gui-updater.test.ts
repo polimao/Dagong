@@ -294,7 +294,7 @@ describe('showPostUpdateReleaseNotes', () => {
       })
     )
     expect(openExternal).toHaveBeenCalledWith(
-      'https://github.com/DagongAgent/Dagong/blob/master/release/release-v0.2.0.md'
+      'https://github.com/polimao/Dagong/blob/master/release/release-v0.2.0.md'
     )
     expect(JSON.parse(mockedFiles.get(versionStatePath) ?? '{}')).toEqual({
       lastSeenVersion: '0.2.0'

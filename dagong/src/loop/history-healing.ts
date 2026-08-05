@@ -11,7 +11,7 @@ export function healLoadedHistoryItems(items: readonly TurnItem[]): HistoryHeali
   // returns the original reference untouched when nothing needs rewriting, and
   // repairModelHistoryItems returns its input array unchanged when it removes
   // nothing. Two full-history JSON.stringify calls per turn step blocked the
-  // event loop for seconds on large threads, starving /health (DagongAgent/Dagong#621).
+  // event loop for seconds on large threads, starving /health (polimao/Dagong#621).
   let changed = false
   const normalized: TurnItem[] = []
   for (let index = 0; index < items.length; index += 1) {

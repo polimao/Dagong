@@ -1164,7 +1164,7 @@ async function ensureDagongRuntime(settings: AppSettingsV1): Promise<AppSettings
   // port (isCurrentDagongChildPid) and startDagongChild early-returns while
   // isChildRunning() stays true, so it would pick a fresh port, never spawn,
   // and fail every request until the ~90s watchdog finally force-restarts
-  // (DagongAgent/Dagong#621). Stop the hung child here so the relaunch spawns a fresh
+  // (polimao/Dagong#621). Stop the hung child here so the relaunch spawns a fresh
   // process on the SAME port instead.
   if (dagongRuntimeAdapter.isChildRunning()) {
     // Never tear down a child still inside its (deliberately generous) startup

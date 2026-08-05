@@ -555,7 +555,7 @@ export class DelegationRuntime {
    * Mark child runs left 'queued'/'running' by a previous process as failed, so
    * a runtime restart doesn't leave subagent records stuck "running" forever —
    * the GUI subagent cards and delegation diagnostics would otherwise show them
-   * in-flight indefinitely, and the parent thread stays wedged (DagongAgent/Dagong#621).
+   * in-flight indefinitely, and the parent thread stays wedged (polimao/Dagong#621).
    * Mirrors TurnService.reconcileOrphanedTurns; run once at startup before any
    * new child spawns. Detached runs owned by this process are skipped defensively.
    * Returns the number of records reconciled.

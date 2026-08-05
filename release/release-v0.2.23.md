@@ -5,7 +5,7 @@
 ### 更新说明与首次设置
 
 - 更新完成后的“查看更新日志”现在会直接打开当前版本的 release note，而不是只进入 release 目录。
-- 默认更新日志入口切换到 DagongAgent/Dagong 的 GitHub release 文档；自定义 `KUN_CHANGELOG_URL` 支持 `{version}` 占位，方便私有部署或镜像站点指向对应版本文档。
+- 默认更新日志入口切换到 polimao/Dagong 的 GitHub release 文档；自定义 `KUN_CHANGELOG_URL` 支持 `{version}` 占位，方便私有部署或镜像站点指向对应版本文档。
 - 首次设置保存时只提交实际变更的 settings patch，避免把旧的顶层 `instructions` 等遗留字段带进 `settings:set`，减少设置迁移期的保存失败。
 - 补充版本化 changelog URL、首次设置 settings patch 和 schema 解析相关测试，让首次启动和更新后的提示路径更可靠。
 
@@ -38,7 +38,7 @@
 
 ### 完整变更
 
-https://github.com/DagongAgent/Dagong/compare/v0.2.22...v0.2.23
+https://github.com/polimao/Dagong/compare/v0.2.22...v0.2.23
 
 ### 总结
 

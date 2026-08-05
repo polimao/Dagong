@@ -101,7 +101,7 @@ describe('FileSessionStore', () => {
 
     // A fresh store has a cold cache, so loadItems hits the on-disk dedup path
     // (newest-write-wins, ordered by last occurrence) the refactor rewrote from
-    // an O(n²) unshift to push+reverse (DagongAgent/Dagong#621).
+    // an O(n²) unshift to push+reverse (polimao/Dagong#621).
     const reader = new FileSessionStore({ dataDir })
     const items = await reader.loadItems('thr_x')
     expect(items.map((entry) => entry.id)).toEqual(['a', 'c', 'b'])

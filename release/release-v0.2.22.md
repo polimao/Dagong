@@ -71,7 +71,7 @@
 
 ### 完整变更
 
-https://github.com/DagongAgent/Dagong/compare/v0.2.21...v0.2.22
+https://github.com/polimao/Dagong/compare/v0.2.21...v0.2.22
 
 ### 总结
 

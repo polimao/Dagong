@@ -1,11 +1,11 @@
 # Deep Research Options / 深度调研方案对比
 
 This note compares several open-source approaches that are relevant to issue
-[#311](https://github.com/DagongAgent/Dagong/issues/311). The goal is to identify
+[#311](https://github.com/polimao/Dagong/issues/311). The goal is to identify
 which ideas fit Dagong's existing single-runtime architecture.
 
 本文对比与 issue
-[#311](https://github.com/DagongAgent/Dagong/issues/311)
+[#311](https://github.com/polimao/Dagong/issues/311)
 相关的开源方案，重点判断哪些思路适合 Dagong 当前的单运行时架构。
 
 ## Comparison / 对比

@@ -633,7 +633,7 @@ async function promoteRelease({ flags, dryRun }) {
       tag,
       releaseDate,
       generatedAt: new Date().toISOString(),
-      githubReleaseUrl: `https://github.com/DagongAgent/Dagong/releases/tag/${tag}`,
+      githubReleaseUrl: `https://github.com/polimao/Dagong/releases/tag/${tag}`,
       updateBaseUrl: joinUrl(config.publicBaseUrl, target.basePath, 'latest') + '/',
       updateMetadata: Object.fromEntries(
         platformManifests.map((manifest) => [

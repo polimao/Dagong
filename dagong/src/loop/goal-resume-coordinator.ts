@@ -6,7 +6,7 @@
  * per-turn model-step budget, or a clean stop while the objective is still
  * unmet) and the goal is still `active`, nothing used to relaunch it — the
  * goal banner kept showing "in progress" while the runtime sat idle
- * (DagongAgent/Dagong#370). This coordinator owns the cross-turn resume policy:
+ * (polimao/Dagong#370). This coordinator owns the cross-turn resume policy:
  *
  * - It relaunches a continuation turn after a goal turn settles without
  *   finishing the goal (path B: an error, the step-budget, or a clean stop

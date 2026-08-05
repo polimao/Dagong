@@ -423,13 +423,13 @@ export class TurnService {
    * to run in the background after the server starts listening.
    *
    * Returns the ids of threads that had at least one turn reconciled, so the
-   * caller can resume goals that were interrupted mid-run (DagongAgent/Dagong#370).
+   * caller can resume goals that were interrupted mid-run (polimao/Dagong#370).
    */
   async reconcileOrphanedTurns(): Promise<string[]> {
     // Include `side` threads: a delegated subagent runs on a hidden side thread
     // whose own turn is left `running` when the runtime is interrupted. Without
     // includeSide it is never swept, so its turn (and the parent's delegate_task
-    // tool item) stay pending forever, wedging the thread (DagongAgent/Dagong#621).
+    // tool item) stay pending forever, wedging the thread (polimao/Dagong#621).
     const summaries = await this.deps.threadStore.list({ includeSide: true })
     const reconciledThreadIds = new Set<string>()
     for (const summary of summaries) {

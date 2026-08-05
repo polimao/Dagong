@@ -110,9 +110,9 @@
   },
   "author": "Dagong Contributors",
   "license": "PolyForm-Noncommercial-1.0.0",
-  "homepage": "https://github.com/DagongAgent/Dagong",
+  "homepage": "https://github.com/polimao/Dagong",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DagongAgent/Dagong.git"
+    "url": "https://github.com/polimao/Dagong.git"
   }
 }

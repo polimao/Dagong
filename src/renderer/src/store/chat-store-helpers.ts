@@ -208,7 +208,7 @@ export function canSwitchComposerModel(
 // actually carries image content that a text-only model could not consume.
 // Locking on the mere presence of a user message (regardless of attachments)
 // made every text model unselectable whenever a vision model was active — see
-// https://github.com/DagongAgent/Dagong/issues/579. Document attachments are
+// https://github.com/polimao/Dagong/issues/579. Document attachments are
 // text-extractable and therefore safe to downgrade with; only image (or
 // unknown-kind, e.g. restored-session) attachments keep the lock engaged.
 export function conversationHasVisionAttachments(blocks: readonly ChatBlock[]): boolean {

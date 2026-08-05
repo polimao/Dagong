@@ -21,7 +21,7 @@ const DEFAULT_STALL_THRESHOLD_MS = 2_000
  * fires much later than scheduled because synchronous work blocked the loop in
  * between. A stall is exactly the window during which `/health` probes and SSE
  * time out, so this disambiguates the two failure modes behind a watchdog
- * restart (DagongAgent/Dagong#621):
+ * restart (polimao/Dagong#621):
  *
  *   - a stall is logged and the runtime keeps going → CPU starvation: a heavy
  *     synchronous step blocked the loop; the magnitude is how long `/health`

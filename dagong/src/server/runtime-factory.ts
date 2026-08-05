@@ -1152,7 +1152,7 @@ export async function startDagongServe(
   // Background sweep after listen: settle turns orphaned by a crash so
   // clients stop spinning on them, without delaying readiness. Then resume
   // goals that were interrupted mid-run so an active goal doesn't sit "in
-  // progress" forever with nothing running (DagongAgent/Dagong#370).
+  // progress" forever with nothing running (polimao/Dagong#370).
   void runtime.turnService
     .reconcileOrphanedTurns()
     .then(async (threadIds) => {

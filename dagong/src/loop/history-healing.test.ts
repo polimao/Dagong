@@ -56,7 +56,7 @@ describe('healLoadedHistoryItems', () => {
     const result = healLoadedHistoryItems(items)
     expect(result.changed).toBe(false)
     // Unchanged items keep their original references — the perf rewrite must not
-    // reallocate every item just to compare (DagongAgent/Dagong#621).
+    // reallocate every item just to compare (polimao/Dagong#621).
     result.items.forEach((item, index) => expect(item).toBe(items[index]))
   })
 

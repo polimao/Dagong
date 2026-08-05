@@ -50,8 +50,8 @@ let backgroundCheckPromise: Promise<void> | null = null
 
 const GUI_UPDATE_SCHEDULE_FILE = 'gui-update-schedule.json'
 const GUI_VERSION_STATE_FILE = 'gui-version-state.json'
-const DEFAULT_CHANGELOG_DIRECTORY_URL = 'https://github.com/DagongAgent/Dagong/tree/master/release'
-const DEFAULT_CHANGELOG_FILE_BASE_URL = 'https://github.com/DagongAgent/Dagong/blob/master/release'
+const DEFAULT_CHANGELOG_DIRECTORY_URL = 'https://github.com/polimao/Dagong/tree/master/release'
+const DEFAULT_CHANGELOG_FILE_BASE_URL = 'https://github.com/polimao/Dagong/blob/master/release'
 
 type GuiVersionState = {
   lastSeenVersion?: string

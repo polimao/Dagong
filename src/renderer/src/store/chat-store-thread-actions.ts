@@ -318,7 +318,7 @@ export function createThreadActions(
       // The server has settled but a tool/approval/user_input block may still be
       // open (e.g. a delegate_task interrupted by a runtime restart). Settle it,
       // otherwise threadHasPendingRuntimeWork stays true and the queued message
-      // we are recovering re-queues forever instead of draining (DagongAgent/Dagong#621).
+      // we are recovering re-queues forever instead of draining (polimao/Dagong#621).
       const blocks = busy ? loaded : settlePendingRuntimeWorkAfterInterrupt(loaded)
       const currentTurnUserId = busy
         ? state.currentTurnUserId ?? latestUserMessageId ?? findLatestUserBlockId(blocks)
